@@ -1,0 +1,141 @@
+name: YouTube GitHub Worker
+
+on:
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: Channel to run on the GitHub-hosted runner
+        required: true
+        type: choice
+        options:
+          - globalmusic
+          - healing
+          - starbucks
+          - mbb
+          - kpop
+          - nasa
+          - history
+          - invention
+          - silent_era
+          - retro_reels
+      confirm_publication:
+        description: Explicitly authorize a real upload attempt (otherwise no upload)
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: youtube-github-worker-${{ inputs.channel }}
+  cancel-in-progress: false
+
+jobs:
+  no-upload:
+    if: ${{ inputs.confirm_publication != true }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "No upload attempted. Dispatch again with confirm_publication=true only after cost hold and channel credentials are reviewed."
+
+  publish:
+    if: ${{ inputs.confirm_publication == true }}
+    runs-on: ubuntu-latest
+    environment: youtube-channels
+    timeout-minutes: 180
+    env:
+      PYTHONUNBUFFERED: "1"
+      YOUTUBE_COST_HOLD: ${{ vars.YOUTUBE_COST_HOLD }}
+      SHEET_ID: ${{ secrets.SHEET_ID }}
+      GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+      GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+      GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+      MUSIC_SOURCE_FOLDER_ID_GLOBALMUSIC: ${{ secrets.MUSIC_SOURCE_FOLDER_ID_GLOBALMUSIC }}
+      MUSIC_SOURCE_FOLDER_ID_HEALING: ${{ secrets.MUSIC_SOURCE_FOLDER_ID_HEALING }}
+      MUSIC_SOURCE_FOLDER_ID_KPOP: ${{ secrets.MUSIC_SOURCE_FOLDER_ID_KPOP }}
+      MUSIC_SOURCE_FOLDER_ID_MBB: ${{ secrets.MUSIC_SOURCE_FOLDER_ID_MBB }}
+      MUSIC_SOURCE_FOLDER_ID_STARBUCKS: ${{ secrets.MUSIC_SOURCE_FOLDER_ID_STARBUCKS }}
+      OUTPUT_FOLDER_ID_GLOBALMUSIC: ${{ secrets.OUTPUT_FOLDER_ID_GLOBALMUSIC }}
+      OUTPUT_FOLDER_ID_HEALING: ${{ secrets.OUTPUT_FOLDER_ID_HEALING }}
+      OUTPUT_FOLDER_ID_KPOP: ${{ secrets.OUTPUT_FOLDER_ID_KPOP }}
+      OUTPUT_FOLDER_ID_MBB: ${{ secrets.OUTPUT_FOLDER_ID_MBB }}
+      OUTPUT_FOLDER_ID_STARBUCKS: ${{ secrets.OUTPUT_FOLDER_ID_STARBUCKS }}
+      THUMBNAIL_FOLDER_ID_GLOBALMUSIC: ${{ secrets.THUMBNAIL_FOLDER_ID_GLOBALMUSIC }}
+      THUMBNAIL_FOLDER_ID_HEALING: ${{ secrets.THUMBNAIL_FOLDER_ID_HEALING }}
+      THUMBNAIL_FOLDER_ID_KPOP: ${{ secrets.THUMBNAIL_FOLDER_ID_KPOP }}
+      THUMBNAIL_FOLDER_ID_MBB: ${{ secrets.THUMBNAIL_FOLDER_ID_MBB }}
+      THUMBNAIL_FOLDER_ID_STARBUCKS: ${{ secrets.THUMBNAIL_FOLDER_ID_STARBUCKS }}
+      YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
+      YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN }}
+      YOUTUBE_OAUTH_CLIENT_ID_GLOBALMUSIC: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_GLOBALMUSIC }}
+      YOUTUBE_OAUTH_CLIENT_SECRET_GLOBALMUSIC: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_GLOBALMUSIC }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_GLOBALMUSIC: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_GLOBALMUSIC }}
+      YOUTUBE_OAUTH_CLIENT_ID_HEALING: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_HEALING }}
+      YOUTUBE_OAUTH_CLIENT_SECRET_HEALING: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_HEALING }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_HEALING: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_HEALING }}
+      YOUTUBE_OAUTH_CLIENT_ID_STARBUCKS: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_STARBUCKS }}
+      YOUTUBE_OAUTH_CLIENT_SECRET_STARBUCKS: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_STARBUCKS }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_STARBUCKS: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_STARBUCKS }}
+      YOUTUBE_OAUTH_CLIENT_ID_MBB: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_MBB }}
+      YOUTUBE_OAUTH_CLIENT_SECRET_MBB: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_MBB }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_MBB: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_MBB }}
+      YOUTUBE_OAUTH_CLIENT_ID_KPOP: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_KPOP }}
+      YOUTUBE_OAUTH_CLIENT_SECRET_KPOP: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_KPOP }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_KPOP: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_KPOP }}
+      YOUTUBE_OAUTH_CLIENT_ID_NASA_SPACE_TIMES: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_NASA_SPACE_TIMES }}
+      YOUTUBE_OAUTH_CLIENT_SECRET_NASA_SPACE_TIMES: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_NASA_SPACE_TIMES }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_NASA_SPACE_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_NASA_SPACE_TIMES }}
+      YOUTUBE_OAUTH_CLIENT_ID_HISTORY_TODAY_TIMES: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_HISTORY_TODAY_TIMES }}
+      YOUTUBE_OAUTH_CLIENT_SECRET_HISTORY_TODAY_TIMES: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_HISTORY_TODAY_TIMES }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_HISTORY_TODAY_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_HISTORY_TODAY_TIMES }}
+      YOUTUBE_OAUTH_CLIENT_ID_INVENTION_TIMES: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_INVENTION_TIMES }}
+      YOUTUBE_OAUTH_CLIENT_SECRET_INVENTION_TIMES: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_INVENTION_TIMES }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_INVENTION_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_INVENTION_TIMES }}
+      YOUTUBE_OAUTH_CLIENT_ID_SILENT_ERA_TIMES: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_SILENT_ERA_TIMES }}
+      YOUTUBE_OAUTH_CLIENT_SECRET_SILENT_ERA_TIMES: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_SILENT_ERA_TIMES }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_SILENT_ERA_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_SILENT_ERA_TIMES }}
+      YOUTUBE_OAUTH_CLIENT_ID_RETRO_REELS_TIMES: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_RETRO_REELS_TIMES }}
+      YOUTUBE_OAUTH_CLIENT_SECRET_RETRO_REELS_TIMES: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_RETRO_REELS_TIMES }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_RETRO_REELS_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_RETRO_REELS_TIMES }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install free runner tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          python -m pip install --upgrade pip
+          python -m pip install requests Pillow google-api-python-client google-auth google-auth-httplib2 google-auth-oauthlib pydub mutagen numpy scipy moviepy
+      - name: Verify explicit cost-hold release
+        env:
+          COST_HOLD: ${{ vars.YOUTUBE_COST_HOLD }}
+        run: |
+          set -euo pipefail
+          if [[ "${COST_HOLD,,}" != "false" ]]; then
+            echo "::error::Publishing blocked. Set the youtube-channels environment variable YOUTUBE_COST_HOLD=false only after owner-approved cost review."
+            exit 1
+          fi
+          echo "Cost hold explicitly released; secret values are not printed."
+      - name: Execute selected channel on GitHub-hosted runner
+        env:
+          CHANNEL: ${{ inputs.channel }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          python scripts/youtube_github_worker.py --enqueue-channel "$CHANNEL"
+      - name: Save sanitized run artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: youtube-github-worker-${{ inputs.channel }}-${{ github.run_id }}
+          path: |
+            artifacts/youtube_playlist_result.json
+            artifacts/youtube_curio_result.json
+            data/youtube_github_queue/logs/
+          if-no-files-found: warn
+          retention-days: 30
