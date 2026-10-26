@@ -6,7 +6,7 @@ Updated: 2026-10-26 KST
 - PR #230 merged to main (squash commit df7b8faa7332c98c2c20bab956fca73a4df5129b).
 - VPS/SSH workflows, VPS deployment assets, systemd timers/services, server-only YouTube worker entry points, and n8n deployment/gateway assets have been retired.
 - Focused tests, Python compilation, Node syntax checks, and the static no-VPS runtime scan passed.
-- YouTube and four-agent GitHub workflows are manual and cost-hold gated. No end-to-end publishing canary has run; automatic YouTube cadence remains disabled.
+- YouTube has a manual worker plus an hourly GitHub calendar scheduler. The scheduler remains disabled unless YOUTUBE_AUTO_PUBLISH_ENABLED=true and YOUTUBE_COST_HOLD=false in the youtube-channels environment. The four-agent workflow is also cost-hold gated. No end-to-end publishing canary has run.
 
 ## Historical evidence (not current runtime state)
 - VPS Docker, n8n Community container, localhost gateway and systemd services were reported running in September 2026. These are historical records only and are not part of the approved target architecture.
