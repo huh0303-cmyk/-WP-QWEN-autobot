@@ -2,18 +2,10 @@
 
 Updated: 2026-09-26 KST
 
-## Verified complete
-- exact independent project package exists under projects/런던프로젝트GPT.
-- VPS Docker verified.
-- n8n Community container verified running.
-- n8n health verified OK.
-- localhost n8n gateway verified OK.
-- gateway systemd verified active.
-- WP25_MASTER imported successfully.
-- BLOGGER33_MASTER imported successfully.
-- n8n deployment GitHub Actions run 36234584029 completed successfully.
-- dashboard ranking/four-metric deployment run 36235791434 completed successfully.
-- Windows-invalid stale Tistory generated-image path was removed from GitHub.
+## Historical evidence (not current runtime state)
+- VPS Docker, n8n Community container, localhost gateway and systemd services were reported running in September 2026. These are historical records only and are not part of the approved target architecture.
+- WP25_MASTER and BLOGGER33_MASTER were previously imported into n8n; those server-hosted n8n workflows are retired and must not be treated as active production schedules.
+- Prior dashboard deployments and Tistory path cleanup remain historical changes.
 
 ## In progress / not yet complete
 - WP25 end-to-end publication receipt coverage.
@@ -24,9 +16,10 @@ Updated: 2026-09-26 KST
 - YouTube Playlist/Knowledge/Language masters.
 - SNS_MASTER.
 - METRICS_MASTER full migration.
-- final obsolete GitHub workflow cleanup.
+- remaining legacy server-only queue shim and historical documentation review.
+- restore and verify scheduled GitHub-native YouTube cadence after channel credential and cost-hold checks.
 - reboot/disaster recovery test.
 
 ## Current completion estimate
-Approximately 55% by runtime-evidence weighting.
+Migration is in progress. Do not reuse the earlier 55% estimate as a current completion metric.
 Do not report 100% until EVALUATION_CHECKLIST.md production-critical items are verified.
