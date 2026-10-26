@@ -133,11 +133,41 @@ def blogger_access_token():
         return None, "BLOGGER_OAUTH_REFRESH_FAILED"
 
 
-def collect_blogger_pageviews(portfolio, now):
-    """Read Blogger native pageview totals through Blogger API v3 when exposed.
+def scrape_widget_pageviews(url):
+    """Read the public Blogger Stats widget's cumulative pageview number.
 
-    The old /api/blog-visits/{site_key} endpoint does not exist (HTTP 404), so
-    it was never a valid visitor source. Never fabricate visitor counts.
+    This is an approximate dashboard signal, not an analytics-grade metric.
+    The widget title and following Archive heading delimit the relevant block;
+    the last integer in that block is the displayed cumulative total.
+    """
+    response = requests.get(url.rstrip("/") + "/", timeout=25,
+                            headers={"User-Agent": "Mozilla/5.0 (compatible; LondonProjectDashboard/1.0)"})
+    response.raise_for_status()
+    source = response.text
+    match = re.search(r"Total\\s+Pageviews(.*?)Archive", source, flags=re.I | re.S)
+    if not match:
+        # Blogger themes may wrap the title in markup or use non-breaking spaces.
+        plain = html.unescape(re.sub(r"<[^>]+>", " ", source))
+        match = re.search(r"Total\\s+Pageviews(.*?)Archive", plain, flags=re.I | re.S)
+        if not match:
+            raise ValueError("TOTAL_PAGEVIEWS_WIDGET_NOT_FOUND")
+        block = match.group(1)
+    else:
+        block = match.group(1)
+    block = html.unescape(re.sub(r"<script\\b.*?</script>|<style\\b.*?</style>", " ", block, flags=re.I | re.S))
+    block = re.sub(r"<[^>]+>", " ", block)
+    numbers = re.findall(r"(?<![\\w.])\\d[\\d,]*(?![\\w.])", block)
+    if not numbers:
+        raise ValueError("TOTAL_PAGEVIEWS_NUMBER_NOT_FOUND")
+    return int(numbers[-1].replace(",", ""))
+
+
+def collect_blogger_pageviews(portfolio, now):
+    """Read public Total Pageviews widgets; prefer Blogger API, scrape as fallback.
+
+    Totals are used only as a directional dashboard signal. Daily change is
+    calculated from the previous saved daily snapshot; the first successful
+    scrape establishes a baseline and correctly shows no fabricated delta.
     """
     try:
         history = json.loads(PAGEVIEWS_HIST.read_text(encoding="utf-8"))
@@ -152,10 +182,13 @@ def collect_blogger_pageviews(portfolio, now):
         url = str(blog.get("blogspot") or "").rstrip("/")
         site_key = str(blog.get("site_key") or "").strip()
         blog_id = str(blog.get("destination_id") or "").strip()
-        row = {"key": site_key or url, "site_key": site_key, "url": url,
+        key = site_key or url
+        row = {"key": key, "site_key": site_key, "url": url,
                "title": blog.get("title") or url, "total_pageviews": None,
                "daily_pageviews": None, "status": token_error or "BLOGGER_VIEWS_UNAVAILABLE",
-               "checked_at": None, "history": []}
+               "checked_at": None, "history": [], "source": None}
+        total = None
+        # Try the official API first, but do not let its common 403 block the public widget.
         if access_token and blog_id:
             try:
                 response = requests.get(
@@ -165,31 +198,41 @@ def collect_blogger_pageviews(portfolio, now):
                 if response.ok:
                     payload = response.json()
                     views = payload.get("views") or {}
-                    total = views.get("total") or views.get("allTime")
-                    if isinstance(total, (int, float)) and total >= 0:
-                        total = int(total)
-                        row["total_pageviews"] = total
-                        row["checked_at"] = now.isoformat()
-                        old = previous.get(site_key or url)
-                        if old is not None and total >= int(old):
-                            row["daily_pageviews"] = total - int(old)
-                            row["status"] = "OK"
-                        elif old is not None:
-                            row["status"] = "COUNTER_RESET_BASELINE_REQUIRED"
-                        else:
-                            row["status"] = "BASELINE_PENDING"
-                        current[site_key or url] = total
-                    else:
-                        row["status"] = "BLOGGER_API_NO_VIEW_TOTAL"
+                    candidate = views.get("total") or views.get("allTime")
+                    if isinstance(candidate, (int, float)) and candidate >= 0:
+                        total = int(candidate)
+                        row["source"] = "blogger_api"
                 else:
-                    row["status"] = "BLOGGER_API_HTTP_" + str(response.status_code)
+                    row["api_status"] = "BLOGGER_API_HTTP_" + str(response.status_code)
             except (requests.RequestException, ValueError, TypeError):
-                row["status"] = "BLOGGER_API_REQUEST_FAILED"
-        elif not blog_id:
-            row["status"] = "BLOG_ID_MISSING"
+                row["api_status"] = "BLOGGER_API_REQUEST_FAILED"
+        if total is None and url:
+            try:
+                total = scrape_widget_pageviews(url)
+                row["source"] = "public_stats_widget"
+                row["api_status"] = row.get("api_status", "API_NOT_USED_OR_UNAVAILABLE")
+            except (requests.RequestException, ValueError, TypeError) as exc:
+                row["status"] = str(exc) if str(exc).startswith("TOTAL_PAGEVIEWS_") else "WIDGET_SCRAPE_FAILED"
+        if total is not None:
+            row["total_pageviews"] = total
+            row["checked_at"] = now.isoformat()
+            old = previous.get(key)
+            if old is not None and total >= int(old):
+                row["daily_pageviews"] = total - int(old)
+                row["status"] = "OK" if row["source"] == "blogger_api" else "OK_WIDGET_ESTIMATE"
+            elif old is not None:
+                row["status"] = "COUNTER_RESET_BASELINE_REQUIRED"
+            else:
+                row["status"] = "BASELINE_PENDING"
+            current[key] = total
+        elif not row.get("status", "").startswith("TOTAL_PAGEVIEWS_") and row.get("status") != "WIDGET_SCRAPE_FAILED":
+            row["status"] = row.get("api_status", token_error or "WIDGET_SCRAPE_FAILED")
         rows.append(row)
-    if current:
-        history["days"][today] = current
+    # Preserve the last known value for sites that fail today; never replace it with zero.
+    today_values = dict(previous)
+    today_values.update(current)
+    if today_values:
+        history["days"][today] = today_values
     for old_day in sorted(history["days"])[:-60]:
         del history["days"][old_day]
     PAGEVIEWS_HIST.parent.mkdir(parents=True, exist_ok=True)
@@ -199,15 +242,16 @@ def collect_blogger_pageviews(portfolio, now):
         key = row["key"]
         series = []
         for day in dates:
-            total = history["days"].get(day, {}).get(key)
+            total_value = history["days"].get(day, {}).get(key)
             prev_day = (dt.date.fromisoformat(day) - dt.timedelta(days=1)).isoformat()
             old = history["days"].get(prev_day, {}).get(key)
-            daily = int(total)-int(old) if total is not None and old is not None and int(total)>=int(old) else None
-            series.append({"date": day, "daily_pageviews": daily, "total_pageviews": total})
+            daily = int(total_value)-int(old) if total_value is not None and old is not None and int(total_value)>=int(old) else None
+            series.append({"date": day, "daily_pageviews": daily, "total_pageviews": total_value})
         row["history"] = series
     return {"generated_at": now.isoformat(),
-            "source": "Blogger API v3 Blog resource views (when exposed); missing totals remain unavailable",
+            "source": "Blogger API v3 when available; otherwise public Total Pageviews widget (directional estimate)",
             "history_days": dates, "blogs": rows}
+
 
 def one(h, props, platform, url, display_name, ref, prev_hist):
     row = {"site": url.split("://", 1)[-1].rstrip("/"), "url": url,
