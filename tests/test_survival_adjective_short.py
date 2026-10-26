@@ -42,8 +42,13 @@ def test_randomized_timing_never_intentionally_targets_29_seconds():
         outro = round(rng.uniform(1.3, 3.2), 2)
         durations = [round(rng.uniform(1.8, 4.0), 2) for _ in range(10)]
         planned = intro + outro + sum(durations)
-        if round(planned) == 29:
-            durations[0] = round(durations[0] + (1.15 if durations[0] <= 2.85 else -1.15), 2)
+        if 28.5 <= planned < 29.5:
+            adjustable = next((i for i, value in enumerate(durations) if value <= 2.8), None)
+            if adjustable is not None:
+                durations[adjustable] = round(durations[adjustable] + 1.1, 2)
+            else:
+                adjustable = next(i for i, value in enumerate(durations) if value >= 3.0)
+                durations[adjustable] = round(durations[adjustable] - 1.1, 2)
             planned = intro + outro + sum(durations)
-        assert round(planned) != 29
+        assert not 28.5 <= planned < 29.5
         assert all(1.8 <= duration <= 4.0 for duration in durations)
