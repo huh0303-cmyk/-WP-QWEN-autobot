@@ -26,7 +26,7 @@ TOPIK_BROAD→@seoultopik, ENGLISH_BROAD→@english_survival,
 STUDIOSTARBUCKS_BROAD→@sis_languagecenter, STARBUCKS_BROAD(다른 것!)→@starbucksvibes
 (플레이리스트 채널, 이 퀴즈 파이프라인과 무관 — 이름이 비슷해서 헷갈리기 쉬움).
 """
-import os, sys, datetime, random, time, requests
+import os, sys, datetime, random, time, requests, hashlib, re
 from common import list_videos, SOCIAL_LANGS, get_secret
 import report
 
@@ -57,8 +57,57 @@ def get_access_token(lang):
     r.raise_for_status()
     return r.json()["access_token"]
 
+def content_fingerprint(path):
+    digest = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+def existing_channel_fingerprints(access_token):
+    """Read the channel's uploads playlist and collect our content hash markers.
+    Fail closed if the API cannot verify history: never upload blindly."""
+    headers = {"Authorization": f"Bearer {access_token}"}
+    r = requests.get("https://www.googleapis.com/youtube/v3/channels",
+                     headers=headers, params={"part": "contentDetails", "mine": "true"},
+                     timeout=30)
+    r.raise_for_status()
+    items = r.json().get("items", [])
+    if not items:
+        raise RuntimeError("현재 OAuth 토큰의 채널을 확인할 수 없어 중복 검사를 중단합니다")
+    playlist_id = items[0]["contentDetails"]["relatedPlaylists"]["uploads"]
+    found = set()
+    page_token = None
+    while True:
+        params = {"part": "snippet,contentDetails", "playlistId": playlist_id,
+                  "maxResults": 50}
+        if page_token:
+            params["pageToken"] = page_token
+        page = requests.get("https://www.googleapis.com/youtube/v3/playlistItems",
+                            headers=headers, params=params, timeout=30)
+        page.raise_for_status()
+        video_ids = [x.get("contentDetails", {}).get("videoId")
+                     for x in page.json().get("items", [])]
+        video_ids = [v for v in video_ids if v]
+        for start in range(0, len(video_ids), 50):
+            vr = requests.get("https://www.googleapis.com/youtube/v3/videos",
+                              headers=headers,
+                              params={"part": "snippet", "id": ",".join(video_ids[start:start+50])},
+                              timeout=30)
+            vr.raise_for_status()
+            for video in vr.json().get("items", []):
+                description = video.get("snippet", {}).get("description", "")
+                found.update(re.findall(r"<!-- quiz-content-sha256:([0-9a-f]{64}) -->", description))
+        page_token = page.json().get("nextPageToken")
+        if not page_token:
+            break
+    return found
+
 def upload_one(access_token, path, title, desc):
     size = os.path.getsize(path)
+    fingerprint = content_fingerprint(path)
+    marker = f"\\n\\n<!-- quiz-content-sha256:{fingerprint} -->"
+    desc = desc + marker
     metadata = {
         "snippet": {"title": title, "description": desc, "categoryId": "27",
                     "tags": ["language learning", "vocabulary quiz", "shorts"]},
@@ -92,6 +141,8 @@ def main():
         return
     is_scheduled_run = os.environ.get("GITHUB_EVENT_NAME") == "schedule"
     uploaded_count = 0
+    # Build the history once per channel; languages sharing a channel share one set.
+    history_by_token = {}
     for lang, path, title, desc in videos:
         try:
             token = get_access_token(lang)
@@ -101,11 +152,25 @@ def main():
                       f"미설정 - 다른 채널로 잘못 올라가지 않도록 건너뜀")
                 report.add("YouTube", lang, "skipped", "채널 토큰 미설정")
                 continue
+            token_key = CHANNEL_TOKEN_KEY.get(lang, _DEFAULT_TOKEN_KEY)
+            if token_key not in history_by_token:
+                try:
+                    history_by_token[token_key] = existing_channel_fingerprints(token)
+                except Exception as e:
+                    print(f"[YouTube][{lang}] 기존 업로드 이력을 확인할 수 없어 안전을 위해 업로드 중단: {e}")
+                    report.add("YouTube", lang, "skipped", "중복 검사 실패 — 안전 중단")
+                    continue
+            fingerprint = content_fingerprint(path)
+            if fingerprint in history_by_token[token_key]:
+                print(f"[YouTube][{lang}] 동일 영상 해시가 이미 채널에 있어 업로드 건너뜀: {os.path.basename(path)}")
+                report.add("YouTube", lang, "skipped", "동일 콘텐츠 중복")
+                continue
             if uploaded_count > 0 and is_scheduled_run:
                 delay = random.randint(UPLOAD_GAP_MIN_SEC, UPLOAD_GAP_MAX_SEC)
                 print(f"[YouTube] 채널별 업로드 시간 분산을 위해 {delay}초 대기 후 [{lang}] 업로드")
                 time.sleep(delay)
             vid = upload_one(token, path, title, desc)
+            history_by_token[token_key].add(fingerprint)
             uploaded_count += 1
             print(f"[YouTube][{lang}] 업로드 완료 (비공개 - 스튜디오에서 직접 공개 승인 필요): https://youtube.com/watch?v={vid}")
             report.add("YouTube", lang, "success", f"https://youtube.com/watch?v={vid}")
