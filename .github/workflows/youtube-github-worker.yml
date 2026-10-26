@@ -46,6 +46,7 @@ jobs:
     env:
       PYTHONUNBUFFERED: "1"
       YOUTUBE_COST_HOLD: ${{ vars.YOUTUBE_COST_HOLD }}
+      FISH_AUDIO_API_KEY: ${{ secrets.FISH_AUDIO_API_KEY }}
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
       PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
