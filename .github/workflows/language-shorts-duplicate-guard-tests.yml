@@ -1,6 +1,13 @@
 name: Language Shorts Duplicate Guard Tests
 
 on:
+  push:
+    branches:
+      - "fix/london-stability-2026-10-26"
+    paths:
+      - "scripts/publish_survival_adjective_shorts.py"
+      - "tests/test_language_shorts_duplicate_guard.py"
+      - ".github/workflows/language-shorts-duplicate-guard-tests.yml"
   pull_request:
     paths:
       - "scripts/publish_survival_adjective_shorts.py"
