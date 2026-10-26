@@ -46,6 +46,9 @@ jobs:
     env:
       PYTHONUNBUFFERED: "1"
       YOUTUBE_COST_HOLD: ${{ vars.YOUTUBE_COST_HOLD }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+      PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
       SHEET_ID: ${{ secrets.SHEET_ID }}
       GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
       GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
@@ -108,7 +111,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y ffmpeg
           python -m pip install --upgrade pip
-          python -m pip install requests Pillow google-api-python-client google-auth google-auth-httplib2 google-auth-oauthlib pydub mutagen numpy scipy moviepy
+          python -m pip install requests Pillow google-api-python-client google-auth google-auth-httplib2 google-auth-oauthlib google-genai google-generativeai pydub mutagen numpy scipy moviepy
       - name: Verify explicit cost-hold release
         env:
           COST_HOLD: ${{ vars.YOUTUBE_COST_HOLD }}
