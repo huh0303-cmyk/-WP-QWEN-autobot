@@ -13,7 +13,7 @@ scripts/data/classic_reads_100.json)을 한 권씩 순서대로 ~10분 영상으
   줌/팬 방향을 바꿔 단조로움을 줄임)
 - 자막은 사이드카 SRT가 아니라 영상에 직접 큼직하게 번인
   (health_longform 채널 벤치마킹 규칙과 동일한 원칙 적용)
-- 목소리는 ElevenLabs Adam(차분하고 깊은 남성 내레이터 — 문학 다큐 톤)
+- 나레이션은 Fish Audio S2.1 Pro Free 우선, 무료 Edge TTS 폴백; 유료 TTS 자동 호출 금지
 - 썸네일은 책 제목을 가장 크게, 저자/발간연도를 작게 표시
 
 "하버드대학 추천"은 채널 브랜딩용 후킹 문구이지 실제 하버드의 공식 100선이
@@ -158,42 +158,59 @@ Respond with JSON only, no explanation, no markdown fences:
 
 
 # ════════════════════════════════════════════════════════════
-# 2. TTS (Adam 보이스) + 문장 단위 캡션
+# 2. 무료 TTS (Fish Audio 우선, Edge TTS 폴백) + 문장 단위 캡션
 # ════════════════════════════════════════════════════════════
-def elevenlabs_tts_voice(text, out_path, voice_id, max_retries=5):
-    """2026-08-17: 문장 단위로 수십~수백 번 호출되다 보니(archive_footage_longform.py
-    등 7분 내레이션이면 문장 70개 이상) ElevenLabs 429(레이트리밋)를 실제로 맞는
-    걸 확인함 — 이전엔 429가 나면 그냥 그 문장만 무음으로 대체하고 넘어갔는데,
-    재시도 없이 그러면 나레이션 전체가 뭉텅뭉텅 무음으로 나갈 수 있다(healing
-    채널 검은화면 사고와 같은 유형 — 다른 이유로 조용히 콘텐츠가 빠지는 것).
-    429만 지수백오프로 재시도하고, 그 외 에러는 기존처럼 즉시 무음 폴백."""
-    if not ELEVENLABS_API_KEY:
-        return False
-    url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}"
-    headers = {"xi-api-key": ELEVENLABS_API_KEY,
-               "Content-Type": "application/json", "Accept": "audio/mpeg"}
-    body = {"text": text, "model_id": ELEVENLABS_MODEL,
-            "voice_settings": {"stability": 0.55, "similarity_boost": 0.75}}
-    for attempt in range(max_retries):
-        try:
-            r = requests.post(url, headers=headers, json=body, timeout=90)
-            if r.status_code == 429:
-                wait = 5 * (attempt + 1)
-                log(f"   ⚠️ TTS 429(레이트리밋) — {wait}초 대기 후 재시도({attempt + 1}/{max_retries})")
-                time.sleep(wait)
-                continue
-            r.raise_for_status()
-            with open(out_path, "wb") as f:
-                f.write(r.content)
-            return True
-        except Exception as e:
-            if attempt == max_retries - 1:
-                log(f"   ⚠️ TTS 실패: {e}")
-                return False
-            time.sleep(3)
-    log("   ⚠️ TTS 실패: 429 재시도 소진")
-    return False
+def elevenlabs_tts_voice(text, out_path, voice_id=None, max_retries=3):
+    """Compatibility name; use free TTS only: Fish Audio S2.1 Pro Free, then Edge TTS.
 
+    No paid provider is called. If all configured free providers fail, stop the
+    production instead of silently substituting silence.
+    """
+    from tts_provider_priority import generate_tts
+
+    api_key = os.environ.get("FISH_AUDIO_API_KEY", "").strip()
+
+    def fish_audio_free(sentence, target_path, language):
+        if not api_key:
+            log("   Fish Audio key unavailable; trying free fallback.")
+            return False
+        last_error = None
+        for attempt in range(max_retries):
+            try:
+                response = requests.post(
+                    "https://api.fish.audio/v1/tts",
+                    headers={
+                        "Authorization": f"Bearer {api_key}",
+                        "model": "s2.1-pro-free",
+                        "Content-Type": "application/json",
+                        "Accept": "audio/mpeg",
+                    },
+                    json={"text": sentence, "format": "mp3"},
+                    timeout=90,
+                )
+                if response.ok and len(response.content) > 256 and not response.content.lstrip().startswith(b"{"):
+                    with open(target_path, "wb") as audio_file:
+                        audio_file.write(response.content)
+                    return True
+                last_error = f"HTTP {response.status_code} or invalid audio"
+                if response.status_code not in (429, 500, 502, 503, 504):
+                    break
+            except Exception as exc:
+                last_error = type(exc).__name__
+            if attempt + 1 < max_retries:
+                time.sleep(min(2 ** attempt, 8))
+        log(f"   Fish Audio free TTS failed ({last_error or 'unknown error'}); trying free fallback.")
+        return False
+
+    result = generate_tts(
+        text,
+        out_path,
+        language="en",
+        fish_generator=fish_audio_free,
+        qwen_generator=None,
+    )
+    log(f"   TTS engine: {result['engine']} (free-only)")
+    return True
 
 def _normalize_audio(in_path, out_path):
     run_ffmpeg(["ffmpeg", "-y", "-i", in_path, "-c:a", "aac", "-ar", "44100", "-ac", "2",
@@ -206,7 +223,7 @@ def build_narration_track(narration_text, workdir):
     하나의 연속 오디오 트랙으로 합친다.
 
     2026-08-18 사고: Invention 영상(zZ-SkcHU3bQ 아님, _scG62MN0PE)이 문장
-    전부(70개+) ElevenLabs 400을 맞아서 8.1분 전체가 무음으로 업로드됨 —
+    전부(70개+) TTS 400을 맞아서 8.1분 전체가 무음으로 업로드됨 —
     문장당 5회 재시도는 이미 하고 있었지만(429 대응으로 8/17에 추가), 그날
     ElevenLabs 쪽이 지속적으로 막혀있어서 재시도로도 못 뚫었음. 재시도만으론
     부족하다는 게 드러나서, 무음으로 대체된 비율이 너무 높으면(30% 이상)
