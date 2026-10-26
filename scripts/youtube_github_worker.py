@@ -204,6 +204,8 @@ def main() -> int:
         channel = next(item for item in load_channels() if item.channel_key == args.enqueue_channel)
         enqueue(channel.channel_key, channel.official_name or channel.display_name,
                 f"youtube_{channel.channel_key}", run_now=True)
+        if not process_one():
+            raise RuntimeError("GitHub worker did not claim the newly enqueued job")
         return 0
     while True:
         worked = process_one()
