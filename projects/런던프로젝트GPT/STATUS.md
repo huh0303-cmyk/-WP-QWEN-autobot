@@ -1,6 +1,12 @@
 # 런던프로젝트GPT — Verified Status
 
-Updated: 2026-09-26 KST
+Updated: 2026-10-26 KST
+
+## GitHub-only migration merged
+- PR #230 merged to main (squash commit df7b8faa7332c98c2c20bab956fca73a4df5129b).
+- VPS/SSH workflows, VPS deployment assets, systemd timers/services, server-only YouTube worker entry points, and n8n deployment/gateway assets have been retired.
+- Focused tests, Python compilation, Node syntax checks, and the static no-VPS runtime scan passed.
+- YouTube and four-agent GitHub workflows are manual and cost-hold gated. No end-to-end publishing canary has run; automatic YouTube cadence remains disabled.
 
 ## Historical evidence (not current runtime state)
 - VPS Docker, n8n Community container, localhost gateway and systemd services were reported running in September 2026. These are historical records only and are not part of the approved target architecture.
@@ -16,10 +22,10 @@ Updated: 2026-09-26 KST
 - YouTube Playlist/Knowledge/Language masters.
 - SNS_MASTER.
 - METRICS_MASTER full migration.
-- remaining legacy server-only queue shim and historical documentation review.
+- review historical documentation for any stale instructions; no active VPS runtime dependency remains in the static scan.
 - restore and verify scheduled GitHub-native YouTube cadence after channel credential and cost-hold checks.
 - reboot/disaster recovery test.
 
 ## Current completion estimate
-Migration is in progress. Do not reuse the earlier 55% estimate as a current completion metric.
+Infrastructure migration is merged; platform-level publication verification remains in progress. Do not reuse the earlier 55% estimate as a current completion metric.
 Do not report 100% until EVALUATION_CHECKLIST.md production-critical items are verified.
