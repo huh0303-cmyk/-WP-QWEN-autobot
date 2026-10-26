@@ -33,7 +33,7 @@ No production path may depend on VPS, SSH, systemd timers, server-local queues, 
 ## Completion checklist
 - [ ] No active workflow uses SSH or VPS host/key secrets.
 - [ ] No active production code reads `/opt/korea365` or `/etc/korea365`.
-- [ ] Legacy queue module has no active callers and is retired.
+- [x] Legacy queue module removed after active callers were migrated.
 - [ ] CI tests and operating-policy audit pass.
 - [ ] Read-only OAuth checks match every selected channel's expected channel ID.
 - [ ] Authorized canary returns a verified video ID, URL, channel ID, privacy state, and durable receipt.
