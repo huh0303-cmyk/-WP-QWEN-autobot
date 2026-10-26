@@ -120,8 +120,8 @@ def normalized_title(value: str) -> str:
     import re
     import unicodedata
     value = unicodedata.normalize("NFKC", value).casefold()
-    value = re.sub(r"#shorts?\\b", "", value)
-    return re.sub(r"[^\\w]+", "", value, flags=re.UNICODE)
+    value = re.sub(r"#shorts?\b", "", value)
+    return re.sub(r"[^\w]+", "", value, flags=re.UNICODE)
 
 
 def recent_channel_videos(service, channel_id: str, limit: int = 100) -> list[dict]:
