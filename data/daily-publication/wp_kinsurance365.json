@@ -1,1 +1,1 @@
-{"day": "2026-10-26", "status": "DISPATCHED", "attempts": 2, "claim": "daily-2026-10-26-wp_kinsurance365-08512942", "claimed_at": "2026-10-26T14:15:00.364959+09:00", "run_id": 40273225065, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-10-26", "status": "PUBLISHED", "public_url": "https://koreainsurance365.com/foreign-resident-health-and-private-insurance-standards-statutory-rules-eligibility-criteria-and-claim-procedures/", "published_at": "2026-10-26T08:42:46Z"}
