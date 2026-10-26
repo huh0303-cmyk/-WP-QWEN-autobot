@@ -1,6 +1,6 @@
 """Read-only public publication evidence. No model calls or publishing."""
 import json,datetime,pathlib,requests,concurrent.futures,html,os,sqlite3
-ROOT=pathlib.Path('/opt/korea365')
+ROOT=pathlib.Path(__file__).resolve().parents[1]
 OUT=ROOT/'data/publication-board.json'
 KST=datetime.timezone(datetime.timedelta(hours=9))
 CATEGORY_PLACEHOLDERS={'etc','etc.','기타','uncategorized','미분류','other','others','etc-uncategorized'}
