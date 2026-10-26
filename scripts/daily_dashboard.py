@@ -156,12 +156,15 @@ def scrape_widget_pageviews(url):
         block = match.group(1)
     else:
         block = match.group(1)
-    block = html.unescape(re.sub(r"<script\b.*?</script>|<style\b.*?</style>", " ", block, flags=re.I | re.S))
+    # Remove graph SVG labels: they can contain axis values larger than the visible counter.
+    block = re.sub(r"<(script|style|svg|noscript)\b.*?</\1>", " ", block, flags=re.I | re.S)
+    block = html.unescape(block)
     block = re.sub(r"<[^>]+>", " ", block)
     numbers = re.findall(r"(?<![\w.])\d[\d,]*(?![\w.])", block)
     if not numbers:
         raise ValueError("TOTAL_PAGEVIEWS_NUMBER_NOT_FOUND")
-    return int(numbers[-1].replace(",", ""))
+    # The first remaining number is the counter; the last can be a chart axis label.
+    return int(numbers[0].replace(",", ""))
 
 
 def collect_blogger_pageviews(portfolio, now):
