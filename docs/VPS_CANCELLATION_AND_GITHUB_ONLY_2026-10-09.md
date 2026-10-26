@@ -3,7 +3,7 @@
 ## Owner decision
 The owner retired VPS hosting and requires London Project to use GitHub Actions as its only hosted execution plane. This decision is binding. The former VPS/n8n architecture is not an approved production path.
 
-## Migration work completed on branch `migration/github-only-no-vps-2026-10-26`
+## Migration work merged to main on 2026-10-26 (PR #230)
 - Removed all 21 previously inventoried SSH-based VPS workflows from this branch.
 - Removed the VPS deployment engine and its systemd unit/timer files from `deploy/vps`.
 - Removed n8n Docker deployment assets, the n8n gateway service, and VPS runtime installer/sealer scripts.
@@ -36,4 +36,4 @@ The owner retired VPS hosting and requires London Project to use GitHub Actions 
 - A manually authorized canary produces a verified video ID, destination URL, expected channel ID, privacy state, and durable receipt.
 - Other platforms have equivalent destination-verified receipts or are explicitly marked HOLD.
 
-**Status: VPS workflows and deployment assets are retired in the migration branch; final runtime verification and residual-code cleanup remain in progress.**
+**Status: VPS/n8n execution and deployment assets are retired on main. The static no-VPS runtime scan and focused CI passed. End-to-end publishing verification and the automatic YouTube cadence remain gated pending owner-approved canary and channel identity checks.**
