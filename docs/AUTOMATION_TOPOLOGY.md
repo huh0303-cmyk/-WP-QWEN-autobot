@@ -10,20 +10,18 @@ Authority: `MASTER_MONETIZATION_STRATEGY_2026.md`.
 | Newsrooms | `newsrooms-daily-publisher.yml` | `autopost_current.py` | current newsroom writer path | one of two newsroom sites | source, length and quality gates |
 | Blogger daily | `blogger-daily-scheduler-v2.yml` (:08/:28/:48) | `blogger-rewrite.yml` | GPT-5 mini text | Blogger draft | one connected site/day |
 | Sheet platform queue | `platform-publish-v2.yml` (:17 hourly) | `process_platform_queue.py` | pre-generated queue content | Blogger draft; other review paths | duplicate-suspect with Blogger daily |
-| YouTube | `youtube-control-scheduler.yml` (:27 hourly) | playlist/knowledge workflows | FLUX Schnell thumbnail policy | one channel dispatch | canonical 10-channel registry, cap 1 |
+| YouTube | `youtube-github-worker.yml` (manual only; cost-hold gated) | `scripts/youtube_github_worker.py` | GitHub-hosted runner; channel identity and receipt checks | one selected channel per run | no VPS/SSH queue; scheduled 10-channel cadence is not yet re-enabled |
 | Site metrics | `daily-site-traffic.yml` (05:20 KST) | `daily_site_traffic.py` | WP REST + GSC | control Sheet | read-only collection |
 | Executive report | `situation-room-daily.yml` (08:10 KST) | `situation_room_daily.py` | GSC/YouTube/official SNS connections | control Sheet + configured notifications | canonical reporting registry |
 | Keyword refresh | `weekly-keyword-refresh.yml` | `refresh_keyword_pool_current.py` | Gemini search grounding | keyword pool | weekly |
 
 ## Manual/review/maintenance
 
-`automation-hub-bootstrap`, `blogger-rewrite`, `blogger-verify`, `curio-scheduler`,
-`curio-longform-daily`, `daily_multilang_quiz`, `deploy-visitor-api`,
-`emergency-privacy-lockdown`, `generate-youtube-playlist`, `generate-youtube-video`,
-`gsc-post-index-audit`, `health-clinic-daily`, `prune-unindexed-posts`,
-`refresh-playlist-thumbnails`, `seouljournal-dashboard-deploy`, `submit-all-sitemaps`,
+`automation-hub-bootstrap`, `blogger-rewrite`, `blogger-verify`, `daily_multilang_quiz`,
+`deploy-visitor-api`, `emergency-privacy-lockdown`, `gsc-post-index-audit`,
+`prune-unindexed-posts`, `seouljournal-dashboard-deploy`, `submit-all-sitemaps`,
 `topik-longform-weekly`, `topik-quiz-daily`, and `wp-create-draft` are manual or
-downstream-dispatched. `prune-unindexed-posts` is destructive and must remain explicit.
+downstream-dispatched. Legacy VPS/n8n deployment and YouTube queue workflows have been retired from the migration branch. `prune-unindexed-posts` is destructive and must remain explicit.
 
 ## Canonical registries
 
