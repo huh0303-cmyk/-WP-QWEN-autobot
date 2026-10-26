@@ -7,8 +7,10 @@ Metrics per site (reference day = day before yesterday KST, so GSC data is more 
  4 GSC sitemap indexed URL count + delta vs previous snapshot (not search impressions)
 """
 import datetime as dt
+import html
 import json
 import os
+import re
 import sys
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
