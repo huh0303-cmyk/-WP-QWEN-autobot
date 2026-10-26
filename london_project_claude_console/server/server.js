@@ -19,7 +19,7 @@ const { WebSocketServer } = require("ws");
 
 const jobRunner = require("./jobRunner");
 const siteRegistry = require("../lib/siteRegistry");
-const n8nGateway = require("../lib/n8nGateway");
+const githubActions = require("../lib/githubActions");
 
 const PORT = Number(process.env.PORT || 8787);
 const APP_USER = process.env.LPC_USER || "admin";
@@ -160,9 +160,9 @@ app.post("/api/registry/sites/:siteId", wrap((req) => {
   return { site: updated };
 }));
 
-app.get("/api/n8n/health", wrap(() => n8nGateway.health()));
-app.post("/api/n8n/run/:action", wrap((req) => n8nGateway.runAction(req.params.action)));
-app.post("/api/n8n/pipeline/:stage", wrap((req) => n8nGateway.pipelineStage(req.params.stage, req.body)));
+app.get("/api/github/actions/health", wrap(() => githubActions.health()));
+app.post("/api/github/actions/run/:action", wrap((req) => githubActions.runAction(req.params.action)));
+app.post("/api/github/actions/pipeline/:stage", wrap((req) => githubActions.pipelineStage(req.params.stage, req.body)));
 
 // Serves files from within the runtime root only (mirrors the path-containment
 // check in the original file:open / file:showInFolder handlers).
