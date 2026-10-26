@@ -1,0 +1,58 @@
+name: Audit and clean duplicate language Shorts
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: "Set duplicate-title videos to private (false = report only)"
+        required: true
+        default: false
+        type: boolean
+      limit:
+        description: "Recent uploads per channel to scan"
+        required: true
+        default: "500"
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: language-shorts-duplicate-cleanup
+  cancel-in-progress: false
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment: youtube-channels
+    env:
+      YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
+      YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_KO: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_KO }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_EN: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_EN }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_JA: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_JA }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_ZH: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_ZH }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_VI: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_VI }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_ES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_ES }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_FR: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_FR }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_DE: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_DE }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_IT: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_IT }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_PT: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_PT }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install --disable-pip-version-check google-api-python-client google-auth
+      - name: Scan ten channels and apply requested cleanup
+        env:
+          APPLY: ${{ inputs.apply }}
+          LIMIT: ${{ inputs.limit }}
+        run: |
+          ARGS=(--limit "${LIMIT:-500}")
+          if [ "${APPLY}" = "true" ]; then ARGS+=(--apply); fi
+          python scripts/audit_dedupe_language_shorts.py "${ARGS[@]}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: language-duplicate-audit
+          path: artifacts/youtube/language-duplicate-audit/
+          retention-days: 90
+          if-no-files-found: warn
