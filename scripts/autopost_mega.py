@@ -3477,7 +3477,9 @@ def process_one(site, keyword):
 
     for attempt in range(MAX_REGEN+1):
         # First draft uses the shared Flash-first writer; quality repair uses GPT.
-        # Newsroom drafts use the configured GPT writer on the first attempt. The old\n        # Gemini-first route returned HTTP 429 and body-only text without TITLE:.\n        use_gpt = attempt > 0 or mode in ("news", "news_en")
+        # Newsroom drafts use the configured GPT writer on the first attempt.
+        # The old Gemini-first route returned HTTP 429 and body-only text without TITLE:.
+        use_gpt = attempt > 0 or mode in ("news", "news_en")
         try:
             raw=generate_content_gemini(prompt, use_gpt=use_gpt)
         except Exception as e:
