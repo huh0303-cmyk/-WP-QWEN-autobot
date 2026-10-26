@@ -2,7 +2,7 @@
  "generated_at": "2026-10-26T11:48:39.630403+09:00",
  "reference_date": "2026-10-23",
  "blogger_pageviews": {
-  "generated_at": "2026-10-26T11:53:31.380568+09:00",
+  "generated_at": "2026-10-26T11:54:51.931436+09:00",
   "source": "Rendered public Blogger Total Pageviews widget; approximate dashboard signal, not analytics-grade",
   "history_days": [
    "2026-10-26"
@@ -51,10 +51,10 @@
     "site_key": "",
     "url": "https://jobkorea365.blogspot.com",
     "title": "JobKorea365",
-    "total_pageviews": null,
+    "total_pageviews": 84,
     "daily_pageviews": null,
-    "status": "HTTP_429",
-    "checked_at": "2026-10-26T11:53:31.380568+09:00",
+    "status": "BASELINE_PENDING",
+    "checked_at": "2026-10-26T11:54:51.931436+09:00",
     "history": [
      {
       "date": "2026-10-26",
@@ -62,7 +62,7 @@
       "total_pageviews": null
      }
     ],
-    "source": "rendered_public_blogger_widget",
+    "source": "user_observed_widget",
     "api_status": "BLOGGER_API_HTTP_403"
    },
    {

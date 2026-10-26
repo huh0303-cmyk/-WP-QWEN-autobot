@@ -53,15 +53,20 @@ async def collect_one(browser, blog, semaphore, checked_at):
         row["status"] = "BLOG_URL_MISSING"
         return row
     async with semaphore:
-        page = await browser.new_page()
+        page = await browser.new_page(user_agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36")
         try:
-            response = await page.goto(url + "/", wait_until="domcontentloaded", timeout=30000)
-            await page.wait_for_timeout(1200)
-            if response and response.status >= 400:
-                row["status"] = "HTTP_" + str(response.status)
-            else:
-                row["total_pageviews"] = await extract_widget_total(page)
-                row["status"] = "OK_WIDGET_ESTIMATE"
+            for attempt in range(3):
+                response = await page.goto(url + "/", wait_until="domcontentloaded", timeout=30000)
+                if response and response.status == 429 and attempt < 2:
+                    await page.wait_for_timeout(5000 * (attempt + 1))
+                    continue
+                await page.wait_for_timeout(1800)
+                if response and response.status >= 400:
+                    row["status"] = "HTTP_" + str(response.status)
+                else:
+                    row["total_pageviews"] = await extract_widget_total(page)
+                    row["status"] = "OK_WIDGET_ESTIMATE"
+                break
         except Exception as exc:
             msg = str(exc)
             row["status"] = msg if msg.startswith("TOTAL_PAGEVIEWS_") else "WIDGET_RENDER_FAILED"
@@ -76,7 +81,7 @@ async def run():
     checked_at = now.isoformat()
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
-        semaphore = asyncio.Semaphore(8)
+        semaphore = asyncio.Semaphore(2)
         rows = await asyncio.gather(*(collect_one(browser, b, semaphore, checked_at) for b in config.get("channels", [])))
         await browser.close()
     payload = {"generated_at": checked_at,

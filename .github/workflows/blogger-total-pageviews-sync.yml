@@ -1,7 +1,13 @@
 name: Blogger Total Pageviews → Control feed
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      site_key:
+        description: Optional site filter, e.g. jobkorea365; empty means all 33
+        required: false
+        type: string
+        default: ''
   schedule:
     - cron: "15 22 * * *" # 07:15 KST daily
 
@@ -24,6 +30,8 @@ jobs:
       - run: pip install playwright -q
       - run: python -m playwright install --with-deps chromium
       - name: Render Blogger widgets and update the Control dashboard feed
+        env:
+          PAGEVIEWS_SITE_KEY: ${{ inputs.site_key || '' }}
         run: python scripts/blogger_total_pageviews.py
       - name: Commit observed totals
         run: |
