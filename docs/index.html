@@ -53,10 +53,10 @@ tr.platform-youtube{background:#fff7f7}tr.platform-tiktok{background:#f2fcfd}tr.
 <div class="table-wrap"><table><thead><tr><th>순위</th><th>구분</th><th>사이트</th><th>일일방문자 (증감)</th><th>GSC 노출 (증감)</th><th>GSC 클릭 (증감)</th><th>콘텐츠 수(증감)</th><th>최근 발행일</th><th>GSC 사이트맵 색인 수</th><th>색인 상태</th><th>즉시 발행</th></tr></thead>
 <tbody id="b"></tbody></table></div>
 <section id="blogger-pageviews" style="margin:18px 0 10px;padding:12px;background:#fff;border:1px solid #cbd5e1;border-radius:8px">
-<h2 id="blogger-pageviews-title" style="margin:0 0 4px;font-size:1.05rem;color:#0f172a">Blogspot (33개) · 누적 방문자 순위</h2>
+<h2 id="blogger-pageviews-title" style="margin:0 0 4px;font-size:1.05rem;color:#0f172a">Blogspot (33개) · 누적 페이지뷰 순위</h2>
 <div class="sub" id="blogger-pageviews-meta">33개 블로그 방문자·게시물 정보를 수집 중...</div>
 <div class="bar"><span>정렬 기준: 누적 방문자 수 내림차순</span><span class="na">방문자 수를 확인할 수 없는 블로그는 아래쪽에 표시</span></div>
-<div class="table-wrap"><table><thead><tr><th>순위</th><th>플랫폼</th><th>블로그</th><th>누적 방문자(증감)</th><th>콘텐츠 수(증감)</th><th>최근 발행일</th><th>방문자 수집 상태</th></tr></thead><tbody id="blogger-pageviews-rows"><tr><td colspan="7" class="na">데이터 수집 전</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>순위</th><th>플랫폼</th><th>블로그</th><th>누적 페이지뷰(증감)</th><th>콘텐츠 수(증감)</th><th>최근 발행일</th><th>페이지뷰 수집 상태</th></tr></thead><tbody id="blogger-pageviews-rows"><tr><td colspan="7" class="na">데이터 수집 전</td></tr></tbody></table></div>
 </section>
 <h2 id="social-title" style="margin:18px 0 5px;font-size:1.05rem;color:#0f172a">SNS 계정별 플랫폼 순위</h2>
 <div class="sub" id="social-meta">계정 등록부를 불러오는 중...</div>
@@ -101,7 +101,7 @@ function drawBloggerRanking(){
   return '<tr class="platform-blogspot"><td>'+rank+'위</td><td>'+platformCell('blogspot')+'</td><td style="text-align:left"><a href="'+esc(r.url||'')+'" target="_blank" rel="noopener">'+esc(r.display_name||r.site||r.url)+'</a></td><td>'+total+'</td><td>'+metricNumber(r.content,'글')+'</td><td>'+metricDay(r.latest_publish_date)+'</td><td style="text-align:left">'+esc(v.status||'미수집')+'</td></tr>';
  }).join('');
  var meta=document.getElementById('blogger-pageviews-meta');
- if(meta)meta.textContent='등록 '+rows.length+'개 · 기준 '+String(J.blogger_pageviews&&J.blogger_pageviews.generated_at||J.generated_at||'').slice(0,16).replace('T',' ')+' · 누적 방문자 수 기준 내림차순';
+ if(meta)meta.textContent='등록 '+rows.length+'개 · 기준 '+String(J.blogger_pageviews&&J.blogger_pageviews.generated_at||J.generated_at||'').slice(0,16).replace('T',' ')+' · 누적 페이지뷰 기준 내림차순';
 }
 function updateAllPlatformSummary(){
  var el=document.getElementById('all-platform-summary');if(!el)return;
