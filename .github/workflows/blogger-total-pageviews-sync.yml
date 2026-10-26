@@ -4,13 +4,6 @@ on:
   workflow_dispatch: {}
   schedule:
     - cron: "15 22 * * *" # 07:15 KST daily
-  push:
-    branches: [main]
-    paths:
-      - "scripts/blogger_total_pageviews.py"
-      - ".github/workflows/blogger-total-pageviews-sync.yml"
-      - "scripts/daily_dashboard.py"
-      - "config/blogger_portfolio.json"
 
 permissions:
   contents: write
@@ -22,21 +15,22 @@ concurrency:
 jobs:
   collect:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: pip install requests -q
-      - name: Crawl public Total Pageviews widgets
+      - run: pip install playwright -q
+      - run: python -m playwright install --with-deps chromium
+      - name: Render Blogger widgets and update the Control dashboard feed
         run: python scripts/blogger_total_pageviews.py
-      - name: Commit current counts for the Control dashboard to consume
+      - name: Commit observed totals
         run: |
           git config user.name "korea365-dashboard-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add data/blogger_total_pageviews.json docs/blogger-total-pageviews.json
-          git diff --cached --quiet || git commit -m "data: refresh Blogger total pageviews feed [skip ci]"
           git fetch origin main
-          git rebase origin/main
+          git reset --soft origin/main
+          git add data/blogger_total_pageviews.json docs/blogger-total-pageviews.json docs/dashboard.json
+          git diff --cached --quiet || git commit -m "data: refresh rendered Blogger pageviews for Control [skip ci]"
           git push origin HEAD:main
