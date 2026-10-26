@@ -13,10 +13,10 @@
   "record_human_approval": true,
   "append_only_event_history": true,
   "storage": {
-    "sqlite": "/opt/korea365/data/control-operations.sqlite3",
-    "jsonl": "/opt/korea365/data/london_project_activity.jsonl",
-    "report_json": "/opt/korea365/data/london_project_activity_report.json",
-    "report_markdown": "/opt/korea365/data/london_project_activity_report.md"
+    "sqlite": "data/control-operations.sqlite3",
+    "jsonl": "data/london_project_activity.jsonl",
+    "report_json": "data/london_project_activity_report.json",
+    "report_markdown": "data/london_project_activity_report.md"
   },
   "required_event_types": [
     "TASK_CREATED",
