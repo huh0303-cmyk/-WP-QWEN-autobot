@@ -47,6 +47,11 @@ def main():
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(text, encoding="utf-8")
     print(json.dumps({"total_blogs": payload["total_blogs"], "successful": payload["successful"], "failed": payload["failed"], "output": [str(p.relative_to(ROOT)) for p in OUTPUTS]}, ensure_ascii=False))
+    for row in rows:
+        if row["total_pageviews"] is not None:
+            print(f"PAGEVIEWS_OK {row['site_key']} {row['total_pageviews']}")
+        else:
+            print(f"PAGEVIEWS_FAIL {row['site_key']} {row['status']}")
     if not payload["successful"]:
         raise SystemExit("No Blogger pageview widgets were readable; refusing to publish an all-failed snapshot")
 

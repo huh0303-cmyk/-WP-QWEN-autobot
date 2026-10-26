@@ -37,4 +37,6 @@ jobs:
           git config user.email "actions@users.noreply.github.com"
           git add data/blogger_total_pageviews.json docs/blogger-total-pageviews.json
           git diff --cached --quiet || git commit -m "data: refresh Blogger total pageviews feed [skip ci]"
+          git fetch origin main
+          git rebase origin/main
           git push origin HEAD:main
