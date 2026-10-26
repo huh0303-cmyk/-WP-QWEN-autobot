@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 from flask import render_template,abort
-ROOT=Path('/opt/korea365')
+ROOT=Path(__file__).resolve().parents[1]
 PLATFORMS={'youtube':'YouTube','tiktok':'TikTok','facebook':'Facebook','instagram':'Instagram','threads':'Threads'}
 def install(app):
  @app.get('/channel-check/<platform>')
