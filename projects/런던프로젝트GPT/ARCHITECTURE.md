@@ -1,124 +1,55 @@
-# 런던프로젝트GPT — Final Architecture
+# 런던프로젝트GPT — GitHub-only Architecture
 
-## 1. Design goal
-The architecture must remain simple, stable, cheap, restartable, and understandable by the next AI without chat history.
+## 1. Binding operating rule
+The owner has explicitly retired VPS hosting. GitHub is the sole orchestration and code source of truth. No production workflow may require SSH, a VPS host, systemd timers, a server-local queue, or files under `/opt/korea365` or `/etc/korea365`.
 
-## 2. Layers
+This document describes the target architecture. A component is not considered migrated merely because its code is stored in GitHub; its actual scheduled execution and verified output must run through GitHub Actions.
 
-### A. GitHub — durable source of truth
-Responsibilities:
-- code
-- configuration
-- n8n workflow JSON
-- deployment workflow
-- architecture documentation
-- rollback history
-- AI-project handoff records
+## 2. Target layers
 
-GitHub is **not** the default 24/7 scheduler and **not** the video renderer.
+### A. GitHub repository
+Owns source code, workflow definitions, channel/site configuration, migration records, run manifests, and versioned publication receipts where safe.
 
-### B. Hostinger VPS — single always-on runtime
-Responsibilities:
-- Docker
-- n8n Community Edition
-- existing Korea365 Python/systemd workers
-- YouTube render/upload workers
-- publication evidence and queue files
-- Control Korea365 backend
+### B. GitHub Actions
+Owns schedules, manual dispatch, bounded retries, concurrency locks, and Linux-hosted execution. Every workflow must declare its required environment and time limits, avoid duplicate schedules, and fail closed when credentials or channel identity cannot be verified.
 
-VPS root: `/opt/korea365`
+Hosted runners are ephemeral. State that must survive a run must be persisted explicitly using a carefully scoped repository commit, workflow artifact, or another owner-approved GitHub-native store. Never treat workspace files or caches as durable job queues.
 
-### C. n8n Community — central orchestrator
-Responsibilities:
-- schedule
-- dispatch
-- retries
-- failure isolation
-- deduplication
-- HOLD/dead-letter
-- execution receipts
-- local-agent handoff
-- bounded polling only where needed
+### C. Credentials
+Use repository or environment-scoped GitHub Actions secrets. Never commit secrets, OAuth JSON, browser cookies, passwords, or private key material. Verify the exact YouTube channel/account identity immediately before any write or publication.
 
-n8n does **not** write long content or render long video itself.
-It calls existing workers.
+### D. Publication evidence
+A successful workflow run is not proof of publication. Record a receipt containing the destination ID, returned content ID, verified public URL or privacy state, timestamp, and sanitized failure reason. Never log secret values.
 
-### D. localhost allowlist gateway
-Purpose:
-- n8n can trigger only approved existing systemd services.
-- no arbitrary shell execution.
-- token authenticated.
-- bound to localhost.
+### E. Local-browser platforms
+Naver/Tistory workflows that require an interactive logged-in browser cannot be declared GitHub-migrated without a supported GitHub-hosted authentication path. If a platform requires an unavailable local session or human challenge, mark it HOLD; do not silently rely on a PC agent or server.
 
-Current service:
-- `korea365-n8n-gateway.service`
-- health: `127.0.0.1:8766/health`
+## 3. Non-negotiable safety rules
+- No VPS, SSH, systemd, n8n-on-server, or server-local queue as a production dependency.
+- No deletion of existing posts or videos during infrastructure migration.
+- No mass privacy changes during migration.
+- No automatic public upload during migration testing; use dry-run or private canaries with exact-channel checks.
+- No duplicate retry unless the previous attempt is reconciled against a durable receipt.
+- Preserve the owner's free-only API/tool policy; never introduce paid APIs or services without approval.
+- A migration is complete only after workflow tests and a real, authorized, destination-verified canary pass.
 
-### E. Control Korea365
-Responsibilities:
-- dashboard
-- status
-- operator actions
-- publication evidence
-- four CEO metrics
-- link to actual result
+## 4. Migration order
+1. Inventory every workflow, script, schedule, queue, secret name, and persistent-state dependency that references VPS/SSH/systemd or server-only paths.
+2. Replace or retire SSH-only diagnostics and repair workflows that cannot be used after VPS retirement.
+3. Port the YouTube queue/worker to GitHub-hosted execution, including cost-hold, channel registry, schedule selection, deduplication, durable state, upload receipts, and bounded retries.
+4. Validate each channel family with read-only OAuth identity checks and private canaries before enabling public schedules.
+5. Migrate WordPress, Blogger, news, social, Naver, and Tistory individually; preserve account isolation and verify destination receipts.
+6. Update dashboard/metrics to consume GitHub workflow status and verified receipts.
+7. Only after replacements pass, remove obsolete VPS scripts, deployment files, docs, and secrets references.
 
-It must not become a second orchestration engine.
+## 5. Current status
+The repository audit on 2026-10-26 found legacy SSH-based workflows and server-only YouTube worker dependencies still present. Therefore, the repository is **not yet fully GitHub-only**. Do not report migration complete or delete the remaining worker code until replacements pass their checks.
 
-### F. LondonLocalAgent
-Purpose:
-- Naver Blog 3
-- Tistory 5
+The first known blockers include:
+- 21 workflow files matched `appleboy/ssh-action` in repository search.
+- YouTube enqueue still calls `VPS_HOST` and imports `automation_hub.youtube_vps_queue` on the remote host.
+- `scripts/run_youtube_vps.py` reads `/etc/korea365/youtube-runtime.json`.
+- `scripts/youtube_vps_worker.py` uses a server-local queue and Google Sheets configuration.
+- The legacy architecture and deployment docs still describe VPS/systemd/n8n as production infrastructure.
 
-Reason:
-These destinations require local authenticated browser sessions.
-
-Rules:
-- PC only needs to be available during browser publication windows.
-- login/captcha/human verification => HOLD.
-- never brute-force authentication.
-- do not embed credentials/cookies in EXE or GitHub.
-- final success requires public URL.
-
-### G. Aside / Chrome
-Used only as browser session surface.
-Not the system of record and not the scheduler.
-
-## 3. Final data flow
-
-```
-GitHub
-  ↓ deploy/version
-VPS
-  ├─ n8n
-  │   ├─ WP25_MASTER → existing WP worker
-  │   ├─ BLOGGER33_MASTER → existing Blogger worker
-  │   ├─ NEWS2_MASTER → newsroom worker
-  │   ├─ YOUTUBE_*_MASTER → VPS video workers
-  │   ├─ SNS_MASTER → approved platform publisher
-  │   ├─ METRICS_MASTER → metric collectors
-  │   └─ NAVER3/TISTORY5_MASTER → local queue
-  │                                  ↓
-  │                           LondonLocalAgent
-  │                                  ↓
-  │                           Aside/Chrome session
-  └─ Control Korea365 ← receipts/status/metrics
-```
-
-## 4. Cost rule
-- n8n Community: free software.
-- PyInstaller/local Python: free software.
-- GitHub: existing account.
-- VPS: existing infrastructure; no additional runtime subscription.
-- New paid API/SaaS requires explicit owner approval.
-- Make.com is not in the production architecture.
-
-## 5. Anti-patterns prohibited
-- one workflow per site/channel
-- duplicated GitHub cron + systemd timer + n8n schedule for same job
-- Control Korea365 acting as full scheduler
-- GitHub video rendering
-- infinite retries
-- blind browser automation after CAPTCHA
-- storing passwords or cookies in repository
-- counting workflow success as publication success
+Next: map each SSH workflow to a GitHub-native replacement or retire it, and port YouTube execution without losing duplicate protection, cost-hold, channel identity checks, or publication receipts.
