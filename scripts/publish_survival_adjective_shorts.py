@@ -149,24 +149,23 @@ def recent_channel_videos(service, channel_id: str, limit: int = 100) -> list[di
 
 
 def assert_no_recent_duplicate(service, manifest: dict, channel_id: str) -> None:
-    """Block only a matching existing title or matching word pair in the title.
-
-    Reusing vocabulary in a later lesson is allowed; matching only words in an
-    old description would incorrectly block legitimate curriculum repetition.
-    """
+    """Block duplicate title, pair ID, or same vocabulary pair on this channel."""
     import re
     title_key = normalized_title(manifest["title"])
+    pair_id = str(manifest.get("pair_id", "")).strip().casefold()
     words = [str(w).strip().casefold() for w in manifest.get("words", []) if str(w).strip()]
-    rows = recent_channel_videos(service, channel_id)
+    rows = recent_channel_videos(service, channel_id, limit=500)
     duplicates = []
     for video in rows:
         snippet = video.get("snippet", {})
         old_title = snippet.get("title", "")
+        old_description = snippet.get("description", "")
         old_key = normalized_title(old_title)
-        old_title_folded = old_title.casefold()
+        old_text = (old_title + " " + old_description).casefold()
         exact_title = bool(title_key and old_key == title_key)
-        both_words_in_title = len(words) >= 2 and all(word in old_title_folded for word in words)
-        if exact_title or both_words_in_title:
+        pair_in_text = bool(pair_id and pair_id in old_text)
+        both_words_in_title = len(words) >= 2 and all(word in old_title.casefold() for word in words)
+        if exact_title or pair_in_text or both_words_in_title:
             stats = video.get("statistics", {})
             duplicates.append({
                 "video_id": video.get("id"),
@@ -174,12 +173,13 @@ def assert_no_recent_duplicate(service, manifest: dict, channel_id: str) -> None
                 "views": int(stats.get("viewCount", 0)),
                 "published_at": snippet.get("publishedAt", ""),
                 "privacy_status": video.get("status", {}).get("privacyStatus", "unknown"),
+                "match_reason": "title" if exact_title else ("pair_id" if pair_in_text else "word_pair"),
             })
     if duplicates:
         duplicates.sort(key=lambda row: (-row["views"], row["published_at"]))
         raise RuntimeError(
             "Duplicate upload blocked for safety. Existing matching video(s): "
-            + json.dumps(duplicates[:5], ensure_ascii=False)
+            + json.dumps(duplicates[:10], ensure_ascii=False)
         )
 
 def publish_one(manifest_path: Path, privacy: str, publish_at: str | None = None) -> dict:
