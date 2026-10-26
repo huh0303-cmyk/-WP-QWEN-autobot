@@ -17,7 +17,7 @@ SCAN_ROOTS = (
 )
 PATTERN = re.compile(
     r"/opt/korea365|/etc/korea365|VPS_HOST|VPS_USER|VPS_SSH|VPS_WP_QUEUE|VPS_JOB_ID|"
-    r"appleboy/ssh-action|systemctl|N8N_WEBHOOK|n8nGateway|127\.0\.0\.1:5678",
+    r"appleboy/ssh-action|systemctl|N8N_WEBHOOK|n8nGateway|youtube_vps_queue|127\.0\.0\.1:5678",
     re.IGNORECASE,
 )
 SUFFIXES = {".py", ".js", ".mjs", ".cjs", ".yml", ".yaml", ".json", ".sh", ".service", ".timer"}
