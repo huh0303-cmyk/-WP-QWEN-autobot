@@ -24,7 +24,7 @@ No production path may depend on VPS, SSH, systemd timers, server-local queues, 
 6. Cost hold remains blocked unless the `youtube-channels` environment variable `YOUTUBE_COST_HOLD` is explicitly set to `false`. No public upload was triggered by this migration work.
 
 ## Remaining blockers
-- `automation_hub/youtube_vps_queue.py` remains as a legacy module; all callers must be verified absent before it can be safely retired.
+- `automation_hub/youtube_vps_queue.py` was removed after the control-center and worker callers were migrated.
 - Some legacy scripts/docs still contain VPS paths or old n8n instructions; they need targeted migration or a clear historical-only label.
 - The new GitHub worker has not completed an authorized end-to-end canary, so it must not be described as production-verified.
 - The automatic 10-channel schedule is not yet re-enabled and verified. The new worker workflow is currently manual-only.
