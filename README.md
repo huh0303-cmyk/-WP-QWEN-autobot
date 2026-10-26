@@ -33,7 +33,7 @@ Google Sheets를 운영 화면으로, GitHub Actions를 서버로 사용하는 �
 
 플레이리스트 채널 `globalmusic`, `healing`, `starbucks`, `mbb`, `kpop`과 지식채널 `nasa`, `history`, `invention`, `silent_era`, `retro_reels`를 기본 등록합니다. 등록 행을 추가하면 같은 구조로 채널 수를 늘릴 수 있습니다.
 
-**YouTube Hub — 10 channel scheduler**가 매시간 시트를 읽고 실행 예정 채널을 한 번에 최대 1개만 호출합니다. 채널별 2~3일 간격, 허용 시간대와 예약 공개 지연을 따로 설정하므로 영상이 한꺼번에 공개되지 않습니다. 예전 플리 고정 cron과 지식채널 cron은 비활성화해 중복 생성·발행을 막았습니다.
+**GitHub-only 전환 상태:** 기존 VPS 작업 큐와 SSH 기반 YouTube 워크플로우는 폐기 대상입니다. 현재 `youtube-github-worker.yml`은 GitHub Actions에서 채널 하나를 수동 실행하도록 구성되어 있으며, `confirm_publication=true`와 환경 변수 `YOUTUBE_COST_HOLD=false`가 모두 명시되어야 업로드 경로에 진입합니다. 비용 차단은 기본적으로 유지됩니다. 10채널 자동 예약 cadence는 별도 검증 전까지 완료된 것으로 간주하지 않습니다.
 
 업로드 직전 OAuth 계정의 실제 YouTube channel ID를 시트/등록부의 기대 ID와 비교합니다. 다르면 `OAuth channel mismatch`로 즉시 중단하므로 다른 채널에 잘못 올리지 않습니다. 텍스트는 `AI_TEXT_PROVIDER=openai`, AI 이미지 생성은 차단 상태이며 무료 스톡·퍼블릭도메인·기존 이미지 소스만 허용됩니다.
 
