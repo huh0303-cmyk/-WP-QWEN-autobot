@@ -11,6 +11,16 @@
 archive 10개 + core 5개 + 언어 Survival 10개 채널의 검증된 매핑. 다른 트랙(Gemini
 등)이 주장하는 매핑은 이 파일과 대조 없이 믿지 말 것.
 
+## 2026-10-26 — VPS retired; GitHub-only migration in progress
+
+- Owner directive: no VPS dependency anywhere in London Project. GitHub Actions is the only approved hosted execution plane.
+- Migration branch removes the 21 SSH workflows, VPS systemd/deploy assets, n8n container/gateway assets, and server-only worker entry points.
+- New path: youtube-github-worker.yml + scripts/youtube_github_worker.py + automation_hub/youtube_github_runtime.py. Cost hold fails closed by default; no upload was triggered by this migration.
+- Control-center YouTube buttons now dispatch GitHub Actions rather than writing a server-local queue.
+- Do not treat the migration as complete: the legacy automation_hub/youtube_vps_queue.py file still remains, some historical scripts/docs still reference server paths, the 10-channel schedule is not restored, and no authorized end-to-end canary has passed.
+- Preserve all existing videos/posts and privacy states. Before enabling any publication, verify GitHub environment secrets, read-only OAuth channel IDs, cost hold, deduplication, and durable publication receipts.
+- Current source of truth for migration status: docs/VPS_CANCELLATION_AND_GITHUB_ONLY_2026-10-09.md and docs/GITHUB_ONLY_NO_VPS_MIGRATION_INVENTORY_2026-10-26.md.
+
 ## 2026-10-04 (8차) — 2027 포트폴리오 계획 초안
 
 - 분야별 1사이트 12개 유지, 나머지 통합/만료. 상세: docs/PORTFOLIO_2027_PLAN_2026-10-04.md. **확정(10/4 18:20 KST)**. 통합 작업 미착수. 1일 1포스팅 유지(WP 25 + Blogger 33), 만료 7일 전 재확인 예약 2건(11/11, 2027-02-12).
