@@ -1,10 +1,9 @@
+# RETIRED 2026-10-26 — no VPS/systemd scheduling is permitted.
 [Unit]
-Description=Check due YouTube private jobs every five minutes
+Description=Retired legacy YouTube timer — do not install
 
 [Timer]
-OnCalendar=*:0/5
-Persistent=true
-Unit=korea365-youtube-private-weekly.service
+# Intentionally no OnCalendar or Unit; this timer does not schedule work.
 
 [Install]
-WantedBy=timers.target
+WantedBy=multi-user.target
