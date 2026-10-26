@@ -119,7 +119,8 @@ def collect():
    r=s.get(url+'/wp-json/wp/v2/categories',params={'per_page':100,'hide_empty':'true','_fields':'id,name,count'},timeout=25);r.raise_for_status();row['categories']=clean_category_labels([c.get('name','') for c in r.json()],row.get('theme',''))
    row['status']=('오늘 발행 확인' if row['today']>= 1 else '목표까지 추가 발행 필요')
    if news:
-    row['next']='RSS 감지 중 · 유료 작성 승인 대기' if pathlib.Path('/etc/korea365/newsroom-cost-hold').exists() else 'RSS 감지 중 · OpenAI 잔액/한도 부족(429), Gemini 403 해결 필요'
+    newsroom_hold=os.environ.get('NEWSROOM_COST_HOLD','true').strip().lower() not in {'false','0','no','off'}
+   row['next']='RSS 감지 중 · 유료 작성 승인 대기' if newsroom_hold else 'RSS 감지 중 · 검수 대기'
    else:row['next']='무료 검수 원고 준비 필요 · 자동작성 복구 미완료'
   except Exception as e:row.update(status='확인 실패',error=type(e).__name__+': '+str(e)[:180])
   return row
