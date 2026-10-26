@@ -15,6 +15,15 @@ class TitleRepeatGuard(unittest.TestCase):
         self.assertTrue(title_self_issues("The Soulful Slurp: Korean Ramen vs Japanese Ramen"))
         self.assertTrue(title_self_issues("현대인 심장 두근거림 원인과 대처법: 부정맥 증상, 심장 건강 관리"))
 
+    def test_generic_gerund_openings_blocked(self):
+        for title in ("Understanding Korea Rental Deposits", "Navigating Health Insurance Options", "Managing Tax Obligations", "Preparing for University Applications"):
+            self.assertTrue(title_self_issues(title), title)
+            self.assertTrue(title_cliches(title), title)
+
+    def test_subject_led_titles_not_blocked_for_gerund(self):
+        for title in ("Korea Rental Deposits: What Tenants Pay", "Health Insurance Options for Foreign Residents", "Tax Deadlines for Freelancers"):
+            self.assertFalse(any("generic gerund opening" in issue for issue in title_self_issues(title)), title)
+
     def test_stock_tail_blocked(self):
         self.assertTrue(title_self_issues("Korea ATM Fees: A Closer Look at What Really Matters"))
 
