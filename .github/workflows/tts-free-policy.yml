@@ -13,6 +13,15 @@ on:
       - '.github/workflows/seoul-journal-daily-shorts.yml'
       - '.github/workflows/seoul-journal-auto-publish.yml'
       - 'scripts/classic_reads_longform.py'
+      - 'scripts/survival_adjective_short.py'
+      - 'scripts/topik_quiz_shorts.py'
+      - 'scripts/topik_quiz_longform.py'
+      - 'scripts/health_clinic/src/tts_elevenlabs.py'
+      - 'scripts/youtube_video_pipeline_legacy.py'
+      - 'scripts/elevenlabs_voice_audit.py'
+      - 'multilang_quiz/scripts/make_quiz_short_multi.py'
+      - '.github/workflows/youtube-language-adjectives-daily.yml'
+      - '.github/workflows/topik-quiz-daily.yml'
       - 'scripts/archive_footage_longform.py'
       - 'scripts/nasa_archive_longform.py'
       - '.github/workflows/youtube-github-worker.yml'
@@ -34,6 +43,32 @@ jobs:
         run: python -m py_compile scripts/seoul_journal_shorts_pipeline.py
       - name: Compile knowledge documentary TTS pipeline
         run: python -m py_compile scripts/classic_reads_longform.py scripts/archive_footage_longform.py scripts/nasa_archive_longform.py
+      - name: Compile all migrated production TTS paths
+        run: |
+          python -m py_compile scripts/survival_adjective_short.py scripts/topik_quiz_shorts.py scripts/topik_quiz_longform.py scripts/health_clinic/src/tts_elevenlabs.py scripts/youtube_video_pipeline_legacy.py scripts/elevenlabs_voice_audit.py multilang_quiz/scripts/make_quiz_short_multi.py
+      - name: Verify all migrated TTS paths prefer Fish Audio and avoid paid endpoints
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          paths = [
+              'scripts/survival_adjective_short.py',
+              'scripts/topik_quiz_shorts.py',
+              'scripts/topik_quiz_longform.py',
+              'scripts/health_clinic/src/tts_elevenlabs.py',
+              'scripts/youtube_video_pipeline_legacy.py',
+              'scripts/elevenlabs_voice_audit.py',
+              'multilang_quiz/scripts/make_quiz_short_multi.py',
+              'scripts/channel_long_video.py',
+              'scripts/health_longform.py',
+              'scripts/curio_longform.py',
+          ]
+          for path in paths:
+              source = Path(path).read_text(encoding='utf-8').lower()
+              assert 'api.fish.audio/v1/tts' in source, f'{path}: Fish Audio endpoint missing'
+              assert 's2.1-pro-free' in source, f'{path}: Fish Audio Free model missing'
+              assert 'api.elevenlabs.io/v1/text-to-speech' not in source, f'{path}: paid TTS endpoint still present'
+          print(f'PASS: {len(paths)} production TTS paths prefer Fish Audio Free and contain no direct paid ElevenLabs endpoint.')
+          PY
       - name: Verify Seoul Journal Shorts uses free-only TTS
         run: |
           python - <<'PY'
