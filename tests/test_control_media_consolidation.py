@@ -240,7 +240,9 @@ def test_youtube_group_order_and_verified_survival_channels_are_explicit():
 
 def test_social_ranking_exposes_real_metric_deltas_without_zero_fill():
     source = (ROOT / "control_center" / "control_home.py").read_text(encoding="utf-8")
-    assert '"video_delta": _delta(videos, previous.get("videos")' in source
+    assert 'delta_videos = _delta(videos, previous_public.get("videos"))' in source
+    assert 'youtube_public_metrics_history.json' in source
+    assert '"video_delta": delta_videos' in source
     assert '"content_count_delta": item.get("video_delta")' in source
     assert '"content_count_delta": item.get("content_delta")' in source
     assert '"target_total": 39' in source
@@ -296,6 +298,9 @@ def test_youtube_ranking_prefers_full_public_api_snapshot(monkeypatch, tmp_path)
     assert result["rows"][0]["name"] == "French Survival"
     assert result["rows"][0]["subscribers"] == 7
     assert result["rows"][0]["views"] == 321
+    # A first public snapshot has no valid daily comparison; do not use stale legacy history.
+    assert result["rows"][0]["view_delta"] is None
+    assert result["rows"][0]["video_delta"] is None
 
 
 def test_sns_ranking_uses_persisted_official_probe(monkeypatch, tmp_path):
