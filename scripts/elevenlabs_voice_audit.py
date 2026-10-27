@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate private ElevenLabs voice audition clips for the seven locked channel profiles.
+"""Generate Fish Audio Free voice samples for the seven locked channel profiles.
 This script never uploads to YouTube. Output is intended for human listening/approval.
 """
 from __future__ import annotations
@@ -10,8 +10,8 @@ import requests
 
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG = json.loads((ROOT / "config/youtube_voice_profiles.json").read_text(encoding="utf-8"))
-API_KEY = os.getenv("ELEVENLABS_API_KEY", "").strip()
-MODEL = os.getenv("ELEVENLABS_MODEL_ID", CONFIG.get("model_id", "eleven_multilingual_v2"))
+API_KEY = os.getenv("FISH_AUDIO_API_KEY", "").strip()
+MODEL = "s2.1-pro-free"
 OUT = ROOT / "artifacts" / "voice-audit"
 OUT.mkdir(parents=True, exist_ok=True)
 
@@ -27,25 +27,16 @@ SAMPLES = {
 
 def main():
     if not API_KEY:
-        raise SystemExit("ELEVENLABS_API_KEY is missing; no audio was generated.")
+        raise SystemExit("FISH_AUDIO_API_KEY is missing; no audio was generated.")
     manifest = {"model_id": MODEL, "uploads_performed": False, "clips": []}
     for key, profile in CONFIG["channels"].items():
-        voice_env = profile.get("voice_id_env", "")
-        voice_id = os.getenv("ELEVENLABS_VOICE_ID_" + key.upper(), "").strip()
-        # Backwards-compatible secret/variable names recorded in the voice profile.
-        if not voice_id and voice_env:
-            voice_id = os.getenv(voice_env, "").strip()
-        if not voice_id:
-            voice_id = profile.get("fallback_voice_id", "").strip()
-        if not voice_id:
-            raise RuntimeError(f"No approved voice ID configured for {key}; refusing to synthesize with a mismatched voice.")
         out_path = OUT / f"{key}.mp3"
-        response = requests.post(
-            f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}",
-            headers={"xi-api-key": API_KEY, "Content-Type": "application/json", "Accept": "audio/mpeg"},
-            json={"text": SAMPLES[key], "model_id": MODEL,
-                  "voice_settings": CONFIG.get("voice_settings", {})},
-            timeout=90,
+                response = requests.post(
+            "https://api.fish.audio/v1/tts",
+            headers={"Authorization": f"Bearer {API_KEY}", "model": MODEL,
+                     "Content-Type": "application/json", "Accept": "audio/mpeg"},
+            json={"text": SAMPLES[key], "format": "mp3"},
+            timeout=120,
         )
         if not response.ok:
             raise RuntimeError(f"{key} TTS failed with HTTP {response.status_code}: {response.text[:250]}")
@@ -54,13 +45,13 @@ def main():
         out_path.write_bytes(response.content)
         manifest["clips"].append({
             "channel_key": key, "display_name": profile["display_name"],
-            "voice_id": voice_id, "voice_name": profile.get("voice_name", ""),
+            "provider": "Fish Audio", "model": MODEL, "voice_name": "Fish Audio default multilingual voice",
             "direction": profile.get("direction", ""), "file": out_path.name,
             "bytes": len(response.content), "status": "generated; human listening required"
         })
         print(f"Generated audition: {key} ({profile.get('voice_name')})")
     (OUT / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
-    print("Done. No videos were rendered or uploaded. Listen to the artifact clips before approving production.")
+    print("Done. Fish Audio Free samples generated; no videos were rendered or uploaded.")
 
 if __name__ == "__main__":
     main()
