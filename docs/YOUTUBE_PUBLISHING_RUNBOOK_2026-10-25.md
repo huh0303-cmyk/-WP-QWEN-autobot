@@ -1,5 +1,5 @@
 # London Project YouTube Publishing Runbook
-**Updated:** 2026-10-25  
+**Updated:** 2026-10-27  
 **Scope:** 23-channel YouTube portfolio, including Seoul Journal political Shorts.
 
 ## Required end-to-end pipeline
@@ -18,7 +18,10 @@
 - `scripts/seoul_journal_shorts_pipeline.py` extracts a Naver News article, drafts a fact-grounded Korean narration package, renders a vertical video, and performs resumable YouTube upload.
 - Seoul Journal Shorts narration was migrated away from ElevenLabs to Fish Audio Free with Edge TTS fallback. The Fish Audio key is optional for execution because Edge TTS is the free fallback; configure GitHub Actions secret `FISH_AUDIO_API_KEY` to use Fish Audio as primary.
 - `.github/workflows/tts-free-policy.yml` now includes compile and regression checks for the Seoul Journal Shorts TTS path.
-- `.github/workflows/seoul-journal-daily-shorts.yml` only creates an editorial queue artifact. It does **not** itself render or upload a Short.
+- `.github/workflows/seoul-journal-daily-shorts.yml` creates an editorial queue at 06:30, 09:00, and 17:00 Vietnam time; the 09:00 Vietnam run additionally renders and uploads one Short as PRIVATE after secret validation and exact-channel OAuth preflight.
+- The daily private-upload job requires `OPENAI_API_KEY`, `FISH_AUDIO_API_KEY`, and Seoul Journal YouTube OAuth/channel secrets. Fish Audio Free is the primary TTS provider; free Edge TTS is used only if Fish Audio fails at request time.
+- The legacy `.github/workflows/seoul-journal-auto-publish.yml` is manual recovery only to prevent overlapping daily schedules. It remains private-only.
+- `scripts/seoul_journal_shorts_pipeline.py` now checks the latest 100 channel uploads and skips a repeated source URL or normalized title before uploading.
 - `.github/workflows/youtube-vps-enqueue-today.yml` queues a single run-now job for its listed ten channel keys; it is not a universal 23-channel dispatcher.
 
 ## Remaining work before claiming the entire 23-channel workflow is production-ready
