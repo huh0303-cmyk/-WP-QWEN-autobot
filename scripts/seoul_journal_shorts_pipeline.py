@@ -238,7 +238,7 @@ def upload_private(video,meta,source_url):
         if not page_token:
             break
     def title_key(value):
-        return re.sub(r"[^\\w]+", "", str(value).casefold(), flags=re.UNICODE)
+        return re.sub(r"[^\w]+", "", str(value).casefold(), flags=re.UNICODE)
     expected_title_key = title_key(meta["youtube_title"])
     for offset in range(0, len(recent_ids), 50):
         existing = yt.videos().list(
