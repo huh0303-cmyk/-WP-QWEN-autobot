@@ -52,6 +52,7 @@ jobs:
     environment: youtube-channels
     env:
       PYTHONUTF8: "1"
+      FISH_AUDIO_API_KEY: ${{ secrets.FISH_AUDIO_API_KEY }}
       YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
       YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
       YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_KO: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_KO }}
@@ -77,7 +78,7 @@ jobs:
           else
             echo "Runner already has FFmpeg and Noto CJK fonts; skipping slow apt refresh."
           fi
-          python -m pip install --disable-pip-version-check pillow edge-tts google-api-python-client google-auth hangul-romanize pykakasi pypinyin
+          python -m pip install --disable-pip-version-check requests pillow edge-tts google-api-python-client google-auth hangul-romanize pykakasi pypinyin
       - name: Resolve KST date and render ten native-locale vocabulary Shorts
         id: build
         shell: bash
