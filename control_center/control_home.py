@@ -80,9 +80,29 @@ def _youtube_stats_by_identity(bucket: int):
     return current_map, previous_map, history.get("updated_at", "")
 
 
-def _youtube_public_stats() -> tuple[dict[str, dict], str]:
+def _youtube_public_stats() -> tuple[dict[str, dict], str, dict[str, dict], str]:
+    """Return current and prior daily snapshots from the same official API source.
+
+    Do not compare today's API values with situation_room_history.json: that
+    legacy history may be weeks old and produced misleading negative deltas.
+    """
     snapshot = _read(ROOT / "data" / "youtube_public_metrics.json", {})
-    return snapshot.get("channels", {}), snapshot.get("checked_at_kst", "")
+    history = _read(ROOT / "data" / "youtube_public_metrics_history.json", {})
+    current_at = str(snapshot.get("checked_at_kst", ""))
+    current_day = current_at[:10]
+    candidates = [
+        row for row in history.get("snapshots", [])
+        if isinstance(row, dict)
+        and str(row.get("checked_at_kst", ""))[:10] < current_day
+        and isinstance(row.get("channels"), dict)
+    ]
+    prior = max(candidates, key=lambda row: str(row.get("checked_at_kst", "")), default={})
+    return (
+        snapshot.get("channels", {}),
+        current_at,
+        prior.get("channels", {}),
+        str(prior.get("checked_at_kst", "")),
+    )
 
 
 def _sns_probe_stats() -> dict[tuple[str, str], dict]:
@@ -118,17 +138,25 @@ ROLE_TO_PROBE_BRAND = {
 def build_youtube_ranking(bucket: int) -> dict:
     inventory = _read(ROOT / "config" / "london_social_account_inventory_2026-09-24.json", {})
     current_map, previous_map, updated_at = _youtube_stats_by_identity(bucket)
-    public_stats, public_updated_at = _youtube_public_stats()
+    public_stats, public_updated_at, previous_public_stats, previous_public_updated_at = _youtube_public_stats()
     rows = []
     for item in inventory.get("youtube", []):
         candidates = [_norm(item.get("name")), _norm(item.get("handle"))]
         current = next((current_map.get(k) for k in candidates if k and current_map.get(k)), {})
         previous = next((previous_map.get(k) for k in candidates if k and previous_map.get(k)), {})
-        public = public_stats.get(item.get("channel_id", ""), {})
+        channel_id = item.get("channel_id", "")
+        public = public_stats.get(channel_id, {})
+        previous_public = previous_public_stats.get(channel_id, {})
         subs = public.get("subscribers") if public.get("subscribers") is not None else (current.get("subs") if isinstance(current, dict) else None)
         views = public.get("views") if public.get("views") is not None else (current.get("views") if isinstance(current, dict) else None)
         videos = public.get("videos") if public.get("videos") is not None else (current.get("videos") if isinstance(current, dict) else None)
-        timeline = opening_recent_info("", "youtube", item.get("channel_id", ""))
+        # Daily deltas must compare like-for-like official API snapshots only.
+        # Until a prior-day snapshot exists, show no delta rather than a stale
+        # multi-week comparison against the unrelated situation-room history.
+        delta_subs = _delta(subs, previous_public.get("subscribers"))
+        delta_views = _delta(views, previous_public.get("views"))
+        delta_videos = _delta(videos, previous_public.get("videos"))
+        timeline = opening_recent_info("", "youtube", channel_id)
         rows.append({
             "name": public.get("name") or item.get("name") or item.get("channel_id"),
             "channel_id": item.get("channel_id", ""),
@@ -136,11 +164,12 @@ def build_youtube_ranking(bucket: int) -> dict:
             "url": f"https://www.youtube.com/channel/{item.get('channel_id')}" if item.get("channel_id") else "",
             "category": item.get("group") or "YouTube",
             "subscribers": subs,
-            "subscriber_delta": _delta(subs, previous.get("subs") if isinstance(previous, dict) else None),
+            "subscriber_delta": delta_subs,
             "views": views,
-            "view_delta": _delta(views, previous.get("views") if isinstance(previous, dict) else None),
+            "view_delta": delta_views,
             "videos": videos,
-            "video_delta": _delta(videos, previous.get("videos") if isinstance(previous, dict) else None),
+            "video_delta": delta_videos,
+            "delta_reference_at": previous_public_updated_at or None,
             "revenue": _social_revenue("YouTube", current.get("handle") or item.get("handle") or "", item.get("channel_id", "")),
             "opening_date": timeline.get("opening_date") or str(item.get("created_at") or "")[:10] or (str(current.get("created_at") or "")[:10] if isinstance(current, dict) else ""),
             "recent_publish_date": timeline.get("recent_publish_date") or str(item.get("recent_publish_date") or "")[:10],
