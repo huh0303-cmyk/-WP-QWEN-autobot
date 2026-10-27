@@ -54,7 +54,7 @@ jobs:
     if: ${{ (github.event_name == 'schedule' && github.event.schedule == '0 2 * * *') || (github.event_name == 'workflow_dispatch' && inputs.run_private_upload && inputs.confirm_private_upload) }}
     runs-on: ubuntu-latest
     timeout-minutes: 25
-    environment: FISH_AUDIO_API_KEY
+    environment: seoul-journal
     steps:
       - uses: actions/checkout@v4
       - name: Validate required secrets before generation
