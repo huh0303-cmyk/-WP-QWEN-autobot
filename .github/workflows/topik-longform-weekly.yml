@@ -28,12 +28,11 @@ jobs:
           sudo apt-get update -q
           sudo apt-get install -y -q ffmpeg fonts-nanum
 
-      - run: pip install requests pillow google-api-python-client google-auth google-auth-httplib2 -q
+      - run: pip install requests edge-tts pillow google-api-python-client google-auth google-auth-httplib2 -q
 
       - name: TOPIK 롱폼 생성 + 업로드
         env:
-          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
-          ELEVENLABS_VOICE_ID: ${{ secrets.ELEVENLABS_VOICE_ID }}
+          FISH_AUDIO_API_KEY: ${{ secrets.FISH_AUDIO_API_KEY }}
           GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
           GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
           GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
