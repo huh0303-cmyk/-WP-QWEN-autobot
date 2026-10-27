@@ -36,6 +36,7 @@ jobs:
   generate:
     if: ${{ vars.TOPIK_VIDEO_GENERATION_DISABLED != 'true' }}
     runs-on: ubuntu-latest
+    environment: FISH_AUDIO_API_KEY
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
@@ -50,7 +51,7 @@ jobs:
         with:
           path: ~/.cache/pip
           key: pip-topikquiz-v2
-      - run: pip install requests pillow google-api-python-client google-auth google-auth-httplib2 -q
+      - run: pip install requests edge-tts pillow google-api-python-client google-auth google-auth-httplib2 -q
       - name: "초급 TOPIK 퀴즈 5개 검수본 생성"
         env:
           TOPIC_CATEGORY: ${{ inputs.category }}
