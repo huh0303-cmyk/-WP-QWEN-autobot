@@ -31,7 +31,7 @@ def main():
     manifest = {"model_id": MODEL, "uploads_performed": False, "clips": []}
     for key, profile in CONFIG["channels"].items():
         out_path = OUT / f"{key}.mp3"
-                response = requests.post(
+        response = requests.post(
             "https://api.fish.audio/v1/tts",
             headers={"Authorization": f"Bearer {API_KEY}", "model": MODEL,
                      "Content-Type": "application/json", "Accept": "audio/mpeg"},
