@@ -378,9 +378,8 @@ def make_fallback_card(word, out_path, size=(900, 900)):
 #   필요가 없다. 텍스트+보이스 해시로 캐싱해서 같은 단어("사과", "apple" 등)를
 #   여러 영상에서 재사용할 때 API 호출을 아낀다(health_clinic의 tts_elevenlabs.py와
 #   동일한 캐싱 패턴).
-ELEVENLABS_API_KEY = os.environ.get("ELEVENLABS_API_KEY", "")
-ELEVENLABS_VOICE_ID = os.environ.get("ELEVENLABS_VOICE_ID_QUIZ") or os.environ.get("ELEVENLABS_VOICE_ID", "")
-_TTS_CACHE_DIR = os.path.join(tempfile.gettempdir(), "quiz_tts_cache")
+FISH_AUDIO_API_KEY = os.environ.get("FISH_AUDIO_API_KEY", "").strip()
+_TTS_CACHE_DIR = os.path.join(tempfile.gettempdir(), "quiz_tts_cache_fish")
 os.makedirs(_TTS_CACHE_DIR, exist_ok=True)
 
 
@@ -388,44 +387,70 @@ def _ffprobe_duration(path):
     return float(subprocess.run(
         ["ffprobe", "-v", "error", "-show_entries", "format=duration",
          "-of", "default=noprint_wrappers=1:nokey=1", path],
-        capture_output=True, text=True).stdout.strip())
+        capture_output=True, text=True, check=True).stdout.strip())
 
 
-def tts(text, out_path, gtts_lang=None, slow=False, max_retries=5):
+def tts(text, out_path, gtts_lang=None, slow=False, max_retries=3):
+    """Fish Audio S2.1 Pro Free first, then free native-language Edge TTS."""
     import time
-    if not ELEVENLABS_API_KEY or not ELEVENLABS_VOICE_ID:
-        raise RuntimeError("ELEVENLABS_API_KEY / ELEVENLABS_VOICE_ID_QUIZ 환경변수 없음 — TTS 불가")
-
-    cache_key = hashlib.sha256((ELEVENLABS_VOICE_ID + text).encode("utf-8")).hexdigest()[:20]
+    language = (gtts_lang or "en").split("-")[0].lower()
+    cache_key = hashlib.sha256(("fish-audio-s2.1-pro-free|" + language + "|" + text).encode("utf-8")).hexdigest()[:20]
     cache_path = os.path.join(_TTS_CACHE_DIR, f"{cache_key}.mp3")
     if os.path.exists(cache_path):
         import shutil
         shutil.copyfile(cache_path, out_path)
+        print(f"TTS_ENGINE=cache_fish_policy language={language}", flush=True)
         return _ffprobe_duration(out_path)
 
     last_err = None
-    for attempt in range(max_retries):
-        try:
-            resp = requests.post(
-                f"https://api.elevenlabs.io/v1/text-to-speech/{ELEVENLABS_VOICE_ID}",
-                headers={"xi-api-key": ELEVENLABS_API_KEY, "Content-Type": "application/json"},
-                json={
-                    "text": text,
-                    "model_id": "eleven_multilingual_v2",
-                    "voice_settings": {"stability": 0.5, "similarity_boost": 0.75},
-                },
-                timeout=60,
-            )
-            resp.raise_for_status()
-            with open(out_path, "wb") as f:
-                f.write(resp.content)
+    if FISH_AUDIO_API_KEY:
+        for attempt in range(max_retries):
+            try:
+                resp = requests.post(
+                    "https://api.fish.audio/v1/tts",
+                    headers={"Authorization": f"Bearer {FISH_AUDIO_API_KEY}", "model": "s2.1-pro-free",
+                             "Content-Type": "application/json", "Accept": "audio/mpeg"},
+                    json={"text": text, "format": "mp3"}, timeout=120,
+                )
+                if resp.ok and len(resp.content) > 1000 and not resp.content.lstrip().startswith(b"{"):
+                    with open(out_path, "wb") as f:
+                        f.write(resp.content)
+                    with open(cache_path, "wb") as f:
+                        f.write(resp.content)
+                    print(f"TTS_ENGINE=fish_audio model=s2.1-pro-free language={language} bytes={len(resp.content)}", flush=True)
+                    return _ffprobe_duration(out_path)
+                last_err = RuntimeError(f"Fish Audio HTTP {resp.status_code}; invalid audio")
+            except Exception as exc:
+                last_err = exc
+            if attempt + 1 < max_retries:
+                time.sleep(2 * (attempt + 1))
+    else:
+        last_err = RuntimeError("FISH_AUDIO_API_KEY is not configured")
+
+    voices = {
+        "ko": "ko-KR-SunHiNeural", "en": "en-US-JennyNeural",
+        "ja": "ja-JP-NanamiNeural", "es": "es-ES-ElviraNeural",
+        "vi": "vi-VN-HoaiMyNeural", "fr": "fr-FR-DeniseNeural",
+        "de": "de-DE-KatjaNeural", "it": "it-IT-ElsaNeural",
+        "pt": "pt-BR-FranciscaNeural", "zh": "zh-CN-XiaoxiaoNeural",
+        "th": "th-TH-PremwadeeNeural",
+    }
+    voice = voices.get(language)
+    if not voice:
+        raise RuntimeError(f"No verified free Edge TTS voice for language={language}; Fish Audio failed: {type(last_err).__name__}")
+    try:
+        import asyncio, edge_tts
+        asyncio.run(edge_tts.Communicate(text, voice).save(str(out_path)))
+        if os.path.exists(out_path) and os.path.getsize(out_path) > 1000:
             with open(cache_path, "wb") as f:
-                f.write(resp.content)
+                f.write(open(out_path, "rb").read())
+            print(f"TTS_ENGINE=edge_tts voice={voice} language={language} bytes={os.path.getsize(out_path)}", flush=True)
             return _ffprobe_duration(out_path)
-        except Exception as e:
-            last_err = e
-            time.sleep(2 * (attempt + 1))
-    raise last_err
+    except Exception as exc:
+        raise RuntimeError(f"Fish Audio and free Edge TTS failed for {language}: {type(last_err).__name__}, {type(exc).__name__}") from exc
+    raise RuntimeError(f"Fish Audio and free Edge TTS produced no valid audio for {language}")
+
+
 
 def load_font(path, size, weight=800):
     font = ImageFont.truetype(path, size)
