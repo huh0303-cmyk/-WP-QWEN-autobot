@@ -1,9 +1,8 @@
-"""Language-aware multi-voice rotation for ElevenLabs narration.
+"""Stable channel voice profiles for narration pipelines.
 
-A voice is chosen once per video/episode, not per scene, so the narration stays
-consistent inside an episode while different uploads alternate male/female voices.
-Set ELEVENLABS_VOICE_IDS_<CHANNEL> to a comma-separated list of 3-4 voice IDs to
-override the public multilingual defaults for a channel.
+This module supplies voice metadata; free-only pipelines use Fish Audio first and
+Microsoft Edge neural TTS as fallback. It must not require an ElevenLabs ID when
+the actual channel pipeline uses a free TTS voice.
 """
 from __future__ import annotations
 
@@ -55,6 +54,10 @@ def choose_voice(channel: str, episode_date: dt.date | None = None) -> dict[str,
     voice_id = single or (pool[0] if pool else "")
 
     fallback = {
+        # The production Japan pipeline uses ja-JP-NanamiNeural through free Edge TTS;
+        # this stable female profile prevents an unrelated ElevenLabs-ID gate from aborting it.
+        "health_japan": {"id": "ja-JP-NanamiNeural", "name": "Nanami (Microsoft Edge TTS)", "gender": "female"},
+        "seoul_journal": {"id": "ko-KR-SunHiNeural", "name": "SunHi (Microsoft Edge TTS)", "gender": "female"},
         "health_usa": {"id": "pNInz6obpgDQGcFmaJgB", "name": "Adam", "gender": "male"},
         "shopping": {"id": "EXAVITQu4vr4xnSDxMaL", "name": "Bella", "gender": "female"},
         "nasa": {"id": "pNInz6obpgDQGcFmaJgB", "name": "Adam", "gender": "male"},
@@ -64,9 +67,7 @@ def choose_voice(channel: str, episode_date: dt.date | None = None) -> dict[str,
     }
     known = {v["id"]: v for v in DEFAULT_VOICES}
     if not voice_id:
-        # Japanese health and Seoul Journal must never silently switch to a generic voice.
-        if key in {"health_japan", "seoul_journal"}:
-            raise RuntimeError(f"No approved ElevenLabs voice ID configured for {key}; refusing to synthesize with a substitute.")
+        # Use a channel-specific, language-matched free voice profile when no account voice is configured.
         voice = fallback.get(key)
         if not voice:
             raise RuntimeError(f"No fixed ElevenLabs voice configured for {key}; refusing to rotate to an unrelated voice.")
