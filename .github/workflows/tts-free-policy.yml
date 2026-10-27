@@ -7,6 +7,7 @@ on:
       - 'scripts/tts_provider_priority.py'
       - 'scripts/seoul_journal_shorts_pipeline.py'
       - 'scripts/voice_rotation.py'
+      - 'scripts/economy_text.py'
       - 'scripts/channel_long_video.py'
       - 'scripts/publish_survival_adjective_shorts.py'
       - '.github/workflows/seoul-journal-daily-shorts.yml'
@@ -65,6 +66,17 @@ jobs:
           assert 'edge-tts' in worker
           print('PASS: knowledge narration is routed through free-only Fish Audio -> Edge TTS; no paid TTS endpoint in narration adapter.')
           print('NOTE: Fish Audio still requires the FISH_AUDIO_API_KEY GitHub Actions secret to be configured.')
+          PY
+      - name: Verify bounded Gemini output and retry limits
+        run: |
+          python -m py_compile scripts/economy_text.py
+          python - <<'PY'
+          from pathlib import Path
+          source = Path("scripts/economy_text.py").read_text(encoding="utf-8")
+          assert 'os.getenv("GEMINI_MAX_OUTPUT_TOKENS", "8192")' in source
+          assert 'os.getenv("WRITER_TRIES_PER_ENGINE", "2")' in source
+          assert 'os.getenv("WRITER_429_COOLDOWN", "1800")' in source
+          print("PASS: default Gemini output is capped at 8192 tokens; transient retries are bounded; 429 cooldown is 30 minutes.")
           PY
       - name: Verify Japan health voice and per-language failure isolation
         run: |
