@@ -73,7 +73,7 @@ def _note_failure(provider: str, key_id: str, model: str, exc: Exception) -> Non
     elif status in (400, 404):
         _DEAD.add((provider, key_id, model))        # this model is unusable for this key
     elif status == 429:
-        _COOLDOWN[(provider, key_id, model)] = _time.time() + float(os.getenv("WRITER_429_COOLDOWN", "900"))
+        _COOLDOWN[(provider, key_id, model)] = _time.time() + float(os.getenv("WRITER_429_COOLDOWN", "1800"))
     elif isinstance(exc, ValueError) and "incomplete" in str(exc):
         _DEAD.add((provider, key_id, model))        # keeps truncating: not worth more tries this run
 
@@ -90,7 +90,7 @@ def _try_gemini(prompt: str, temperature: float, model: str, key: str | None = N
         raise RuntimeError("GEMINI_API_KEY missing")
     if model not in FREE_GEMINI_MODELS:
         raise ValueError("unsupported Gemini model")
-    config = {"temperature": temperature, "maxOutputTokens": int(os.getenv("GEMINI_MAX_OUTPUT_TOKENS", "16384"))}
+    config = {"temperature": temperature, "maxOutputTokens": int(os.getenv("GEMINI_MAX_OUTPUT_TOKENS", "8192"))}
     if model.startswith("gemini-2.5-"):
         config["thinkingConfig"] = {"thinkingBudget": 0}
     response = requests.post(
@@ -110,7 +110,7 @@ def _try_gemini(prompt: str, temperature: float, model: str, key: str | None = N
     return content.strip()
 
 
-TRIES_PER_ENGINE = int(os.getenv("WRITER_TRIES_PER_ENGINE", "4"))
+TRIES_PER_ENGINE = int(os.getenv("WRITER_TRIES_PER_ENGINE", "2"))
 RETRY_SLEEP = float(os.getenv("WRITER_RETRY_SLEEP", "5"))
 
 def _discover(spec: tuple) -> list:
