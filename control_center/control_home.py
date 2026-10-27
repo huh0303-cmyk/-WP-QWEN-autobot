@@ -173,16 +173,30 @@ def build_youtube_ranking(bucket: int) -> dict:
             "revenue": _social_revenue("YouTube", current.get("handle") or item.get("handle") or "", item.get("channel_id", "")),
             "opening_date": timeline.get("opening_date") or str(item.get("created_at") or "")[:10] or (str(current.get("created_at") or "")[:10] if isinstance(current, dict) else ""),
             "recent_publish_date": timeline.get("recent_publish_date") or str(item.get("recent_publish_date") or "")[:10],
+            "recent_video_views": timeline.get("recent_video_views") if isinstance(timeline.get("recent_video_views"), (int, float)) else None,
             "last_post_url": timeline.get("recent_video_url") or "",
             "last_post_id": timeline.get("recent_video_id") or "",
             "infrastructure": infrastructure_info("youtube"),
             "connected": isinstance(subs, (int, float)),
         })
     # UC ID가 없는 계획 슬롯은 실제 채널 순위/개수에 포함하지 않는다.
+    def recent_date_order(value: object) -> int:
+        try:
+            return datetime.strptime(str(value)[:10], "%Y-%m-%d").date().toordinal()
+        except (TypeError, ValueError):
+            return 0
+
+    # Ranking order requested by the control room:
+    # subscribers/followers ↓, cumulative views ↓, content count ↓,
+    # recent content views ↓, recent publish date ↓. Unknown subscriber
+    # counts remain at the bottom; missing tie-break metrics sort last.
     rows.sort(key=lambda r: (
         r["subscribers"] is None,
         -(r["subscribers"] or 0),
         -(r["views"] or 0),
+        -(r["videos"] or 0),
+        -(r["recent_video_views"] or 0),
+        -recent_date_order(r.get("recent_publish_date")),
         str(r["name"]).casefold(),
     ))
     rank = 0
