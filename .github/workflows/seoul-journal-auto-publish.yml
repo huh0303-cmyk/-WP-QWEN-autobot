@@ -1,10 +1,8 @@
 name: Seoul Journal Automatic Political Shorts
 
 on:
+  # Manual recovery only; daily scheduling is owned by seoul-journal-daily-shorts.yml.
   workflow_dispatch:
-  schedule:
-    # Daily at 09:00 Vietnam time (02:00 UTC).
-    - cron: "0 2 * * *"
 
 permissions:
   contents: read
@@ -70,7 +68,7 @@ jobs:
           YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_CLIENT_SECRET }}
           SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN }}
           SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID }}
-          YOUTUBE_PRIVACY_STATUS: public
+          YOUTUBE_PRIVACY_STATUS: private
         run: python scripts/seoul_journal_shorts_pipeline.py
       - name: Save video package and upload receipt
         if: always()
