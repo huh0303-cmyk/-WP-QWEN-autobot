@@ -1,6 +1,11 @@
 name: Blogger Total Pageviews → Control feed
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/blogger_total_pageviews.py"
+      - ".github/workflows/blogger-total-pageviews-sync.yml"
   workflow_dispatch:
     inputs:
       site_key:
@@ -15,7 +20,8 @@ permissions:
   contents: write
 
 concurrency:
-  group: blogger-total-pageviews-sync
+  # Share a lock with the daily dashboard job because both update docs/dashboard.json.
+  group: daily-dashboard
   cancel-in-progress: false
 
 jobs:
