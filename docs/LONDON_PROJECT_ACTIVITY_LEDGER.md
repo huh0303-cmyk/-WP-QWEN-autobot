@@ -545,3 +545,13 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - No `data/naver-daily-plans/2026-10-26.json` or `data/naver-trend-brief/2026-10-26.json` exists. The 07:07–07:50 KST trend window has passed. No same-day posts in any feed (0/3 as of 10:05 KST); latest public items remain N1 Oct10, N2 Oct7, N3 Oct8.
 - Current prompt cadence (N1 1/day, N2 1/day, N3 1–5/day) still differs from checked-in configuration (N1/N2 3–4, N3 8–10). No plan was generated or post drafted/published while this mismatch, missing current-day evidence, and unavailable browser session remain unresolved. Prior CUA state inspection failed; no fresh login-state proof.
 - No catch-up posting. The same-day research and account-session blockers remain; keep the current date on safe hold rather than publish unverified content.
+
+
+## tistory-daily-audit-20261026
+
+- `task_id=tistory-daily-audit-20261026`; heartbeat received 2026-10-27T01:21:52Z (2026-10-27 10:21 KST), auditing the exact 2026-10-26 selection.
+- Selected: `tistory_finance_housing` → https://k-vietnam.tistory.com/ (09:48 KST); `tistory_insurance_lab` → https://k-insight-vietnam.tistory.com/ (11:54 KST); `tistory_ktrip365` → https://k-trip365.tistory.com/ (16:02 KST). Daily plan JSON is absent; canonical `tistory-daily-plan.yml` remains paused for the quality incident.
+- Slot receipts: Finance/Housing dispatched 10:06:38 KST (late); Ktrip dispatched 23:10:51 KST (late); Insurance Lab has no receipt. Dispatcher is not publication evidence.
+- Direct RSS checks found no Oct26 posts on any of the three selected sites (0/3). Latest items remain Finance/Housing Oct18, Insurance Lab Oct23, and Ktrip Oct10. No public URLs for Oct26.
+- Local runner has no Oct26 job IDs. Windows task's current latest run is Oct27 08:20 Bangkok and was running at audit time; it does not prove an Oct26 publication. Google Sheets queue remains unverified through the previously blocked export path.
+- No retries or catch-up posts were started. This is the same paused-plan/late-dispatch failure pattern; no new public result or user action arose in this check.
