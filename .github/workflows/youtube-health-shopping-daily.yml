@@ -54,7 +54,7 @@ jobs:
   produce:
     runs-on: ubuntu-latest
     timeout-minutes: 75
-    environment: youtube-channels
+    environment: FISH_AUDIO_API_KEY
     env:
       PYTHONUTF8: "1"
       LOCAL_TEXT_FALLBACK_ENABLED: "false"
