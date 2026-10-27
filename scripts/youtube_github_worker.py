@@ -111,6 +111,11 @@ def _playlist(env: dict[str, str], log_handle) -> str:
 
 
 def _knowledge(env: dict[str, str], log_handle) -> str:
+    if not env.get("FISH_AUDIO_API_KEY", "").strip():
+        raise RuntimeError(
+            "FISH_AUDIO_API_KEY is not available to the youtube-channels worker. "
+            "Add it as a repository Actions secret so knowledge videos cannot silently fall back to Edge TTS."
+        )
     channel = env["CHANNEL_KEY"]
     output = ROOT / "curio_longform_output" / channel / "en"
     if output.exists():
