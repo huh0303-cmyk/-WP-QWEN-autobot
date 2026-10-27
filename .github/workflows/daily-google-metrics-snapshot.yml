@@ -69,7 +69,7 @@ jobs:
         run: |
           git config user.name "korea365-metrics-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add data/gsc_properties.json data/adsense_revenue_by_domain.json data/core_metrics_latest.json data/core_metrics_history.json data/core_metrics_daily_latest.json data/core_metrics_daily_history.json data/core_metrics_report.html data/opening_recent_snapshot.json data/youtube_public_metrics.json data/domain_billing_snapshot.json
+          git add data/gsc_properties.json data/adsense_revenue_by_domain.json data/core_metrics_latest.json data/core_metrics_history.json data/core_metrics_daily_latest.json data/core_metrics_daily_history.json data/core_metrics_report.html data/opening_recent_snapshot.json data/youtube_public_metrics.json data/youtube_public_metrics_history.json data/domain_billing_snapshot.json
           if git diff --cached --quiet; then
             echo "No metrics changes"
           else
@@ -89,6 +89,7 @@ jobs:
             data/core_metrics_report.html
             data/opening_recent_snapshot.json
             data/youtube_public_metrics.json
+            data/youtube_public_metrics_history.json
             data/domain_billing_snapshot.json
           if-no-files-found: warn
           retention-days: 14
