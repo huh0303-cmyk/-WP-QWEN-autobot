@@ -14,10 +14,9 @@ from pydub import AudioSegment
 
 from config import LANGUAGES
 
-ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY")
-API_URL = "https://api.elevenlabs.io/v1/text-to-speech/{voice_id}"
+FISH_AUDIO_API_KEY = os.getenv("FISH_AUDIO_API_KEY", "").strip()
 
-CACHE_DIR = "/tmp/vita150_tts_cache"
+CACHE_DIR = "/tmp/vita150_tts_cache_fish"
 os.makedirs(CACHE_DIR, exist_ok=True)
 
 SPEAKER_TAG_RE = re.compile(r"^\[(A|B)\]\s*(.*)$")
@@ -56,26 +55,54 @@ def parse_dialogue(script_text: str):
     return segments
 
 
-def _tts_single(text: str, voice_id: str) -> str:
-    """텍스트 한 덩어리를 하나의 mp3로 합성 (캐시 적용)."""
-    text_hash = hashlib.sha256((voice_id + text).encode("utf-8")).hexdigest()[:16]
+def _tts_single(text: str, voice_id: str, lang: str, speaker: str) -> str:
+    """Fish Audio S2.1 Pro Free first, then free native-language Edge TTS."""
+    text_hash = hashlib.sha256(("fish-audio-s2.1-pro-free|" + lang + "|" + speaker + "|" + text).encode("utf-8")).hexdigest()[:16]
     out_path = os.path.join(CACHE_DIR, f"{text_hash}.mp3")
     if os.path.exists(out_path):
         return out_path
 
-    resp = requests.post(
-        API_URL.format(voice_id=voice_id),
-        headers={"xi-api-key": ELEVENLABS_API_KEY, "Content-Type": "application/json"},
-        json={
-            "text": text,
-            "model_id": "eleven_multilingual_v2",
-            "voice_settings": {"stability": 0.5, "similarity_boost": 0.75},
-        },
-        timeout=180,
-    )
-    resp.raise_for_status()
-    with open(out_path, "wb") as f:
-        f.write(resp.content)
+    if FISH_AUDIO_API_KEY:
+        try:
+            resp = requests.post(
+                "https://api.fish.audio/v1/tts",
+                headers={"Authorization": f"Bearer {FISH_AUDIO_API_KEY}", "model": "s2.1-pro-free",
+                         "Content-Type": "application/json", "Accept": "audio/mpeg"},
+                json={"text": text, "format": "mp3"}, timeout=180,
+            )
+            if resp.ok and len(resp.content) > 1000 and not resp.content.lstrip().startswith(b"{"):
+                with open(out_path, "wb") as f:
+                    f.write(resp.content)
+                print(f"[TTS_ENGINE] fish_audio model=s2.1-pro-free lang={lang} speaker={speaker} bytes={len(resp.content)}")
+                return out_path
+            print(f"[TTS] Fish Audio HTTP {resp.status_code}; falling back to free Edge TTS.")
+        except Exception as exc:
+            print(f"[TTS] Fish Audio failed ({type(exc).__name__}); falling back to free Edge TTS.")
+    else:
+        print("[TTS] FISH_AUDIO_API_KEY unavailable; using free Edge TTS fallback.")
+
+    voices = {
+        "ko": ("ko-KR-SunHiNeural", "ko-KR-InJoonNeural"),
+        "en": ("en-US-AriaNeural", "en-US-GuyNeural"),
+        "ja": ("ja-JP-NanamiNeural", "ja-JP-KeitaNeural"),
+        "vi": ("vi-VN-HoaiMyNeural", "vi-VN-NamMinhNeural"),
+        "zh": ("zh-CN-XiaoxiaoNeural", "zh-CN-YunxiNeural"),
+        "es": ("es-ES-ElviraNeural", "es-ES-AlvaroNeural"),
+        "fr": ("fr-FR-DeniseNeural", "fr-FR-HenriNeural"),
+        "de": ("de-DE-KatjaNeural", "de-DE-ConradNeural"),
+        "it": ("it-IT-ElsaNeural", "it-IT-DiegoNeural"),
+        "pt": ("pt-BR-FranciscaNeural", "pt-BR-AntonioNeural"),
+    }
+    pair = voices.get(lang.split("-")[0].lower())
+    if not pair:
+        raise RuntimeError(f"No configured free Edge TTS voice for language={lang}.")
+    voice = pair[0] if speaker == "A" else pair[1]
+    import asyncio
+    import edge_tts
+    asyncio.run(edge_tts.Communicate(text, voice).save(out_path))
+    if not os.path.exists(out_path) or os.path.getsize(out_path) <= 1000:
+        raise RuntimeError(f"Fish Audio and Edge TTS failed for {lang}/{speaker}.")
+    print(f"[TTS_ENGINE] edge_tts voice={voice} lang={lang} speaker={speaker} bytes={os.path.getsize(out_path)}")
     return out_path
 
 
@@ -86,19 +113,13 @@ def synthesize_dialogue_with_timeline(script_text: str, lang: str):
       timeline: [{"speaker": "A", "text": "...", "start_ms": int, "duration_ms": int}, ...]
     """
     lang_cfg = LANGUAGES[lang]
-    voice_a = os.getenv(lang_cfg["voice_id_a_env"])
-    voice_b = os.getenv(lang_cfg["voice_id_b_env"])
-    voice_map = {"A": voice_a, "B": voice_b}
+    voice_map = {"A": "A", "B": "B"}
 
     segments = parse_dialogue(script_text)
     if not segments:
         raise ValueError("대본에서 읽을 텍스트를 찾지 못했습니다.")
 
     used_speakers = {s for s, _ in segments}
-    missing = [s for s in used_speakers if not voice_map.get(s)]
-    if missing:
-        env_names = [lang_cfg["voice_id_a_env"] if s == "A" else lang_cfg["voice_id_b_env"] for s in missing]
-        raise ValueError(f"{lang} 채널의 다음 음성이 .env에 설정되지 않았습니다: {env_names}")
 
     print(f"[TTS] {len(segments)}개 대사 세그먼트 합성 시작 (화자: {sorted(used_speakers)})")
     combined = AudioSegment.silent(duration=300)
@@ -107,7 +128,7 @@ def synthesize_dialogue_with_timeline(script_text: str, lang: str):
     cursor = 300
 
     for i, (speaker, text) in enumerate(segments):
-        mp3_path = _tts_single(text, voice_map[speaker])
+        mp3_path = _tts_single(text, voice_map[speaker], lang, speaker)
         clip = AudioSegment.from_mp3(mp3_path)
         timeline.append({"speaker": speaker, "text": text, "start_ms": cursor, "duration_ms": len(clip)})
         combined += clip + silence
