@@ -16,10 +16,12 @@ import hashlib
 import shutil
 import subprocess
 import sys
+import os
 from dataclasses import dataclass
 from pathlib import Path
 
 import edge_tts
+import requests
 from PIL import Image, ImageDraw, ImageFont
 
 
@@ -217,17 +219,43 @@ def make_card(path: Path, profile: LanguageProfile, word: str, reading: str, mea
     image.save(path, quality=95)
 
 
-async def synthesize(text: str, profile: LanguageProfile, output: Path) -> None:
+async def synthesize(text: str, profile: LanguageProfile, output: Path) -> str:
+    """Fish Audio S2.1 Pro Free first; free native-locale Edge TTS only if Fish fails."""
+    api_key = os.getenv("FISH_AUDIO_API_KEY", "").strip()
+    fish_error = "FISH_AUDIO_API_KEY not configured"
+    if api_key:
+        try:
+            response = requests.post(
+                "https://api.fish.audio/v1/tts",
+                headers={
+                    "Authorization": f"Bearer {api_key}",
+                    "model": "s2.1-pro-free",
+                    "Content-Type": "application/json",
+                    "Accept": "audio/mpeg",
+                },
+                json={"text": text, "format": "mp3"},
+                timeout=120,
+            )
+            if response.ok and len(response.content) > 1000 and not response.content.lstrip().startswith(b"{"):
+                output.parent.mkdir(parents=True, exist_ok=True)
+                output.write_bytes(response.content)
+                print(f"TTS_ENGINE=fish_audio model=s2.1-pro-free language={profile.code} bytes={output.stat().st_size}", flush=True)
+                return "Fish Audio S2.1 Pro Free"
+            fish_error = f"Fish Audio HTTP {response.status_code}; invalid audio={len(response.content) <= 1000 or response.content.lstrip().startswith(b'{')}"
+        except Exception as exc:
+            fish_error = f"Fish Audio request failed ({type(exc).__name__})"
+    print(f"TTS_FALLBACK language={profile.code} reason={fish_error}; provider=edge_tts", flush=True)
     last_error: Exception | None = None
     for attempt in range(3):
         try:
             await edge_tts.Communicate(text, profile.voice, rate="-8%", pitch="+0Hz").save(str(output))
             if output.exists() and output.stat().st_size > 1000:
-                return
-        except Exception as exc:  # network/voice service failure, retried then fail closed
+                print(f"TTS_ENGINE=edge_tts voice={profile.voice} language={profile.code} bytes={output.stat().st_size}", flush=True)
+                return "Microsoft Edge TTS (free fallback)"
+        except Exception as exc:
             last_error = exc
         await asyncio.sleep(1.5 * (attempt + 1))
-    raise RuntimeError(f"Native voice generation failed for {profile.code}/{profile.voice}: {last_error}")
+    raise RuntimeError(f"Both Fish Audio and free native voice generation failed for {profile.code}/{profile.voice}: {last_error}; {fish_error}")
 
 
 def quote_concat(path: Path) -> str:
@@ -284,8 +312,9 @@ async def build_language(target_date: dt.date, pair: dict, code: str, channel: d
     workdir.mkdir(parents=True, exist_ok=True)
 
     raw_a, raw_b = workdir / "word_a.mp3", workdir / "word_b.mp3"
-    await synthesize(words[0], profile, raw_a)
-    await synthesize(words[1], profile, raw_b)
+    engine_a = await synthesize(words[0], profile, raw_a)
+    engine_b = await synthesize(words[1], profile, raw_b)
+    engines_used = sorted(set([engine_a, engine_b]))
     # Stable per date/language/pair randomization varies pacing while keeping reruns reproducible.
     seed_text = f"{target_date.isoformat()}|{code}|{pair['id']}"
     seed = int(hashlib.sha256(seed_text.encode("utf-8")).hexdigest()[:16], 16)
@@ -361,7 +390,7 @@ async def build_language(target_date: dt.date, pair: dict, code: str, channel: d
         "words": words,
         "pronunciations": readings,
         "meanings": meanings,
-        "voice_provider": "Microsoft Edge neural TTS",
+        "voice_provider": engines_used,
         "voice": profile.voice,
         "voice_locale": profile.locale,
         "synthetic_voice_disclosure": "native-locale neural voice; not a recorded human speaker",
