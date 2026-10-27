@@ -79,6 +79,14 @@ jobs:
             echo "Runner already has FFmpeg and Noto CJK fonts; skipping slow apt refresh."
           fi
           python -m pip install --disable-pip-version-check requests pillow edge-tts google-api-python-client google-auth hangul-romanize pykakasi pypinyin
+      - name: Require Fish Audio secret in the YouTube production environment
+        shell: bash
+        run: |
+          if [ -z "${FISH_AUDIO_API_KEY:-}" ]; then
+            echo "::error title=Missing Fish Audio key::Add the existing Fish Audio API key as an environment secret named FISH_AUDIO_API_KEY in the youtube-channels environment. Refusing to silently generate another batch with Edge TTS."
+            exit 1
+          fi
+          echo "Fish Audio secret is available to the production job."
       - name: Resolve KST date and render ten native-locale vocabulary Shorts
         id: build
         shell: bash
