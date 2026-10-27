@@ -51,9 +51,7 @@ GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 GEMINI_TEXT_MODEL = "gemini-2.5-flash"
 GEMINI_IMAGE_MODELS = ["gemini-2.5-flash-image", "gemini-2.5-flash-image-preview"]  # 나노바나나
 
-ELEVENLABS_API_KEY = os.environ.get("ELEVENLABS_API_KEY", "")
-ELEVENLABS_VOICE_ID = os.environ.get("ELEVENLABS_VOICE_ID") or "21m00Tcm4TlvDq8ikWAM"
-ELEVENLABS_MODEL = "eleven_multilingual_v2"
+FISH_AUDIO_API_KEY = os.environ.get("FISH_AUDIO_API_KEY", "").strip()
 
 GMAIL_USER = "huh0303@gmail.com"
 GMAIL_APP_PASSWORD = os.environ.get("GMAIL_APP_PASSWORD", "")
@@ -268,15 +266,33 @@ def make_placeholder_image(out_path, text=""):
 # 4) ElevenLabs TTS
 # ════════════════════════════════════════════════════════════
 def elevenlabs_tts(text, out_path):
-    url = f"https://api.elevenlabs.io/v1/text-to-speech/{ELEVENLABS_VOICE_ID}"
-    headers = {"xi-api-key": ELEVENLABS_API_KEY,
-               "Content-Type": "application/json", "Accept": "audio/mpeg"}
-    body = {"text": text, "model_id": ELEVENLABS_MODEL,
-            "voice_settings": {"stability": 0.5, "similarity_boost": 0.75}}
-    r = requests.post(url, headers=headers, json=body, timeout=90)
-    r.raise_for_status()
-    with open(out_path, "wb") as f:
-        f.write(r.content)
+    """Legacy function name retained; Fish Audio Free first, free Edge TTS fallback."""
+    api_key = os.environ.get("FISH_AUDIO_API_KEY", "").strip()
+    if api_key:
+        try:
+            r = requests.post(
+                "https://api.fish.audio/v1/tts",
+                headers={"Authorization": f"Bearer {api_key}", "model": "s2.1-pro-free",
+                         "Content-Type": "application/json", "Accept": "audio/mpeg"},
+                json={"text": text, "format": "mp3"}, timeout=150,
+            )
+            if r.ok and len(r.content) > 1000 and not r.content.lstrip().startswith(b"{"):
+                with open(out_path, "wb") as f:
+                    f.write(r.content)
+                log(f"TTS_ENGINE=fish_audio model=s2.1-pro-free bytes={len(r.content)}")
+                return out_path
+            log(f"Fish Audio unavailable: HTTP {r.status_code}; trying free Edge TTS")
+        except Exception as exc:
+            log(f"Fish Audio unavailable ({type(exc).__name__}); trying free Edge TTS")
+    try:
+        import asyncio, edge_tts
+        asyncio.run(edge_tts.Communicate(text, "ko-KR-SunHiNeural").save(str(out_path)))
+        if os.path.exists(out_path) and os.path.getsize(out_path) > 1000:
+            log(f"TTS_ENGINE=edge_tts voice=ko-KR-SunHiNeural bytes={os.path.getsize(out_path)}")
+            return out_path
+    except Exception as exc:
+        log(f"Free Edge TTS failed ({type(exc).__name__})")
+    raise RuntimeError("All free TTS providers failed; no paid TTS fallback is permitted.")
 
 
 # ════════════════════════════════════════════════════════════
