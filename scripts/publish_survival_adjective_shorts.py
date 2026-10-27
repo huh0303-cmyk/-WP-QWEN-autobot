@@ -282,18 +282,48 @@ def main() -> int:
     if args.replace_video_id:
         replace_map[codes[0]] = args.replace_video_id
     receipts = []
+    failures = []
     for code in codes:
         print(f"PUBLISH {code}", flush=True)
-        receipts.append(publish_one(root / code / "manifest.json", args.privacy, args.publish_at))
+        try:
+            receipt = publish_one(root / code / "manifest.json", args.privacy, args.publish_at)
+            receipts.append(receipt)
+            print(f"PUBLISH_OK {code} video_id={receipt.get('video_id', '')}", flush=True)
+        except Exception as exc:
+            # Fail closed for this language only. Duplicate detection and channel-ID
+            # checks remain intact, but one channel must not prevent the other nine
+            # independent channels from being processed.
+            failure = {"language_code": code, "error_type": type(exc).__name__, "error": str(exc)[:1200]}
+            failures.append(failure)
+            print(f"PUBLISH_FAILED {code}: {type(exc).__name__}: {str(exc)[:500]}", flush=True)
+
     for code, old_video_id in replace_map.items():
-        service = youtube_service(code)
-        expected_channel = json.loads((root / code / "manifest.json").read_text(encoding="utf-8"))["channel_id"]
-        receipt = next(row for row in receipts if row["language_code"] == code)
-        receipt["replaced_old_video"] = make_old_video_private(service, old_video_id, expected_channel)
-    summary = {"date": args.date, "privacy": args.privacy, "count": len(receipts), "receipts": receipts}
+        receipt = next((row for row in receipts if row.get("language_code") == code), None)
+        if receipt is None:
+            failures.append({"language_code": code, "error_type": "ReplacementSkipped",
+                             "error": "Old video was not changed because the corrected upload was not verified."})
+            print(f"REPLACEMENT_SKIPPED {code}: corrected upload not verified", flush=True)
+            continue
+        if args.privacy != "public":
+            failures.append({"language_code": code, "error_type": "ReplacementSkipped",
+                             "error": "Old video replacement is allowed only after a verified public corrected upload."})
+            print(f"REPLACEMENT_SKIPPED {code}: corrected upload is not public", flush=True)
+            continue
+        try:
+            service = youtube_service(code)
+            expected_channel = json.loads((root / code / "manifest.json").read_text(encoding="utf-8"))["channel_id"]
+            receipt["replaced_old_video"] = make_old_video_private(service, old_video_id, expected_channel)
+        except Exception as exc:
+            failures.append({"language_code": code, "error_type": type(exc).__name__, "error": str(exc)[:1200]})
+            print(f"REPLACEMENT_FAILED {code}: {type(exc).__name__}: {str(exc)[:500]}", flush=True)
+
+    summary = {"date": args.date, "privacy": args.privacy, "count": len(receipts),
+               "failed_count": len(failures), "receipts": receipts, "failures": failures}
     (root / "publication_batch_receipt.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(summary, ensure_ascii=False))
-    return 0
+    # Return a failure status if any language failed, while retaining receipts for
+    # successes and allowing every independent language to finish its own attempt.
+    return 1 if failures else 0
 
 
 if __name__ == "__main__":
