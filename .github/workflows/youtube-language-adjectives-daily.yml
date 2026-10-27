@@ -92,7 +92,20 @@ jobs:
           fi
           LANGUAGES="${INPUT_LANGUAGES:-all}"
           ARGS=(--date "$TARGET_DATE" --languages "$LANGUAGES")
-          if [ -n "${INPUT_PAIR:-}" ]; then ARGS+=(--pair-id "$INPUT_PAIR"); fi
+          if [ -n "${INPUT_PAIR:-}" ]; then
+            PAIR_ID="$INPUT_PAIR"
+            echo "Using explicitly requested pair override: $PAIR_ID"
+          else
+            PAIR_LOG="$(python scripts/select_unique_survival_pair.py --languages "$LANGUAGES")"
+            echo "$PAIR_LOG"
+            PAIR_ID="$(printf '%s\n' "$PAIR_LOG" | sed -n 's/^SELECTED_PAIR_ID=//p' | tail -n 1)"
+            if [ -z "$PAIR_ID" ]; then
+              echo "::error::No unused vocabulary pair was selected; refusing to generate repeated lessons."
+              exit 1
+            fi
+          fi
+          ARGS+=(--pair-id "$PAIR_ID")
+          echo "selected_pair_id=$PAIR_ID" >> "$GITHUB_OUTPUT"
           python scripts/survival_adjective_short.py "${ARGS[@]}"
           echo "target_date=$TARGET_DATE" >> "$GITHUB_OUTPUT"
           echo "publish_at=$PUBLISH_AT" >> "$GITHUB_OUTPUT"
