@@ -6,6 +6,11 @@ on:
       - 'docs/TTS_PROVIDER_PRIORITY.md'
       - 'scripts/tts_provider_priority.py'
       - 'scripts/seoul_journal_shorts_pipeline.py'
+      - 'scripts/voice_rotation.py'
+      - 'scripts/channel_long_video.py'
+      - 'scripts/publish_survival_adjective_shorts.py'
+      - '.github/workflows/seoul-journal-daily-shorts.yml'
+      - '.github/workflows/seoul-journal-auto-publish.yml'
       - 'scripts/classic_reads_longform.py'
       - 'scripts/archive_footage_longform.py'
       - 'scripts/nasa_archive_longform.py'
@@ -60,6 +65,22 @@ jobs:
           assert 'edge-tts' in worker
           print('PASS: knowledge narration is routed through free-only Fish Audio -> Edge TTS; no paid TTS endpoint in narration adapter.')
           print('NOTE: Fish Audio still requires the FISH_AUDIO_API_KEY GitHub Actions secret to be configured.')
+          PY
+      - name: Verify Japan health voice and per-language failure isolation
+        run: |
+          python -m py_compile scripts/voice_rotation.py scripts/channel_long_video.py scripts/publish_survival_adjective_shorts.py
+          python - <<'PY'
+          import os
+          from scripts.voice_rotation import choose_voice
+          os.environ.pop("ELEVENLABS_VOICE_ID_HEALTH_JAPAN", None)
+          os.environ.pop("ELEVENLABS_VOICE_IDS_HEALTH_JAPAN", None)
+          voice = choose_voice("health_japan")
+          assert voice["id"] == "ja-JP-NanamiNeural", voice
+          assert voice["gender"] == "female", voice
+          publisher = open("scripts/publish_survival_adjective_shorts.py", encoding="utf-8").read()
+          assert "PUBLISH_FAILED" in publisher
+          assert "failed_count" in publisher
+          print("PASS: Japan health has a fixed free female voice profile; language failures are isolated and recorded.")
           PY
       - name: Verify provider order and paid-fallback guard
         run: |
