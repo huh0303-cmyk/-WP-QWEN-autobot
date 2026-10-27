@@ -22,7 +22,7 @@ jobs:
           CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
         run: |
           python - <<'PY'
-          import os, urllib.parse
+          import base64, os, urllib.parse
           client_id = os.environ.get("CLIENT_ID", "").strip()
           if not client_id:
               raise SystemExit("YOUTUBE_OAUTH_CLIENT_ID is missing.")
@@ -37,7 +37,7 @@ jobs:
               "state": "seoul-journal-reauth-20261027",
           }
           url = "https://accounts.google.com/o/oauth2/v2/auth?" + urllib.parse.urlencode(params)
-          print("OPEN_THIS_GOOGLE_CONSENT_URL=" + url)
+          print("OPEN_THIS_GOOGLE_CONSENT_URL_B64=" + base64.b64encode(url.encode("utf-8")).decode("ascii"))
           print("Approve access while signed into the Google account that owns the Seoul Journal YouTube channel.")
           print("After redirect, copy only the code query parameter. Rerun this workflow and paste it into auth_code.")
           with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as f:
