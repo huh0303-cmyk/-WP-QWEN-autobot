@@ -366,7 +366,15 @@ def main():
     rows.sort(key=lambda r: (r["clicks"] is None, -(r["clicks"] or 0), -(r["impressions"] or 0), r["site"]))
     for i, r in enumerate(rows, 1):
         r["rank"] = i
-    blogger_pageviews = collect_blogger_pageviews(blogger_portfolio, now)
+    # Blogspot pageviews are owned by blogger_total_pageviews.py (Playwright).
+    # Do not scrape them a second time here: the requests-only parser can mistake
+    # chart labels for the counter and overwrite the validated widget feed.
+    prior_dashboard = json.loads(OUT.read_text(encoding="utf-8")) if OUT.exists() else {}
+    blogger_pageviews = prior_dashboard.get("blogger_pageviews", {
+        "generated_at": None,
+        "source": "Awaiting rendered Blogger Stats widget collector",
+        "blogs": []
+    })
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps({
         "generated_at": now.isoformat(), "reference_date": ref.isoformat(),
