@@ -35,3 +35,71 @@ jobs:
           path: artifacts/seoul-journal-daily-queue.json
           if-no-files-found: error
           retention-days: 14
+
+  # The queue workflow used to stop after planning, so no Short was ever rendered
+  # or uploaded by its daily schedule. Upload one reviewed-queue candidate as PRIVATE
+  # at 09:00 Vietnam time only; never publish publicly without human review.
+  publish-private:
+    if: ${{ github.event_name == 'schedule' && github.event.schedule == '0 2 * * *' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    environment: FISH_AUDIO_API_KEY
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate required secrets before generation
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_CLIENT_ID }}
+          YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_CLIENT_SECRET }}
+          SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN }}
+          SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID }}
+        run: |
+          set -eu
+          missing=""
+          for name in OPENAI_API_KEY YOUTUBE_OAUTH_CLIENT_ID YOUTUBE_OAUTH_CLIENT_SECRET SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID; do
+            eval 'value=${'"$name"'-}'
+            if [ -z "$value" ]; then
+              echo "::error title=Missing GitHub secret::$name is not configured."
+              missing="yes"
+            fi
+          done
+          if [ -n "$missing" ]; then
+            echo "Stopped before generation. No video was uploaded."
+            exit 1
+          fi
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Verify exact Seoul Journal channel before generation
+        env:
+          PROFILE: SEOUL_JOURNAL
+          CLIENT_ID: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_CLIENT_SECRET }}
+          REFRESH_TOKEN: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN }}
+          EXPECTED_CHANNEL_ID: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID }}
+        run: |
+          python -m pip install --disable-pip-version-check requests google-api-python-client google-auth
+          python scripts/youtube_auth_preflight.py
+      - name: Install FFmpeg and free narration dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-noto-cjk
+          python -m pip install --disable-pip-version-check requests trafilatura beautifulsoup4 Pillow openai google-api-python-client google-auth google-auth-httplib2 edge-tts
+      - name: Render with Fish Audio first and free Edge TTS fallback; upload PRIVATE only
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          FISH_AUDIO_API_KEY: ${{ secrets.FISH_AUDIO_API_KEY }}
+          YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_CLIENT_ID }}
+          YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_CLIENT_SECRET }}
+          SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN }}
+          SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID }}
+        run: python scripts/seoul_journal_shorts_pipeline.py
+      - name: Save private upload receipt and rendered assets
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: seoul-journal-private-short-${{ github.run_id }}
+          path: artifacts/seoul-journal-short/
+          if-no-files-found: warn
+          retention-days: 14
