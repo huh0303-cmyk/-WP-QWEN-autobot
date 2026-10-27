@@ -216,12 +216,50 @@ def upload_private(video,meta,source_url):
     creds=Credentials(token=None,refresh_token=refresh,token_uri="https://oauth2.googleapis.com/token",
       client_id=client_id,client_secret=client_secret,scopes=["https://www.googleapis.com/auth/youtube.upload","https://www.googleapis.com/auth/youtube.readonly"])
     yt=build("youtube","v3",credentials=creds,cache_discovery=False)
-    ch=yt.channels().list(part="snippet",mine=True).execute()
+    ch=yt.channels().list(part="snippet,contentDetails",mine=True).execute()
     items=ch.get("items",[])
     if len(items)!=1 or items[0]["id"]!=expected:
         got=items[0]["id"] if items else "NO_CHANNEL"
         name=items[0]["snippet"]["title"] if items else "NO_CHANNEL"
         raise RuntimeError(f"채널 ID 검증 실패: 인증 채널={name} ({got}); 예상 채널과 일치하지 않아 업로드 중단.")
+    # Idempotency guard: inspect recent uploads before any insert. A repeated source URL
+    # or normalized title is skipped, preventing scheduled/manual runs from duplicating a Short.
+    uploads_id = items[0].get("contentDetails", {}).get("relatedPlaylists", {}).get("uploads", "")
+    recent_ids = []
+    page_token = None
+    for _ in range(2):  # latest 100 uploads is sufficient for daily news deduplication
+        if not uploads_id:
+            break
+        page = yt.playlistItems().list(
+            part="contentDetails", playlistId=uploads_id, maxResults=50, pageToken=page_token
+        ).execute()
+        recent_ids.extend(row["contentDetails"]["videoId"] for row in page.get("items", []))
+        page_token = page.get("nextPageToken")
+        if not page_token:
+            break
+    def title_key(value):
+        return re.sub(r"[^\\w]+", "", str(value).casefold(), flags=re.UNICODE)
+    expected_title_key = title_key(meta["youtube_title"])
+    for offset in range(0, len(recent_ids), 50):
+        existing = yt.videos().list(
+            part="snippet,status", id=",".join(recent_ids[offset:offset+50])
+        ).execute().get("items", [])
+        for old in existing:
+            old_snippet = old.get("snippet", {})
+            old_description = old_snippet.get("description", "")
+            old_title = old_snippet.get("title", "")
+            if source_url in old_description or (expected_title_key and title_key(old_title) == expected_title_key):
+                result = {
+                    "video_id": old.get("id"),
+                    "url": "https://studio.youtube.com/video/" + str(old.get("id")) + "/edit",
+                    "privacy": old.get("status", {}).get("privacyStatus", "unknown"),
+                    "channel_title": items[0]["snippet"]["title"],
+                    "channel_id": items[0]["id"],
+                    "skipped_duplicate": True,
+                    "duplicate_reason": "source_url" if source_url in old_description else "normalized_title",
+                }
+                log("DUPLICATE_SKIPPED: " + json.dumps(result, ensure_ascii=False))
+                return result
     description=(meta["description"].replace("[원문 기사]",source_url)+"\n\n원문 기사: "+source_url+"\n\n#Shorts #서울저널 #정치뉴스")
     body={"snippet":{"title":meta["youtube_title"][:100],"description":description[:4900],"categoryId":"25","tags":["서울저널","정치뉴스","대한민국정치","Shorts"]},
           "status":{"privacyStatus":"private","selfDeclaredMadeForKids":False}}
@@ -251,8 +289,11 @@ def main():
     log("VIDEO_RENDERED: "+str(video))
     result=upload_private(video,meta,url)
     (OUT/"upload_receipt.json").write_text(json.dumps(result,ensure_ascii=False,indent=2),encoding="utf-8")
-    log("YOUTUBE_PRIVATE_UPLOADED: "+json.dumps(result,ensure_ascii=False))
-    log("Owner review required in YouTube Studio before making public.")
+    if result.get("skipped_duplicate"):
+        log("YOUTUBE_UPLOAD_SKIPPED_DUPLICATE: " + json.dumps(result, ensure_ascii=False))
+    else:
+        log("YOUTUBE_PRIVATE_UPLOADED: " + json.dumps(result, ensure_ascii=False))
+        log("Owner review required in YouTube Studio before making public.")
 if __name__=="__main__":
     try: main()
     except Exception as e:
