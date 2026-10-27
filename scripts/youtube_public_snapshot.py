@@ -55,8 +55,34 @@ def main() -> None:
         raise SystemExit("YOUTUBE_API_KEY is required")
     result = collect(api_key)
     destination = ROOT / "data" / "youtube_public_metrics.json"
+    history_path = ROOT / "data" / "youtube_public_metrics_history.json"
+
+    # Keep a daily history from the same official YouTube Data API source.
+    # Re-running on the same KST date replaces today's snapshot instead of
+    # creating fake extra days; deltas compare only distinct daily snapshots.
+    try:
+        history = json.loads(history_path.read_text(encoding="utf-8"))
+    except (OSError, ValueError, TypeError):
+        history = {"snapshots": []}
+    snapshots = history.get("snapshots", [])
+    if not isinstance(snapshots, list):
+        snapshots = []
+    today = result["checked_at_kst"][:10]
+    snapshots = [row for row in snapshots if str(row.get("checked_at_kst", ""))[:10] != today]
+    snapshots.append(result)
+    snapshots.sort(key=lambda row: str(row.get("checked_at_kst", "")))
+    history_path.write_text(
+        json.dumps({"source": result["source"], "snapshots": snapshots[-90:]}, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
     destination.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(json.dumps({k: result[k] for k in ("confirmed_channels", "connected_channels", "source")}, ensure_ascii=False))
+    print(json.dumps({
+        "confirmed_channels": result["confirmed_channels"],
+        "connected_channels": result["connected_channels"],
+        "source": result["source"],
+        "history_days": len(snapshots[-90:]),
+        "checked_at_kst": result["checked_at_kst"],
+    }, ensure_ascii=False))
 
 
 if __name__ == "__main__":
