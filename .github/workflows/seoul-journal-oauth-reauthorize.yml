@@ -117,6 +117,13 @@ jobs:
           }, timeout=30)
           if not verify.ok:
               raise SystemExit("GitHub secret was updated, but refresh verification failed; rerun OAuth diagnosis before publishing.")
+          # Automatically resume the blocked production task after successful reauthorization.
+          dispatch = requests.post(base + "/actions/workflows/seoul-journal-daily-shorts.yml/dispatches",
+              headers=headers,
+              json={"ref":"main","inputs":{"run_private_upload":"true","confirm_private_upload":"true"}},
+              timeout=30)
+          if dispatch.status_code != 204:
+              raise SystemExit(f"OAuth is valid and the secret was saved, but private publishing could not be queued: HTTP_{dispatch.status_code}. Trigger the daily-shorts workflow manually.")
           print("PASS: Seoul Journal OAuth refreshed, exact channel identity verified, and GitHub secret updated.")
-          print("No video was uploaded by this authorization workflow.")
+          print("The private-only Seoul Journal publishing workflow was queued automatically.")
           PY
