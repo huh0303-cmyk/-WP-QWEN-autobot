@@ -411,22 +411,33 @@ def draw_quiz_card(icon_path, item, idx, total, reveal, out_path, header_text="�
 # 오디오: TTS + 딩 효과음
 # ════════════════════════════════════════════════════════════
 def elevenlabs_tts(text, out_path):
-    if not ELEVENLABS_API_KEY:
-        return False
-    url = f"https://api.elevenlabs.io/v1/text-to-speech/{ELEVENLABS_VOICE_ID}"
-    headers = {"xi-api-key": ELEVENLABS_API_KEY,
-               "Content-Type": "application/json", "Accept": "audio/mpeg"}
-    body = {"text": text, "model_id": ELEVENLABS_MODEL,
-            "voice_settings": {"stability": 0.5, "similarity_boost": 0.75}}
+    """Legacy name retained; Fish Audio Free first, Edge TTS free fallback."""
+    api_key = os.environ.get("FISH_AUDIO_API_KEY", "").strip()
+    if api_key:
+        try:
+            r = requests.post(
+                "https://api.fish.audio/v1/tts",
+                headers={"Authorization": f"Bearer {api_key}", "model": "s2.1-pro-free",
+                         "Content-Type": "application/json", "Accept": "audio/mpeg"},
+                json={"text": text, "format": "mp3"}, timeout=120,
+            )
+            if r.ok and len(r.content) > 1000 and not r.content.lstrip().startswith(b"{"):
+                with open(out_path, "wb") as f:
+                    f.write(r.content)
+                log(f"TTS_ENGINE=fish_audio model=s2.1-pro-free bytes={len(r.content)}")
+                return True
+            log(f"Fish Audio unavailable: HTTP {r.status_code}; trying free Edge TTS")
+        except Exception as exc:
+            log(f"Fish Audio unavailable ({type(exc).__name__}); trying free Edge TTS")
     try:
-        r = requests.post(url, headers=headers, json=body, timeout=90)
-        r.raise_for_status()
-        with open(out_path, "wb") as f:
-            f.write(r.content)
-        return True
-    except Exception as e:
-        log(f"   ⚠️ TTS 실패: {e}")
-        return False
+        import asyncio, edge_tts
+        asyncio.run(edge_tts.Communicate(text, "ko-KR-SunHiNeural").save(str(out_path)))
+        if os.path.exists(out_path) and os.path.getsize(out_path) > 1000:
+            log(f"TTS_ENGINE=edge_tts voice=ko-KR-SunHiNeural bytes={os.path.getsize(out_path)}")
+            return True
+    except Exception as exc:
+        log(f"Free Edge TTS failed ({type(exc).__name__})")
+    return False
 
 
 def make_silence(out_path, duration):
