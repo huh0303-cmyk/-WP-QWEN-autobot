@@ -317,6 +317,7 @@ async def _tts(text: str, voice: str, out: Path, elevenlabs_voice_id: str = ""):
             )
             if response.ok and len(response.content) > 2000 and not response.content.lstrip().startswith(b"{"):
                 out.write_bytes(response.content)
+                print(f"TTS_ENGINE=fish_audio model=s2.1-pro-free bytes={len(response.content)}", flush=True)
                 return
             print(f"Fish Audio TTS unavailable (HTTP {response.status_code}); using free Edge TTS.", flush=True)
         except Exception as exc:
@@ -325,6 +326,7 @@ async def _tts(text: str, voice: str, out: Path, elevenlabs_voice_id: str = ""):
         import edge_tts
         await edge_tts.Communicate(text, voice).save(str(out))
         if out.exists() and out.stat().st_size > 2000:
+            print(f"TTS_ENGINE=edge_tts voice={voice} bytes={out.stat().st_size}", flush=True)
             return
         raise RuntimeError("Edge TTS returned an empty/short audio file")
     except Exception as exc:
