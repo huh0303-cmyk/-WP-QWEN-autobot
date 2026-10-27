@@ -135,11 +135,10 @@ async def run():
             target["source"] = row["source"]
             target["checked_at"] = checked_at
         else:
-            # Preserve last-known good totals; expose the latest failed attempt separately.
+            # Preserve last-known good totals, but never label a failed refresh as healthy.
             target["last_attempt_at"] = checked_at
             target["last_attempt_status"] = row["status"]
-            if target.get("total_pageviews") is None:
-                target["status"] = row["status"]
+            target["status"] = row["status"]
     pageviews["generated_at"] = checked_at
     pageviews["source"] = payload["source"]
     pageviews["successful"] = payload["successful"]
@@ -150,7 +149,7 @@ async def run():
     for row in rows:
         print(("PAGEVIEWS_OK " + row["site_key"] + " " + str(row["total_pageviews"])) if row["total_pageviews"] is not None else ("PAGEVIEWS_FAIL " + row["site_key"] + " " + row["status"]))
     if not payload["successful"]:
-        raise SystemExit("No rendered Blogger pageview widgets were readable; dashboard totals were preserved")
+        print("WARNING: no counters could be verified; last-known good totals were preserved and failure states recorded.")
 
 
 if __name__ == "__main__":
