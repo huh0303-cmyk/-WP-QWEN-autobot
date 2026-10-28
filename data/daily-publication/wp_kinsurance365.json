@@ -1,1 +1,1 @@
-{"day": "2026-10-28", "status": "DISPATCHED", "attempts": 1, "claim": "daily-2026-10-28-wp_kinsurance365-268ab9cd", "claimed_at": "2026-10-28T10:15:49.645267+09:00", "run_id": 40613994643, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-10-28", "status": "PUBLISHED", "public_url": "https://koreainsurance365.com/hanwha-general-insurance-options-and-medical-coverage-provisions-for-foreign-residents/", "published_at": "2026-10-28T01:19:44Z"}
