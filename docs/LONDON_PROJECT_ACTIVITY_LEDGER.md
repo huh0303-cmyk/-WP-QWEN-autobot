@@ -573,3 +573,13 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - Read-only inspection of the local runner queue found no Oct28/Oct29 job IDs. It contains five `2026-09-04` jobs in retry state with 203–285 attempts and five pending Sheets outbox results; each retry error is `tistory_editor_error` caused by the image ALT validation remaining unresolved. No receipt or public post is associated with the Oct28 selection. These are stale queue items and must not be treated as the day's selected work.
 - Windows task `Tistory5개_일일자동발행` was found running `tistory_local_runner.py run --max-jobs 5 --gap-seconds 600` despite the daily-plan pause and absence of current selection keys. The exact runner process was stopped, then the scheduled task was disabled to prevent it from consuming stale pending/retry jobs. Final task state verified `Disabled`; no matching runner process remained. This is a temporary safety hold pending queue cleanup and an explicit re-enable after the paused workflow is repaired.
 - No posts were retried or backfilled. Required next action: clear/archive stale jobs and outbox items after reconciliation, repair the ALT validation issue and paused-plan quality gate, verify today's intended three queue rows, then explicitly re-enable the Windows task. Google Sheets row-level publication details are unverified beyond the no-matching-key query; public RSS is the publication evidence.
+
+
+## naver-daily-check-20261029
+
+- task_id=`naver-daily-check-20261029`; heartbeat `2026-10-29T10:35:52Z` = 2026-10-29 19:35 KST. Checked N1 `k-insight-vietnam`, N2 `health-standard`, N3 `sky-only`.
+- No `data/naver-daily-plans/2026-10-29.json` or `data/naver-trend-brief/2026-10-29.json` exists. The required same-day research window (07:07–07:50 KST) has passed; no evidence-backed plan is available. No late/backfill publication was attempted.
+- Direct public Naver RSS checks returned zero Oct29 items for all three blogs. Latest public items remain N1 Oct10 01:18 KST, N2 Oct7 10:39 KST, and N3 Oct8 10:20 KST. Confirmed Oct29 count: 0/3; no new public URLs.
+- Current Chrome inventory showed YouTube/GitHub tabs but no Naver editor; the active Naver account-to-blog identity could not be confirmed. No draft was inserted and no post was published.
+- Current heartbeat quota (N1 one/day, N2 one/day, N3 1–5/day) still differs from the locked scope's prior 3–4 / 3–4 / 8–10 cadence. No configuration change was made; no schedule was created above the current heartbeat quota.
+- Next action: prepare the next day's trend brief during the configured morning window, confirm the live Naver account/blog pair before any editor action, and proceed only with a same-day validated plan and publication slot.
