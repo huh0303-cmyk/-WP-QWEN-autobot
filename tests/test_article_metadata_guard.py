@@ -1,4 +1,4 @@
-"""Regression tests for per-article WordPress tag filtering."""
+"""Regression tests for per-article WordPress tag filtering; run by isolated CI."""
 
 import sys
 import unittest
