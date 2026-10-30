@@ -583,3 +583,19 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - Current Chrome inventory showed YouTube/GitHub tabs but no Naver editor; the active Naver account-to-blog identity could not be confirmed. No draft was inserted and no post was published.
 - Current heartbeat quota (N1 one/day, N2 one/day, N3 1–5/day) still differs from the locked scope's prior 3–4 / 3–4 / 8–10 cadence. No configuration change was made; no schedule was created above the current heartbeat quota.
 - Next action: prepare the next day's trend brief during the configured morning window, confirm the live Naver account/blog pair before any editor action, and proceed only with a same-day validated plan and publication slot.
+
+
+## tistory-daily-audit-20261029
+
+- task_id=`tistory-daily-audit-20261029`; heartbeat `2026-10-30T03:53:03Z` = 2026-10-30 12:53 KST. Audited the exact saved 2026-10-29 selection.
+- Selected: `tistory_life365` → `https://huh0303.tistory.com/` at 08:36 KST; `tistory_insurance_lab` → `https://k-insight-vietnam.tistory.com/` at 11:16 KST; `tistory_finance_housing` → `https://k-vietnam.tistory.com/` at 22:12 KST. The daily plan file is absent; canonical `tistory-daily-plan.yml` remains paused for the quality incident.
+- Dated slot receipts: Life365 and Insurance Lab were marked `dispatched` together at 14:39 KST, after their slots; Finance/Housing has no receipt. Dispatch is not proof of generation or publication. Google Sheets contains no rows matching the 2026-10-29 run keys. No matching Oct29 local runner jobs exist.
+- Direct RSS checks of the three exact sites found no Oct29 posts (0/3): Life365 latest Oct23 19:17 KST, Insurance Lab latest Oct23 19:08 KST, Finance/Housing latest Oct18 17:36 KST. No public URLs to report.
+- Windows task `Tistory5개_일일자동발행` remains disabled and no local runner process is active. The local queue still has five old outbox rows from the previously documented 2026-09-04 ALT-validation failures. No stale job was retried.
+
+## tistory-daily-progress-20261030
+
+- task_id=`tistory-daily-progress-20261030`; heartbeat `2026-10-30T03:53:03Z` = 2026-10-30 12:53 KST; interim check of the exact 2026-10-30 selection.
+- Selected: `tistory_finance_housing` 10:11 KST, `tistory_ktrip365` 11:49 KST, `tistory_life365` 22:44 KST. The daily plan file is absent. The first two slots have passed; none of the three dated dispatch receipts or Sheets run-key rows exists at check time. Windows task remains disabled; no local runner process is active.
+- Direct RSS showed no Oct30 post on any selected site (0/3 as of 12:53 KST); latest public posts remain Finance/Housing Oct18, Ktrip Oct10, and Life365 Oct23. No public URLs to report.
+- No retry or catch-up was initiated. The remaining 22:44 slot cannot complete through the disabled local task unless the queue/quality gate is repaired and the authorized schedule is re-enabled. Keep the task disabled while stale queue/outbox items remain.
