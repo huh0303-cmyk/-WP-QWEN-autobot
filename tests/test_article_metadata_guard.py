@@ -1,3 +1,5 @@
+"""Regression tests for per-article WordPress tag filtering."""
+
 import sys
 import unittest
 from pathlib import Path
