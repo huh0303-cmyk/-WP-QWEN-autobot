@@ -9,7 +9,6 @@ import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
-from urllib.parse import urljoin
 
 import requests
 
@@ -17,7 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from scripts.site_registry import SITES  # noqa: E402
 
 EXCLUDED_NEWS = {"https://koreanews365.com", "https://theseouljournal.com"}
-WP_USER = os.getenv("WP_USER", "").strip()
+WP_USER = os.getenv("WP_USER", "huh0303@gmail.com").strip()
 OUT = Path(os.getenv("REPORT_PATH", "artifacts/coupang_fleet_readonly_manifest.json"))
 TIMEOUT = 20
 SESSION = requests.Session()
@@ -29,7 +28,7 @@ def parse_yesterday(payload):
     if not isinstance(payload, dict):
         return None
     keys = (
-        "yesterday", "yesterday_visitors", "visitors_yesterday",
+        "yesterday", "yesterday_count", "yesterday_visitors", "visitors_yesterday",
         "previous_day", "previous_day_visitors", "visitors_previous_day",
     )
     for key in keys:
@@ -75,12 +74,6 @@ def main():
             result["visitor_status"] = "BLOCKED_MISSING_CREDENTIAL"
             result["post_inventory_status"] = "BLOCKED_MISSING_CREDENTIAL"
             result["errors"].append("Required site credential secret is not available to this workflow.")
-            sites.append(result)
-            continue
-        if not WP_USER:
-            result["visitor_status"] = "BLOCKED_MISSING_WP_USER"
-            result["post_inventory_status"] = "BLOCKED_MISSING_WP_USER"
-            result["errors"].append("WP_USER GitHub Actions secret is missing.")
             sites.append(result)
             continue
         auth = (WP_USER, password)
