@@ -49,6 +49,22 @@ class TitleRepeatGuard(unittest.TestCase):
         self.assertEqual(list(R.flag(d)), [("s", "1")])
 
 
+    def test_wordpress_history_includes_scheduled_and_review_posts(self):
+        from unittest import mock
+        from automation_hub.repetition_guard import fetch_wp_history
+        response = mock.Mock()
+        response.raise_for_status = lambda: None
+        response.json = lambda: [{"id": 1, "status": "future", "title": {"rendered": "Scheduled topic"}}]
+        session = mock.Mock()
+        session.get.return_value = response
+        rows = fetch_wp_history(session, "https://example.test", ("u", "p"))
+        self.assertEqual(rows[0]["status"], "future")
+        params = session.get.call_args.kwargs["params"]
+        self.assertIn("future", params["status"])
+        self.assertIn("draft", params["status"])
+        self.assertEqual(params["per_page"], 100)
+
+
 if __name__ == "__main__":
     unittest.main()
 
