@@ -256,9 +256,10 @@ def _publish_wordpress(*, site_url: str, secret_name: str, article: dict, image_
     category_id = resolve_category_id(site_url, wp_pass, "")
     if category_id:
         data["categories"] = [category_id]
-    tag_ids = resolve_tag_ids(site_url, wp_pass, article.get("labels", []))
-    if tag_ids:
-        data["tags"] = tag_ids
+    from automation_hub.article_metadata_guard import sanitize_article_labels
+    article["labels"] = sanitize_article_labels(article.get("labels", []), title=article.get("title", ""), keyword=keyword)
+    tag_ids = resolve_tag_ids(site_url, wp_pass, article["labels"])
+    data["tags"] = tag_ids
     focus_keyword = keyword.strip()
     if not focus_keyword:
         raise SystemExit("WordPress focus keyword is required; draft creation blocked")
