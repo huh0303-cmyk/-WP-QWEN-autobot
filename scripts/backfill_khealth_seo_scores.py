@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Backfill missing K-Health365 SEO scores using the repo's transparent heuristic.
 
+Run revision 2: trigger the score-backfill workflow after its workflow file is installed.
+
 Important: this is an internal estimate, NOT Rank Math's native editor-side score.
 It only replaces blank/"None"/non-numeric values for the explicitly listed posts.
 """
