@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Repair K-Health365 topic pollution across existing WordPress posts.
 
+Workflow-triggering release: repair non-empty polluted tag sets as well as missing ones.
+
 This script does not delete posts. It only corrects known repeated expo
 headlines, replaces duplicate/generic focus keywords, and removes unrelated
 tag IDs from posts in publish/future/draft/pending/private states.
