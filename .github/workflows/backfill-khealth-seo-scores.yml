@@ -1,0 +1,41 @@
+name: "K-Health365 — backfill missing SEO scores"
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/backfill_khealth_seo_scores.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: khealth-seo-score-backfill
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependency
+        run: pip install requests -q
+      - name: Validate script syntax
+        run: python -m py_compile scripts/backfill_khealth_seo_scores.py
+      - name: Backfill scores and verify saved values
+        env:
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+        run: python scripts/backfill_khealth_seo_scores.py
+      - name: Upload score report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: khealth-seo-score-backfill
+          path: artifacts/khealth-seo-score-backfill.json
+          if-no-files-found: warn
+          retention-days: 30
