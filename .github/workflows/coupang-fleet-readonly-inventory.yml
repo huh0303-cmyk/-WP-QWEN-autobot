@@ -1,0 +1,62 @@
+name: "London Project — Coupang fleet visitor rank and post inventory (read-only)"
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 05:30 KST daily; cloud runner only, does not depend on the user's PC.
+    - cron: "30 20 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: coupang-fleet-readonly-inventory
+  cancel-in-progress: false
+
+jobs:
+  read-only-inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install read-only audit dependency
+        run: python -m pip install requests
+      - name: Collect visitor ranks and latest 100 published posts per general site
+        env:
+          WP_USER: ${{ secrets.WP_USER }}
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+          KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
+          KOREAINVEST365COM: ${{ secrets.KOREAINVEST365COM }}
+          KIKOREACOM: ${{ secrets.KIKOREACOM }}
+          KOREAINSURANCE365COM: ${{ secrets.KOREAINSURANCE365COM }}
+          KFINANCE365COM: ${{ secrets.KFINANCE365COM }}
+          KOREATAXNLAWCOM: ${{ secrets.KOREATAXNLAWCOM }}
+          KOREACRYPTO365COM: ${{ secrets.KOREACRYPTO365COM }}
+          KREALESTATE365COM: ${{ secrets.KREALESTATE365COM }}
+          KTECH365COM: ${{ secrets.KTECH365COM }}
+          KSKIN365COM: ${{ secrets.KSKIN365COM }}
+          OLIVEYOUNGKOREACOM: ${{ secrets.OLIVEYOUNGKOREACOM }}
+          KWORLD365COM: ${{ secrets.KWORLD365COM }}
+          KTRIP365COM: ${{ secrets.KTRIP365COM }}
+          KVISA365COM: ${{ secrets.KVISA365COM }}
+          KOREAWEDDING365COM: ${{ secrets.KOREAWEDDING365COM }}
+          KSTUDY365COM: ${{ secrets.KSTUDY365COM }}
+          STUDYINKOREA365COM: ${{ secrets.STUDYINKOREA365COM }}
+          KIECAKOREAORG: ${{ secrets.KIECAKOREAORG }}
+          KSAKOREAORG: ${{ secrets.KSAKOREAORG }}
+          SISKOREACOM: ${{ secrets.SISKOREACOM }}
+          JOBKOREA365COM: ${{ secrets.JOBKOREA365COM }}
+          JOBINKOREA365COM: ${{ secrets.JOBINKOREA365COM }}
+          JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
+          KOREA365ORG: ${{ secrets.KOREA365ORG }}
+        run: python scripts/coupang_fleet_readonly_inventory.py
+      - name: Save manifest artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coupang-fleet-readonly-manifest-${{ github.run_id }}
+          path: artifacts/coupang_fleet_readonly_manifest.json
+          if-no-files-found: error
+          retention-days: 14
