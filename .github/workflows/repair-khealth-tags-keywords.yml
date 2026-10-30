@@ -1,0 +1,39 @@
+name: "K-Health365 — repair duplicate titles and polluted tags"
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/repair_khealth_tags_keywords.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: khealth-tags-keywords-repair
+  cancel-in-progress: false
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install runtime dependencies
+        run: pip install requests beautifulsoup4 -q
+      - name: Repair existing K-Health365 posts
+        env:
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+        run: python scripts/repair_khealth_tags_keywords.py
+      - name: Upload audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: khealth-tags-keywords-repair
+          path: artifacts/khealth-tags-keywords-repair.json
+          if-no-files-found: warn
+          retention-days: 30
