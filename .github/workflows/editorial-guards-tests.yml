@@ -26,5 +26,7 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install beautifulsoup4 requests -q
+      - name: Compile changed publishing paths
+        run: python -m py_compile automation_hub/article_metadata_guard.py automation_hub/original_writer.py automation_hub/repetition_guard.py scripts/auto_write_and_draft.py scripts/london_four_agent_pipeline.py scripts/repair_khealth_tags_keywords.py
       - name: Run editorial guard tests
         run: python -m unittest discover -s tests -p "test_article_metadata_guard.py" -v
