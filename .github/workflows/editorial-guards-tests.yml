@@ -1,0 +1,30 @@
+name: "Editorial guard unit tests"
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "automation_hub/article_metadata_guard.py"
+      - "automation_hub/original_writer.py"
+      - "automation_hub/repetition_guard.py"
+      - "scripts/auto_write_and_draft.py"
+      - "scripts/london_four_agent_pipeline.py"
+      - "tests/test_article_metadata_guard.py"
+      - "tests/test_title_repeat_guard.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install beautifulsoup4 requests -q
+      - name: Run editorial guard tests
+        run: python -m unittest discover -s tests -p "test_*guard.py" -v
