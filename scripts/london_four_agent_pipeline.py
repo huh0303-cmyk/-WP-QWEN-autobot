@@ -387,6 +387,8 @@ def stage_write(run_id: str) -> dict:
             failures = list(failures) + ["new rewrite unavailable; retained prior quality-passed article"]
         else:
             raise RuntimeError(f"writer quality gate failed: score={score} failures={failures}")
+    from automation_hub.article_metadata_guard import sanitize_article_labels
+    article["labels"] = sanitize_article_labels(article.get("labels") or article.get("tags") or [], title=article.get("title", ""), keyword=keyword)
     if platform == "wordpress":
         from scripts.create_manual_wp_draft import WP_USER
         from automation_hub.article_metadata_guard import wp_repetition_issues, repetition_feedback
