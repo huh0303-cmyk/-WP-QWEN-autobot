@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 for candidate in (ROOT, ROOT / "scripts"):
     if str(candidate) not in sys.path:
         sys.path.insert(0, str(candidate))
-STATE_DIR = ROOT / "data" / "london-pipeline"
+STATE_DIR = ROOT / "data" / "london-pipeline"  # title/tag guard rollout
 KST = timezone(timedelta(hours=9))
 MEDICAL_TOPIC = re.compile(r"(?i)covid|corona|vaccine|vaccination|medical|treatment|hospital|health|코로나|백신|접종|의료|치료|질병|건강")
 
