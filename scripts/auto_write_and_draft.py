@@ -172,6 +172,8 @@ def _write_article(*, keyword: str, site_theme: str, language: str, persona: str
             candidate = parse_rewrite_json(raw)
             ymyl = any(w in keyword.lower() for w in ("visa", "immigration", "insurance", "medical", "hospital", "treatment", "비자", "보험", "의료"))
             candidate = normalize_rewrite_format(candidate, target_chars=target_chars, source_url="", ymyl=ymyl)
+            from automation_hub.article_metadata_guard import sanitize_article_labels
+            candidate["labels"] = sanitize_article_labels(candidate.get("labels", []), title=candidate.get("title", ""), keyword=keyword)
             candidate = _finish_meta_description(candidate, keyword=keyword)
             score, failures = original_quality_score(candidate, keyword=keyword, target_chars=target_chars, language=language,
                                                    min_chars=min_chars, max_chars=max_chars)
@@ -377,6 +379,22 @@ def main() -> int:
         if service is not None and sheet_row is not None:
             _set_status(service, sheet_id, sheet_row, "보류")
         raise SystemExit(f"Quality gate failed for {site_id}/{keyword}: score={score} failures={failures}")
+
+    if platform == "wordpress":
+        from automation_hub.article_metadata_guard import wp_repetition_issues, repetition_feedback
+        guard_args = {"site_url": site_url, "secret_name": settings["secret_name"], "wp_user": WP_USER}
+        try:
+            repeat_issues = wp_repetition_issues(**guard_args, article=article)
+        except Exception as exc:
+            raise SystemExit(f"WordPress repetition guard could not verify history; draft blocked: {type(exc).__name__}: {exc}")
+        if repeat_issues:
+            print(json.dumps({"repetition_retry": True, "issues": repeat_issues[:5]}, ensure_ascii=False))
+            article, score, failures, provider = _write_article(**writer_args, review_feedback=repetition_feedback(repeat_issues))
+            if article is None:
+                raise SystemExit(f"REPETITION_GUARD_BLOCKED: rewrite failed; original candidate not saved: {failures}")
+            repeat_issues = wp_repetition_issues(**guard_args, article=article)
+            if repeat_issues:
+                raise SystemExit(f"REPETITION_GUARD_BLOCKED: title/opening still overlaps existing content: {repeat_issues[:5]}")
 
     image_subject = (article.get("image_queries") or [article["title"]])[0]
     image_url = "" if os.environ.get("IMAGE_MODEL", "").strip() == "none" else (generate_image_url(image_subject, theme=article["title"]) or "")
