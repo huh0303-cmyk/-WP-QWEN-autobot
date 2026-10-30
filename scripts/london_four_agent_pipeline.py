@@ -156,10 +156,13 @@ def _publish_wordpress_native(state: dict, profile: dict, public: bool) -> dict:
     }
     if category.get("id"):
         payload["categories"] = [int(category["id"])]
-    tags = [str(tag).strip() for tag in (article.get("tags") or []) if str(tag).strip()]
+    # The writer schema returns "labels"; accept the legacy "tags" alias only as fallback.
+    tags = [str(tag).strip() for tag in (article.get("labels") or article.get("tags") or []) if str(tag).strip()]
+    from automation_hub.article_metadata_guard import sanitize_article_labels
+    tags = sanitize_article_labels(tags, title=article.get("title", ""), keyword=str(state.get("keyword") or article.get("title", "")))
     tag_ids = resolve_tag_ids(site_url, password, tags)
-    if tag_ids:
-        payload["tags"] = tag_ids
+    # Always send the full list, including [], so stale/default tag sets cannot survive an update.
+    payload["tags"] = tag_ids
     meta_description = str(article.get("meta_description") or "").strip()
     if meta_description:
         payload["meta"] = {"rank_math_description": meta_description}
@@ -365,7 +368,7 @@ def stage_write(run_id: str) -> dict:
     funnel = settings.get("editorial_funnel") or profile["wordpress"].get("editorial_funnel") or {}
     previous_article = state.get("article")
     previous_writer = state.get("writer") or {}
-    article, score, failures, provider = _write_article(
+    writer_args = dict(
         keyword=keyword,
         site_theme=profile["wordpress"]["theme"] + (f". Editorial funnel: {json.dumps(funnel, ensure_ascii=False)}" if funnel else ""),
         language=profile["language"],
@@ -375,6 +378,7 @@ def stage_write(run_id: str) -> dict:
         target_chars=settings["target_chars"],
         max_chars=settings["max_chars"],
     )
+    article, score, failures, provider = _write_article(**writer_args)
     if article is None:
         if previous_article and int(previous_writer.get("quality_score") or 0) >= 70:
             article = previous_article
@@ -383,6 +387,21 @@ def stage_write(run_id: str) -> dict:
             failures = list(failures) + ["new rewrite unavailable; retained prior quality-passed article"]
         else:
             raise RuntimeError(f"writer quality gate failed: score={score} failures={failures}")
+    if platform == "wordpress":
+        from scripts.create_manual_wp_draft import WP_USER
+        from automation_hub.article_metadata_guard import wp_repetition_issues, repetition_feedback
+        guard_args = {"site_url": profile["wordpress"]["url"], "secret_name": profile["wordpress"]["secret_name"], "wp_user": WP_USER}
+        try:
+            repeat_issues = wp_repetition_issues(**guard_args, article=article)
+        except Exception as exc:
+            raise RuntimeError(f"WordPress repetition guard could not verify history; publish blocked: {type(exc).__name__}: {exc}")
+        if repeat_issues:
+            article, score, failures, provider = _write_article(**writer_args, review_feedback=repetition_feedback(repeat_issues))
+            if article is None:
+                raise RuntimeError(f"REPETITION_GUARD_BLOCKED: rewrite failed: {failures}")
+            repeat_issues = wp_repetition_issues(**guard_args, article=article)
+            if repeat_issues:
+                raise RuntimeError(f"REPETITION_GUARD_BLOCKED: title/opening still overlaps existing content: {repeat_issues[:5]}")
     state["article"] = article
     state["writer"] = {"quality_score": score, "provider": provider, "failures": failures}
     if MEDICAL_TOPIC.search(keyword):
