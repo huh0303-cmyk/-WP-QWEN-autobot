@@ -644,3 +644,12 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - 사용자의 명시적 요청으로 ChatGPT의 WordPress connector 앱 연결을 제거했다.
 - GitHub `main`에서 운영 지침을 직접 REST API/승인된 클라우드 실행 경로로 변경하고, 구형 연결 전용 지침 파일과 설정 플래그를 삭제했다.
 - 기존 작업 결과와 포스트 콘텐츠는 변경하지 않았다. Git 커밋 이력은 감사 추적을 위해 유지한다.
+
+## 2026-11-01 OliveYoungKorea + Kskin365 cleanup and affiliate task
+- task_id: oliveyoung-kskin365-cleanup-20261101
+- Scope: WordPress OliveYoungKorea + Kskin365; DC + PowerShell; WPVibe prohibited.
+- Public read-only audit: OliveYoungKorea 63 posts, 0 duplicate title groups, 7 repeated cross-post inline-image groups, 0 within-post duplicates. Kskin365 103 posts, 1 duplicate title group (IDs 2897/2905), 4 repeated cross-post inline-image groups, 1 within-post repeated image case (ID 1582).
+- Proposed Kskin365 #2905 retitle: Niacinamide 2%, 5%, and 10%: Choosing the Right Concentration for Korean Skincare.
+- Safety: retain posts and media-library originals; remove only repeated inline blocks after audit; preserve all other post fields; verify authenticated read-back.
+- Artifacts: reports/oliveyoung-kskin365-editorial-audit-2026-11-01.json; scripts/oliveyoung_kskin365_editorial_cleanup.py; .github/workflows/oliveyoung-kskin365-editorial-cleanup.yml; docs/OLIVEYOUNG_KSKIN365_CLEANUP_2026-11-01.md.
+- Live edits and affiliate placements remain pending until authenticated update and public verification.
