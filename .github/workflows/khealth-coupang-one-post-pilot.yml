@@ -25,7 +25,7 @@ jobs:
           from bs4 import BeautifulSoup
           base="https://k-health365.com/wp-json/wp/v2"
           auth=(os.environ["WP_USER"],os.environ["WP_PASS"])
-          pid=7314
+          pid=7310
           product_url="https://link.coupang.com/a/ihaVByREei"
           image_url="https://k-health365.com/wp-content/uploads/2026/10/순수식품-rTG-오메가3-비타민D-1000mg-3개-상품-사진.jpg"
           g=requests.get(f"{base}/posts/{pid}",auth=auth,params={"context":"edit"},timeout=30)
