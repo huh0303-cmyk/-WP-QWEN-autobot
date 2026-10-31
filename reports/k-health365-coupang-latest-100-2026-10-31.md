@@ -16,7 +16,7 @@
 - Product: 순수식품 rTG 오메가3 + 비타민D
 - Partner link: https://link.coupang.com/a/ihaVByREei
 - Image: https://k-health365.com/wp-content/uploads/2026/10/순수식품-rTG-오메가3-비타민D-1000mg-3개-상품-사진.jpg
-- Verification: WPVibe content search found exactly one `khealth-coupang-product` module. Post remains published; original publication date unchanged.
+- Verification: WordPress connector content search found exactly one `khealth-coupang-product` module. Post remains published; original publication date unchanged.
 
 ### Post 7291
 - Title: 심뇌혈관질환 예방을 위한 단계별 혈관 관리 및 조기 진단 전략
@@ -24,7 +24,7 @@
 - Product: 순수식품 rTG 오메가3 + 비타민D
 - Partner link: https://link.coupang.com/a/ihaVByREei
 - Image: https://k-health365.com/wp-content/uploads/2026/10/순수식품-rTG-오메가3-비타민D-1000mg-3%ea%b0%9c-%ec%83%81%ed%92%88-%ec%82%ac%ec%a7%84.jpg
-- Verification: WPVibe content search found exactly one `khealth-coupang-product` module. Post remains published; original publication date unchanged.
+- Verification: WordPress connector content search found exactly one `khealth-coupang-product` module. Post remains published; original publication date unchanged.
 
 ## Existing matching product card
 - Post 7314 — 오메가3 EPA DHA 함량 비교와 올바른 섭취 기준 및 혈관 건강 관리법
