@@ -1,0 +1,25 @@
+﻿name: JobKorea365 fill every published post with 8 verified Coupang products
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  fill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests -q
+      - name: Insert 8 official partner creatives per published post and verify read-back
+        env:
+          JOBKOREA365COM: \${{ secrets.JOBKOREA365COM }}
+        run: python scripts/jobkorea365_fill_all_posts_6to10.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: jobkorea365-all-posts-6to10-report
+          path: reports/jobkorea365-all-posts-6to10-report.json
+          if-no-files-found: warn
