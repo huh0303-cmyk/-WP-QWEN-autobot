@@ -1,0 +1,101 @@
+name: K-Health365 Coupang one-post pilot
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests beautifulsoup4
+      - name: Insert one relevant product card into the newest matching published post
+        env:
+          WP_USER: huh0303@gmail.com
+          WP_PASS: ${{ secrets.KHEALTH365COM }}
+        run: |
+          python - <<'PY'
+          import os, re, sys, html, requests
+          from bs4 import BeautifulSoup
+
+          base = "https://k-health365.com/wp-json/wp/v2"
+          auth = (os.environ["WP_USER"], os.environ["WP_PASS"])
+          product_url = "https://link.coupang.com/a/ihKqEBmP48"
+          headers = {"User-Agent": "Mozilla/5.0 KHealth365AffiliatePilot/1.0"}
+
+          r = requests.get(base + "/posts", auth=auth, headers=headers,
+                           params={"status":"publish","per_page":100,"page":1,
+                                   "orderby":"date","order":"desc",
+                                   "_fields":"id,date,link,title,content"},
+                           timeout=30)
+          r.raise_for_status()
+          posts = r.json()
+          print("LATEST_PUBLISHED_POSTS", len(posts))
+          if not posts:
+              raise SystemExit("No published posts returned")
+
+          keywords = ("관절", "연골", "콘드로이친", "글루코사민", "무릎", "골관절")
+          chosen = None
+          for post in posts:
+              title = BeautifulSoup(post["title"]["rendered"], "html.parser").get_text(" ", strip=True)
+              body = BeautifulSoup(post["content"]["rendered"], "html.parser").get_text(" ", strip=True)
+              text = title + " " + body[:6000]
+              if any(k in text for k in keywords):
+                  chosen = post
+                  break
+          if not chosen:
+              raise SystemExit("No suitable joint/cartilage post among latest 100; no changes made")
+
+          content = chosen["content"]["rendered"]
+          if "khealth-coupang-pilot-20261031" in content:
+              print("ALREADY_INSERTED", chosen["id"], chosen["link"])
+              raise SystemExit(0)
+
+          pr = requests.get(product_url, headers=headers, timeout=30, allow_redirects=True)
+          pr.raise_for_status()
+          soup = BeautifulSoup(pr.text, "html.parser")
+          image = ""
+          meta = soup.find("meta", attrs={"property":"og:image"})
+          if meta and meta.get("content","").startswith("https://"):
+              image = meta["content"]
+          if not image:
+              meta = soup.find("meta", attrs={"name":"twitter:image"})
+              if meta and meta.get("content","").startswith("https://"):
+                  image = meta["content"]
+          if not image:
+              print("PRODUCT_PAGE", pr.url)
+              raise SystemExit("Could not verify product image from Coupang product page; no changes made")
+
+          card = (
+            '<div id="khealth-coupang-pilot-20261031" style="margin:28px 0;padding:18px;border:1px solid #e5e7eb;border-radius:12px;">'
+            '<p style="font-size:12px;color:#777;margin:0 0 10px;">파트너스 광고</p>'
+            f'<a href="{product_url}" target="_blank" rel="sponsored nofollow noopener" referrerpolicy="unsafe-url">'
+            f'<img src="{html.escape(image, quote=True)}" alt="관절엔 콘드로이친 1200 건강기능식품 상품 이미지" loading="lazy" style="display:block;width:100%;max-width:360px;height:auto;margin:0 auto 12px;border-radius:8px;">'
+            '<strong>관절엔 콘드로이친 1200 상품 정보 확인하기</strong></a>'
+            '<p style="font-size:12px;color:#777;margin:10px 0 0;">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p>'
+            '</div>'
+          )
+          new_content = content + "\\n" + card
+          u = requests.post(base + f"/posts/{chosen['id']}", auth=auth,
+                            headers=headers, json={"content":new_content}, timeout=30)
+          u.raise_for_status()
+          verify = requests.get(base + f"/posts/{chosen['id']}", auth=auth,
+                                params={"context":"edit","_fields":"id,link,content,status"},
+                                timeout=30)
+          verify.raise_for_status()
+          saved = verify.json()["content"]["raw"]
+          if "khealth-coupang-pilot-20261031" not in saved or product_url not in saved:
+              raise SystemExit("POST returned but read-back verification failed")
+          print("INSERTED_AND_VERIFIED=1")
+          print("POST_ID", chosen["id"])
+          print("POST_URL", chosen["link"])
+          print("PRODUCT_URL", product_url)
+          print("IMAGE_URL", image)
+          PY
