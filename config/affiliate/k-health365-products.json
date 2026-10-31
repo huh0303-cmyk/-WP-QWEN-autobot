@@ -1,0 +1,79 @@
+[
+  {
+    "id": "chondroitin-01",
+    "enabled": false,
+    "affiliate_confirmed": false,
+    "title": "관절엔 콘드로이친 1200",
+    "url": "https://link.coupang.com/a/ihKqEBmP48",
+    "image_url": "",
+    "relevance": "관절·뼈 건강",
+    "keywords": [
+      "골다공증",
+      "뼈",
+      "관절",
+      "칼슘"
+    ],
+    "note": "실제 대표 이미지 URL 확인 후 활성화"
+  },
+  {
+    "id": "calcium-k2-01",
+    "enabled": false,
+    "affiliate_confirmed": false,
+    "title": "고려은단 뼈건강 칼마디 K2",
+    "url": "https://link.coupang.com/a/ihPTujzeyy",
+    "image_url": "https://thumbnail9.coupangcdn.com/thumbnails/remote/212x212ex/image/vendor_inventory/752b/279847c76be6ce234b214dc858ceaecf81bd12fe07dcc556dc44cd3749fd.jpg",
+    "relevance": "칼슘·마그네슘·비타민D·K2",
+    "keywords": [
+      "골다공증",
+      "뼈",
+      "칼슘",
+      "비타민D"
+    ],
+    "note": "이미지 URL 및 상품 일치 여부 검증 후 활성화"
+  },
+  {
+    "id": "omega3-vitd-01",
+    "enabled": false,
+    "affiliate_confirmed": false,
+    "title": "순수식품 rTG 오메가3 + 비타민D",
+    "url": "https://link.coupang.com/a/ihaVByREei",
+    "image_url": "",
+    "relevance": "영양 보충",
+    "keywords": [
+      "골다공증",
+      "건강",
+      "비타민D"
+    ],
+    "note": "실제 대표 이미지 URL 확인 후 활성화"
+  },
+  {
+    "id": "multivitamin-01",
+    "enabled": false,
+    "affiliate_confirmed": false,
+    "title": "고려은단 멀티비타민 올인원",
+    "url": "https://link.coupang.com/a/ihPGNw5JzU",
+    "image_url": "",
+    "relevance": "종합 영양 보충",
+    "keywords": [
+      "골다공증",
+      "건강",
+      "영양"
+    ],
+    "note": "실제 대표 이미지 URL 확인 후 활성화"
+  },
+  {
+    "id": "msm-yuhan-01",
+    "enabled": false,
+    "affiliate_confirmed": false,
+    "title": "유한양행 식물성 MSM",
+    "url": "https://www.coupang.com/vp/products/7525337812?itemId=7499302545&vendorItemId=87223585679&utm_source=chatgpt.com",
+    "image_url": "",
+    "relevance": "관절 건강 보조",
+    "keywords": [
+      "관절",
+      "뼈",
+      "건강"
+    ],
+    "note": "사용자 화면에서 상품 페이지 진입 확인. 파트너스 링크 및 이미지 URL 확인 후 활성화"
+  }
+]
