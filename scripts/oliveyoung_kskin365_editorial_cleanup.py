@@ -37,15 +37,23 @@ def main():
   for pid in sorted(set(targets)|set(RETITLES.get(site,{}))):
    p=fetch(s,cfg["url"],pid)
    if p.get("status")!="publish": raise RuntimeError(f"{site} #{pid} is not published")
-   co=p.get("content",{}); old=co.get("raw") or co.get("rendered") or ""
+   co=p.get("content",{}); raw=co.get("raw") or ""; rendered=co.get("rendered") or ""
    to=p.get("title",{}); oldtitle=to.get("raw") or html.unescape(re.sub("<[^>]+>","",to.get("rendered","")))
-   new=old; removed=[]
-   for spec in targets.get(pid,[]):
-    if isinstance(spec,tuple): u=spec[1]; new,n=remove(new,u,True); rule="keep_first_within_post"
-    else: u=spec; new,n=remove(new,u,False); rule="retain_lowest_post_id"
-    if n: removed.append({"url":u,"blocks":n,"rule":rule})
+   def apply_image_rules(source):
+    result=source; removed_local=[]
+    for spec in targets.get(pid,[]):
+     if isinstance(spec,tuple): u=spec[1]; result,n=remove(result,u,True); rule="keep_first_within_post"
+     else: u=spec; result,n=remove(result,u,False); rule="retain_lowest_post_id"
+     if n: removed_local.append({"url":u,"blocks":n,"rule":rule})
+    return result,removed_local
+   raw_new,raw_removed=apply_image_rules(raw) if raw else (raw,[])
+   rendered_new,rendered_removed=apply_image_rules(rendered) if rendered else (rendered,[])
+   if len(rendered_removed)>len(raw_removed):
+    old=rendered; new=rendered_new; removed=rendered_removed; content_source="rendered_fallback"
+   else:
+    old=raw or rendered; new=raw_new if raw else rendered_new; removed=raw_removed; content_source="raw" if raw else "rendered"
    newtitle=RETITLES.get(site,{}).get(pid,oldtitle)
-   item={"post_id":pid,"link":p.get("link"),"title_before":oldtitle,"title_after":newtitle,"image_blocks_removed":removed,"content_changed":new!=old,"title_changed":newtitle!=oldtitle}
+   item={"post_id":pid,"link":p.get("link"),"title_before":oldtitle,"title_after":newtitle,"image_blocks_removed":removed,"content_source":content_source,"content_changed":new!=old,"title_changed":newtitle!=oldtitle}
    if a.apply and (new!=old or newtitle!=oldtitle):
     payload={}
     if new!=old: payload["content"]=new
@@ -53,7 +61,12 @@ def main():
     pr=s.post(f"{cfg['url']}/wp-json/wp/v2/posts/{pid}",json=payload,timeout=45); pr.raise_for_status()
     q=fetch(s,cfg["url"],pid); qc=q.get("content",{}); check=qc.get("raw") or qc.get("rendered") or ""
     qt=q.get("title",{}); checktitle=qt.get("raw") or html.unescape(re.sub("<[^>]+>","",qt.get("rendered","")))
-    if checktitle!=newtitle or (new!=old and check!=new): raise RuntimeError(f"Readback mismatch {site} #{pid}")
+    if content_source=="rendered_fallback":
+     pub=requests.get(f"{cfg['url']}/wp-json/wp/v2/posts/{pid}",timeout=30); pub.raise_for_status()
+     check=pub.json().get("content",{}).get("rendered","")
+     images_still_present=[x["url"] for x in removed if x["url"] in check]
+     if images_still_present: raise RuntimeError(f"Duplicate images remain {site} #{pid}: {images_still_present}")
+    if checktitle!=newtitle or (new!=old and content_source!="rendered_fallback" and check!=new): raise RuntimeError(f"Readback mismatch {site} #{pid}")
     item.update({"status":"UPDATED_VERIFIED","sha256_before":sha(old),"sha256_after":sha(check),"updated_fields":list(payload)})
    elif a.apply: item["status"]="NO_CHANGE"
    changes.append(item)
