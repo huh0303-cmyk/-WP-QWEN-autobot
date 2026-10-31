@@ -20,6 +20,5 @@
   "pilot_post_limit": 3,
   "require_post_write_verification": true,
   "no_duplicate_marker": "<!-- COUPANG_PARTNERS_BLOCK:replace-with-site-key -->",
-  "cloud_execution_only": true,
-  "wpvibe_enabled": false
+  "cloud_execution_only": true
 }
