@@ -32,7 +32,7 @@ Read `scripts/site_registry.py`. It currently has 27 WordPress destinations, inc
 - Keep medical/health content informational; no disease-cure claims or unsupported health claims.
 
 ## Required inputs / preflight blockers
-Current WPVibe inventory reports only three connected sites (`k-health365.com`, `kworld365.com`, `kstudy365.com`); this is not proof that all 25 site credentials are currently usable. The canonical registry names 25 general sites, but live authentication and write permission must be verified per site.
+Do not infer site access from connector inventories. Verify each site's direct WordPress REST authentication and write permission independently before any change.
 
 Before any write:
 1. Verify the expected site registry and per-site credentials/secrets are present in GitHub Actions without printing secret values.
@@ -62,7 +62,6 @@ A task is complete only when:
 ## Current observed state (2026-10-31)
 - London Project repository exists and is writable: `huh0303-cmyk/-WP-QWEN-autobot`.
 - `scripts/site_registry.py` lists 27 destinations total, of which 25 are non-news general sites.
-- WPVibe currently lists only 3 connected sites, not 25.
 - Desktop Commander lists two computers, both offline.
 - No post edits or 2,500-post batch writes have been performed as part of this task.
 - This document records the requested work and safety/acceptance contract; it is not evidence that the live rollout is complete.
