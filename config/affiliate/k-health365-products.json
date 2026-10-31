@@ -63,17 +63,17 @@
   },
   {
     "id": "msm-yuhan-01",
-    "enabled": false,
-    "affiliate_confirmed": false,
+    "enabled": true,
+    "affiliate_confirmed": true,
     "title": "유한양행 식물성 MSM",
-    "url": "https://www.coupang.com/vp/products/7525337812?itemId=7499302545&vendorItemId=87223585679&utm_source=chatgpt.com",
-    "image_url": "",
+    "url": "https://link.coupang.com/a/ihWmcAFZSK",
+    "image_url": "https://t5a.coupangcdn.com/thumbnails/remote/212x212ex/image/vendor_inventory/d319/26024e257b07344aba2b67088b0126e73d90d3ea5ec91b7f0c82dba9468e.jpg",
     "relevance": "관절 건강 보조",
     "keywords": [
       "관절",
       "뼈",
       "건강"
     ],
-    "note": "사용자 화면에서 상품 페이지 진입 확인. 파트너스 링크 및 이미지 URL 확인 후 활성화"
+    "note": "사용자가 제공한 쿠팡 파트너스 상품 링크 및 파트너스 페이지에 표시된 상품 대표 이미지"
   }
 ]
