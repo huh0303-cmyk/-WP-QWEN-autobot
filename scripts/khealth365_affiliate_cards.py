@@ -48,7 +48,7 @@ def request(url: str, method: str = "GET", payload: dict | None = None, auth: st
         fail(f"Request failed: {exc}")
 
 def resolve_product_image(affiliate_url: str) -> str:
-    """Resolve the actual product image from the Coupang affiliate destination page."""
+    """Resolve and verify the actual product image from the Coupang destination."""
     req = urllib.request.Request(affiliate_url, headers={
         "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/126 Safari/537.36",
         "Accept": "text/html,application/xhtml+xml"
@@ -59,23 +59,24 @@ def resolve_product_image(affiliate_url: str) -> str:
             page = response.read(3_000_000).decode("utf-8", "replace")
     except Exception as exc:
         fail(f"Could not resolve Coupang affiliate destination {affiliate_url}: {exc}")
+
+    patterns = [
+        r'<meta[^>]+property="og:image"[^>]+content="([^"]+)',
+        r'<meta[^>]+content="([^"]+)"[^>]+property="og:image"',
+        r'<meta[^>]+name="twitter:image"[^>]+content="([^"]+)',
+        r'(https://[^" ]+\\.(?:jpg|jpeg|png|webp)(?:\\?[^" ]*)?)'
+    ]
     candidates = []
-    for pattern in (
-        r'<meta[^>]+(?:property|name)="og:image"[^>]+content="([^"]+)',
-        r'<meta[^>]+content="([^"]+)"[^>]+(?:property|name)="og:image"',
-        r'<meta[^>]+(?:name|property)="twitter:image"[^>]+content="([^"]+)',
-        r"(https?://[^\\"']+\\.(?:jpg|jpeg|png|webp)(?:\\?[^\\"']*)?)"
-    ):        candidates.extend(re.findall(pattern, page, flags=re.I))
+    for pattern in patterns:
+        candidates.extend(re.findall(pattern, page, flags=re.I))
+
     for candidate in candidates:
-        if isinstance(candidate, tuple):
-            candidate = candidate[-1]
-        image_url = html.unescape(candidate).replace("\\/", "/")
-        image_url = urllib.parse.urljoin(page_url, image_url)
+        image_url = urllib.parse.urljoin(page_url, html.unescape(candidate).replace("\\/", "/"))
         parsed = urllib.parse.urlparse(image_url)
         if parsed.scheme != "https" or not any(parsed.path.lower().endswith(ext) for ext in (".jpg", ".jpeg", ".png", ".webp")):
             continue
         try:
-            check = urllib.request.Request(image_url, headers={"User-Agent": "Mozilla/5.0"}, method="GET")
+            check = urllib.request.Request(image_url, headers={"User-Agent": "Mozilla/5.0"})
             with urllib.request.urlopen(check, timeout=20) as img:
                 if img.status == 200 and img.headers.get("Content-Type", "").lower().startswith("image/"):
                     return image_url
@@ -149,9 +150,17 @@ def main() -> None:
     block = "\n".join(cards)
     if START in content and END in content:
         before, remainder = content.split(START, 1)
-        # Remove the earlier unmarked pilot block left by the first manual insertion.
+        # Remove the earlier unmarked affiliate section from the initial manual insertion.
         before = re.sub(
-            r'\\s*<section class="khealth-affiliate-products" aria-label="관련 상품 추천">.*?</section>\\s*        content = content.rstrip() + "\n\n" + block
+            r'\\s*<section class="khealth-affiliate-products" aria-label="관련 상품 추천">.*?</section>\\s*$',
+            '',
+            before,
+            count=1,
+            flags=re.S
+        )
+        content = before + block + remainder.split(END, 1)[1]
+    else:
+        content = content.rstrip() + "\\n\\n" + block
 
     OUT.mkdir(exist_ok=True)
     report = {
