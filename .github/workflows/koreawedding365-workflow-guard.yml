@@ -1,0 +1,38 @@
+name: KoreaWedding365 sequential workflow guard
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "status or validate_evidence"
+        required: true
+        type: choice
+        options: [status, validate_evidence]
+      evidence_path:
+        description: "Repository-relative evidence file for the current checkpoint"
+        required: false
+        type: string
+permissions:
+  contents: read
+jobs:
+  checkpoint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate sequential checkpoint
+        shell: pwsh
+        run: |
+          $state = Get-Content "data/affiliate/koreawedding365-workflow-state.json" -Raw | ConvertFrom-Json
+          Write-Host "Site: $($state.site)"
+          Write-Host "Current step: $($state.current_step) / $($state.current_step_name)"
+          Write-Host "Status: $($state.status)"
+          Write-Host "Affiliate insertion locked: $($state.affiliate_insertion_locked)"
+          if ("${ inputs.action }}" -eq "validate_evidence") {
+            $evidence = "${ inputs.evidence_path }}"
+            if ([string]::IsNullOrWhiteSpace($evidence) -or !(Test-Path $evidence)) { throw "Evidence path is required and must exist in the repository." }
+            Write-Host "Evidence file exists: $evidence"
+            Write-Host "Guard only validates; it never edits WordPress or advances state."
+          }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: koreawedding365-workflow-state
+          path: data/affiliate/koreawedding365-workflow-state.json
