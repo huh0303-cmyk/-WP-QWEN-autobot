@@ -61,12 +61,11 @@ def resolve_product_image(affiliate_url: str) -> str:
         fail(f"Could not resolve Coupang affiliate destination {affiliate_url}: {exc}")
     candidates = []
     for pattern in (
-        r'<meta[^>]+(?:property|name)=["\\']og:image["\\'][^>]+content=["\\']([^"\\']+)',
-        r'<meta[^>]+content=["\\']([^"\\']+)["\\'][^>]+(?:property|name)=["\\']og:image["\\']',
-        r'<meta[^>]+(?:name|property)=["\\']twitter:image["\\'][^>]+content=["\\']([^"\\']+)',
-        r'(["\\'])(https?:\\?/\\?/[^"\\']+(?:jpg|jpeg|png|webp)(?:\\?[^"\\']*)?)\\1'
-    ):
-        candidates.extend(re.findall(pattern, page, flags=re.I))
+        r'<meta[^>]+(?:property|name)="og:image"[^>]+content="([^"]+)',
+        r'<meta[^>]+content="([^"]+)"[^>]+(?:property|name)="og:image"',
+        r'<meta[^>]+(?:name|property)="twitter:image"[^>]+content="([^"]+)',
+        r"(https?://[^\\"']+\\.(?:jpg|jpeg|png|webp)(?:\\?[^\\"']*)?)"
+    ):        candidates.extend(re.findall(pattern, page, flags=re.I))
     for candidate in candidates:
         if isinstance(candidate, tuple):
             candidate = candidate[-1]
