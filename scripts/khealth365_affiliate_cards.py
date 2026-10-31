@@ -152,7 +152,8 @@ def main() -> None:
         before, remainder = content.split(START, 1)
         # Remove the earlier unmarked affiliate section from the initial manual insertion.
         before = re.sub(
-            r'\s*<section class="khealth-affiliate-products" aria-label="관련 상품 추천">.*?</section>\s*            '',
+            r'\s*<section class="khealth-affiliate-products" aria-label="관련 상품 추천">.*?</section>\s*$',
+            '',
             before,
             count=1,
             flags=re.S
