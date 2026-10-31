@@ -24,7 +24,7 @@ jobs:
       - run: pip install requests -q
       - name: Build read-only manifest for 24 general WordPress sites
         env:
-          WP_USER: ${{ secrets.WP_USER }}
+          WP_USER: huh0303@gmail.com
           KOREA365ORG: ${{ secrets.KOREA365ORG }}
           KSTUDY365COM: ${{ secrets.KSTUDY365COM }}
           OLIVEYOUNGKOREACOM: ${{ secrets.OLIVEYOUNGKOREACOM }}
