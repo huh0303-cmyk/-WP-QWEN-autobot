@@ -1,0 +1,64 @@
+name: K-Health365 Coupang Product Cards
+
+on:
+  workflow_dispatch:
+    inputs:
+      post_id:
+        description: "K-Health365 WordPress post ID"
+        required: true
+        default: "6148"
+        type: string
+      mode:
+        description: "preview = build artifact only; apply = update the post"
+        required: true
+        default: "preview"
+        type: choice
+        options:
+          - preview
+          - apply
+      min_items:
+        description: "Minimum number of relevant products (5-10)"
+        required: true
+        default: "5"
+        type: choice
+        options: ["5", "6", "7", "8", "9", "10"]
+      max_items:
+        description: "Maximum number of relevant products (5-10)"
+        required: true
+        default: "10"
+        type: choice
+        options: ["5", "6", "7", "8", "9", "10"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: khealth365-affiliate-cards-${{ inputs.post_id }}
+  cancel-in-progress: false
+
+jobs:
+  build-and-apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate range and build product cards
+        env:
+          POST_ID: ${{ inputs.post_id }}
+          MODE: ${{ inputs.mode }}
+          MIN_ITEMS: ${{ inputs.min_items }}
+          MAX_ITEMS: ${{ inputs.max_items }}
+          WP_SITE_URL: https://k-health365.com
+          WP_USER: ${{ secrets.KHEALTH365_WP_USER }}
+          WP_APP_PASSWORD: ${{ secrets.KHEALTH365_WP_APP_PASSWORD }}
+        run: python scripts/khealth365_affiliate_cards.py
+      - name: Upload preview/result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: khealth365-affiliate-cards-${{ inputs.post_id }}
+          path: output/khealth365-affiliate-*
+          if-no-files-found: warn
