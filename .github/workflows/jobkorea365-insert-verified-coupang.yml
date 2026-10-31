@@ -1,0 +1,25 @@
+﻿name: JobKorea365 insert verified Coupang codes
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  insert:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests -q
+      - name: Insert verified codes into matching published posts and read-back verify
+        env:
+          JOBKOREA365COM: ${{ secrets.JOBKOREA365COM }}
+        run: python scripts/jobkorea365_insert_verified_coupang.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: jobkorea365-coupang-insertion-report
+          path: jobkorea365-coupang-insert-report.json
+          if-no-files-found: warn
