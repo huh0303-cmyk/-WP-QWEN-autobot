@@ -58,7 +58,7 @@ The user supplies site names in sequence. For each site:
 - Use the existing site-specific GitHub secret; never print or log secret values.
 - Never commit credentials, cookies, session tokens, or partner account identifiers.
 - Never run a K-Health365-only workflow for another site.
-- WPVibe is disabled / quota exhausted; do not use it.
+- Use direct WordPress REST API through the approved cloud workflow; do not depend on optional WordPress MCP connectors.
 - Do not add paid APIs, paid SaaS, or paid image services.
 
 ## Per-site data contract
