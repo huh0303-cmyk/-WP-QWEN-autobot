@@ -1,0 +1,35 @@
+﻿name: OliveYoung and Kskin365 editorial cleanup
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "dry_run or apply"
+        required: true
+        default: "dry_run"
+        type: choice
+        options: [dry_run, apply]
+permissions:
+  contents: read
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests
+      - name: Run editorial cleanup
+        env:
+          OLIVEYOUNGKOREACOM: ${{ secrets.OLIVEYOUNGKOREACOM }}
+          KSKIN365COM: ${{ secrets.KSKIN365COM }}
+        run: |
+          if [ "${{ inputs.mode }}" = "apply" ]; then
+            python scripts/oliveyoung_kskin365_editorial_cleanup.py --apply
+          else
+            python scripts/oliveyoung_kskin365_editorial_cleanup.py
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: oliveyoung-kskin365-editorial-cleanup-report
+          path: reports/oliveyoung-kskin365-editorial-cleanup-2026-11-01.json
