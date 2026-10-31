@@ -72,3 +72,11 @@ The broader fleet preflight reported 20 authenticated sites and 4 blocked sites 
 ## Truthful completion status
 
 NOT PUBLISHED YET. The 50-item candidate pool, 77-post inventory and 77-post product matching manifest are prepared. Product-specific portal links/creatives, the pilot and live-site insertion remain outstanding.
+
+
+## GitHub record
+
+- Branch pushed and remotely verified: fix/jobkorea365-coupang-placements-20261031.
+- Pull request opened: https://github.com/huh0303-cmyk/-WP-QWEN-autobot/pull/233.
+- Product link capture template created: data/affiliate/jobkorea365-coupang-link-capture-template.csv (50 rows; exact product URLs, portal short URLs, official creative HTML, capture time and post mapping fields).
+- No secret values, cookies or partner credentials were committed.
