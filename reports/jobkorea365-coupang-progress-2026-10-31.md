@@ -8,7 +8,7 @@ Working branch: fix/jobkorea365-coupang-placements-20261031
 
 - Use Desktop Commander (DC) and PowerShell together for local PC, browser, filesystem and command execution.
 - Continue in this ChatGPT session when Work/Codex is unavailable; do not redirect the user to Work/Codex.
-- WPVibe is disabled by the user and must not be used.
+- WordPress connector is disabled by the user and must not be used.
 - Record all material decisions and results in GitHub in the same session.
 - The requested placement unit is each individual post/article. Each eligible JobKorea365 post should receive 5–10 article-matched products, not 5–10 products per site.
 - Build a separate JobKorea365 pool of approximately 40–50 commercial product candidates, then select 5–10 per article by relevance, purchase intent, practical Korea-living needs and appropriate higher-ticket value.
@@ -22,7 +22,7 @@ Working branch: fix/jobkorea365-coupang-placements-20261031
 - New working branch: fix/jobkorea365-coupang-placements-20261031.
 - GitHub CLI authentication is available on the PC.
 - JOBKOREA365COM is present in GitHub Actions workflow environment mappings; secret values are not read or written to the repository.
-- WPVibe was not used.
+- WordPress connector was not used.
 
 ## JobKorea365 live-site read-only inventory
 
