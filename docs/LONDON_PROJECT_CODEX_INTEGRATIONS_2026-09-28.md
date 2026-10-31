@@ -10,7 +10,7 @@ Codex에서 런던프로젝트GPT의 4-Agent 운영, 방문자·검색 색인·�
 | --- | --- | --- |
 | OpenAI Docs MCP | Codex 전역에 `openaiDeveloperDocs`로 추가, streamable HTTP, enabled | OpenAI/Codex 개발 문서 조회 전용. 블로그 통계 접근 권한 없음. |
 | GitHub 커넥터 | 설치됨 | 소스, PR, CI, 감사 기록. |
-| WPVibe | 설치됨; 개별 WordPress 사이트 연결은 미검증 | 연결된 사이트에 한해 글/사이트 정보 관리. 런던프로젝트GPT의 자체 발행 상태와 혼동하지 않는다. |
+| WordPress direct REST | 승인된 사이트별 자격 증명으로 접근; 사이트별 인증 및 쓰기 권한 확인 필요 | GitHub Actions 또는 승인된 클라우드 실행 경로로 운영. |
 | Google Drive·Gmail·Calendar | 설치됨 | 문서·메일·일정 작업에만 사용; GSC·GA4·AdSense 지표를 대신하지 않는다. |
 | GSC Wizard | 추천함; 아직 연결/설치 확인 안 됨 | Google 로그인 후 Search Console 속성과 연결된 GA4 자료를 읽는 후보. 속성 권한과 실제 연결은 별도 확인 필요. |
 | AdSense 수익 연결 | 적합한 설치형 연결 확인 못 함 | 실제 수익은 AdSense 날짜별 계정 보고서 또는 검증된 API 증거로만 기록. |
@@ -23,6 +23,6 @@ Codex에서 런던프로젝트GPT의 4-Agent 운영, 방문자·검색 색인·�
 
 1. 사용자가 GSC Wizard를 연결할 때 실제 Search Console 속성과 필요한 GA4 속성 권한을 확인한다. 연결 전에는 검색 색인 수나 GA4 방문자 수를 확정 값으로 보고하지 않는다.
 2. 수익 보고는 AdSense 계정의 실제 보고서 접근이 마련될 때까지 `미확인`으로 둔다. 승인 여부와 수익을 분리한다.
-3. WordPress 개별 사이트를 WPVibe로 다루려면 그 사이트의 연결 상태를 확인한다. 이미 존재하는 운영 서버 자격 증명을 Codex MCP 화면에 복사하지 않는다.
+3. WordPress 작업은 직접 REST API 또는 승인된 클라우드 실행 경로로 수행하고, 사이트별 자격 증명은 GitHub Secrets에 보관한다.
 
 비밀 키, 토큰, 개인 로그인 정보는 GitHub에 기록하지 않는다.
