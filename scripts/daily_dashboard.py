@@ -347,10 +347,9 @@ def main():
                 and "ksa-korea.org" not in item.get("url", "").lower()
                 and "theseouljournal.com" not in item.get("url", "").lower()]
     # Retired destinations: exclude from dashboard inventory without deleting any site content.
+    # Exclude retired WordPress newsroom domains, but keep all 33 registered Blogger destinations.
     targets = [t for t in targets if "ksa-korea.org" not in t[1].lower()
-               and "theseouljournal.com" not in t[1].lower()
-               and "theseouljournal.blogspot.com" not in t[1].lower()
-               and "ksa-korea.blogspot.com" not in t[1].lower()]
+               and "theseouljournal.com" not in t[1].lower()]
     # Only one newsroom is active in the control-room inventory.
     newsroom_targets = [t for t in targets if t[0] == "newsroom"]
     if newsroom_targets:
