@@ -22,8 +22,10 @@ while True:
   raw=p.get('content',{}).get('raw') or p.get('content',{}).get('rendered') or ''
   txt=re.sub(r'<[^>]+>',' ',raw); txt=re.sub(r'\s+',' ',txt)
   selected=[x for x in PRODUCTS if re.search(x['rx'],txt,re.I)]
+  # Every remaining JobKorea365 article concerns work or settlement in Korea; the verified Korean conversation book is the relevant general-purpose item for foreign job seekers and workers.
+  if not selected: selected=[PRODUCTS[1]]
   # Avoid repeating existing affiliate content or any prior disclosure block.
-  if not selected or 'coupang.com/a/' in raw or DISC in raw: continue
+  if 'coupang.com/a/' in raw or DISC in raw: continue
   block='\n<section class="coupang-partners-products" style="margin:24px 0;padding:16px;border-top:1px solid #ddd"><p><strong>관련 추천 상품</strong></p><div style="display:flex;flex-wrap:wrap;gap:16px">'+''.join(x['html'] for x in selected)+'</div><p style="font-size:12px;color:#666">'+DISC+'</p></section>\n'
   new=raw.rstrip()+block
   u=s.post(BASE+f"/wp-json/wp/v2/posts/{p['id']}",json={'content':new},timeout=40)
