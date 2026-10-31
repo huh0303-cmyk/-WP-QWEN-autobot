@@ -1,0 +1,46 @@
+name: K-Health365 remove mismatched pilot card
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests beautifulsoup4
+      - name: Remove pilot card from unrelated post
+        env:
+          WP_USER: huh0303@gmail.com
+          WP_PASS: ${{ secrets.KHEALTH365COM }}
+        run: |
+          python - <<'PY'
+          import os, requests
+          from bs4 import BeautifulSoup
+          base="https://k-health365.com/wp-json/wp/v2"
+          auth=(os.environ["WP_USER"],os.environ["WP_PASS"])
+          pid=7464
+          marker="khealth-coupang-pilot-20261031"
+          g=requests.get(f"{base}/posts/{pid}",auth=auth,params={"context":"edit"},timeout=30)
+          g.raise_for_status()
+          post=g.json()
+          raw=post["content"]["raw"]
+          soup=BeautifulSoup(raw,"html.parser")
+          node=soup.find(id=marker)
+          if node:
+              node.decompose()
+              u=requests.post(f"{base}/posts/{pid}",auth=auth,json={"content":str(soup)},timeout=30)
+              u.raise_for_status()
+          v=requests.get(f"{base}/posts/{pid}",auth=auth,params={"context":"edit"},timeout=30)
+          v.raise_for_status()
+          if marker in v.json()["content"]["raw"]:
+              raise SystemExit("Cleanup verification failed")
+          print("REMOVED_MISMATCHED_CARD=1")
+          print("POST_ID",pid)
+          print("POST_URL",post["link"])
+          PY
