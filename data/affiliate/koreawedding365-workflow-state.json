@@ -1,88 +1,106 @@
-{
-  "workflow_id": "koreawedding365-standard-2026-11-01",
-  "site": "https://koreawedding365.com",
-  "repo": "huh0303-cmyk/-WP-QWEN-autobot",
-  "execution_mode": "ChatGPT + Desktop Commander + PowerShell + GitHub",
-  "wpvibe": "PROHIBITED",
-  "deletion_policy": "NO_POST_OR_MEDIA_DELETION",
-  "expected_published_posts": 132,
-  "products_per_post": 8,
-  "expected_total_affiliate_placements": 1056,
-  "final_kpi": "Each in-scope published post has 8 official Coupang Partners product links and images at the bottom, verified on the public page.",
-  "current_step": 0,
-  "current_step_name": "preflight_backup_and_baseline",
-  "status": "pending",
-  "affiliate_insertion_locked": true,
-  "steps": [
-    {
-      "id": 0,
-      "name": "preflight_backup_and_baseline",
-      "status": "pending",
-      "evidence": []
-    },
-    {
-      "id": 1,
-      "name": "title_and_body_duplicate_audit",
-      "status": "pending",
-      "evidence": []
-    },
-    {
-      "id": 2,
-      "name": "editorial_cleanup_apply",
-      "status": "pending",
-      "evidence": []
-    },
-    {
-      "id": 3,
-      "name": "image_duplicate_and_quality_audit_apply",
-      "status": "pending",
-      "evidence": []
-    },
-    {
-      "id": 4,
-      "name": "editorial_and_image_revalidation",
-      "status": "pending",
-      "evidence": []
-    },
-    {
-      "id": 5,
-      "name": "capture_official_coupang_products",
-      "status": "pending",
-      "evidence": []
-    },
-    {
-      "id": 6,
-      "name": "insert_eight_products_per_post",
-      "status": "locked",
-      "evidence": []
-    },
-    {
-      "id": 7,
-      "name": "public_page_full_verification",
-      "status": "locked",
-      "evidence": []
-    },
-    {
-      "id": 8,
-      "name": "closeout_and_github_record",
-      "status": "locked",
-      "evidence": []
-    }
-  ],
-  "rules": {
-    "sequential_only": true,
-    "user_says_next_advances_one_step_only": true,
-    "no_delete_posts": true,
-    "no_delete_media_attachments": true,
-    "preserve_urls_and_slugs": true,
-    "dry_run_before_apply": true,
-    "official_affiliate_urls_and_images_only": true,
-    "no_wpvibe": true,
-    "insert_products_only_after_steps_0_through_5_completed": true,
-    "product_search_urls_are_not_affiliate_links": true
-  },
-  "product_candidate_plan": "data/affiliate/koreawedding365-search-plan.json",
-  "product_capture_report": "reports/koreawedding365-coupang-products-2026-11-01.ndjson",
-  "updated_at_kst": "2026-11-01",
-  "note": "Workflow initialized only; no site audit, content edits, product capture, or affiliate insertion is claimed complete."
+﻿{
+    "workflow_id":  "koreawedding365-standard-2026-11-01",
+    "site":  "https://koreawedding365.com",
+    "repo":  "huh0303-cmyk/-WP-QWEN-autobot",
+    "execution_mode":  "ChatGPT + Desktop Commander + PowerShell + GitHub",
+    "wpvibe":  "PROHIBITED",
+    "deletion_policy":  "NO_POST_OR_MEDIA_DELETION",
+    "expected_published_posts":  132,
+    "products_per_post":  8,
+    "expected_total_affiliate_placements":  1056,
+    "final_kpi":  "Each in-scope published post has 8 official Coupang Partners product links and images at the bottom, verified on the public page.",
+    "current_step":  1,
+    "current_step_name":  "title_and_body_duplicate_audit",
+    "status":  "pending",
+    "affiliate_insertion_locked":  true,
+    "steps":  [
+                  {
+                      "id":  0,
+                      "name":  "preflight_backup_and_baseline",
+                      "status":  "completed",
+                      "evidence":  [
+                                       "reports/koreawedding365/step0-public-baseline-20261101-082655.json"
+                                   ]
+                  },
+                  {
+                      "id":  1,
+                      "name":  "title_and_body_duplicate_audit",
+                      "status":  "pending",
+                      "evidence":  [
+
+                                   ]
+                  },
+                  {
+                      "id":  2,
+                      "name":  "editorial_cleanup_apply",
+                      "status":  "pending",
+                      "evidence":  [
+
+                                   ]
+                  },
+                  {
+                      "id":  3,
+                      "name":  "image_duplicate_and_quality_audit_apply",
+                      "status":  "pending",
+                      "evidence":  [
+
+                                   ]
+                  },
+                  {
+                      "id":  4,
+                      "name":  "editorial_and_image_revalidation",
+                      "status":  "pending",
+                      "evidence":  [
+
+                                   ]
+                  },
+                  {
+                      "id":  5,
+                      "name":  "capture_official_coupang_products",
+                      "status":  "pending",
+                      "evidence":  [
+
+                                   ]
+                  },
+                  {
+                      "id":  6,
+                      "name":  "insert_eight_products_per_post",
+                      "status":  "locked",
+                      "evidence":  [
+
+                                   ]
+                  },
+                  {
+                      "id":  7,
+                      "name":  "public_page_full_verification",
+                      "status":  "locked",
+                      "evidence":  [
+
+                                   ]
+                  },
+                  {
+                      "id":  8,
+                      "name":  "closeout_and_github_record",
+                      "status":  "locked",
+                      "evidence":  [
+
+                                   ]
+                  }
+              ],
+    "rules":  {
+                  "sequential_only":  true,
+                  "user_says_next_advances_one_step_only":  true,
+                  "no_delete_posts":  true,
+                  "no_delete_media_attachments":  true,
+                  "preserve_urls_and_slugs":  true,
+                  "dry_run_before_apply":  true,
+                  "official_affiliate_urls_and_images_only":  true,
+                  "no_wpvibe":  true,
+                  "insert_products_only_after_steps_0_through_5_completed":  true,
+                  "product_search_urls_are_not_affiliate_links":  true
+              },
+    "product_candidate_plan":  "data/affiliate/koreawedding365-search-plan.json",
+    "product_capture_report":  "reports/koreawedding365-coupang-products-2026-11-01.ndjson",
+    "updated_at_kst":  "2026-11-01 08:27:10",
+    "note":  "Workflow initialized only; no site audit, content edits, product capture, or affiliate insertion is claimed complete."
 }
