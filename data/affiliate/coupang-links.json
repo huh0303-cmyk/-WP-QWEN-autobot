@@ -1,0 +1,25 @@
+{
+  "program": "Coupang Partners",
+  "purpose": "Generic Coupang shopping destination for editorially neutral site-wide CTAs",
+  "created_at_kst": "2026-10-31",
+  "links": [
+    {
+      "id": "coupang_any_page_home_20261031",
+      "type": "any_page",
+      "destination": "https://www.coupang.com/",
+      "affiliate_url": "https://link.coupang.com/a/ihRFb7FNgy",
+      "user_supplied": true,
+      "status": "registered_unverified_redirect",
+      "cta_text": "쿠팡에서 상품 둘러보기",
+      "disclosure": "이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.",
+      "rel": "sponsored nofollow noopener",
+      "notes": [
+        "Use only as a general shopping link; do not describe it as a link to a specific product.",
+        "Insert only into published posts where a neutral shopping CTA is appropriate.",
+        "Deduplicate by link URL and stable marker.",
+        "Preserve post status, publication date, featured image, title, and existing content.",
+        "After each update, read the post back from WordPress REST API and verify the URL, disclosure, and marker."
+      ]
+    }
+  ]
+}
