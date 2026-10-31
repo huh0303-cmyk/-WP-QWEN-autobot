@@ -653,3 +653,13 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - Safety: retain posts and media-library originals; remove only repeated inline blocks after audit; preserve all other post fields; verify authenticated read-back.
 - Artifacts: reports/oliveyoung-kskin365-editorial-audit-2026-11-01.json; scripts/oliveyoung_kskin365_editorial_cleanup.py; .github/workflows/oliveyoung-kskin365-editorial-cleanup.yml; docs/OLIVEYOUNG_KSKIN365_CLEANUP_2026-11-01.md.
 - Live edits and affiliate placements remain pending until authenticated update and public verification.
+
+## 2026-11-01 OliveYoungKorea + Kskin365 Coupang Partners all-post rollout
+- task_id: oliveyoung-kskin365-coupang-all-posts-20261101
+- Published post scope refreshed after cleanup: OliveYoungKorea 64, Kskin365 104, total 168.
+- Verified product pool: 45 unique products with account-generated Coupang Partners URLs and official image creatives; 50 searches prepared, 47 captured, 1 duplicate product deduplicated and 1 generic non-matching item excluded.
+- Product mapping: 8 unique products per post, 1,344 planned placements; 168/168 combinations unique. Selection mix: 3 topical, 2 daily essentials, 2 premium/high-ticket, 1 randomized, frequency-balanced.
+- Editorial cleanup applied and verified: OliveYoungKorea 8 posts; Kskin365 8 posts. No posts or media-library assets deleted.
+- Affiliate insertion script and workflow: scripts/oliveyoung_kskin365_insert_coupang.py; .github/workflows/oliveyoung-kskin365-coupang-insert.yml. Run dry_run before apply; final public verification required.
+- Product pool: data/affiliate/oliveyoung-kskin365-verified-product-pool.json; placement map: reports/oliveyoung-kskin365-affiliate-placement-map-2026-11-01.json.
+- WPVibe remains prohibited; DC + PowerShell required.
