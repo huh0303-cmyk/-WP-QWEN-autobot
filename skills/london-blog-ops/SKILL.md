@@ -13,7 +13,7 @@ Use this skill for requests about the Korea365 LondonProjectGPT console and its 
 - For visits, use a verified site visitor counter or connected GA4 property and state which one was used. Search Console clicks and impressions are search performance, not visitor counts.
 - For Google indexed pages or a particular URL's indexing, use a connected Search Console property or URL Inspection. Public `site:` queries are only rough clues. If the property is not connected, report the metric as unavailable.
 - For revenue, use the relevant AdSense account's dated report. Approval state or an earnings estimate is not actual revenue. Do not infer revenue from traffic.
-- Prefer already connected tools. GSC Wizard may provide Search Console and linked GA4 after the user connects it; WordPress access may use a connected WPVibe site. The public OpenAI Docs MCP answers OpenAI documentation questions, not site metrics.
+- Prefer already connected tools. GSC Wizard may provide Search Console and linked GA4 after the user connects it; WordPress access must use the direct REST API or approved cloud deployment workflow. The public OpenAI Docs MCP answers OpenAI documentation questions, not site metrics.
 
 ## Four-agent work
 
