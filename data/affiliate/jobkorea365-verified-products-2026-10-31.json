@@ -1,0 +1,47 @@
+{
+  "site": "https://jobkorea365.com",
+  "captured_at": "2026-10-31",
+  "source": "Authenticated Coupang Partners portal currently open in user's browser session",
+  "note": "Only exact product links and official blog HTML captured from the logged-in portal are eligible. Other candidate-pool items remain unverified.",
+  "disclosure": "이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.",
+  "products": [
+    {
+      "product_id": "jobkorea365-portal-001",
+      "product_title": "엘칸토 마쯔 남성 발모랄 정장화 3.5cm LCMD43M313",
+      "affiliate_short_url": "https://link.coupang.com/a/iixQIsSQSW",
+      "official_creative_href": "https://link.coupang.com/a/iixSD4xn2q",
+      "official_image_url": "https://image8.coupangcdn.com/image/affiliate/banner/42897fb68bee72edc6d3a25d45b15a43@2x.jpg",
+      "official_blog_html": "<a href=\"https://link.coupang.com/a/iixSD4xn2q\" target=\"_blank\" referrerpolicy=\"unsafe-url\"><img src=\"https://image8.coupangcdn.com/image/affiliate/banner/42897fb68bee72edc6d3a25d45b15a43@2x.jpg\" alt=\"엘칸토 마쯔 남성 발모랄 정장화 3.5cm LCMD43M313\" width=\"120\" height=\"240\"></a>",
+      "price_krw": 33750,
+      "original_price_krw": 159000,
+      "verification_status": "portal_page_captured",
+      "verified_account_owned": true,
+      "suitability_note": "Only use in articles specifically about interview attire, office dress, business clothing, or work shoes; not generic employment-policy articles."
+    },
+    {
+      "product_id": "jobkorea365-portal-002",
+      "product_title": "Job Interview: An Essential Guide Containing 100 Common Questions Winning Answers and Costly Mistak... Paperback, Bravex Publications",
+      "affiliate_short_url": "https://link.coupang.com/a/iiwTqgthGC",
+      "official_creative_href": "https://link.coupang.com/a/iiwTIacwpw",
+      "official_image_url": "https://image8.coupangcdn.com/image/affiliate/banner/5dbd284f2fbdf01a500cb9aab465d56b@2x.jpg",
+      "official_blog_html": "<a href=\"https://link.coupang.com/a/iiwTIacwpw\" target=\"_blank\" referrerpolicy=\"unsafe-url\"><img src=\"https://image8.coupangcdn.com/image/affiliate/banner/5dbd284f2fbdf01a500cb9aab465d56b@2x.jpg\" alt=\"Job Interview: An Essential Guide Containing 100 Common Questions Winning Answers and Costly Mistak... Paperback, Bravex Publications\" width=\"120\" height=\"240\"></a>",
+      "price_krw": 19800,
+      "original_price_krw": 26400,
+      "verification_status": "portal_page_captured",
+      "verified_account_owned": true,
+      "suitability_note": "Use only in interview preparation, job application, or interview Q&A articles."
+    },
+    {
+      "product_id": "jobkorea365-portal-003",
+      "product_title": "배워서 바로 써먹는 찰떡 한국어, 필수 회화, 시대고시기획",
+      "affiliate_short_url": "https://link.coupang.com/a/iiwBtrzlQa",
+      "official_creative_href": "https://link.coupang.com/a/iiwBtrzlQa",
+      "official_image_url": "https://image6.coupangcdn.com/image/affiliate/banner/a024a08f8b0232329a2c917f5cf04b1e@2x.jpg",
+      "official_blog_html": "<a href=\"https://link.coupang.com/a/iiwBtrzlQa\" target=\"_blank\" referrerpolicy=\"unsafe-url\"><img src=\"https://image6.coupangcdn.com/image/affiliate/banner/a024a08f8b0232329a2c917f5cf04b1e@2x.jpg\" alt=\"배워서 바로 써먹는 찰떡 한국어, 필수 회화, 시대고시기획\" width=\"120\" height=\"240\"></a>",
+      "price_krw": 13500,
+      "verification_status": "portal_page_captured",
+      "verified_account_owned": true,
+      "suitability_note": "Use only in Korean language learning, Korean conversation, settlement, or workplace Korean articles."
+    }
+  ]
+}

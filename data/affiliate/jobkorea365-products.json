@@ -1,0 +1,841 @@
+{
+  "site": "https://jobkorea365.com",
+  "generated_date": "2026-10-31",
+  "status": "candidate_pool_only_unverified",
+  "note": "Candidates only; exact Coupang listings, portal-generated partner URLs and official creatives must be verified before publishing.",
+  "products": [
+    {
+      "id": "jk01",
+      "name": "Korean Workplace Vocabulary Workbook",
+      "group": "job_language",
+      "price_tier": "low",
+      "keywords": [
+        "workplace korean",
+        "office korean",
+        "job interview",
+        "korean language",
+        "work communication"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk02",
+      "name": "EPS-TOPIK Korean Vocabulary and Listening Book",
+      "group": "job_language",
+      "price_tier": "low",
+      "keywords": [
+        "eps-topik",
+        "e-9",
+        "manufacturing",
+        "factory",
+        "korean test",
+        "language exam"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk03",
+      "name": "Korean Resume and Interview Preparation Workbook",
+      "group": "job_search",
+      "price_tier": "low",
+      "keywords": [
+        "resume",
+        "cv",
+        "interview",
+        "job application",
+        "recruitment",
+        "career"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk04",
+      "name": "A4 Expanding Document Folder",
+      "group": "documents",
+      "price_tier": "low",
+      "keywords": [
+        "contract",
+        "documents",
+        "certificate",
+        "payroll",
+        "visa",
+        "application",
+        "employment paperwork"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk05",
+      "name": "Portable Document Scanner",
+      "group": "documents",
+      "price_tier": "high",
+      "keywords": [
+        "documents",
+        "certificate",
+        "paperwork",
+        "resume",
+        "office",
+        "remote work",
+        "application"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk06",
+      "name": "Business-Casual Interview Shirt",
+      "group": "interview",
+      "price_tier": "mid",
+      "keywords": [
+        "interview",
+        "office",
+        "professional",
+        "dress code",
+        "first day"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk07",
+      "name": "Formal Leather Shoes",
+      "group": "interview",
+      "price_tier": "mid",
+      "keywords": [
+        "interview",
+        "office",
+        "professional",
+        "commuting"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk08",
+      "name": "Padded Laptop Backpack",
+      "group": "commute",
+      "price_tier": "mid",
+      "keywords": [
+        "commute",
+        "office",
+        "laptop",
+        "university",
+        "job search",
+        "work"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk09",
+      "name": "USB Headset with Microphone",
+      "group": "digital_work",
+      "price_tier": "mid",
+      "keywords": [
+        "online interview",
+        "remote job",
+        "online meeting",
+        "english teaching",
+        "language study"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk10",
+      "name": "HD Webcam with Privacy Shutter",
+      "group": "digital_work",
+      "price_tier": "mid",
+      "keywords": [
+        "online interview",
+        "remote job",
+        "online meeting",
+        "english teaching",
+        "video call"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk11",
+      "name": "Certified Steel-Toe Safety Shoes",
+      "group": "work_safety",
+      "price_tier": "mid",
+      "keywords": [
+        "manufacturing",
+        "factory",
+        "industrial",
+        "construction",
+        "warehouse",
+        "worksite",
+        "e-9"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk12",
+      "name": "Task-Appropriate Coated Work Gloves",
+      "group": "work_safety",
+      "price_tier": "low",
+      "keywords": [
+        "manufacturing",
+        "factory",
+        "industrial",
+        "construction",
+        "warehouse",
+        "worksite",
+        "e-9"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk13",
+      "name": "High-Visibility Safety Vest",
+      "group": "work_safety",
+      "price_tier": "low",
+      "keywords": [
+        "construction",
+        "logistics",
+        "warehouse",
+        "outdoor",
+        "worksite",
+        "industrial"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk14",
+      "name": "Industrial Safety Helmet",
+      "group": "work_safety",
+      "price_tier": "mid",
+      "keywords": [
+        "construction",
+        "industrial",
+        "worksite",
+        "factory"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk15",
+      "name": "Protective Safety Glasses",
+      "group": "work_safety",
+      "price_tier": "low",
+      "keywords": [
+        "industrial",
+        "factory",
+        "manufacturing",
+        "construction",
+        "worksite"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk16",
+      "name": "Industrial Ear Protection",
+      "group": "work_safety",
+      "price_tier": "low",
+      "keywords": [
+        "factory",
+        "manufacturing",
+        "industrial",
+        "machinery",
+        "worksite"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk17",
+      "name": "Thermal Base-Layer Set",
+      "group": "clothing",
+      "price_tier": "mid",
+      "keywords": [
+        "winter",
+        "cold",
+        "outdoor",
+        "seasonal",
+        "agriculture",
+        "fisheries",
+        "worksite"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk18",
+      "name": "Insulated Food Jar",
+      "group": "daily_life",
+      "price_tier": "mid",
+      "keywords": [
+        "shift",
+        "factory",
+        "manufacturing",
+        "work schedule",
+        "meal",
+        "lunch"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk19",
+      "name": "Insulated Water Bottle",
+      "group": "daily_life",
+      "price_tier": "low",
+      "keywords": [
+        "shift",
+        "factory",
+        "outdoor",
+        "commute",
+        "workday",
+        "daily life"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk20",
+      "name": "Compact Personal First-Aid Kit",
+      "group": "daily_life",
+      "price_tier": "low",
+      "keywords": [
+        "daily life",
+        "travel",
+        "dormitory",
+        "worksite",
+        "outdoor"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk21",
+      "name": "Single-Bed Dormitory Bedding Set",
+      "group": "dormitory",
+      "price_tier": "mid",
+      "keywords": [
+        "dormitory",
+        "housing",
+        "relocation",
+        "accommodation",
+        "worker housing",
+        "moving"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk22",
+      "name": "Supportive Memory-Foam Pillow",
+      "group": "dormitory",
+      "price_tier": "mid",
+      "keywords": [
+        "dormitory",
+        "housing",
+        "relocation",
+        "accommodation",
+        "sleep",
+        "worker housing"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk23",
+      "name": "Compact Electric Rice Cooker",
+      "group": "dormitory",
+      "price_tier": "mid",
+      "keywords": [
+        "dormitory",
+        "housing",
+        "relocation",
+        "accommodation",
+        "meal",
+        "living in korea"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk24",
+      "name": "Leakproof Compartment Lunch Box",
+      "group": "daily_life",
+      "price_tier": "low",
+      "keywords": [
+        "shift",
+        "meal",
+        "commute",
+        "factory",
+        "workday",
+        "daily life"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk25",
+      "name": "Laundry Detergent and Mesh Bag Set",
+      "group": "dormitory",
+      "price_tier": "low",
+      "keywords": [
+        "dormitory",
+        "housing",
+        "relocation",
+        "accommodation",
+        "laundry",
+        "living in korea"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk26",
+      "name": "Foldable Indoor Laundry Drying Rack",
+      "group": "dormitory",
+      "price_tier": "mid",
+      "keywords": [
+        "dormitory",
+        "housing",
+        "relocation",
+        "accommodation",
+        "laundry",
+        "living in korea"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk27",
+      "name": "Compact Electric Kettle",
+      "group": "dormitory",
+      "price_tier": "low",
+      "keywords": [
+        "dormitory",
+        "housing",
+        "relocation",
+        "accommodation",
+        "living in korea"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk28",
+      "name": "Compact Commuter Umbrella",
+      "group": "commute",
+      "price_tier": "low",
+      "keywords": [
+        "commute",
+        "daily life",
+        "outdoor",
+        "relocation",
+        "living in korea"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk29",
+      "name": "Multi-Outlet Power Strip with USB",
+      "group": "daily_life",
+      "price_tier": "mid",
+      "keywords": [
+        "dormitory",
+        "housing",
+        "office",
+        "laptop",
+        "charging",
+        "living in korea"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk30",
+      "name": "USB-C Multiport Charger",
+      "group": "digital_work",
+      "price_tier": "mid",
+      "keywords": [
+        "smartphone",
+        "laptop",
+        "tablet",
+        "commute",
+        "charging",
+        "office"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk31",
+      "name": "Lightweight Business Laptop",
+      "group": "premium_tech",
+      "price_tier": "high",
+      "keywords": [
+        "remote job",
+        "professional",
+        "office",
+        "job search",
+        "resume",
+        "online interview",
+        "it jobs",
+        "study"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk32",
+      "name": "24–27 Inch Office Monitor",
+      "group": "premium_tech",
+      "price_tier": "high",
+      "keywords": [
+        "office",
+        "remote work",
+        "it jobs",
+        "professional",
+        "home office",
+        "computer"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk33",
+      "name": "Tablet with Pen Support",
+      "group": "premium_tech",
+      "price_tier": "high",
+      "keywords": [
+        "study",
+        "training",
+        "language learning",
+        "documents",
+        "professional",
+        "university"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk34",
+      "name": "Ergonomic Office Chair",
+      "group": "premium_tech",
+      "price_tier": "high",
+      "keywords": [
+        "office",
+        "remote work",
+        "home office",
+        "professional",
+        "it jobs"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk35",
+      "name": "Noise-Cancelling Headphones",
+      "group": "premium_tech",
+      "price_tier": "high",
+      "keywords": [
+        "online interview",
+        "language study",
+        "remote work",
+        "office",
+        "commute"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk36",
+      "name": "External SSD for Document Backup",
+      "group": "premium_tech",
+      "price_tier": "high",
+      "keywords": [
+        "documents",
+        "remote work",
+        "it jobs",
+        "professional",
+        "office",
+        "data backup"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk37",
+      "name": "Laser Multifunction Printer and Scanner",
+      "group": "premium_tech",
+      "price_tier": "high",
+      "keywords": [
+        "documents",
+        "office",
+        "resume",
+        "application",
+        "certificate",
+        "professional"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk38",
+      "name": "Ergonomic Keyboard and Mouse Set",
+      "group": "premium_tech",
+      "price_tier": "mid",
+      "keywords": [
+        "office",
+        "remote work",
+        "it jobs",
+        "computer",
+        "home office"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk39",
+      "name": "Portable Second Monitor",
+      "group": "premium_tech",
+      "price_tier": "high",
+      "keywords": [
+        "remote work",
+        "professional",
+        "it jobs",
+        "laptop",
+        "hybrid work"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk40",
+      "name": "Premium Smartphone",
+      "group": "premium_tech",
+      "price_tier": "high",
+      "keywords": [
+        "communication",
+        "navigation",
+        "job search",
+        "remote work",
+        "professional",
+        "daily life"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk41",
+      "name": "TOPIK II Preparation Book Set",
+      "group": "job_language",
+      "price_tier": "low",
+      "keywords": [
+        "topik",
+        "korean language",
+        "language exam",
+        "study",
+        "university"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk42",
+      "name": "Korean Workplace Conversation Textbook",
+      "group": "job_language",
+      "price_tier": "low",
+      "keywords": [
+        "workplace korean",
+        "office korean",
+        "korean language",
+        "work communication",
+        "interview"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk43",
+      "name": "Korean-English Pocket Dictionary",
+      "group": "job_language",
+      "price_tier": "low",
+      "keywords": [
+        "korean language",
+        "translation",
+        "workplace korean",
+        "job search",
+        "study"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk44",
+      "name": "Korean Vocabulary Flashcards",
+      "group": "job_language",
+      "price_tier": "low",
+      "keywords": [
+        "korean language",
+        "language study",
+        "topik",
+        "eps-topik",
+        "vocabulary"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk45",
+      "name": "Digital Voice Recorder",
+      "group": "digital_work",
+      "price_tier": "mid",
+      "keywords": [
+        "meeting",
+        "language study",
+        "training",
+        "lecture",
+        "workplace communication"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk46",
+      "name": "Airline-Compliant Power Bank",
+      "group": "daily_life",
+      "price_tier": "mid",
+      "keywords": [
+        "commute",
+        "travel",
+        "smartphone",
+        "charging",
+        "daily life"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk47",
+      "name": "Compact Bluetooth Keyboard",
+      "group": "digital_work",
+      "price_tier": "mid",
+      "keywords": [
+        "tablet",
+        "remote work",
+        "office",
+        "study",
+        "mobile work"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk48",
+      "name": "A4 Work Planner and Schedule Notebook",
+      "group": "documents",
+      "price_tier": "low",
+      "keywords": [
+        "work schedule",
+        "shift",
+        "job search",
+        "interview",
+        "planner",
+        "employment"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk49",
+      "name": "RFID Document and Passport Wallet",
+      "group": "documents",
+      "price_tier": "mid",
+      "keywords": [
+        "visa",
+        "passport",
+        "travel",
+        "relocation",
+        "identity document",
+        "documents"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    },
+    {
+      "id": "jk50",
+      "name": "Smartwatch or Fitness Band",
+      "group": "daily_life",
+      "price_tier": "mid",
+      "keywords": [
+        "shift",
+        "work schedule",
+        "commute",
+        "notifications",
+        "daily life",
+        "health tracking"
+      ],
+      "listing_status": "not_verified",
+      "affiliate_url": null,
+      "image_creative": null
+    }
+  ]
+}

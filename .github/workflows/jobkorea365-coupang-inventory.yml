@@ -1,0 +1,24 @@
+name: "JobKorea365 — Coupang article inventory (read-only)"
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: Read every published JobKorea365 article (no writes, no credentials)
+        run: python scripts/jobkorea365_coupang_inventory.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: jobkorea365-coupang-post-inventory-${{ github.run_id }}
+          path: reports/jobkorea365-coupang-post-inventory-2026-10-31.json
+          if-no-files-found: warn
+          retention-days: 30
