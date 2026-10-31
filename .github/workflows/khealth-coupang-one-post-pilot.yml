@@ -11,12 +11,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
       - run: pip install requests beautifulsoup4
-      - name: Insert and verify one relevant affiliate link
+      - name: Insert and verify one exact omega-3 product match
         env:
           WP_USER: huh0303@gmail.com
           WP_PASS: ${{ secrets.KHEALTH365COM }}
@@ -24,49 +23,44 @@ jobs:
           python - <<'PY'
           import os, requests
           from bs4 import BeautifulSoup
-          base = "https://k-health365.com/wp-json/wp/v2"
-          auth = (os.environ["WP_USER"], os.environ["WP_PASS"])
-          product_url = "https://link.coupang.com/a/ihKqEBmP48"
-          r = requests.get(base + "/posts", auth=auth,
-              params={"status":"publish","per_page":100,"page":1,"orderby":"date","order":"desc",
-                      "_fields":"id,date,link,title,content"}, timeout=30)
-          r.raise_for_status()
-          posts = r.json()
-          print("LATEST_PUBLISHED_POSTS", len(posts))
-          keys = ("관절","연골","콘드로이친","글루코사민","무릎","골관절")
-          chosen = None
-          for p in posts:
-              title = BeautifulSoup(p["title"]["rendered"],"html.parser").get_text(" ",strip=True)
-              body = BeautifulSoup(p["content"]["rendered"],"html.parser").get_text(" ",strip=True)
-              if any(k in title + " " + body[:6000] for k in keys):
-                  chosen = p
-                  break
-          if not chosen:
-              raise SystemExit("No relevant joint-health post among newest 100; no change")
-          content = chosen["content"]["rendered"]
-          marker = "khealth-coupang-pilot-20261031"
-          if marker in content:
-              print("ALREADY_PRESENT", chosen["id"], chosen["link"])
+          base="https://k-health365.com/wp-json/wp/v2"
+          auth=(os.environ["WP_USER"],os.environ["WP_PASS"])
+          pid=7314
+          product_url="https://link.coupang.com/a/ihaVByREei"
+          image_url="https://k-health365.com/wp-content/uploads/2026/10/순수식품-rTG-오메가3-비타민D-1000mg-3개-상품-사진.jpg"
+          g=requests.get(f"{base}/posts/{pid}",auth=auth,params={"context":"edit"},timeout=30)
+          g.raise_for_status()
+          p=g.json()
+          title=BeautifulSoup(p["title"]["rendered"],"html.parser").get_text(" ",strip=True)
+          print("POST_TITLE",title)
+          if "오메가3" not in title and "오메가 3" not in title:
+              raise SystemExit("Target post title is not an omega-3 article; no change")
+          raw=p["content"]["raw"]
+          if product_url in raw:
+              print("ALREADY_HAS_THIS_LINK",pid,p["link"])
               raise SystemExit(0)
-          card = (
+          marker="khealth-coupang-omega3-pilot-20261031"
+          if marker in raw:
+              raise SystemExit("Pilot marker already present; stop")
+          card=(
             f'<div id="{marker}" style="margin:28px 0;padding:18px;border:1px solid #e5e7eb;border-radius:12px;">'
             '<p style="font-size:12px;color:#777;margin:0 0 10px;">파트너스 광고</p>'
-            f'<p><a href="{product_url}" target="_blank" rel="sponsored nofollow noopener" referrerpolicy="unsafe-url">'
-            '<strong>관절엔 콘드로이친 1200 상품 정보 확인하기</strong></a></p>'
+            f'<a href="{product_url}" target="_blank" rel="sponsored nofollow noopener" referrerpolicy="unsafe-url">'
+            f'<img src="{image_url}" alt="순수식품 rTG 오메가3 비타민D 상품 이미지" loading="lazy" style="display:block;width:100%;max-width:360px;height:auto;margin:0 auto 12px;border-radius:8px;">'
+            '<strong>순수식품 rTG 오메가3 + 비타민D 상품 정보 확인하기</strong></a>'
             '<p style="font-size:12px;color:#777;margin:10px 0 0;">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p>'
             '</div>'
           )
-          u = requests.post(base + f'/posts/{chosen["id"]}', auth=auth,
-                            json={"content":content + "\n" + card}, timeout=30)
+          u=requests.post(f"{base}/posts/{pid}",auth=auth,json={"content":raw+"\n"+card},timeout=30)
           u.raise_for_status()
-          v = requests.get(base + f'/posts/{chosen["id"]}', auth=auth,
-                           params={"context":"edit","_fields":"id,link,content,status"},timeout=30)
+          v=requests.get(f"{base}/posts/{pid}",auth=auth,params={"context":"edit"},timeout=30)
           v.raise_for_status()
-          saved = v.json()["content"]["raw"]
-          if marker not in saved or product_url not in saved:
+          saved=v.json()["content"]["raw"]
+          if marker not in saved or product_url not in saved or image_url not in saved:
               raise SystemExit("Read-back verification failed")
           print("INSERTED_AND_VERIFIED=1")
-          print("POST_ID",chosen["id"])
-          print("POST_URL",chosen["link"])
+          print("POST_ID",pid)
+          print("POST_URL",p["link"])
           print("PRODUCT_URL",product_url)
+          print("IMAGE_URL",image_url)
           PY
