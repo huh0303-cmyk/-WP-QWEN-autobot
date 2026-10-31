@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "site_key": "replace-with-site-key",
+  "site_url": "https://example.com",
+  "wordpress_secret_env": "REPLACE_WITH_SITE_SECRET_NAME",
+  "wordpress_user_env": "WP_USER",
+  "product_pool_target": 40,
+  "target_products_per_article": {"min": 6, "max": 7},
+  "placement_mix": {
+    "directly_relevant": {"min": 2, "max": 3},
+    "local_essentials": 2,
+    "higher_value": 2
+  },
+  "require_verified_account_owned_links": true,
+  "require_official_portal_image_creative": true,
+  "published_posts_only": true,
+  "update_fields": ["content"],
+  "preserve_fields": ["status", "date", "title", "slug", "categories", "tags", "featured_media", "excerpt", "meta"],
+  "disclosure": "이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.",
+  "pilot_post_limit": 3,
+  "require_post_write_verification": true,
+  "no_duplicate_marker": "<!-- COUPANG_PARTNERS_BLOCK:replace-with-site-key -->",
+  "cloud_execution_only": true,
+  "wpvibe_enabled": false
+}
