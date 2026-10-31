@@ -28,9 +28,7 @@ def main():
   if secret: s.auth=(WP_USER,secret)
   targets={}
   for group in audit[site]["cross_post_duplicate_image_groups"]:
-   urls={x["url"] for x in group["posts"]}
-   if not urls: continue
-   url=sorted(urls)[0]
+   url=group["url"]
    ids=sorted({x["id"] for x in group["posts"]})
    for pid in ids[1:]: targets.setdefault(pid,[]).append(url)
   for item in audit[site]["within_post_duplicate_images"]:
