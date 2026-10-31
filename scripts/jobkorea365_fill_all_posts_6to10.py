@@ -100,12 +100,9 @@ while True:
         new = re.sub(r'<section\b(?=[^>]*class=["\'][^"\']*coupang-partners-products)[\s\S]*?</section>', '', raw, flags=re.I)
         items = choose(post)
         new_block = block(items)
-        # Put the disclosure and product panel near the beginning, after the first paragraph.
-        m = re.search(r'</p\s*>', new, flags=re.I)
-        if m:
-            new = new[:m.end()] + new_block + new[m.end():]
-        else:
-            new = new_block + new
+        # Append the disclosure and product panel strictly after the complete article body.
+        # Strip trailing whitespace only; preserve every existing article element and its order.
+        new = new.rstrip() + "\n\n" + new_block + "\n"
         u = s.post(BASE + f"/wp-json/wp/v2/posts/{post['id']}", json={"content":new}, timeout=45)
         if u.status_code not in (200, 201):
             results.append({"id":post["id"],"url":post.get("link"),"status":"WRITE_FAILED","http":u.status_code,"detail":u.text[:200]})
