@@ -64,7 +64,7 @@ def resolve_product_image(affiliate_url: str) -> str:
         r'<meta[^>]+property="og:image"[^>]+content="([^"]+)',
         r'<meta[^>]+content="([^"]+)"[^>]+property="og:image"',
         r'<meta[^>]+name="twitter:image"[^>]+content="([^"]+)',
-        r'(https://[^" ]+\\.(?:jpg|jpeg|png|webp)(?:\\?[^" ]*)?)'
+        r'(https://[^" ]+\.(?:jpg|jpeg|png|webp)(?:\?[^" ]*)?)'
     ]
     candidates = []
     for pattern in patterns:
@@ -152,7 +152,77 @@ def main() -> None:
         before, remainder = content.split(START, 1)
         # Remove the earlier unmarked affiliate section from the initial manual insertion.
         before = re.sub(
-            r'\\s*<section class="khealth-affiliate-products" aria-label="관련 상품 추천">.*?</section>\\s*$',
+            r'\s*<section class="khealth-affiliate-products" aria-label="관련 상품 추천">.*?</section>\s*,
+            '',
+            before,
+            count=1,
+            flags=re.S
+        )
+        content = before + block + remainder.split(END, 1)[1]
+    else:
+        content = content.rstrip() + "\n\n" + block
+
+    OUT.mkdir(exist_ok=True)
+    report = {
+        "site": site, "post_id": post_id, "post_title": title, "mode": mode,
+        "selected_count": len(chosen),
+        "products": [{"title": p["title"], "url": p["url"], "image_url": p["image_url"]} for p in chosen],
+        "note": "Preview does not modify WordPress." if mode == "preview" else "WordPress content update requested."
+    }
+    (OUT / f"khealth365-affiliate-{post_id}.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+    (OUT / f"khealth365-affiliate-{post_id}.html").write_text(block, encoding="utf-8")
+    print(json.dumps(report, ensure_ascii=False, indent=2))
+    if mode == "apply":
+        result = request(f"{site}/wp-json/wp/v2/posts/{post_id}", "POST",
+                         {"content": content}, auth=auth)
+        if result.get("id") != post_id:
+            fail("Update response did not confirm the expected post ID.")
+        verify = request(f"{site}/wp-json/wp/v2/posts/{post_id}?context=edit", auth=auth)
+        raw = verify.get("content", {}).get("raw", "")
+        if START not in raw or END not in raw:
+            fail("Post update could not be verified after write.")
+        print(f"VERIFIED: updated post {post_id}; {len(chosen)} product cards present.")
+    else:
+        print("PREVIEW ONLY: WordPress was not modified.")
+
+if __name__ == "__main__":
+    main()
+,
+            '',
+            before,
+            count=1,
+            flags=re.S
+        )
+        content = before + block + remainder.split(END, 1)[1]
+    else:
+        content = content.rstrip() + "\n\n" + block
+
+    OUT.mkdir(exist_ok=True)
+    report = {
+        "site": site, "post_id": post_id, "post_title": title, "mode": mode,
+        "selected_count": len(chosen),
+        "products": [{"title": p["title"], "url": p["url"], "image_url": p["image_url"]} for p in chosen],
+        "note": "Preview does not modify WordPress." if mode == "preview" else "WordPress content update requested."
+    }
+    (OUT / f"khealth365-affiliate-{post_id}.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+    (OUT / f"khealth365-affiliate-{post_id}.html").write_text(block, encoding="utf-8")
+    print(json.dumps(report, ensure_ascii=False, indent=2))
+    if mode == "apply":
+        result = request(f"{site}/wp-json/wp/v2/posts/{post_id}", "POST",
+                         {"content": content}, auth=auth)
+        if result.get("id") != post_id:
+            fail("Update response did not confirm the expected post ID.")
+        verify = request(f"{site}/wp-json/wp/v2/posts/{post_id}?context=edit", auth=auth)
+        raw = verify.get("content", {}).get("raw", "")
+        if START not in raw or END not in raw:
+            fail("Post update could not be verified after write.")
+        print(f"VERIFIED: updated post {post_id}; {len(chosen)} product cards present.")
+    else:
+        print("PREVIEW ONLY: WordPress was not modified.")
+
+if __name__ == "__main__":
+    main()
+,
             '',
             before,
             count=1,
