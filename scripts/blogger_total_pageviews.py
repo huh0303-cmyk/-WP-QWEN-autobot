@@ -144,7 +144,7 @@ async def run():
     pageviews["successful"] = payload["successful"]
     pageviews["failed"] = payload["failed"]
     dashboard["generated_at"] = dashboard.get("generated_at") or checked_at
-    DASHBOARD.write_text(json.dumps(dashboard, ensure_ascii=False, indent=1) + "\\n", encoding="utf-8")
+    DASHBOARD.write_text(json.dumps(dashboard, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     print(json.dumps({"total_blogs": payload["total_blogs"], "successful": payload["successful"], "failed": payload["failed"]}, ensure_ascii=False))
     for row in rows:
         print(("PAGEVIEWS_OK " + row["site_key"] + " " + str(row["total_pageviews"])) if row["total_pageviews"] is not None else ("PAGEVIEWS_FAIL " + row["site_key"] + " " + row["status"]))
