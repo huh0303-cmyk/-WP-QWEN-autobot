@@ -47,6 +47,44 @@ def request(url: str, method: str = "GET", payload: dict | None = None, auth: st
     except Exception as exc:
         fail(f"Request failed: {exc}")
 
+def resolve_product_image(affiliate_url: str) -> str:
+    """Resolve the actual product image from the Coupang affiliate destination page."""
+    req = urllib.request.Request(affiliate_url, headers={
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/126 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml"
+    })
+    try:
+        with urllib.request.urlopen(req, timeout=25) as response:
+            page_url = response.geturl()
+            page = response.read(3_000_000).decode("utf-8", "replace")
+    except Exception as exc:
+        fail(f"Could not resolve Coupang affiliate destination {affiliate_url}: {exc}")
+    candidates = []
+    for pattern in (
+        r'<meta[^>]+(?:property|name)=["\\']og:image["\\'][^>]+content=["\\']([^"\\']+)',
+        r'<meta[^>]+content=["\\']([^"\\']+)["\\'][^>]+(?:property|name)=["\\']og:image["\\']',
+        r'<meta[^>]+(?:name|property)=["\\']twitter:image["\\'][^>]+content=["\\']([^"\\']+)',
+        r'(["\\'])(https?:\\?/\\?/[^"\\']+(?:jpg|jpeg|png|webp)(?:\\?[^"\\']*)?)\\1'
+    ):
+        candidates.extend(re.findall(pattern, page, flags=re.I))
+    for candidate in candidates:
+        if isinstance(candidate, tuple):
+            candidate = candidate[-1]
+        image_url = html.unescape(candidate).replace("\\/", "/")
+        image_url = urllib.parse.urljoin(page_url, image_url)
+        parsed = urllib.parse.urlparse(image_url)
+        if parsed.scheme != "https" or not any(parsed.path.lower().endswith(ext) for ext in (".jpg", ".jpeg", ".png", ".webp")):
+            continue
+        try:
+            check = urllib.request.Request(image_url, headers={"User-Agent": "Mozilla/5.0"}, method="GET")
+            with urllib.request.urlopen(check, timeout=20) as img:
+                if img.status == 200 and img.headers.get("Content-Type", "").lower().startswith("image/"):
+                    return image_url
+        except Exception:
+            continue
+    fail(f"No verified product image found on Coupang destination: {affiliate_url}")
+
+
 def main() -> None:
     post_id = int(os.getenv("POST_ID", "6148"))
     if post_id != ALLOWED_POST_ID:
@@ -63,7 +101,7 @@ def main() -> None:
     for p in products:
         if not p.get("enabled", False):
             continue
-        if not all(p.get(k) for k in ("title", "url", "image_url", "relevance")):
+        if not all(p.get(k) for k in ("title", "url", "relevance")):
             continue
         u = urllib.parse.urlparse(p["url"])
         img = urllib.parse.urlparse(p["image_url"])
@@ -71,7 +109,7 @@ def main() -> None:
             continue
         if not p.get("affiliate_confirmed", False):
             continue
-        eligible.append(p)
+        p["image_url"] = resolve_product_image(p["url"])\n        eligible.append(p)
     if len(eligible) < lo:
         fail(f"Only {len(eligible)} fully verified products are enabled; need at least {lo}. "
              "Each enabled item needs a verified affiliate URL, real product image URL, title, and relevance.")
