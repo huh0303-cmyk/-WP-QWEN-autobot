@@ -1,11 +1,11 @@
 [
   {
     "id": "chondroitin-01",
-    "enabled": false,
-    "affiliate_confirmed": false,
+    "enabled": true,
+    "affiliate_confirmed": true,
     "title": "관절엔 콘드로이친 1200",
     "url": "https://link.coupang.com/a/ihKqEBmP48",
-    "image_url": "",
+    "image_url": "https://thumbnail9.coupangcdn.com/thumbnails/remote/212x212ex/image/vendor_inventory/",
     "relevance": "관절·뼈 건강",
     "keywords": [
       "골다공증",
@@ -17,8 +17,8 @@
   },
   {
     "id": "calcium-k2-01",
-    "enabled": false,
-    "affiliate_confirmed": false,
+    "enabled": true,
+    "affiliate_confirmed": true,
     "title": "고려은단 뼈건강 칼마디 K2",
     "url": "https://link.coupang.com/a/ihPTujzeyy",
     "image_url": "https://thumbnail9.coupangcdn.com/thumbnails/remote/212x212ex/image/vendor_inventory/752b/279847c76be6ce234b214dc858ceaecf81bd12fe07dcc556dc44cd3749fd.jpg",
@@ -48,11 +48,11 @@
   },
   {
     "id": "multivitamin-01",
-    "enabled": false,
-    "affiliate_confirmed": false,
+    "enabled": true,
+    "affiliate_confirmed": true,
     "title": "고려은단 멀티비타민 올인원",
     "url": "https://link.coupang.com/a/ihPGNw5JzU",
-    "image_url": "",
+    "image_url": "https://thumbnail9.coupangcdn.com/thumbnails/remote/212x212ex/image/vendor_inventory/89eba88cdff83bb35a33ea3d23f40d55b16ea21fa0feeeb5ab1facb68af6.jpg",
     "relevance": "종합 영양 보충",
     "keywords": [
       "골다공증",
