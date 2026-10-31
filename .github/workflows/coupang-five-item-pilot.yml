@@ -15,6 +15,6 @@ jobs:
       - run: pip install requests -q
       - name: Insert five related items into one matching published article and verify
         env:
-          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
-          WP_USER: ${{ secrets.WP_USER }}
+          WP_USER: huh0303@gmail.com
+          WP_PASS: ${{ secrets.KHEALTH365COM }}
         run: python scripts/coupang_five_item_pilot.py
