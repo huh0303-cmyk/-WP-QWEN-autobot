@@ -27,7 +27,7 @@
 2. Select one or more best-selling, mid/high-value products per eligible article based on current evidence.
 3. Validate each product's account-generated affiliate URL and product image source.
 4. Run a dry-run report; deduplicate existing cards/disclosures.
-5. Apply in small batches with GitHub Actions, using direct WordPress REST API from the runner (not WPVibe). Upload product images to WP media, then patch post content with the hosted image and affiliate URL.
+5. Apply in small batches with GitHub Actions, using direct WordPress REST API from the runner (not WordPress connector). Upload product images to WP media, then patch post content with the hosted image and affiliate URL.
 6. Verify each post by fetching it back; record success/failure. Retry only failed items. Stop automatically at 100 verified eligible posts or when no eligible posts remain.
 
 ## Current completion
