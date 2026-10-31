@@ -5,7 +5,7 @@
     "affiliate_confirmed": true,
     "title": "관절엔 콘드로이친 1200",
     "url": "https://link.coupang.com/a/ihKqEBmP48",
-    "image_url": "https://thumbnail9.coupangcdn.com/thumbnails/remote/212x212ex/image/vendor_inventory/",
+    "image_url": "",
     "relevance": "관절·뼈 건강",
     "keywords": [
       "골다공증",
@@ -13,7 +13,7 @@
       "관절",
       "칼슘"
     ],
-    "note": "실제 대표 이미지 URL 확인 후 활성화"
+    "note": "대표 이미지는 제휴 링크의 쿠팡 상품 상세페이지에서 워크플로우가 자동 추출하고 이미지 응답을 검증"
   },
   {
     "id": "calcium-k2-01",
@@ -21,7 +21,7 @@
     "affiliate_confirmed": true,
     "title": "고려은단 뼈건강 칼마디 K2",
     "url": "https://link.coupang.com/a/ihPTujzeyy",
-    "image_url": "https://thumbnail9.coupangcdn.com/thumbnails/remote/212x212ex/image/vendor_inventory/752b/279847c76be6ce234b214dc858ceaecf81bd12fe07dcc556dc44cd3749fd.jpg",
+    "image_url": "",
     "relevance": "칼슘·마그네슘·비타민D·K2",
     "keywords": [
       "골다공증",
@@ -29,12 +29,12 @@
       "칼슘",
       "비타민D"
     ],
-    "note": "이미지 URL 및 상품 일치 여부 검증 후 활성화"
+    "note": "대표 이미지는 제휴 링크의 쿠팡 상품 상세페이지에서 워크플로우가 자동 추출하고 이미지 응답을 검증"
   },
   {
     "id": "omega3-vitd-01",
-    "enabled": false,
-    "affiliate_confirmed": false,
+    "enabled": true,
+    "affiliate_confirmed": true,
     "title": "순수식품 rTG 오메가3 + 비타민D",
     "url": "https://link.coupang.com/a/ihaVByREei",
     "image_url": "",
@@ -44,7 +44,7 @@
       "건강",
       "비타민D"
     ],
-    "note": "실제 대표 이미지 URL 확인 후 활성화"
+    "note": "대표 이미지는 제휴 링크의 쿠팡 상품 상세페이지에서 워크플로우가 자동 추출하고 이미지 응답을 검증"
   },
   {
     "id": "multivitamin-01",
@@ -52,14 +52,14 @@
     "affiliate_confirmed": true,
     "title": "고려은단 멀티비타민 올인원",
     "url": "https://link.coupang.com/a/ihPGNw5JzU",
-    "image_url": "https://thumbnail9.coupangcdn.com/thumbnails/remote/212x212ex/image/vendor_inventory/89eba88cdff83bb35a33ea3d23f40d55b16ea21fa0feeeb5ab1facb68af6.jpg",
+    "image_url": "",
     "relevance": "종합 영양 보충",
     "keywords": [
       "골다공증",
       "건강",
       "영양"
     ],
-    "note": "실제 대표 이미지 URL 확인 후 활성화"
+    "note": "대표 이미지는 제휴 링크의 쿠팡 상품 상세페이지에서 워크플로우가 자동 추출하고 이미지 응답을 검증"
   },
   {
     "id": "msm-yuhan-01",
@@ -67,13 +67,13 @@
     "affiliate_confirmed": true,
     "title": "유한양행 식물성 MSM",
     "url": "https://link.coupang.com/a/ihWmcAFZSK",
-    "image_url": "https://t5a.coupangcdn.com/thumbnails/remote/212x212ex/image/vendor_inventory/d319/26024e257b07344aba2b67088b0126e73d90d3ea5ec91b7f0c82dba9468e.jpg",
+    "image_url": "",
     "relevance": "관절 건강 보조",
     "keywords": [
       "관절",
       "뼈",
       "건강"
     ],
-    "note": "사용자가 제공한 쿠팡 파트너스 상품 링크 및 파트너스 페이지에 표시된 상품 대표 이미지"
+    "note": "대표 이미지는 제휴 링크의 쿠팡 상품 상세페이지에서 워크플로우가 자동 추출하고 이미지 응답을 검증"
   }
 ]
