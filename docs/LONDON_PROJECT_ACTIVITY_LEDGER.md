@@ -1,4 +1,4 @@
-# 런던프로젝트 작업 원장 정책
+﻿# 런던프로젝트 작업 원장 정책
 
 모든 런던프로젝트 작업은 성공 여부와 관계없이 흔적을 남긴다.
 
@@ -637,3 +637,12 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - This task initiated 0 Actions runs, made 0 post edits, uploaded 0 media files, and performed 0 saved-readback verifications. Existing featured images were untouched.
 - Durable execution report: `reports/k-health365-latest100-coupang-execution-2026-10-31.md` (commit 056fad886a97efae450f9c6377aaf28d11baea83).
 - Next action: reconcile the verified-link inventory, gather account-generated links and image-rights evidence for relevant offers, prepare a dry-run manifest, and implement a pilot-first idempotent batch workflow with featured-media preservation and per-post read-back.
+
+## 2026-11-01 OliveYoungKorea + Kskin365 cleanup and affiliate task
+- task_id: oliveyoung-kskin365-cleanup-20261101
+- Scope: WordPress OliveYoungKorea + Kskin365; DC + PowerShell; WPVibe prohibited.
+- Public read-only audit: OliveYoungKorea 63 posts, 0 duplicate title groups, 7 repeated cross-post inline-image groups, 0 within-post duplicates. Kskin365 103 posts, 1 duplicate title group (IDs 2897/2905), 4 repeated cross-post inline-image groups, 1 within-post repeated image case (ID 1582).
+- Proposed Kskin365 #2905 retitle: Niacinamide 2%, 5%, and 10%: Choosing the Right Concentration for Korean Skincare.
+- Safety: retain posts and media-library originals; remove only repeated inline blocks after audit; preserve all other post fields; verify authenticated read-back.
+- Artifacts: reports/oliveyoung-kskin365-editorial-audit-2026-11-01.json; scripts/oliveyoung_kskin365_editorial_cleanup.py; .github/workflows/oliveyoung-kskin365-editorial-cleanup.yml; docs/OLIVEYOUNG_KSKIN365_CLEANUP_2026-11-01.md.
+- Live edits and affiliate placements are pending; no completion claim until read-back/public verification.
