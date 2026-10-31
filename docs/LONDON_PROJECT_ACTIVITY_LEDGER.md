@@ -626,3 +626,14 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - Direct RSS checks found no Oct31 posts (0/3). Latest public posts: N1 Oct10 01:18 KST, N2 Oct7 10:39 KST, N3 Oct8 10:20 KST. No new URLs.
 - Current Chrome profile is `huh0303@gmail.com`, but its open tabs are Coupang/Gmail and no Naver editor is open; the live account-to-blog match is unverified. No content was inserted or published, and no credentials were requested or handled.
 - The current heartbeat quota remains N1 1/day, N2 1/day, N3 1–5/day; the existing config contains a different network cadence. No config or schedule was changed. Resume only in the next valid same-day research window after a verified trend brief/plan exists and the target account is confirmed in its editor; do not catch up today.
+
+
+## khealth-coupang-latest100-20261031-1104-kst
+
+- Request received 2026-10-31 11:04 KST: execute Coupang affiliate placements across K-Health365's latest 100 posts, preserve featured images, run GitHub Actions, and verify all saved posts.
+- Reviewed the committed latest-100 report: inventory has 100 published posts; 25 likely product-intent posts. It records prior cards on posts 7310 and 7291 and an existing matching card on 7314; these prior changes were not re-verified in this task.
+- Blocked before new content writes. The repository has a single-post Omega-3 pilot workflow for post 7310 and a separate read-only inventory workflow, but no matching 100-post batch write workflow. Current WPVibe connection reports read access only. No compatible Actions dispatch tool is available in the connected GitHub integration.
+- Verified product assets are incomplete for the 25 likely product-intent posts; the plan and rollout report also disagree on the current verified link inventory (chondroitin vs Omega-3). No URLs or images were invented/reused for other categories; the other 75 posts were not force-filled with unrelated products.
+- This task initiated 0 Actions runs, made 0 post edits, uploaded 0 media files, and performed 0 saved-readback verifications. Existing featured images were untouched.
+- Durable execution report: `reports/k-health365-latest100-coupang-execution-2026-10-31.md` (commit 056fad886a97efae450f9c6377aaf28d11baea83).
+- Next action: reconcile the verified-link inventory, gather account-generated links and image-rights evidence for relevant offers, prepare a dry-run manifest, and implement a pilot-first idempotent batch workflow with featured-media preservation and per-post read-back.
