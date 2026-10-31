@@ -641,6 +641,6 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 
 ## 2026-10-31 — WordPress connector removal
 
-- 사용자의 명시적 요청으로 ChatGPT의 WPVibe 앱 연결을 제거했다.
+- 사용자의 명시적 요청으로 ChatGPT의 WordPress connector 앱 연결을 제거했다.
 - GitHub `main`에서 운영 지침을 직접 REST API/승인된 클라우드 실행 경로로 변경하고, 구형 연결 전용 지침 파일과 설정 플래그를 삭제했다.
 - 기존 작업 결과와 포스트 콘텐츠는 변경하지 않았다. Git 커밋 이력은 감사 추적을 위해 유지한다.
