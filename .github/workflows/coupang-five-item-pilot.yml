@@ -1,0 +1,20 @@
+name: "K-Health365 — Coupang 5-item single-page pilot"
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: Insert five related items into one matching published article and verify
+        env:
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+          WP_USER: ${{ secrets.WP_USER }}
+        run: python scripts/coupang_five_item_pilot.py
