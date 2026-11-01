@@ -3138,14 +3138,11 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
 
     related_html = "" if is_newsroom else build_related_links_html(url, pw, site.get("lang","ko"), exclude_title=title)
     final += related_html
-    # Shared London Project affiliate footer: soft category mix, article relevance first.
+        # Mandatory shared Coupang footer: fail publication if ten verified cards are unavailable.
     if not is_newsroom:
-        try:
-            from automation_hub.coupang_partners import apply_footer
-            final = apply_footer(final, title, site.get("site_id", url), site.get("lang", "ko"))
-        except Exception as affiliate_exc:
-            # Affiliate rendering is optional; never block a valid article on a catalog outage.
-            print(f"  ⚠️ Coupang footer skipped safely: {affiliate_exc}")
+        from automation_hub.coupang_partners import apply_footer
+        final = apply_footer(final, title, site.get("site_id", url), site.get("lang", "ko"))
+
 
     # Hard reader-visible provenance gate. Stock provider/license details belong
     # in internal receipts only; if any legacy/model path leaks them, block the
