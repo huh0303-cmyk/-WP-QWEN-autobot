@@ -5,6 +5,7 @@ from __future__ import annotations
 import html
 import json
 import os
+import re
 import time
 import sys
 from datetime import datetime, timezone, timedelta
