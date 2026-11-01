@@ -21,9 +21,9 @@ def image_from_affiliate(url):
     r.raise_for_status()
     page = r.text[:5000000]
     patterns = [
-        r'<meta[^>]+property=["\\']og:image["\\'][^>]+content=["\\']([^"\\']+)',
-        r'<meta[^>]+content=["\\']([^"\\']+)["\\'][^>]+property=["\\']og:image["\\']',
-        r'<meta[^>]+name=["\\']twitter:image["\\'][^>]+content=["\\']([^"\\']+)',
+        r"""<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)""",
+        r"""<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)""",
+        r"""<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)""",
     ]
     for pat in patterns:
         m = re.search(pat, page, re.I)
@@ -45,7 +45,7 @@ def load_products():
     if len(set(urls)) != 10:
         die("중복 쿠팡 파트너스 URL이 있습니다.")
     for p in items:
-        if not re.fullmatch(r"https://link\\.coupang\\.com/a/[A-Za-z0-9]+", p["url"]):
+        if not re.fullmatch(r"https://link\.coupang\.com/a/[A-Za-z0-9]+", p["url"]):
             die("쿠팡 파트너스 단축 URL 형식 오류: " + p["id"])
         if not p.get("title"):
             die("상품명 누락: " + p["id"])
@@ -153,7 +153,7 @@ def main():
             public = wp_request(session,"GET",SITE + "/wp-json/wp/v2/posts/" + str(pid),
                 params={"_fields":"id,link,content,status"}).json()
             rendered = public.get("content",{}).get("rendered","")
-            distinct = set(re.findall(r'href=["\\'](https://link\\.coupang\\.com/a/[^"\\']+)',rendered))
+            distinct = set(re.findall(r"""href=["'](https://link\.coupang\.com/a/[^"']+)""", rendered))
             expected = set(p["url"] for p in products)
             if len(expected.intersection(distinct)) != 10:
                 report["errors"].append({"id":pid,"reason":"public page missing one or more affiliate links"})
