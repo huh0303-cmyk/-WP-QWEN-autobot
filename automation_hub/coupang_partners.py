@@ -130,8 +130,8 @@ def apply_footer(content, title, site_id="", lang="en"):
                 before = before.rstrip()[:-3]
             if after.lstrip().startswith("</p>"):
                 after = after.lstrip()[4:]
-            return before.rstrip() + "\\n" + footer + "\\n" + after.lstrip()
+            return before.rstrip() + "\n" + footer + "\n" + after.lstrip()
     # Unknown legacy affiliate markup is preserved for explicit migration review.
     if "link.coupang.com/" in content or "쿠팡 파트너스 활동의 일환" in content:
         return content
-    return content.rstrip() + ("\\n" if content.strip() else "") + footer
+    return content.rstrip() + ("\n" if content.strip() else "") + footer
