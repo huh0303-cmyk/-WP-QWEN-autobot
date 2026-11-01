@@ -6,6 +6,8 @@ on:
       - "automation_hub/blogger_adapter.py"
       - "scripts/autopost_mega.py"
       - "scripts/london_four_agent_pipeline.py"
+      - "scripts/publish_blogger_33_now.py"
+      - "scripts/audit_coupang_catalog_coverage.py"
       - "config/affiliate/london-shared-policy.json"
       - "tests/test_coupang_partners.py"
       - ".github/workflows/coupang-partners-tests.yml"
