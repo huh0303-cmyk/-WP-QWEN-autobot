@@ -34,9 +34,9 @@ If a site's own verified catalog has fewer than ten eligible products, the publi
 The footer displays ten cards on every device. The grid is responsive: four columns on desktop and two on narrow/mobile screens, with natural card heights and row wrapping.
 
 ## Existing content rollout
-This integration affects newly created posts only. It does not mass-edit published articles. Historical backfill must be a separate preview/report/apply operation per platform, with explicit approval and preservation checks.
+This integration affects newly created posts across every registered WordPress and Blogspot destination, including newsroom sites. It does not mass-edit published articles. Historical backfill must be a separate preview/report/apply operation per platform, with explicit approval and preservation checks.
 
 ## Operational guardrails
-- Do not alter article text, publication status/date, featured images, SEO metadata, or newsroom editorial content.
+- Do not alter article text, publication status/date, featured images, SEO metadata, or editorial content.
 - No new scheduler. Use the locked London 4-Agent / existing WP and Blogger publishers.
 - Require ten verified records before a post is sent to WordPress or Blogger. If the site's catalog is short, fail that site's publish job and report which catalog needs additional portal-captured products.
