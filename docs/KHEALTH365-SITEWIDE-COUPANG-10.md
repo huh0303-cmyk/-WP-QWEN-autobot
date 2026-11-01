@@ -27,7 +27,7 @@ The four additional product images are resolved from their Coupang affiliate des
 - Apply mode reads each post back through the authenticated WordPress REST API and verifies the public rendered post contains all ten distinct affiliate destinations.
 
 ## Run
-GitHub Actions → K-Health365 Sitewide Coupang 10 Products.
+GitHub Actions → K-Health365 Sitewide Coupang 10 Products. The scheduled job runs daily at 12:00 KST (03:00 UTC), after the usual morning publishing window, and applies the footer to all published posts.
 1. Run preview first with limit=1 to test the first published post.
 2. Review the uploaded JSON report, especially skipped_legacy and errors.
 3. Only after preview review, run apply with confirm_apply=APPLY-ALL.
