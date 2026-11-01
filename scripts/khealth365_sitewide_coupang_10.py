@@ -134,9 +134,16 @@ def main():
             report["errors"].append({"id":pid,"reason":"raw content unavailable"})
             continue
         if START in raw and END in raw:
-            before = raw.split(START,1)[0]
-            after = raw.split(END,1)[1]
-            new = before + block + after
+            start_at = raw.index(START)
+            end_at = raw.index(END, start_at) + len(END)
+            before = raw[:start_at]
+            after = raw[end_at:]
+            # Existing editor content sometimes wraps marker comments in empty paragraph tags.
+            if before.rstrip().endswith("<p>"):
+                before = before.rstrip()[:-3]
+            if after.lstrip().startswith("</p>"):
+                after = after.lstrip()[4:]
+            new = before.rstrip() + "\\n" + block + "\\n" + after.lstrip()
         elif "link.coupang.com/" in raw or "쿠팡 파트너스 활동의 일환" in raw:
             report["skipped_legacy"] += 1
             report["results"].append({"id":pid,"url":post.get("link"),"status":"SKIPPED_UNMARKED_LEGACY_BLOCK"})
