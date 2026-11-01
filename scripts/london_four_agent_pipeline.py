@@ -147,9 +147,17 @@ def _publish_wordpress_native(state: dict, profile: dict, public: bool) -> dict:
 
     from scripts.create_manual_wp_draft import WP_USER, ensure_featured_media, resolve_tag_ids
 
+    content_html = article["content_html"]
+    # Shared London Project affiliate footer, also used by the Blogger publisher.
+    try:
+        from automation_hub.coupang_partners import apply_footer
+        content_html = apply_footer(content_html, article["title"], state.get("site_id", site_url), profile.get("language", "en"))
+    except Exception as affiliate_exc:
+        print(f"Affiliate footer skipped safely: {affiliate_exc}")
+
     payload = {
         "title": article["title"],
-        "content": article["content_html"],
+        "content": content_html,
         "status": "publish" if public else "draft",
         "comment_status": "closed",
         "ping_status": "closed",
