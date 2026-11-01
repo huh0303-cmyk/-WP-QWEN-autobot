@@ -38,7 +38,7 @@
     "preserve_featured_image": true,
     "preserve_seo_metadata": true,
     "idempotent_marker": "LONDON-COUPANG-PARTNERS-START/END",
-    "newsroom_excluded_by_default": true,
+    "newsroom_excluded_by_default": false,
     "never_auto_modify_existing_published_posts_during_new_post_integration": true
   },
   "product_sources": [
