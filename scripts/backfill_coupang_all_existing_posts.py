@@ -30,7 +30,7 @@ def wp_posts(session, base):
     page = 1
     while True:
         response = session.get(base.rstrip("/") + "/wp-json/wp/v2/posts",
-            params={"status":"publish","per_page":100,"page":page,"context":"edit",
+            params={"status":"any","per_page":100,"page":page,"context":"edit",
                     "_fields":"id,link,title,content,status,date,modified"},
             timeout=60)
         if response.status_code == 400 and page > 1:
@@ -46,7 +46,7 @@ def blogger_posts(session, blog_id, token):
     endpoint = f"https://www.googleapis.com/blogger/v3/blogs/{blog_id}/posts"
     page_token = None
     while True:
-        params = {"fetchBodies":"true","maxResults":500,"status":["live"]}
+        params = {"fetchBodies":"true","maxResults":500,"status":["live","draft","scheduled"]}
         if page_token: params["pageToken"] = page_token
         r = session.get(endpoint, params=params, headers={"Authorization":f"Bearer {token}"}, timeout=60)
         r.raise_for_status()
