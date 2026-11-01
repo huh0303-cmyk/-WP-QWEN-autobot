@@ -40,3 +40,10 @@ This integration affects newly created posts across every registered WordPress a
 - Do not alter article text, publication status/date, featured images, SEO metadata, or editorial content.
 - No new scheduler. Use the locked London 4-Agent / existing WP and Blogger publishers.
 - Require ten verified records before a post is sent to WordPress or Blogger. If the site's catalog is short, fail that site's publish job and report which catalog needs additional portal-captured products.
+
+## Historical backfill (all existing posts)
+- Use `scripts/backfill_coupang_all_existing_posts.py` to enumerate every published post on each registered WordPress and Blogger site.
+- Run `.github/workflows/backfill-coupang-existing-posts.yml` in `preview` mode first. Review the JSON report for catalog coverage, missing credentials, existing ten-card blocks, and legacy sections.
+- Only after catalog and credentials are ready, run `apply` with the explicit `APPLY-ALL` confirmation. It updates only post body/content and reads each post back to verify ten distinct affiliate destinations.
+- Required Actions secrets: `WP_SITE_CREDENTIALS_JSON` (JSON map keyed by site_id or secret_name, each with username and app_password), `BLOGGER_GOOGLE_CLIENT_ID`, `BLOGGER_GOOGLE_CLIENT_SECRET`, and `BLOGGER_GOOGLE_REFRESH_TOKEN`.
+- Posts with unmarked legacy affiliate markup are reported for review rather than having unknown article HTML deleted automatically.
