@@ -116,8 +116,9 @@ def _category(item):
     return "korea_lifestyle_hot_items"
 
 def select_products(title, article_text, site_id="", limit=10):
+    # Ten unique, verified offers are mandatory. Never publish a partial block.
     pool = load_candidates(site_id)
-    if not pool: return []
+    if len(pool) < 10 or limit < 10: return []
     clean_text = article_text or ""
     for old_start, old_end in LEGACY_MARKERS:
         clean_text = re.sub(re.escape(old_start) + r".*?" + re.escape(old_end), " ", clean_text, flags=re.S)
@@ -139,17 +140,18 @@ def select_products(title, article_text, site_id="", limit=10):
         if len(chosen) >= limit: break
         if item["url"] not in used:
             chosen.append(item); used.add(item["url"])
-    return chosen[:limit]
+    return chosen[:10] if len(chosen) >= 10 else []
 
 def render_footer(title, article_text, site_id="", lang="en"):
     products = select_products(title, article_text, site_id)
-    if not products: return ""
+    if len(products) != 10:
+        raise RuntimeError(f"Coupang footer requires exactly 10 unique verified products for site={site_id}; found {len(products)}")
     cards = []
     for p in products:
         url, image, name = (html.escape(p[k], quote=True) for k in ("url","image","title"))
         cards.append(
             '<article class="london-coupang-card"><a href="' + url + '" target="_blank" rel="sponsored nofollow noopener">'
-            '<img src="' + image + '" alt="' + name + '" loading="lazy" decoding="async">'
+            '<img src="' + image + '" alt="' + name + '" loading="lazy" decoding="async" referrerpolicy="unsafe-url">'
             '<span>' + name + '</span></a><a class="london-coupang-button" href="' + url
             + '" target="_blank" rel="sponsored nofollow noopener">상품 확인</a></article>'
         )
@@ -157,8 +159,8 @@ def render_footer(title, article_text, site_id="", lang="en"):
     return (START + '<section class="london-coupang-wrap" aria-label="Coupang Partners products">'
         '<style>.london-coupang-wrap{margin:30px 0;padding:18px;border:1px solid #e5e7eb;border-radius:12px}'
         '.london-coupang-wrap h2{font-size:20px;margin:0 0 10px}.london-coupang-disclosure{font-size:12px;color:#666;margin:0 0 14px}'
-        '.london-coupang-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}'
-        '.london-coupang-card{min-width:0;border:1px solid #e5e7eb;border-radius:10px;padding:10px;text-align:center;display:flex;flex-direction:column}'
+        '.london-coupang-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;align-items:stretch}'
+        '.london-coupang-card{min-width:0;border:1px solid #e5e7eb;border-radius:10px;padding:10px;text-align:center;display:flex;flex-direction:column;justify-content:space-between;background:#fff}'
         '.london-coupang-card img{width:100%;height:145px;object-fit:contain}.london-coupang-card span{display:block;font-size:13px;line-height:1.45;margin:8px 0;overflow-wrap:anywhere}'
         '.london-coupang-button{margin-top:auto;background:#17365d;color:#fff!important;text-decoration:none;padding:8px;border-radius:7px;font-size:12px}'
         '@media(max-width:760px){.london-coupang-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.london-coupang-card img{height:125px}}</style>'
