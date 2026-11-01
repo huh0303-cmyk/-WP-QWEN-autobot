@@ -43,6 +43,10 @@ def _candidate(raw, source):
     url = raw.get("affiliate_url") or raw.get("url")
     title = raw.get("title_ko") or raw.get("product_title") or raw.get("title") or raw.get("display_title_en")
     image = raw.get("official_image_url") or raw.get("image_url")
+    official_tag = raw.get("official_blog_html_tag") or raw.get("blog_html_tag") or ""
+    if not image and isinstance(official_tag, str):
+        match = re.search(r"<img[^>]+src=[\x22\x27]([^\x22\x27]+)", official_tag, re.I)
+        if match: image = match.group(1)
     status = raw.get("status", "")
     account_owned = raw.get("affiliate_confirmed") is True or (
         raw.get("verified_account_owned") is True and raw.get("capture_source") == "coupang_partners_portal"
@@ -55,7 +59,7 @@ def _candidate(raw, source):
     price_raw = raw.get("price_krw") or raw.get("price") or raw.get("displayed_price") or ""
     digits = re.sub(r"[^0-9]", "", str(price_raw))
     price = int(digits) if digits else None
-    return {"url": url, "title": title.strip(), "image": image, "source": source, "price_krw": price,
+    return {"url": url, "title": title.strip(), "image": image, "official_tag": official_tag, "source": source, "price_krw": price,
             "category": str(raw.get("category", "")).lower(),
             "search_text": " ".join([title, str(raw.get("query","")), str(raw.get("category","")), str(raw.get("relevance","")), str(raw.get("description_en",""))]).lower()}
 
@@ -153,7 +157,7 @@ def render_footer(title, article_text, site_id="", lang="en"):
     return (START + '<section class="london-coupang-wrap" aria-label="Coupang Partners products">'
         '<style>.london-coupang-wrap{margin:30px 0;padding:18px;border:1px solid #e5e7eb;border-radius:12px}'
         '.london-coupang-wrap h2{font-size:20px;margin:0 0 10px}.london-coupang-disclosure{font-size:12px;color:#666;margin:0 0 14px}'
-        '.london-coupang-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}'
+        '.london-coupang-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}'
         '.london-coupang-card{min-width:0;border:1px solid #e5e7eb;border-radius:10px;padding:10px;text-align:center;display:flex;flex-direction:column}'
         '.london-coupang-card img{width:100%;height:145px;object-fit:contain}.london-coupang-card span{display:block;font-size:13px;line-height:1.45;margin:8px 0;overflow-wrap:anywhere}'
         '.london-coupang-button{margin-top:auto;background:#17365d;color:#fff!important;text-decoration:none;padding:8px;border-radius:7px;font-size:12px}'
