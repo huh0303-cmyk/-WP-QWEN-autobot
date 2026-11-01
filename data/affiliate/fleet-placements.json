@@ -1,0 +1,5 @@
+﻿{
+  "schema_version": 1,
+  "policy": {"products_per_post": 8, "categories": {"topic": 2, "korean_life": 2, "health": 2, "kbeauty": 2}},
+  "sites": {}
+}
