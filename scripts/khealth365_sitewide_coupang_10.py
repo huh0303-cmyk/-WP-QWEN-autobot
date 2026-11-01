@@ -4,10 +4,9 @@ import os, re, json, html, argparse, sys
 from pathlib import Path
 from urllib.parse import urlparse
 import requests
+from automation_hub.coupang_partners import apply_footer, select_products, START, END
 
 SITE = "https://k-health365.com"
-START = "<!-- KHEALTH365-COUPANG-START -->"
-END = "<!-- KHEALTH365-COUPANG-END -->"
 DISCLOSURE = "이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다."
 CATALOG = Path("config/affiliate/k-health365-sitewide-10.json")
 OUT = Path("output/khealth365-sitewide-10-report.json")
@@ -107,8 +106,6 @@ def main():
     password = os.getenv("KHEALTH365_WP_APP_PASSWORD", "").strip()
     if not user or not password:
         die("GitHub Secrets KHEALTH365_WP_USER / KHEALTH365_WP_APP_PASSWORD 필요")
-    products = load_products()
-    block = render_block(products)
     session = requests.Session()
     session.auth = (user, password)
     session.headers.update(UA)
@@ -125,48 +122,40 @@ def main():
         page += 1
     if args.limit:
         posts = posts[:args.limit]
-    report = {"site":SITE,"mode":args.mode,"products":len(products),"posts_found":len(posts),
-        "updated":0,"already_current":0,"skipped_legacy":0,"errors":[],"results":[]}
+    report = {"site":SITE,"mode":args.mode,"products_available":len(select_products("K-Health365", "", "wp_khealth365")),
+        "posts_found":len(posts),"updated":0,"already_current":0,"skipped_legacy":0,"errors":[],"results":[]}
     for post in posts:
         pid = post["id"]
         raw = post.get("content",{}).get("raw")
         if raw is None:
             report["errors"].append({"id":pid,"reason":"raw content unavailable"})
             continue
-        if START in raw and END in raw:
-            start_at = raw.index(START)
-            end_at = raw.index(END, start_at) + len(END)
-            before = raw[:start_at]
-            after = raw[end_at:]
-            # Existing editor content sometimes wraps marker comments in empty paragraph tags.
-            if before.rstrip().endswith("<p>"):
-                before = before.rstrip()[:-3]
-            if after.lstrip().startswith("</p>"):
-                after = after.lstrip()[4:]
-            new = before.rstrip() + "\n" + block + "\n" + after.lstrip()
-        elif "link.coupang.com/" in raw or "쿠팡 파트너스 활동의 일환" in raw:
-            report["skipped_legacy"] += 1
-            report["results"].append({"id":pid,"url":post.get("link"),"status":"SKIPPED_UNMARKED_LEGACY_BLOCK"})
-            continue
-        else:
-            new = raw.rstrip() + "\n\n" + block + "\n"
+        title_obj = post.get("title", {})
+        title = title_obj.get("rendered", "") if isinstance(title_obj, dict) else str(title_obj)
+        title = html.unescape(re.sub(r"<[^>]+>", "", title)).strip()
+        selected = select_products(title, raw, "wp_khealth365")
+        new = apply_footer(raw, title, "wp_khealth365", "ko")
         if new == raw:
-            report["already_current"] += 1
+            if "link.coupang.com/" in raw or "쿠팡 파트너스 활동의 일환" in raw:
+                report["skipped_legacy"] += 1
+                report["results"].append({"id":pid,"url":post.get("link"),"status":"SKIPPED_UNMARKED_LEGACY_BLOCK"})
+            else:
+                report["already_current"] += 1
             continue
-        report["results"].append({"id":pid,"url":post.get("link"),"status":"PREVIEW_READY"})
+        report["results"].append({"id":pid,"url":post.get("link"),"status":"PREVIEW_READY","selected_products":len(selected)})
         if args.mode == "apply":
             wp_request(session,"POST",SITE + "/wp-json/wp/v2/posts/" + str(pid),json={"content":new})
             verify = wp_request(session,"GET",SITE + "/wp-json/wp/v2/posts/" + str(pid),
                 params={"context":"edit","_fields":"id,link,content,status"}).json()
             check = verify.get("content",{}).get("raw","")
-            if START not in check or END not in check or sum(check.count(p["url"]) for p in products) < 20:
-                report["errors"].append({"id":pid,"reason":"REST read-back verification failed"})
+            expected = set(p["url"] for p in selected)
+            if START not in check or END not in check or len(expected) != 10 or not all(check.count(url) >= 2 for url in expected):
+                report["errors"].append({"id":pid,"reason":"REST read-back verification failed","expected_products":len(expected)})
                 continue
             public = wp_request(session,"GET",SITE + "/wp-json/wp/v2/posts/" + str(pid),
                 params={"_fields":"id,link,content,status"}).json()
             rendered = public.get("content",{}).get("rendered","")
             distinct = set(re.findall(r"""href=["'](https://link\.coupang\.com/a/[^"']+)""", rendered))
-            expected = set(p["url"] for p in products)
             if len(expected.intersection(distinct)) != 10:
                 report["errors"].append({"id":pid,"reason":"public page missing one or more affiliate links"})
                 continue
