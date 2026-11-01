@@ -65,7 +65,10 @@ def _category(item):
 def select_products(title, article_text, site_id="", limit=10):
     pool = load_candidates()
     if not pool: return []
-    subject = f"{title} {article_text[:5000]}"
+    clean_text = article_text or ""
+    for old_start, old_end in LEGACY_MARKERS:
+        clean_text = re.sub(re.escape(old_start) + r".*?" + re.escape(old_end), " ", clean_text, flags=re.S)
+    subject = f"{title} {clean_text[:5000]}"
     ranked = sorted(pool, key=lambda p: (_score(p, subject), p["source"] == "beauty"), reverse=True)
     chosen, used = [], set()
     # First two are always selected by article relevance, not by a rigid category quota.
