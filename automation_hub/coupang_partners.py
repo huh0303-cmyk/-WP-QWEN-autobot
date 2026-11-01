@@ -7,6 +7,7 @@ from urllib.parse import urlparse
 ROOT = Path(__file__).resolve().parents[1]
 START = "<!-- LONDON-COUPANG-PARTNERS-START -->"
 END = "<!-- LONDON-COUPANG-PARTNERS-END -->"
+LEGACY_MARKERS = ((START, END), ("<!-- KHEALTH365-COUPANG-START -->", "<!-- KHEALTH365-COUPANG-END -->"))
 DISCLOSURE = "이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다."
 POLICY_PATH = ROOT / "config/affiliate/london-shared-policy.json"
 
@@ -109,14 +110,28 @@ def render_footer(title, article_text, site_id="", lang="en"):
         '<div class="london-coupang-grid">' + ''.join(cards) + '</div></section>' + END)
 
 def apply_footer(content, title, site_id="", lang="en"):
-    """Replace a prior shared block or append once; never duplicate."""
+    """Replace shared/K-Health legacy marker blocks or append once; never duplicate."""
     content = content or ""
-    start = content.find(START)
-    end = content.find(END, start + len(START)) if start >= 0 else -1
-    footer = render_footer(title, content, site_id, lang)
-    if start >= 0 and end >= 0:
-        return content[:start] + footer + content[end + len(END):]
-    # Don't silently stack a new block over unknown legacy affiliate markup.
+    footer_source = content
+    for old_start, old_end in LEGACY_MARKERS:
+        a = footer_source.find(old_start)
+        b = footer_source.find(old_end, a + len(old_start)) if a >= 0 else -1
+        if a >= 0 and b >= 0:
+            footer_source = footer_source[:a] + footer_source[b + len(old_end):]
+    footer = render_footer(title, footer_source, site_id, lang)
+    if not footer:
+        return content
+    for old_start, old_end in LEGACY_MARKERS:
+        a = content.find(old_start)
+        b = content.find(old_end, a + len(old_start)) if a >= 0 else -1
+        if a >= 0 and b >= 0:
+            before, after = content[:a], content[b + len(old_end):]
+            if before.rstrip().endswith("<p>"):
+                before = before.rstrip()[:-3]
+            if after.lstrip().startswith("</p>"):
+                after = after.lstrip()[4:]
+            return before.rstrip() + "\\n" + footer + "\\n" + after.lstrip()
+    # Unknown legacy affiliate markup is preserved for explicit migration review.
     if "link.coupang.com/" in content or "쿠팡 파트너스 활동의 일환" in content:
         return content
-    return content.rstrip() + ("\n" if content.strip() else "") + footer
+    return content.rstrip() + ("\\n" if content.strip() else "") + footer
