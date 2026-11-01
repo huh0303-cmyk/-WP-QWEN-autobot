@@ -130,7 +130,7 @@ def main():
                     entry["posts_seen"] += 1
                     report["totals"]["posts_seen"] += 1
                     if new == raw:
-                        if START in raw and END in raw:
+                        if START in raw and END in raw and len(distinct_links(raw)) >= 10:
                             entry["already_ten"] += 1
                         elif "link.coupang.com/" in raw or DISCLOSURE in raw:
                             entry["skipped_legacy"] += 1
@@ -167,7 +167,7 @@ def main():
                     new = apply_footer(raw,title,sid,lang_for(site,raw))
                     entry["posts_seen"] += 1; report["totals"]["posts_seen"] += 1
                     if new == raw:
-                        if START in raw and END in raw: entry["already_ten"] += 1
+                        if START in raw and END in raw and len(distinct_links(raw)) >= 10: entry["already_ten"] += 1
                         elif "link.coupang.com/" in raw or DISCLOSURE in raw: entry["skipped_legacy"] += 1
                         else: entry["errors"].append({"post_id":post.get("id"),"reason":"footer unchanged; inspect catalog or legacy markup"})
                         continue
