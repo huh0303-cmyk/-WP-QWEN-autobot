@@ -4,6 +4,9 @@ import os, re, json, html, argparse, sys
 from pathlib import Path
 from urllib.parse import urlparse
 import requests
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 from automation_hub.coupang_partners import apply_footer, select_products, START, END
 
 SITE = "https://k-health365.com"
