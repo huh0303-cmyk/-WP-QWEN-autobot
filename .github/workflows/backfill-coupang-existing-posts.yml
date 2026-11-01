@@ -1,0 +1,62 @@
+name: Backfill Coupang cards across existing posts
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Preview first; Apply updates existing published post content.
+        required: true
+        type: choice
+        options: [preview, apply]
+        default: preview
+      platform:
+        description: Which publishing platform to process.
+        required: true
+        type: choice
+        options: [all, wordpress, blogger]
+        default: all
+      site_id:
+        description: Optional exact site_id; leave blank for all registered sites.
+        required: false
+        type: string
+      limit_per_site:
+        description: Optional post limit per site (0 = all).
+        required: false
+        type: string
+        default: "0"
+      confirm_apply:
+        description: Type APPLY-ALL only when mode is apply.
+        required: false
+        type: string
+permissions:
+  contents: read
+jobs:
+  backfill:
+    if: ${{ inputs.mode == 'preview' || inputs.confirm_apply == 'APPLY-ALL' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install --upgrade pip requests
+      - name: Preview or update existing published posts
+        env:
+          MODE: ${{ inputs.mode }}
+          PLATFORM: ${{ inputs.platform }}
+          SITE_ID: ${{ inputs.site_id }}
+          LIMIT_PER_SITE: ${{ inputs.limit_per_site }}
+          WP_SITE_CREDENTIALS_JSON: ${{ secrets.WP_SITE_CREDENTIALS_JSON }}
+          BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
+          BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
+          BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
+        run: |
+          ARGS=(--mode "$MODE" --platform "$PLATFORM" --limit-per-site "${LIMIT_PER_SITE:-0}")
+          if [ -n "$SITE_ID" ]; then ARGS+=(--site-id "$SITE_ID"); fi
+          if [ "$MODE" = "apply" ]; then ARGS+=(--confirm APPLY-ALL); fi
+          python scripts/backfill_coupang_all_existing_posts.py "${ARGS[@]}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coupang-existing-posts-backfill-report
+          path: reports/coupang-existing-posts-backfill.json
