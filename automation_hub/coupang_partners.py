@@ -153,16 +153,16 @@ def render_footer(title, article_text, site_id="", lang="en"):
             '<article class="london-coupang-card"><a href="' + url + '" target="_blank" rel="sponsored nofollow noopener">'
             '<img src="' + image + '" alt="' + name + '" loading="lazy" decoding="async" referrerpolicy="unsafe-url">'
             '<span>' + name + '</span></a><a class="london-coupang-button" href="' + url
-            + '" target="_blank" rel="sponsored nofollow noopener">상품 확인</a></article>'
+            + '" target="_blank" rel="sponsored nofollow noopener">쇼핑하기</a></article>'
         )
-    heading = "함께 살펴볼 상품" if lang == "ko" else "Products to Explore"
+    heading = "함께 살펴볼 만한 추천 상품" if lang == "ko" else "Products to Explore"
     return (START + '<section class="london-coupang-wrap" aria-label="Coupang Partners products">'
         '<style>.london-coupang-wrap{margin:30px 0;padding:18px;border:1px solid #e5e7eb;border-radius:12px}'
         '.london-coupang-wrap h2{font-size:20px;margin:0 0 10px}.london-coupang-disclosure{font-size:12px;color:#666;margin:0 0 14px}'
         '.london-coupang-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;align-items:stretch}'
         '.london-coupang-card{min-width:0;border:1px solid #e5e7eb;border-radius:10px;padding:10px;text-align:center;display:flex;flex-direction:column;justify-content:space-between;background:#fff}'
         '.london-coupang-card img{width:100%;height:145px;object-fit:contain}.london-coupang-card span{display:block;font-size:13px;line-height:1.45;margin:8px 0;overflow-wrap:anywhere}'
-        '.london-coupang-button{margin-top:auto;background:#17365d;color:#fff!important;text-decoration:none;padding:8px;border-radius:7px;font-size:12px}'
+        '.london-coupang-button{margin-top:auto;background:#356dff;color:#fff!important;text-decoration:none;padding:9px 12px;border-radius:24px;font-size:13px;font-weight:700}'
         '@media(max-width:760px){.london-coupang-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.london-coupang-card img{height:125px}}</style>'
         '<h2>' + heading + '</h2><p class="london-coupang-disclosure">' + DISCLOSURE + '</p>'
         '<div class="london-coupang-grid">' + ''.join(cards) + '</div></section>' + END)
