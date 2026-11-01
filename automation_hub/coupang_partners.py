@@ -21,35 +21,75 @@ def _load_json(path):
     try: return json.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError, TypeError): return None
 
+def _resolve_site_key(site_id):
+    raw = str(site_id or "").strip()
+    if raw.startswith("http"):
+        host = urlparse(raw).netloc.lower().split(":")[0]
+        registry = _load_json(ROOT / "config/automation_hub_sites.json") or {}
+        for site in registry.get("sites", []):
+            if urlparse(str(site.get("url", ""))).netloc.lower().split(":")[0] == host:
+                sid = str(site.get("site_id", ""))
+                return sid[3:] if sid.startswith("wp_") else sid
+        return host
+    key = raw.lower()
+    if key.startswith("blogger_"):
+        key = key[len("blogger_"):]
+    if key.startswith("wp_"):
+        key = key[len("wp_"):]
+    return key
+
 def _candidate(raw, source):
     if not isinstance(raw, dict): return None
     url = raw.get("affiliate_url") or raw.get("url")
-    title = raw.get("title_ko") or raw.get("title") or raw.get("display_title_en")
+    title = raw.get("title_ko") or raw.get("product_title") or raw.get("title") or raw.get("display_title_en")
     image = raw.get("official_image_url") or raw.get("image_url")
     status = raw.get("status", "")
+    account_owned = raw.get("affiliate_confirmed") is True or (
+        raw.get("verified_account_owned") is True and raw.get("capture_source") == "coupang_partners_portal"
+    ) or status == "VERIFIED_ACCOUNT_GENERATED"
     if not (isinstance(url, str) and url.startswith("https://link.coupang.com/")): return None
     if not (isinstance(title, str) and title.strip() and isinstance(image, str) and image.startswith("https://")): return None
-    if status and status not in {"VERIFIED_ACCOUNT_GENERATED"} and raw.get("affiliate_confirmed") is not True: return None
+    if not account_owned: return None
     host = urlparse(image).netloc.lower()
     if "coupangcdn.com" not in host: return None
-    price_raw = raw.get("price_krw") or raw.get("displayed_price") or ""
+    price_raw = raw.get("price_krw") or raw.get("price") or raw.get("displayed_price") or ""
     digits = re.sub(r"[^0-9]", "", str(price_raw))
     price = int(digits) if digits else None
     return {"url": url, "title": title.strip(), "image": image, "source": source, "price_krw": price,
+            "category": str(raw.get("category", "")).lower(),
             "search_text": " ".join([title, str(raw.get("query","")), str(raw.get("category","")), str(raw.get("relevance","")), str(raw.get("description_en",""))]).lower()}
 
-def load_candidates():
-    paths = [
-        (ROOT / "data/affiliate/oliveyoung-kskin365-verified-product-pool.json", "beauty"),
-        (ROOT / "config/affiliate/k-health365-sitewide-10.json", "health"),
-        (ROOT / "config/affiliate/k-health365-products.json", "health"),
-    ]
+def load_candidates(site_id=""):
+    key = _resolve_site_key(site_id)
+    paths = []
+    # Each site consumes only its own catalog. These two product pools have
+    # explicit site_scope declarations and are never spread across the fleet.
+    if key in {"oliveyoung", "kskin365"}:
+        paths.append((ROOT / "data/affiliate/oliveyoung-kskin365-verified-product-pool.json", "beauty"))
+    if key == "khealth365":
+        paths.extend([
+            (ROOT / "config/affiliate/k-health365-sitewide-10.json", "health"),
+            (ROOT / "config/affiliate/k-health365-products.json", "health"),
+        ])
+    # Standard per-site catalog locations for future portal captures.
+    paths.extend([
+        (ROOT / f"data/affiliate/catalogs/{key}.json", key),
+        (ROOT / f"data/affiliate/{key}-products.json", key),
+        (ROOT / f"config/affiliate/catalogs/{key}.json", key),
+    ])
     out, seen = [], set()
     for path, source in paths:
         data = _load_json(path)
         rows = data.get("products", []) if isinstance(data, dict) else data if isinstance(data, list) else []
         for raw in rows:
             item = _candidate(raw, source)
+            if item and item["url"] not in seen:
+                seen.add(item["url"]); out.append(item)
+    # Legacy portal captures are also scoped to the exact site's placement map.
+    fleet = _load_json(ROOT / "data/affiliate/fleet-placements.json") or {}
+    for post in (fleet.get("sites", {}).get(key + ".com", []) or fleet.get("sites", {}).get(key, [])):
+        for raw in post.get("products", []):
+            item = _candidate(raw, key)
             if item and item["url"] not in seen:
                 seen.add(item["url"]); out.append(item)
     return out
@@ -61,13 +101,18 @@ def _score(item, text):
     return len(tokens & words)
 
 def _category(item):
+    raw = item.get("category", "")
+    if raw in {"kbeauty", "beauty", "toner", "serum", "mask", "cleanser", "moisturizer", "sunscreen", "device", "luxury"}: return "k_beauty_olive_young"
+    if raw in {"health", "k_health", "supplement", "vitamin"}: return "k_health_supplements"
+    if raw in {"korean_life", "korea_life", "daily_life", "lifestyle"}: return "korea_lifestyle_hot_items"
+    if raw in {"digital", "esim", "usim", "sim"}: return "korea_digital_esim_sim"
     s = item["search_text"]
     for cat, terms in CATEGORY_TERMS.items():
         if any(term in s for term in terms): return cat
     return "korea_lifestyle_hot_items"
 
 def select_products(title, article_text, site_id="", limit=10):
-    pool = load_candidates()
+    pool = load_candidates(site_id)
     if not pool: return []
     clean_text = article_text or ""
     for old_start, old_end in LEGACY_MARKERS:
