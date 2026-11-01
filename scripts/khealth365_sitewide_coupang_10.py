@@ -22,7 +22,7 @@ def image_from_affiliate(url):
     page = r.text[:5000000]
     patterns = [
         r"""<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)""",
-        r"""<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)""",
+        r"""<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']""",
         r"""<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)""",
     ]
     for pat in patterns:
@@ -53,6 +53,11 @@ def load_products():
             p["image_url"] = image_from_affiliate(p["url"])
         if not p["image_url"].startswith("https://"):
             die("이미지 URL 검증 실패: " + p["id"])
+        check = requests.get(p["image_url"], headers=UA, timeout=25, stream=True)
+        ctype = check.headers.get("Content-Type", "").lower()
+        check.close()
+        if not check.ok or not ctype.startswith("image/"):
+            die("상품 이미지 응답 검증 실패: " + p["id"])
     return items
 
 def render_block(products):
