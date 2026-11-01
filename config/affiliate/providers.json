@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "description": "Provider registry for the London Project affiliate commerce engine.",
+  "security": {
+    "credentials_location": "GitHub Actions Secrets or server environment only",
+    "never_commit_credentials": true,
+    "never_invent_affiliate_urls": true,
+    "never_publish_unverified_offers": true
+  },
+  "providers": [
+    {
+      "id": "coupang",
+      "name": "Coupang Partners",
+      "status": "active_manual_portal_capture",
+      "adapter": "manual_portal",
+      "allowed_affiliate_hosts": ["link.coupang.com"],
+      "catalog_scope": "per_site",
+      "link_creation": "authenticated_partner_portal",
+      "creative_source": "official_partner_portal_image_or_html"
+    },
+    {
+      "id": "alibaba",
+      "name": "Alibaba Affiliate",
+      "status": "planned",
+      "adapter": "manual_portal",
+      "allowed_affiliate_hosts": [],
+      "catalog_scope": "per_site",
+      "link_creation": "official_affiliate_program_or_network_api",
+      "notes": "Enable only after account approval and official link/feed/API access are confirmed."
+    },
+    {
+      "id": "airbnb",
+      "name": "Airbnb",
+      "status": "planned_review_required",
+      "adapter": "manual_portal",
+      "allowed_affiliate_hosts": [],
+      "catalog_scope": "per_site",
+      "link_creation": "official_program_if_available",
+      "notes": "Do not assume a public affiliate program or generate tracking links until eligibility and current program terms are verified."
+    },
+    {
+      "id": "agoda",
+      "name": "Agoda",
+      "status": "planned",
+      "adapter": "manual_portal",
+      "allowed_affiliate_hosts": [],
+      "catalog_scope": "per_site",
+      "link_creation": "official_partner_portal_or_network_api"
+    },
+    {
+      "id": "awin",
+      "name": "Awin",
+      "status": "planned",
+      "adapter": "api_or_feed",
+      "allowed_affiliate_hosts": [],
+      "catalog_scope": "per_site",
+      "link_creation": "approved_advertiser_deep_link_api",
+      "notes": "Awin APIs support publisher link building and performance reporting subject to account access."
+    }
+  ],
+  "normalized_offer_fields": [
+    "provider", "offer_id", "site_id", "title", "destination_url",
+    "affiliate_url", "image_url", "category", "keywords", "currency",
+    "price", "availability", "popularity_evidence", "creative_source", "verified"
+  ],
+  "selection": {
+    "cards_per_post": 10,
+    "first_two": "highest article relevance",
+    "remaining_eight": "site-specific mix of Korea lifestyle, health, K-beauty, digital connectivity, travel and accommodation offers",
+    "provider_mix": "choose the strongest eligible offers across enabled providers; no fixed provider quota",
+    "site_catalog_isolation": true,
+    "deduplicate_by": ["provider", "affiliate_url"],
+    "require_verified_tracking_link": true,
+    "require_official_image": true
+  }
+}
