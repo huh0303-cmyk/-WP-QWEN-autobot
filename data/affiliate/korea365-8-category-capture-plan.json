@@ -1,0 +1,86 @@
+{
+  "site": "korea365.org",
+  "purpose": "Capture eight site-specific Coupang Partners products for Korea365.org",
+  "target_count": 8,
+  "category_balance": {
+    "topic": 2,
+    "korean_life": 2,
+    "health": 2,
+    "kbeauty": 2
+  },
+  "capture_policy": {
+    "source": "coupang_partners_portal",
+    "require_account_owned_affiliate_url": true,
+    "require_official_banner_html": true,
+    "require_product_title_and_ids": true,
+    "require_image_url_from_official_banner": true,
+    "never_fabricate_links_or_images": true,
+    "status_before_verification": "PENDING_PORTAL_CAPTURE"
+  },
+  "products": [
+    {
+      "candidate_id": "k365-01",
+      "category": "topic",
+      "search_query": "외국인을 위한 한국어 회화 교재 한국어 생활 회화",
+      "relevance": "Korea365 Korean culture and language content"
+    },
+    {
+      "candidate_id": "k365-02",
+      "category": "topic",
+      "search_query": "TOPIK 한국어능력시험 교재 TOPIK II",
+      "relevance": "Korean study and proficiency content"
+    },
+    {
+      "candidate_id": "k365-03",
+      "category": "korean_life",
+      "search_query": "해외여행용 USB C 멀티 어댑터 GaN",
+      "relevance": "Travel and Korea arrival essentials"
+    },
+    {
+      "candidate_id": "k365-04",
+      "category": "korean_life",
+      "search_query": "20000mAh PD 고속충전 보조배터리",
+      "relevance": "Travel and daily mobile use"
+    },
+    {
+      "candidate_id": "k365-05",
+      "category": "health",
+      "search_query": "성인 멀티비타민 종합비타민",
+      "relevance": "General wellness content; no medical efficacy claims"
+    },
+    {
+      "candidate_id": "k365-06",
+      "category": "health",
+      "search_query": "프로바이오틱스 유산균 성인",
+      "relevance": "General wellness content; no disease-treatment claims"
+    },
+    {
+      "candidate_id": "k365-07",
+      "category": "kbeauty",
+      "search_query": "한국 선크림 SPF50+ PA++++",
+      "relevance": "K-beauty and skincare content"
+    },
+    {
+      "candidate_id": "k365-08",
+      "category": "kbeauty",
+      "search_query": "한국 보습 크림 수분 장벽 크림",
+      "relevance": "K-beauty and skincare content"
+    }
+  ],
+  "capture_fields_required": [
+    "product_title",
+    "product_id",
+    "item_id",
+    "vendor_item_id",
+    "price",
+    "affiliate_url",
+    "product_image_url",
+    "official_image_url",
+    "official_blog_html_tag",
+    "link_generation_url",
+    "captured_at_kst",
+    "verified_account_owned",
+    "capture_source"
+  ],
+  "note": "Public shopping search results are discovery hints only. They are not Coupang Partners affiliate URLs and must not be inserted into production placements."
+}
