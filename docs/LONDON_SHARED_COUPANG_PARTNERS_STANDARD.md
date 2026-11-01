@@ -22,7 +22,8 @@ Prefer recognizable, widely useful, easy-to-understand products with accessible 
 - If legacy Coupang markup is unmarked, preserve it for review rather than appending another block.
 
 ## Shared integration
-- WordPress: `scripts/autopost_mega.py::wp_post`, the common WordPress publisher used by the current publishing entrypoint.
+- WordPress legacy publisher: `scripts/autopost_mega.py::wp_post`.
+- WordPress locked four-agent publisher: `scripts/london_four_agent_pipeline.py::_publish_wordpress_native`.
 - Blogger/Blogspot: `automation_hub/blogger_adapter.py::BloggerPublisher.publish`.
 - Product pools are read from verified repository catalogs. Product records without official affiliate URLs and usable Coupang CDN images are excluded.
 - Current verified pools include the Olive Young / K-Skin 45-product capture and K-Health365's affiliate catalog. Broader lifestyle and digital pools must be populated from the user's authenticated Coupang Partners portal before those categories can be guaranteed across every destination.
