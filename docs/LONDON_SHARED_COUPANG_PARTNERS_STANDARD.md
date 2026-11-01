@@ -14,7 +14,7 @@ These are flexible guidelines, not hard quotas. When a category is unavailable, 
 Prefer recognizable, widely useful, easy-to-understand products with accessible price points and low purchase friction. Article relevance leads the first two slots. Favor actual verified sales/popularity evidence when available; otherwise say nothing about sales rank. Affiliate attribution may occur after the visitor follows the link and purchases a different eligible item within the program's attribution window; do not make guarantees about commission eligibility or timing in article copy.
 
 ## Presentation
-- Footer after the article, responsive grid (5 desktop / 2 mobile).
+- Footer after the article, responsive grid (4 desktop / 2 mobile; matching the supplied reference screenshot).
 - Each card includes the official product image, product title, and affiliate CTA.
 - Required Coupang Partners disclosure appears visibly.
 - Affiliate links use `rel="sponsored nofollow noopener"`.
