@@ -35,7 +35,19 @@
       "candidate_id": "k365-03",
       "category": "korean_life",
       "search_query": "해외여행용 USB C 멀티 어댑터 GaN",
-      "relevance": "Travel and Korea arrival essentials"
+      "relevance": "Travel and Korea arrival essentials",
+      "product_title": "스카이 필 2500W급 GaN 65W 노트북용 초고속 5포트 해외여행용 멀티플러그 충전어댑터 T65PD",
+      "price_krw": 39990,
+      "product_id": "8452637644",
+      "item_id": "24456419794",
+      "vendor_item_id": "91620162220",
+      "affiliate_url": "https://link.coupang.com/a/jEG30aaxo",
+      "verified_account_owned": true,
+      "capture_source": "coupang_partners_portal",
+      "captured_from_user_screenshot": true,
+      "captured_at_kst": "2026-11-01",
+      "official_banner_html_status": "NOT_YET_CAPTURED",
+      "status": "PARTIAL_CAPTURE_LINK_VERIFIED"
     },
     {
       "candidate_id": "k365-04",
@@ -95,5 +107,5 @@
     "verified_account_owned",
     "capture_source"
   ],
-  "note": "Public shopping search results are discovery hints only. They are not Coupang Partners affiliate URLs and must not be inserted into production placements. Verify eSIM/USIM compatibility, validity period, data allowance, voice/SMS support, and roaming terms before placement."
+  "note": "Partner-generated affiliate short URL was supplied in a user screenshot. Product IDs/title were cross-checked against the matching Coupang listing. Do not mark fully ready or publish until the official image+text/banner HTML and image URL are captured from the partner portal."
 }
