@@ -32,7 +32,10 @@ def _candidate(raw, source):
     if status and status not in {"VERIFIED_ACCOUNT_GENERATED"} and raw.get("affiliate_confirmed") is not True: return None
     host = urlparse(image).netloc.lower()
     if "coupangcdn.com" not in host: return None
-    return {"url": url, "title": title.strip(), "image": image, "source": source,
+    price_raw = raw.get("price_krw") or raw.get("displayed_price") or ""
+    digits = re.sub(r"[^0-9]", "", str(price_raw))
+    price = int(digits) if digits else None
+    return {"url": url, "title": title.strip(), "image": image, "source": source, "price_krw": price,
             "search_text": " ".join([title, str(raw.get("query","")), str(raw.get("category","")), str(raw.get("relevance","")), str(raw.get("description_en",""))]).lower()}
 
 def load_candidates():
@@ -52,8 +55,9 @@ def load_candidates():
     return out
 
 def _score(item, text):
-    tokens = set(re.findall(r"[a-z0-9가-힣]{2,}", text.lower()))
-    words = set(re.findall(r"[a-z0-9가-힣]{2,}", item["search_text"]))
+    stop = {"the","and","for","with","from","your","how","what","when","where","why","into","this","that","are","was","is","of","in","on","to","a","an"}
+    tokens = set(re.findall(r"[a-z0-9가-힣]{2,}", text.lower())) - stop
+    words = set(re.findall(r"[a-z0-9가-힣]{2,}", item["search_text"])) - stop
     return len(tokens & words)
 
 def _category(item):
@@ -69,7 +73,7 @@ def select_products(title, article_text, site_id="", limit=10):
     for old_start, old_end in LEGACY_MARKERS:
         clean_text = re.sub(re.escape(old_start) + r".*?" + re.escape(old_end), " ", clean_text, flags=re.S)
     subject = f"{title} {clean_text[:5000]}"
-    ranked = sorted(pool, key=lambda p: (_score(p, subject), p["source"] == "beauty"), reverse=True)
+    ranked = sorted(pool, key=lambda p: (_score(p, subject), p.get("price_krw") is not None and p["price_krw"] <= 30000, p["source"] == "beauty"), reverse=True)
     chosen, used = [], set()
     # First two are always selected by article relevance, not by a rigid category quota.
     for item in ranked:
