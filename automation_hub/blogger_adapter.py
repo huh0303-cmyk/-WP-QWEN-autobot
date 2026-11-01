@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import html
+import re
 from typing import Any
 
 import requests
@@ -28,7 +29,16 @@ class BloggerPublisher:
 
         endpoint = f"https://www.googleapis.com/blogger/v3/blogs/{self.blog_id}/posts"
         marker = f"automation-job:{job.job_id}"
-        marked_content = f"<!-- {html.escape(marker)} -->{job.content_html}"
+        # Shared London Project affiliate footer; infer language from the authored article.
+        source_html = job.content_html or ""
+        try:
+            from .coupang_partners import apply_footer
+            lang = "ko" if re.search(r"[\\uac00-\\ud7a3]", source_html) else "en"
+            source_html = apply_footer(source_html, job.title, self.site_id, lang)
+        except Exception:
+            # Catalog/rendering failure must not break a valid Blogger publication.
+            pass
+        marked_content = f"<!-- {html.escape(marker)} -->{source_html}"
         try:
             # Blogger has no idempotency-key header.  Persist a hidden stable
             # job marker in the draft and look for it before every retry.  A
