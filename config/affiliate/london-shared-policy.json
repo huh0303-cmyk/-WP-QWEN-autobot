@@ -11,20 +11,20 @@
     {"key": "korea_digital_esim_sim", "soft_target": 2, "priority": 5}
   ],
   "selection_principles": [
-    "The category counts are flexible guidance, not hard quotas.",
+    "The category counts are flexible guidance, not hard quotas; the total of ten unique product cards is mandatory.",
     "The first two selections should be the most naturally relevant to the article title and subject.",
     "Prefer verified account-generated affiliate links and official product image creatives.",
     "Favor familiar, broadly useful, easy-to-understand, lower-friction products; use observed sales/popularity data only when actually available.",
     "Do not claim a sales ranking when only search-result ordering or a product pool is available.",
     "Fill missing category slots with the strongest available verified products; never invent links, images, prices, sales figures, or products.",
     "Do not repeat the same product URL in one post.",
-    "If fewer than ten verified products with usable images are available, publish only the verified available cards and report the shortfall; never fabricate cards.",
+    "Exactly ten unique verified products with usable official images are mandatory for every new post. If a site catalog has fewer than ten, block that post from publication and report the missing catalog coverage; never publish a partial block or fabricate cards.",
     "Keep affiliate disclosure visible and links marked sponsored nofollow noopener."
   ],
   "display": {
     "position": "end_of_article",
     "layout": "responsive_product_cards",
-    "desktop_columns": 5,
+    "desktop_columns": 4,
     "mobile_columns": 2,
     "show_product_image": true,
     "show_product_title": true,
