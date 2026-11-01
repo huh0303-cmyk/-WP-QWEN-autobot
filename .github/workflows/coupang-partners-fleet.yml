@@ -1,0 +1,70 @@
+name: London Project - Coupang Partners verified 8-product fleet
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: dry_run validates all mappings; apply writes verified placements
+        required: true
+        type: choice
+        default: dry_run
+        options: [dry_run, apply]
+      sites:
+        description: all or comma-separated exact domains
+        required: true
+        default: all
+        type: string
+      limit:
+        description: optional maximum posts per site (0 = all mapped)
+        required: true
+        default: '0'
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: coupang-partners-fleet
+  cancel-in-progress: false
+jobs:
+  insert:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install requests
+      - name: Validate or insert verified personal affiliate creatives
+        env:
+          WP_USER: huh0303@gmail.com
+          KOREA365ORG: ${{ secrets.KOREA365ORG }}
+          KSTUDY365COM: ${{ secrets.KSTUDY365COM }}
+          OLIVEYOUNGKOREACOM: ${{ secrets.OLIVEYOUNGKOREACOM }}
+          JOBKOREA365COM: ${{ secrets.JOBKOREA365COM }}
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+          KSKIN365COM: ${{ secrets.KSKIN365COM }}
+          KTRIP365COM: ${{ secrets.KTRIP365COM }}
+          KFINANCE365COM: ${{ secrets.KFINANCE365COM }}
+          KOREAINSURANCE365COM: ${{ secrets.KOREAINSURANCE365COM }}
+          KOREATAXNLAWCOM: ${{ secrets.KOREATAXNLAWCOM }}
+          KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
+          STUDYINKOREA365COM: ${{ secrets.STUDYINKOREA365COM }}
+          JOBINKOREA365COM: ${{ secrets.JOBINKOREA365COM }}
+          KWORLD365COM: ${{ secrets.KWORLD365COM }}
+          KOREAWEDDING365COM: ${{ secrets.KOREAWEDDING365COM }}
+          JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
+          KOREAINVEST365COM: ${{ secrets.KOREAINVEST365COM }}
+          KREALESTATE365COM: ${{ secrets.KREALESTATE365COM }}
+          KOREACRYPTO365COM: ${{ secrets.KOREACRYPTO365COM }}
+          KTECH365COM: ${{ secrets.KTECH365COM }}
+          KIECAKOREAORG: ${{ secrets.KIECAKOREAORG }}
+          KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
+        run: |
+          if [ '${{ inputs.mode }}' = 'apply' ]; then FLAG='--apply'; else FLAG=''; fi
+          python scripts/coupang_partners_fleet.py $FLAG --sites '${{ inputs.sites }}' --limit '${{ inputs.limit }}'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coupang-partners-fleet-report-${{ github.run_id }}
+          path: reports/coupang-partners-fleet-report.json
+          if-no-files-found: warn
+          retention-days: 30
