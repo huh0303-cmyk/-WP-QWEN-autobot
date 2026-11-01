@@ -1,0 +1,61 @@
+name: K-Health365 Sitewide Coupang 10 Products
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "preview only, or apply updates to all published posts"
+        required: true
+        type: choice
+        default: preview
+        options:
+          - preview
+          - apply
+      confirm_apply:
+        description: "Type APPLY-ALL only when authorizing sitewide post updates"
+        required: false
+        type: string
+      limit:
+        description: "Post limit for a small test; 0 means all published posts"
+        required: true
+        default: "0"
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: khealth365-sitewide-coupang-10
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install runtime
+        run: pip install requests
+      - name: Enforce apply confirmation
+        if: inputs.mode == 'apply'
+        env:
+          CONFIRM_APPLY: ${{ inputs.confirm_apply }}
+        run: |
+          test "$CONFIRM_APPLY" = "APPLY-ALL" || { echo "Apply confirmation missing"; exit 1; }
+      - name: Preview or apply ten product cards
+        env:
+          MODE: ${{ inputs.mode }}
+          KHEALTH365_WP_USER: ${{ secrets.KHEALTH365_WP_USER }}
+          KHEALTH365_WP_APP_PASSWORD: ${{ secrets.KHEALTH365_WP_APP_PASSWORD }}
+        run: |
+          python scripts/khealth365_sitewide_coupang_10.py --mode "$MODE" --limit "${{ inputs.limit }}"
+      - name: Upload execution report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: khealth365-sitewide-coupang-10-report
+          path: output/khealth365-sitewide-10-report.json
+          if-no-files-found: warn
