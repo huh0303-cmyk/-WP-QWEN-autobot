@@ -2,7 +2,7 @@ name: K-Health365 Sitewide Coupang 10 Products
 
 on:
   schedule:
-    - cron: "0 0 * * *" # 09:00 KST daily; maintain the ten-card footer for new posts
+    - cron: "0 3 * * *" # 09:00 KST daily; maintain the ten-card footer for new posts
   workflow_dispatch:
     inputs:
       mode:
