@@ -226,6 +226,18 @@ def main() -> int:
                     scheduled_kst = None
             schedule_mode = bool(scheduled_kst) and not draft_mode
             insert_is_draft = draft_mode or schedule_mode
+            # Shared London Project affiliate footer for the direct 33-Blogspot publisher.
+            try:
+                import sys
+                from pathlib import Path
+                repo_root = Path(__file__).resolve().parents[1]
+                if str(repo_root) not in sys.path:
+                    sys.path.insert(0, str(repo_root))
+                from automation_hub.coupang_partners import apply_footer
+                affiliate_lang = "ko" if re.search(r"[가-힣]", body) else "en"
+                body = apply_footer(body, title, site.get("key", ""), affiliate_lang)
+            except Exception as affiliate_exc:
+                print(f"  ⚠️ Coupang footer skipped safely: {affiliate_exc}", flush=True)
             response = requests.post(endpoint, params={"isDraft": "true" if insert_is_draft else "false"}, headers=headers,
                                      json={"kind": "blogger#post", "title": title, "content": body, "labels": labels}, timeout=30)
             response.raise_for_status()
