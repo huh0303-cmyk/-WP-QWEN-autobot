@@ -236,7 +236,7 @@ def main() -> int:
                     sys.path.insert(0, str(repo_root))
                 from automation_hub.coupang_partners import apply_footer
                 affiliate_lang = "ko" if re.search(r"[가-힣]", body) else "en"
-                body = apply_footer(body, title, site.get("key", ""), affiliate_lang)
+                body = apply_footer(body, title, site.get("url") or site.get("key", ""), affiliate_lang)
             except Exception as affiliate_exc:
                 print(f"  ⚠️ Coupang footer skipped safely: {affiliate_exc}", flush=True)
             response = requests.post(endpoint, params={"isDraft": "true" if insert_is_draft else "false"}, headers=headers,
