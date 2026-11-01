@@ -1,12 +1,13 @@
 {
   "site": "korea365.org",
-  "purpose": "Capture eight site-specific Coupang Partners products for Korea365.org",
-  "target_count": 8,
+  "purpose": "Capture ten site-specific Coupang Partners products for Korea365.org",
+  "target_count": 10,
   "category_balance": {
     "topic": 2,
     "korean_life": 2,
     "health": 2,
-    "kbeauty": 2
+    "kbeauty": 2,
+    "mobile_data": 2
   },
   "capture_policy": {
     "source": "coupang_partners_portal",
@@ -65,6 +66,18 @@
       "category": "kbeauty",
       "search_query": "한국 보습 크림 수분 장벽 크림",
       "relevance": "K-beauty and skincare content"
+    },
+    {
+      "candidate_id": "k365-09",
+      "category": "mobile_data",
+      "search_query": "한국 여행 외국인용 eSIM 데이터 무제한",
+      "relevance": "Mobile data connectivity for visitors to Korea; verify device compatibility and coverage"
+    },
+    {
+      "candidate_id": "k365-10",
+      "category": "mobile_data",
+      "search_query": "한국 선불 유심 USIM 데이터 통화 로밍",
+      "relevance": "Prepaid SIM and mobile data options for visitors and new residents in Korea"
     }
   ],
   "capture_fields_required": [
@@ -82,5 +95,5 @@
     "verified_account_owned",
     "capture_source"
   ],
-  "note": "Public shopping search results are discovery hints only. They are not Coupang Partners affiliate URLs and must not be inserted into production placements."
+  "note": "Public shopping search results are discovery hints only. They are not Coupang Partners affiliate URLs and must not be inserted into production placements. Verify eSIM/USIM compatibility, validity period, data allowance, voice/SMS support, and roaming terms before placement."
 }
