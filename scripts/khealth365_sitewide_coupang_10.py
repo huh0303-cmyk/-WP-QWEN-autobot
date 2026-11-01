@@ -143,7 +143,7 @@ def main():
                 before = before.rstrip()[:-3]
             if after.lstrip().startswith("</p>"):
                 after = after.lstrip()[4:]
-            new = before.rstrip() + "\\n" + block + "\\n" + after.lstrip()
+            new = before.rstrip() + "\n" + block + "\n" + after.lstrip()
         elif "link.coupang.com/" in raw or "쿠팡 파트너스 활동의 일환" in raw:
             report["skipped_legacy"] += 1
             report["results"].append({"id":pid,"url":post.get("link"),"status":"SKIPPED_UNMARKED_LEGACY_BLOCK"})
