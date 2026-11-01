@@ -163,7 +163,7 @@ def main():
             report["results"][-1]["status"] = "UPDATED_AND_VERIFIED"
     OUT.parent.mkdir(parents=True,exist_ok=True)
     OUT.write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding="utf-8")
-    print(json.dumps({k:report[k] for k in ("mode","products","posts_found","updated","already_current","skipped_legacy","errors")},ensure_ascii=False))
+    print(json.dumps({k:report[k] for k in ("mode","products_available","posts_found","updated","already_current","skipped_legacy","errors")},ensure_ascii=False))
     if report["errors"]:
         sys.exit(2)
     if args.mode == "preview":
