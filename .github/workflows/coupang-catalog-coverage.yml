@@ -1,0 +1,27 @@
+name: Coupang catalog coverage audit
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 18 * * *"
+  push:
+    paths:
+      - "config/affiliate/**"
+      - "data/affiliate/catalogs/**"
+      - "data/affiliate/*-products.json"
+      - "automation_hub/coupang_partners.py"
+      - "scripts/audit_coupang_catalog_coverage.py"
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python scripts/audit_coupang_catalog_coverage.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: coupang-catalog-coverage
+          path: reports/coupang-catalog-coverage.json
