@@ -33,7 +33,7 @@ class BloggerPublisher:
         source_html = job.content_html or ""
         try:
             from .coupang_partners import apply_footer
-            lang = "ko" if re.search(r"[\\uac00-\\ud7a3]", source_html) else "en"
+            lang = "ko" if re.search(r"[가-힣]", source_html) else "en"
             source_html = apply_footer(source_html, job.title, self.site_id, lang)
         except Exception:
             # Catalog/rendering failure must not break a valid Blogger publication.
