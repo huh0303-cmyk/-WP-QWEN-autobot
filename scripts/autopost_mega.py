@@ -3138,10 +3138,9 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
 
     related_html = "" if is_newsroom else build_related_links_html(url, pw, site.get("lang","ko"), exclude_title=title)
     final += related_html
-    # Mandatory shared Coupang footer: fail publication if ten verified cards are unavailable.
-    if not is_newsroom:
-        from automation_hub.coupang_partners import apply_footer
-        final = apply_footer(final, title, site.get("site_id", url), site.get("lang", "ko"))
+    # Mandatory shared Coupang footer for every WordPress article, including newsroom sites.
+    from automation_hub.coupang_partners import apply_footer
+    final = apply_footer(final, title, site.get("site_id", url), site.get("lang", "ko"))
 
 
     # Hard reader-visible provenance gate. Stock provider/license details belong
