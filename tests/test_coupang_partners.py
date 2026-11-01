@@ -2,7 +2,7 @@ from automation_hub.coupang_partners import apply_footer, select_products, START
 
 def test_soft_category_policy_selects_unique_verified_products():
     items = select_products("Vitamin D and daily skincare routine", "vitamin D, toner, sunscreen, omega-3, skin hydration")
-    assert len(items) <= 10
+    assert len(items) == 10
     assert len({x["url"] for x in items}) == len(items)
     assert all(x["url"].startswith("https://link.coupang.com/") for x in items)
     assert all(x["image"].startswith("https://") for x in items)
