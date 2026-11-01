@@ -1,6 +1,8 @@
 name: K-Health365 Sitewide Coupang 10 Products
 
 on:
+  schedule:
+    - cron: "0 0 * * *" # 09:00 KST daily; maintain the ten-card footer for new posts
   workflow_dispatch:
     inputs:
       mode:
@@ -47,11 +49,11 @@ jobs:
           test "$CONFIRM_APPLY" = "APPLY-ALL" || { echo "Apply confirmation missing"; exit 1; }
       - name: Preview or apply ten product cards
         env:
-          MODE: ${{ inputs.mode }}
+          MODE: ${{ inputs.mode || 'apply' }}
           KHEALTH365_WP_USER: ${{ secrets.KHEALTH365_WP_USER }}
           KHEALTH365_WP_APP_PASSWORD: ${{ secrets.KHEALTH365_WP_APP_PASSWORD }}
         run: |
-          python scripts/khealth365_sitewide_coupang_10.py --mode "$MODE" --limit "${{ inputs.limit }}"
+          python scripts/khealth365_sitewide_coupang_10.py --mode "$MODE" --limit "${{ inputs.limit || '0' }}"
       - name: Upload execution report
         if: always()
         uses: actions/upload-artifact@v4
