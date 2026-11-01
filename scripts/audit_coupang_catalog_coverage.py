@@ -2,10 +2,13 @@
 """Audit that every registered WordPress/Blogspot site has ten verified offers."""
 from __future__ import annotations
 import json
+import sys
 from pathlib import Path
-from automation_hub.coupang_partners import load_candidates
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from automation_hub.coupang_partners import load_candidates
 registry = json.loads((ROOT / "config/automation_hub_sites.json").read_text(encoding="utf-8"))
 rows = []
 for site in registry.get("sites", []):
