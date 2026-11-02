@@ -2,7 +2,7 @@
  "generated_at": "2026-11-02T10:04:46.215549+09:00",
  "reference_date": "2026-10-30",
  "blogger_pageviews": {
-  "generated_at": "2026-11-01T10:09:42.267543+09:00",
+  "generated_at": "2026-11-02T10:30:26.150128+09:00",
   "source": "Rendered public Blogger Total Pageviews widget; approximate dashboard signal, not analytics-grade",
   "history_days": [
    "2026-10-26",
@@ -32,7 +32,7 @@
     ],
     "source": "rendered_public_blogger_widget",
     "api_status": "BLOGGER_API_HTTP_403",
-    "last_attempt_at": "2026-11-01T10:09:42.267543+09:00",
+    "last_attempt_at": "2026-11-02T10:30:26.150128+09:00",
     "last_attempt_status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND"
    },
    {
@@ -42,7 +42,7 @@
     "title": "KWorld365",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "HTTP_429",
+    "status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND",
     "checked_at": "2026-10-27T10:29:02.367972+09:00",
     "history": [
      {
@@ -58,8 +58,8 @@
     ],
     "source": null,
     "api_status": "BLOGGER_API_HTTP_403",
-    "last_attempt_at": "2026-11-01T10:09:42.267543+09:00",
-    "last_attempt_status": "HTTP_429"
+    "last_attempt_at": "2026-11-02T10:30:26.150128+09:00",
+    "last_attempt_status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND"
    },
    {
     "key": "https://jobkorea365.blogspot.com",
@@ -68,7 +68,7 @@
     "title": "JobKorea365",
     "total_pageviews": 0,
     "daily_pageviews": 0,
-    "status": "HTTP_429",
+    "status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND",
     "checked_at": "2026-10-27T10:29:02.367972+09:00",
     "history": [
      {
@@ -84,8 +84,8 @@
     ],
     "source": "rendered_public_blogger_widget",
     "api_status": "BLOGGER_API_HTTP_403",
-    "last_attempt_at": "2026-11-01T10:09:42.267543+09:00",
-    "last_attempt_status": "HTTP_429"
+    "last_attempt_at": "2026-11-02T10:30:26.150128+09:00",
+    "last_attempt_status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND"
    },
    {
     "key": "https://kstudy365.blogspot.com",
@@ -94,7 +94,7 @@
     "title": "KStudy365",
     "total_pageviews": 0,
     "daily_pageviews": 0,
-    "status": "HTTP_429",
+    "status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND",
     "checked_at": "2026-10-27T10:29:02.367972+09:00",
     "history": [
      {
@@ -110,8 +110,8 @@
     ],
     "source": "rendered_public_blogger_widget",
     "api_status": "BLOGGER_API_HTTP_403",
-    "last_attempt_at": "2026-11-01T10:09:42.267543+09:00",
-    "last_attempt_status": "HTTP_429"
+    "last_attempt_at": "2026-11-02T10:30:26.150128+09:00",
+    "last_attempt_status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND"
    },
    {
     "key": "https://koreainsurance365.blogspot.com",
@@ -136,7 +136,7 @@
     ],
     "source": "rendered_public_blogger_widget",
     "api_status": "BLOGGER_API_HTTP_403",
-    "last_attempt_at": "2026-11-01T10:09:42.267543+09:00",
+    "last_attempt_at": "2026-11-02T10:30:26.150128+09:00",
     "last_attempt_status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND"
    },
    {
@@ -146,7 +146,7 @@
     "title": "KFinance365",
     "total_pageviews": 0,
     "daily_pageviews": 0,
-    "status": "HTTP_429",
+    "status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND",
     "checked_at": "2026-10-27T10:29:02.367972+09:00",
     "history": [
      {
@@ -162,8 +162,8 @@
     ],
     "source": "rendered_public_blogger_widget",
     "api_status": "BLOGGER_API_HTTP_403",
-    "last_attempt_at": "2026-11-01T10:09:42.267543+09:00",
-    "last_attempt_status": "HTTP_429"
+    "last_attempt_at": "2026-11-02T10:30:26.150128+09:00",
+    "last_attempt_status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND"
    },
    {
     "key": "https://koreamedicaltour365.blogspot.com",
@@ -188,7 +188,7 @@
     ],
     "source": "rendered_public_blogger_widget",
     "api_status": "BLOGGER_API_HTTP_403",
-    "last_attempt_at": "2026-11-01T10:09:42.267543+09:00",
+    "last_attempt_at": "2026-11-02T10:30:26.150128+09:00",
     "last_attempt_status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND"
    },
    {
@@ -214,7 +214,7 @@
     ],
     "source": "rendered_public_blogger_widget",
     "api_status": "BLOGGER_API_HTTP_403",
-    "last_attempt_at": "2026-11-01T10:09:42.267543+09:00",
+    "last_attempt_at": "2026-11-02T10:30:26.150128+09:00",
     "last_attempt_status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND"
    },
    {
@@ -240,7 +240,7 @@
     ],
     "source": null,
     "api_status": "BLOGGER_API_HTTP_403",
-    "last_attempt_at": "2026-11-01T10:09:42.267543+09:00",
+    "last_attempt_at": "2026-11-02T10:30:26.150128+09:00",
     "last_attempt_status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND"
    },
    {
@@ -266,7 +266,7 @@
     ],
     "source": "rendered_public_blogger_widget",
     "api_status": "BLOGGER_API_HTTP_403",
-    "last_attempt_at": "2026-11-01T10:09:42.267543+09:00",
+    "last_attempt_at": "2026-11-02T10:30:26.150128+09:00",
     "last_attempt_status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND"
    },
    {
@@ -292,7 +292,7 @@
     ],
     "source": "rendered_public_blogger_widget",
     "api_status": "BLOGGER_API_HTTP_403",
-    "last_attempt_at": "2026-11-01T10:09:42.267543+09:00",
+    "last_attempt_at": "2026-11-02T10:30:26.150128+09:00",
     "last_attempt_status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND"
    },
    {
@@ -318,7 +318,7 @@
     ],
     "source": "rendered_public_blogger_widget",
     "api_status": "BLOGGER_API_HTTP_403",
-    "last_attempt_at": "2026-11-01T10:09:42.267543+09:00",
+    "last_attempt_at": "2026-11-02T10:30:26.150128+09:00",
     "last_attempt_status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND"
    },
    {
@@ -344,7 +344,7 @@
     ],
     "source": "rendered_public_blogger_widget",
     "api_status": "BLOGGER_API_HTTP_403",
-    "last_attempt_at": "2026-11-01T10:09:42.267543+09:00",
+    "last_attempt_at": "2026-11-02T10:30:26.150128+09:00",
     "last_attempt_status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND"
    },
    {
@@ -370,7 +370,7 @@
     ],
     "source": "rendered_public_blogger_widget",
     "api_status": "BLOGGER_API_HTTP_403",
-    "last_attempt_at": "2026-11-01T10:09:42.267543+09:00",
+    "last_attempt_at": "2026-11-02T10:30:26.150128+09:00",
     "last_attempt_status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND"
    },
    {
@@ -396,7 +396,7 @@
     ],
     "source": null,
     "api_status": "BLOGGER_API_HTTP_403",
-    "last_attempt_at": "2026-11-01T10:09:42.267543+09:00",
+    "last_attempt_at": "2026-11-02T10:30:26.150128+09:00",
     "last_attempt_status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND"
    },
    {
@@ -422,7 +422,7 @@
     ],
     "source": null,
     "api_status": "BLOGGER_API_HTTP_403",
-    "last_attempt_at": "2026-11-01T10:09:42.267543+09:00",
+    "last_attempt_at": "2026-11-02T10:30:26.150128+09:00",
     "last_attempt_status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND"
    },
    {
@@ -448,7 +448,7 @@
     ],
     "source": null,
     "api_status": "BLOGGER_API_HTTP_403",
-    "last_attempt_at": "2026-11-01T10:09:42.267543+09:00",
+    "last_attempt_at": "2026-11-02T10:30:26.150128+09:00",
     "last_attempt_status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND"
    },
    {
@@ -474,7 +474,7 @@
     ],
     "source": null,
     "api_status": "BLOGGER_API_HTTP_403",
-    "last_attempt_at": "2026-11-01T10:09:42.267543+09:00",
+    "last_attempt_at": "2026-11-02T10:30:26.150128+09:00",
     "last_attempt_status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND"
    },
    {
@@ -500,7 +500,7 @@
     ],
     "source": null,
     "api_status": "BLOGGER_API_HTTP_403",
-    "last_attempt_at": "2026-11-01T10:09:42.267543+09:00",
+    "last_attempt_at": "2026-11-02T10:30:26.150128+09:00",
     "last_attempt_status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND"
    },
    {
@@ -526,7 +526,7 @@
     ],
     "source": "rendered_public_blogger_widget",
     "api_status": "BLOGGER_API_HTTP_403",
-    "last_attempt_at": "2026-11-01T10:09:42.267543+09:00",
+    "last_attempt_at": "2026-11-02T10:30:26.150128+09:00",
     "last_attempt_status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND"
    },
    {
@@ -552,7 +552,7 @@
     ],
     "source": "rendered_public_blogger_widget",
     "api_status": "BLOGGER_API_HTTP_403",
-    "last_attempt_at": "2026-11-01T10:09:42.267543+09:00",
+    "last_attempt_at": "2026-11-02T10:30:26.150128+09:00",
     "last_attempt_status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND"
    },
    {
@@ -578,7 +578,7 @@
     ],
     "source": "rendered_public_blogger_widget",
     "api_status": "BLOGGER_API_HTTP_403",
-    "last_attempt_at": "2026-11-01T10:09:42.267543+09:00",
+    "last_attempt_at": "2026-11-02T10:30:26.150128+09:00",
     "last_attempt_status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND"
    },
    {
@@ -604,7 +604,7 @@
     ],
     "source": "rendered_public_blogger_widget",
     "api_status": "BLOGGER_API_HTTP_403",
-    "last_attempt_at": "2026-11-01T10:09:42.267543+09:00",
+    "last_attempt_at": "2026-11-02T10:30:26.150128+09:00",
     "last_attempt_status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND"
    },
    {
@@ -630,7 +630,7 @@
     ],
     "source": "rendered_public_blogger_widget",
     "api_status": "BLOGGER_API_HTTP_403",
-    "last_attempt_at": "2026-11-01T10:09:42.267543+09:00",
+    "last_attempt_at": "2026-11-02T10:30:26.150128+09:00",
     "last_attempt_status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND"
    },
    {
@@ -640,7 +640,7 @@
     "title": "Korea Real Estate 365",
     "total_pageviews": 365,
     "daily_pageviews": 0,
-    "status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND",
+    "status": "HTTP_429",
     "checked_at": "2026-10-27T10:29:02.367972+09:00",
     "history": [
      {
@@ -656,8 +656,8 @@
     ],
     "source": "rendered_public_blogger_widget",
     "api_status": "BLOGGER_API_HTTP_403",
-    "last_attempt_at": "2026-11-01T10:09:42.267543+09:00",
-    "last_attempt_status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND"
+    "last_attempt_at": "2026-11-02T10:30:26.150128+09:00",
+    "last_attempt_status": "HTTP_429"
    },
    {
     "key": "https://k-health365.blogspot.com",
@@ -666,7 +666,7 @@
     "title": "K-Health365 연구소",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND",
+    "status": "HTTP_429",
     "checked_at": "2026-10-27T10:29:02.367972+09:00",
     "history": [
      {
@@ -682,8 +682,8 @@
     ],
     "source": null,
     "api_status": "BLOGGER_API_HTTP_403",
-    "last_attempt_at": "2026-11-01T10:09:42.267543+09:00",
-    "last_attempt_status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND"
+    "last_attempt_at": "2026-11-02T10:30:26.150128+09:00",
+    "last_attempt_status": "HTTP_429"
    },
    {
     "key": "https://skin.k-health365.com",
@@ -692,7 +692,7 @@
     "title": "KSkin365",
     "total_pageviews": 0,
     "daily_pageviews": 0,
-    "status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND",
+    "status": "HTTP_429",
     "checked_at": "2026-10-27T10:29:02.367972+09:00",
     "history": [
      {
@@ -708,8 +708,8 @@
     ],
     "source": "rendered_public_blogger_widget",
     "api_status": "BLOGGER_API_HTTP_403",
-    "last_attempt_at": "2026-11-01T10:09:42.267543+09:00",
-    "last_attempt_status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND"
+    "last_attempt_at": "2026-11-02T10:30:26.150128+09:00",
+    "last_attempt_status": "HTTP_429"
    },
    {
     "key": "kwellness_lab",
@@ -718,7 +718,7 @@
     "title": "K-wellness Lab",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND",
+    "status": "HTTP_429",
     "checked_at": "2026-10-27T10:29:02.367972+09:00",
     "history": [
      {
@@ -734,8 +734,8 @@
     ],
     "source": null,
     "api_status": "BLOGGER_API_HTTP_403",
-    "last_attempt_at": "2026-11-01T10:09:42.267543+09:00",
-    "last_attempt_status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND"
+    "last_attempt_at": "2026-11-02T10:30:26.150128+09:00",
+    "last_attempt_status": "HTTP_429"
    },
    {
     "key": "kmedical_job_center",
@@ -744,7 +744,7 @@
     "title": "K-Medical Job Center",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND",
+    "status": "HTTP_429",
     "checked_at": "2026-10-27T10:29:02.367972+09:00",
     "history": [
      {
@@ -760,8 +760,8 @@
     ],
     "source": null,
     "api_status": "BLOGGER_API_HTTP_403",
-    "last_attempt_at": "2026-11-01T10:09:42.267543+09:00",
-    "last_attempt_status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND"
+    "last_attempt_at": "2026-11-02T10:30:26.150128+09:00",
+    "last_attempt_status": "HTTP_429"
    },
    {
     "key": "korea_life_support365",
@@ -786,7 +786,7 @@
     ],
     "source": null,
     "api_status": "BLOGGER_API_HTTP_403",
-    "last_attempt_at": "2026-11-01T10:09:42.267543+09:00",
+    "last_attempt_at": "2026-11-02T10:30:26.150128+09:00",
     "last_attempt_status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND"
    },
    {
@@ -812,7 +812,7 @@
     ],
     "source": null,
     "api_status": "BLOGGER_API_HTTP_403",
-    "last_attempt_at": "2026-11-01T10:09:42.267543+09:00",
+    "last_attempt_at": "2026-11-02T10:30:26.150128+09:00",
     "last_attempt_status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND"
    },
    {
@@ -838,7 +838,7 @@
     ],
     "source": null,
     "api_status": "BLOGGER_API_HTTP_403",
-    "last_attempt_at": "2026-11-01T10:09:42.267543+09:00",
+    "last_attempt_at": "2026-11-02T10:30:26.150128+09:00",
     "last_attempt_status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND"
    },
    {
@@ -864,7 +864,7 @@
     ],
     "source": "rendered_public_blogger_widget",
     "api_status": "BLOGGER_API_HTTP_403",
-    "last_attempt_at": "2026-11-01T10:09:42.267543+09:00",
+    "last_attempt_at": "2026-11-02T10:30:26.150128+09:00",
     "last_attempt_status": "TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND"
    }
   ],
