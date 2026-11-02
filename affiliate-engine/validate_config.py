@@ -14,6 +14,9 @@ assert cfg["new_content_automation"]["scheduled_mode"] == "dry_run"
 assert cfg["new_content_automation"]["manual_write_requires"] == "AFFILIATE_WRITE_ENABLED=true"
 assert cfg["new_content_automation"]["backfill_batch_size_per_site"] == 5
 assert cfg["selection_policy"]["rotating_slots"] == ["living_essential", "travel_activity", "kpop", "esim"]
+assert cfg["affiliate_programs"]["coupang_partners"]["priority"] == "primary"
+assert cfg["selection_policy"]["provider_priority"]["beauty_1"][0] == "olive_young_global"
+assert cfg["selection_policy"]["provider_priority"]["travel_activity"] == ["coupang_travel", "trip_com", "agoda"]
 print("AFFILIATE_CONFIG_VALID=PASS")
 print("REQUIRED_PRODUCT_SLOTS=10")
 print("COUPANG_MANDATORY=PASS")

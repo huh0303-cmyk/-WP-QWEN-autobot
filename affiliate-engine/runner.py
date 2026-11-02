@@ -70,6 +70,13 @@ def select_offers(title: str, content: str, routing: dict[str, Any]) -> list[dic
             candidates = [offer for offer in candidates if any(normalized(keyword) in text for keyword in offer.get("keywords", []))]
         if not candidates:
             raise ValueError(f"missing verified offer for {slot['slot']}")
+        provider_priority = routing["selection_policy"].get("provider_priority", {}).get(slot["slot"], [])
+        def provider_rank(offer: dict[str, Any]) -> int:
+            provider = offer.get("provider") or (offer.get("providers") or [""])[0]
+            return provider_priority.index(provider) if provider in provider_priority else len(provider_priority)
+        candidates.sort(key=provider_rank)
+        best_provider_rank = provider_rank(candidates[0])
+        candidates = [offer for offer in candidates if provider_rank(offer) == best_provider_rank]
         if slot["slot"] in routing["selection_policy"].get("rotating_slots", []):
             candidates.sort(key=lambda offer: hashlib.sha256(f"{title}:{slot['slot']}:{offer['url']}".encode()).hexdigest())
         selected.append(candidates[0])
