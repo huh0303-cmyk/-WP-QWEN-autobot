@@ -39,3 +39,14 @@ This commit establishes the shared policy/configuration and a manual validation 
 5. Review generated cards and link checks.
 6. Enable writes only after pilot verification.
 7. Expand to the full WordPress and Blogspot inventories.
+
+## New-content runner
+
+`runner.py` polls the registered WordPress and Blogger destinations for recent
+posts, appends a marked block only when all ten verified offers are available,
+and skips any post already containing the marker. The scheduled GitHub Actions
+workflow is dry-run only. A real write needs an explicit manual `write` run and
+the `AFFILIATE_WRITE_ENABLED=true` GitHub secret.
+
+Add approved tracking URLs to `data/offers.json`; do not commit API keys,
+passwords, tokens, or unverified URLs.

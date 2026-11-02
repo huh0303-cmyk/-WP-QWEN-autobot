@@ -46,6 +46,14 @@
     "never_delete_posts":true,
     "never_remove_existing_links":true
   },
+  "new_content_automation": {
+    "enabled":true,
+    "wordpress_and_blogger_only":true,
+    "lookback_hours":36,
+    "scheduled_mode":"dry_run",
+    "manual_write_requires":"AFFILIATE_WRITE_ENABLED=true",
+    "social_platforms":"blocked_until_registered_credentials_and_supported_api_scopes"
+  },
   "rollout": {
     "pilot_site":"https://k-trip365.com",
     "pilot_published_posts_expected":71,

@@ -1,0 +1,4 @@
+{
+  "offers": [],
+  "schema_note": "Add only approved, account-generated tracking URLs. Required fields: slot, title, url, providers, keywords. Do not store API keys or secrets here."
+}
