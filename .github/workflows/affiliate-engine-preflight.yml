@@ -1,0 +1,19 @@
+name: Affiliate Engine - Policy Preflight
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'affiliate-engine/**'
+      - '.github/workflows/affiliate-engine-preflight.yml'
+permissions:
+  contents: read
+jobs:
+  validate-policy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate affiliate policy
+        run: python affiliate-engine/validate_config.py
