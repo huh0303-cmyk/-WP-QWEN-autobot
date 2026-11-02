@@ -1,4 +1,4 @@
-# 사이트 건강도 리포트 (2026-11-01 09:09 KST)
+# 사이트 건강도 리포트 (2026-11-02 09:47 KST)
 
 - 점검 60곳 · 정상 35 · 경고 18 · 심각 7
 - 자동수정 모드: ON
@@ -48,7 +48,7 @@
   - 자동수정: {'indexnow_ping': False}
 - **https://jobkorea365.com** (wordpress): warn:robots_no_sitemap_line
   - 자동수정: {'indexnow_ping': False}
-- **https://jobinkorea365.com** (wordpress): warn:robots_no_sitemap_line, warn:stale_8d
+- **https://jobinkorea365.com** (wordpress): warn:robots_no_sitemap_line
   - 자동수정: {'indexnow_ping': False}
 - **https://jobkoreaglobal.com** (wordpress): warn:duplicate_titles_2groups
   - 자동수정: {'indexnow_ping': False}
@@ -67,17 +67,17 @@
 
 ## 최근 28일 검색 클릭 상위
 
-- https://korea365.org: 클릭 10 / 노출 637
-- https://koreainsurance365.com: 클릭 5 / 노출 480
-- https://jobkoreaglobal.com: 클릭 4 / 노출 330
-- https://koreawedding365.com: 클릭 3 / 노출 406
-- https://jobinkorea365.com: 클릭 2 / 노출 237
-- https://koreataxnlaw.com: 클릭 1 / 노출 74
-- https://oliveyoungkorea.com: 클릭 1 / 노출 628
-- https://kworld365.com: 클릭 1 / 노출 30
-- https://k-trip365.com: 클릭 1 / 노출 20
-- https://kieca-korea.org: 클릭 1 / 노출 33
+- https://korea365.org: 클릭 11 / 노출 661
+- https://koreainsurance365.com: 클릭 5 / 노출 494
+- https://koreawedding365.com: 클릭 4 / 노출 407
+- https://jobkoreaglobal.com: 클릭 4 / 노출 347
+- https://jobinkorea365.com: 클릭 2 / 노출 232
+- https://koreataxnlaw.com: 클릭 1 / 노출 76
+- https://oliveyoungkorea.com: 클릭 1 / 노출 612
+- https://kworld365.com: 클릭 1 / 노출 47
+- https://kieca-korea.org: 클릭 1 / 노출 34
+- https://k-health365.com: 클릭 0 / 노출 8
 
 ## 주간 추이 (최근 7일 vs 직전 7일, 전체 사이트 합계)
 
-- 클릭 13 (직전 8) · 노출 977 (직전 938)
+- 클릭 14 (직전 6) · 노출 992 (직전 962)
