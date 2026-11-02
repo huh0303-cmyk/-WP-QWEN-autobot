@@ -13,6 +13,7 @@ assert cfg["publishing_policy"]["blogger"]["preserve_existing_body"] is True
 assert cfg["new_content_automation"]["scheduled_mode"] == "dry_run"
 assert cfg["new_content_automation"]["manual_write_requires"] == "AFFILIATE_WRITE_ENABLED=true"
 assert cfg["new_content_automation"]["backfill_batch_size_per_site"] == 5
+assert cfg["selection_policy"]["rotating_slots"] == ["living_essential", "travel_activity", "kpop", "esim"]
 print("AFFILIATE_CONFIG_VALID=PASS")
 print("REQUIRED_PRODUCT_SLOTS=10")
 print("COUPANG_MANDATORY=PASS")

@@ -49,3 +49,7 @@ entire network in one operation.
 Each offer must contain `slot`, `title`, `url`, `providers` and `keywords`.
 Only account-generated tracking URLs may be stored. API keys, passwords and
 tokens must never be committed.
+
+The living-essential, travel, K-pop and eSIM/SIM slots rotate among their
+verified candidate offers using a stable per-post selection. Different posts
+receive variety; rerunning one post preserves its selected links.

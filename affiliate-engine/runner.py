@@ -70,7 +70,8 @@ def select_offers(title: str, content: str, routing: dict[str, Any]) -> list[dic
             candidates = [offer for offer in candidates if any(normalized(keyword) in text for keyword in offer.get("keywords", []))]
         if not candidates:
             raise ValueError(f"missing verified offer for {slot['slot']}")
-        candidates.sort(key=lambda offer: hashlib.sha256(f"{title}:{offer['url']}".encode()).hexdigest())
+        if slot["slot"] in routing["selection_policy"].get("rotating_slots", []):
+            candidates.sort(key=lambda offer: hashlib.sha256(f"{title}:{slot['slot']}:{offer['url']}".encode()).hexdigest())
         selected.append(candidates[0])
     return selected
 

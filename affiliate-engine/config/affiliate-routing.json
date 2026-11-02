@@ -29,7 +29,8 @@
     "no_invented_tracking_urls":true,
     "no_unverified_commission_claims":true,
     "no_unlicensed_images":true,
-    "disclosure_required":true
+    "disclosure_required":true,
+    "rotating_slots":["living_essential","travel_activity","kpop","esim"]
   },
   "publishing_policy": {
     "wordpress":{"enabled":true,"preserve_existing_body":true,"preserve_existing_affiliate_links":true,"idempotency_key":"post_id+affiliate_engine_version","append_only":true},
