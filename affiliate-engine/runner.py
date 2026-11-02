@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Append verified affiliate blocks to newly published WordPress and Blogger posts.
+"""Append verified affiliate blocks to WordPress and Blogger posts.
 
 This runner is intentionally deterministic: it does not call an LLM, invent a
 tracking URL, alter existing affiliate blocks, or write unless --write and the
@@ -89,18 +89,27 @@ def can_write(write_requested: bool) -> bool:
     return write_requested and os.getenv("AFFILIATE_WRITE_ENABLED", "").lower() == "true"
 
 
-def wordpress(destination: dict[str, str], since: str, block_for, write: bool) -> list[dict[str, Any]]:
+def wordpress(destination: dict[str, str], since: str, block_for, write: bool, scope: str, batch_size: int) -> list[dict[str, Any]]:
     password = os.getenv(destination["secret_name"], "")
     base = destination["url"].rstrip("/")
-    response = requests.get(f"{base}/wp-json/wp/v2/posts", params={"after": since, "status": "publish", "per_page": 100}, timeout=30)
-    response.raise_for_status()
     rows = []
-    for post in response.json():
-        content = post["content"]["rendered"]
-        result = {"platform": "wordpress", "site": destination["site_key"], "post_id": post["id"], "url": post["link"], "action": "skipped"}
-        if MARKER in content:
-            result["reason"] = "already_processed"
-        else:
+    page = 1
+    while len(rows) < batch_size:
+        params = {"status": "publish", "per_page": 100, "page": page, "orderby": "date", "order": "desc"}
+        if scope == "new":
+            params["after"] = since
+        response = requests.get(f"{base}/wp-json/wp/v2/posts", params=params, timeout=30)
+        if response.status_code == 400 and page > 1:
+            break
+        response.raise_for_status()
+        posts = response.json()
+        if not posts:
+            break
+        for post in posts:
+            content = post["content"]["rendered"]
+            if MARKER in content:
+                continue
+            result = {"platform": "wordpress", "site": destination["site_key"], "post_id": post["id"], "url": post["link"], "action": "skipped"}
             try:
                 block = block_for(post["title"]["rendered"], content)
             except ValueError as exc:
@@ -114,7 +123,12 @@ def wordpress(destination: dict[str, str], since: str, block_for, write: bool) -
                         update = requests.post(f"{base}/wp-json/wp/v2/posts/{post['id']}", auth=(os.getenv("WP_USER", ""), password), json={"content": content + "\n" + block}, timeout=30)
                         update.raise_for_status()
                         result["action"] = "appended"
-        rows.append(result)
+            rows.append(result)
+            if len(rows) >= batch_size:
+                break
+        if scope == "new" or len(posts) < 100:
+            break
+        page += 1
     return rows
 
 
@@ -129,21 +143,28 @@ def blogger_token() -> str:
     return response.json()["access_token"]
 
 
-def blogger(destination: dict[str, str], since: str, block_for, write: bool) -> list[dict[str, Any]]:
+def blogger(destination: dict[str, str], since: str, block_for, write: bool, scope: str, batch_size: int) -> list[dict[str, Any]]:
     if not destination["destination_id"]:
         return []
     token = blogger_token() if write else ""
     headers = {"Authorization": f"Bearer {token}"} if token else {}
     endpoint = f"https://www.googleapis.com/blogger/v3/blogs/{destination['destination_id']}/posts"
-    response = requests.get(endpoint, params={"publishedMin": since, "fetchBodies": "true", "maxResults": 100}, headers=headers, timeout=30)
-    response.raise_for_status()
     rows = []
-    for post in response.json().get("items", []):
-        content = post["content"]
-        result = {"platform": "blogger", "site": destination["site_key"], "post_id": post["id"], "url": post["url"], "action": "skipped"}
-        if MARKER in content:
-            result["reason"] = "already_processed"
-        else:
+    page_token = ""
+    while len(rows) < batch_size:
+        params = {"fetchBodies": "true", "maxResults": 100}
+        if scope == "new":
+            params["publishedMin"] = since
+        if page_token:
+            params["pageToken"] = page_token
+        response = requests.get(endpoint, params=params, headers=headers, timeout=30)
+        response.raise_for_status()
+        payload = response.json()
+        for post in payload.get("items", []):
+            content = post["content"]
+            if MARKER in content:
+                continue
+            result = {"platform": "blogger", "site": destination["site_key"], "post_id": post["id"], "url": post["url"], "action": "skipped"}
             try:
                 block = block_for(post["title"], content)
             except ValueError as exc:
@@ -154,14 +175,21 @@ def blogger(destination: dict[str, str], since: str, block_for, write: bool) -> 
                     update = requests.put(f"{endpoint}/{post['id']}", headers=headers, json={"title": post["title"], "content": content + "\n" + block}, timeout=30)
                     update.raise_for_status()
                     result["action"] = "appended"
-        rows.append(result)
+            rows.append(result)
+            if len(rows) >= batch_size:
+                break
+        page_token = payload.get("nextPageToken", "")
+        if scope == "new" or not page_token:
+            break
     return rows
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--platform", choices=["wordpress", "blogger", "all"], default="all")
+    parser.add_argument("--scope", choices=["new", "backfill"], default="new")
     parser.add_argument("--since-hours", type=int, default=36)
+    parser.add_argument("--batch-size", type=int, default=5)
     parser.add_argument("--write", action="store_true")
     args = parser.parse_args()
     routing = load_json(ROUTING)
@@ -174,17 +202,17 @@ def main() -> int:
     if args.platform in {"wordpress", "all"}:
         for destination in load_destinations("wordpress"):
             try:
-                results.extend(wordpress(destination, since, block_for, write))
+                results.extend(wordpress(destination, since, block_for, write, args.scope, args.batch_size))
             except requests.RequestException as exc:
                 results.append({"platform": "wordpress", "site": destination["site_key"], "action": "blocked", "reason": type(exc).__name__})
     if args.platform in {"blogspot", "blogger", "all"}:
         for destination in load_destinations("blogspot"):
             try:
-                results.extend(blogger(destination, since, block_for, write))
+                results.extend(blogger(destination, since, block_for, write, args.scope, args.batch_size))
             except requests.RequestException as exc:
                 results.append({"platform": "blogger", "site": destination["site_key"], "action": "blocked", "reason": type(exc).__name__})
-    report = {"generated_at": datetime.now(UTC).isoformat(), "since": since, "write": write, "results": results}
-    output = ENGINE / "reports" / "latest-new-content-run.json"
+    report = {"generated_at": datetime.now(UTC).isoformat(), "scope": args.scope, "since": since, "batch_size": args.batch_size, "write": write, "results": results}
+    output = ENGINE / "reports" / f"latest-{args.scope}-run.json"
     output.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps({"write": write, "processed": len(results), "appended": sum(row["action"] == "appended" for row in results)}, ensure_ascii=False))
 

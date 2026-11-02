@@ -50,6 +50,8 @@
     "enabled":true,
     "wordpress_and_blogger_only":true,
     "lookback_hours":36,
+    "backfill_batch_size_per_site":5,
+    "backfill_requires_manual_workflow_dispatch":true,
     "scheduled_mode":"dry_run",
     "manual_write_requires":"AFFILIATE_WRITE_ENABLED=true",
     "social_platforms":"blocked_until_registered_credentials_and_supported_api_scopes"

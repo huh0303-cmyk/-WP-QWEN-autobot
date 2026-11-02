@@ -15,6 +15,12 @@ on:
         default: dry-run
         type: choice
         options: [dry-run, write]
+      scope:
+        description: New only or existing-post backfill (five posts per site per run)
+        required: true
+        default: new
+        type: choice
+        options: [new, backfill]
   schedule:
     - cron: '17 */6 * * *'
 
@@ -67,10 +73,10 @@ jobs:
           BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
         run: |
           if [ "${{ inputs.mode || 'dry-run' }}" = "write" ]; then WRITE=--write; else WRITE=; fi
-          python affiliate-engine/runner.py --platform "${{ inputs.platform || 'all' }}" $WRITE
+          python affiliate-engine/runner.py --platform "${{ inputs.platform || 'all' }}" --scope "${{ inputs.scope || 'new' }}" --batch-size 5 $WRITE
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: affiliate-new-content-report-${{ github.run_id }}
-          path: affiliate-engine/reports/latest-new-content-run.json
+          path: affiliate-engine/reports/latest-*-run.json
           if-no-files-found: warn

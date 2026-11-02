@@ -34,6 +34,16 @@ OAuth scopes and API review/permissions. They are intentionally excluded from
 the live-write path until their credentials and allowed placement surfaces are
 registered. This prevents an unapproved platform API call or unsupported edit.
 
+## Existing-post backfill
+
+Use the manual workflow with `scope=backfill`. It processes at most five
+previously unmarked published posts per site per run, newest to oldest. A post
+is changed only after all ten slots resolve to verified URLs; otherwise the
+report records the missing slot and the post remains untouched. Re-run the
+manual workflow until every eligible post has the marker. This bounded approach
+provides a report and rollback boundary for each group instead of changing the
+entire network in one operation.
+
 ## Required offer format
 
 Each offer must contain `slot`, `title`, `url`, `providers` and `keywords`.
