@@ -1,0 +1,57 @@
+{
+  "engine": "London Project Affiliate Engine",
+  "version": "1.0.0",
+  "mode": "safe",
+  "default_locale": "ko-KR",
+  "required_slots": [
+    {"slot":"topic_1","count":1,"category":"topic_related","required":true},
+    {"slot":"topic_2","count":1,"category":"topic_related","required":true},
+    {"slot":"beauty_1","count":1,"category":"k_beauty","required":true},
+    {"slot":"beauty_2","count":1,"category":"k_beauty","required":true},
+    {"slot":"health_1","count":1,"category":"k_health","required":true},
+    {"slot":"health_2","count":1,"category":"k_health","required":true},
+    {"slot":"living_essential","count":1,"category":"korea_living_essential","required":true},
+    {"slot":"travel_activity","count":1,"category":"travel_package_tour_activity","required":true},
+    {"slot":"kpop","count":1,"category":"kpop_album_official_merch","required":true},
+    {"slot":"esim","count":1,"category":"data_esim_sim","required":true}
+  ],
+  "affiliate_programs": {
+    "coupang_partners":{"enabled":true,"priority":"mandatory","tracking_url_required":true,"image_policy":"merchant_or_affiliate_permitted_image"},
+    "trip_com":{"enabled":true,"priority":"high","tracking_url_required":true,"product_types":["flight","cruise_if_eligible","hotel","train","tour_ticket","rental_car","airport_transfer","package","esim"]},
+    "agoda":{"enabled":true,"priority":"high","tracking_url_required":true,"domain_verification_required":true,"product_types":["hotel","accommodation"]},
+    "olive_young_global":{"enabled":true,"priority":"high","tracking_url_required":true,"reward_code":"HUH556423","product_types":["k_beauty"]},
+    "naver_travel_connect":{"enabled":true,"priority":"conditional","tracking_url_required":true,"approval_required":true}
+  },
+  "selection_policy": {
+    "objective":"maximize_confirmed_commission_per_qualified_visitor",
+    "ranking_factors":["topic_relevance","purchase_intent","effective_commission_rate","average_order_value","conversion_evidence","cookie_window","availability","refund_cancellation_risk"],
+    "never_rank_by_commission_rate_alone":true,
+    "no_invented_tracking_urls":true,
+    "no_unverified_commission_claims":true,
+    "no_unlicensed_images":true,
+    "disclosure_required":true
+  },
+  "publishing_policy": {
+    "wordpress":{"enabled":true,"preserve_existing_body":true,"preserve_existing_affiliate_links":true,"idempotency_key":"post_id+affiliate_engine_version","append_only":true},
+    "blogger":{"enabled":true,"preserve_existing_body":true,"preserve_existing_affiliate_links":true,"idempotency_key":"blog_id+post_id+affiliate_engine_version","append_only":true,"rewrite_independently":true},
+    "youtube":{"enabled":true,"destinations":["description","pinned_comment"],"platform_policy_check":true},
+    "tiktok":{"enabled":true,"destinations":["profile_link","supported_product_link"],"account_feature_check":true}
+  },
+  "safety_gates": {
+    "require_real_tracking_url":true,
+    "require_image_source":true,
+    "require_exactly_10_slots_before_publish":true,
+    "dry_run_default":true,
+    "bulk_write_requires_explicit_enable_flag":true,
+    "never_delete_posts":true,
+    "never_remove_existing_links":true
+  },
+  "rollout": {
+    "pilot_site":"https://k-trip365.com",
+    "pilot_published_posts_expected":71,
+    "pilot_batch_size":5,
+    "expand_after_verified_pilot":true,
+    "wordpress_network":"inventory_required",
+    "blogger_network":"blog_id_and_oauth_inventory_required"
+  }
+}
