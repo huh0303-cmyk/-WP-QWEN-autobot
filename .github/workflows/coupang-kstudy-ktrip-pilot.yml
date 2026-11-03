@@ -26,7 +26,7 @@ jobs:
       - run: pip install requests -q
       - name: Insert Coupang CTA and verify each post
         env:
-          WP_USER: ${{ secrets.WP_USER }}
+          WP_USER: huh0303@gmail.com
           KSTUDY365COM: ${{ secrets.KSTUDY365COM }}
           KTRIP365COM: ${{ secrets.KTRIP365COM }}
           DRY_RUN: ${{ inputs.dry_run }}
