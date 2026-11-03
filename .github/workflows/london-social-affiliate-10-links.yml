@@ -1,0 +1,97 @@
+name: London Project — Social & YouTube 10-Link Affiliate Workflow
+
+on:
+  workflow_dispatch:
+    inputs:
+      content_id:
+        description: Stable source content ID (post/video/article ID)
+        required: true
+        type: string
+      title:
+        description: Content title
+        required: false
+        type: string
+      url:
+        description: Public source content URL
+        required: false
+        type: string
+      summary:
+        description: Short content summary for destination-specific adaptation
+        required: false
+        type: string
+      mode:
+        description: New content distribution or existing-content backfill
+        required: true
+        type: choice
+        options:
+          - new
+          - backfill
+        default: new
+  repository_dispatch:
+    types: [london_content_published]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: london-social-affiliate-${{ github.event.client_payload.content_id || inputs.content_id || github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  build-destination-queue:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Resolve source content payload
+        id: source
+        shell: bash
+        env:
+          EVENT_CONTENT_ID: ${{ github.event.client_payload.content_id }}
+          EVENT_TITLE: ${{ github.event.client_payload.title }}
+          EVENT_URL: ${{ github.event.client_payload.url }}
+          EVENT_SUMMARY: ${{ github.event.client_payload.summary }}
+          INPUT_CONTENT_ID: ${{ inputs.content_id }}
+          INPUT_TITLE: ${{ inputs.title }}
+          INPUT_URL: ${{ inputs.url }}
+          INPUT_SUMMARY: ${{ inputs.summary }}
+          INPUT_MODE: ${{ inputs.mode }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          if [ "$EVENT_NAME" = "repository_dispatch" ]; then
+            echo "content_id=$EVENT_CONTENT_ID" >> "$GITHUB_OUTPUT"
+            echo "title=$EVENT_TITLE" >> "$GITHUB_OUTPUT"
+            echo "url=$EVENT_URL" >> "$GITHUB_OUTPUT"
+            echo "summary=$EVENT_SUMMARY" >> "$GITHUB_OUTPUT"
+            echo "mode=new" >> "$GITHUB_OUTPUT"
+          else
+            echo "content_id=$INPUT_CONTENT_ID" >> "$GITHUB_OUTPUT"
+            echo "title=$INPUT_TITLE" >> "$GITHUB_OUTPUT"
+            echo "url=$INPUT_URL" >> "$GITHUB_OUTPUT"
+            echo "summary=$INPUT_SUMMARY" >> "$GITHUB_OUTPUT"
+            echo "mode=$INPUT_MODE" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Build per-destination 10-link queue (no publishing)
+        env:
+          CONTENT_ID: ${{ steps.source.outputs.content_id }}
+          CONTENT_TITLE: ${{ steps.source.outputs.title }}
+          CONTENT_URL: ${{ steps.source.outputs.url }}
+          CONTENT_SUMMARY: ${{ steps.source.outputs.summary }}
+          CONTENT_MODE: ${{ steps.source.outputs.mode }}
+        run: |
+          python scripts/build_social_affiliate_queue.py \
+            --content-id "$CONTENT_ID" \
+            --title "$CONTENT_TITLE" \
+            --url "$CONTENT_URL" \
+            --summary "$CONTENT_SUMMARY" \
+            --mode "$CONTENT_MODE"
+      - name: Upload destination queue and blockers
+        uses: actions/upload-artifact@v4
+        with:
+          name: social-affiliate-queue-${{ github.run_id }}
+          path: reports/social-affiliate-distribution-queue.json
+          if-no-files-found: error
+          retention-days: 90
