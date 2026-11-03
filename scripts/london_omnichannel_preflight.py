@@ -9,7 +9,6 @@ POLICY=json.loads((ROOT/"config/affiliate_distribution_policy.json").read_text(e
 PROFILES=json.loads((ROOT/"config/content_engine_profiles.json").read_text(encoding="utf-8-sig"))["profiles"]
 YT=json.loads((ROOT/"config/YOUTUBE_23_CHANNEL_MASTER_LOCK_2026-09-27.json").read_text(encoding="utf-8-sig"))
 SNS=json.loads((ROOT/"config/sns_six_channel_policy.json").read_text(encoding="utf-8-sig"))
-PROTECTED={"khealth365","krealestate365","kworld365","oliveyoung","ksa"}
 CATALOGS=ROOT/"affiliate-engine"/"data"/"catalogs"
 EXPECTED=POLICY["provider_allocation"]
 
@@ -25,7 +24,7 @@ def catalog_status(key:str)->dict:
     return {"site_key":key,"status":"ready" if valid else "incomplete","verified_offers":sum(counts.values()),"provider_counts":dict(counts),"missing":missing}
 
 registry=json.loads((ROOT/"config"/"automation_hub_sites.json").read_text(encoding="utf-8-sig"))["sites"]
-wp=[s["site_id"] for s in registry if s.get("platform")=="wordpress" and s.get("content_type")=="blog" and s.get("enabled",True) and s["site_id"] not in {"wp_khealth365","wp_krealestate","wp_kworld365","wp_oliveyoung","wp_ksa"}]
+wp=[s["site_id"] for s in registry if s.get("platform")=="wordpress" and s.get("content_type")=="blog" and s.get("enabled",True)]
 blogger=[s["site_id"] for s in registry if s.get("platform")=="blogger" and s.get("content_type")=="blog" and s.get("enabled",True)]
 yt_channels=[c for group in YT.get("groups",{}).values() for c in group]
 sns_accounts=SNS.get("accounts",[])
@@ -39,7 +38,7 @@ report={
  "policy_version":POLICY["policy_version"],
  "affiliate_allocation":EXPECTED,
  "total_offers_per_article":POLICY["per_article_total"],
- "blogs":{"wordpress_registry":len([s for s in registry if s.get("platform")=="wordpress" and s.get("content_type")=="blog" and s.get("enabled",True)]),"wordpress_locked_excluded":5,"wordpress_eligible_excluding_locked":len(wp),"blogger":len(blogger),"catalogs_ready":sum(x["status"]=="ready" for x in catalogs),"catalogs_missing_or_incomplete":sum(x["status"]!="ready" for x in catalogs)},
+ "blogs":{"wordpress_registry":len([s for s in registry if s.get("platform")=="wordpress" and s.get("content_type")=="blog" and s.get("enabled",True)]),"wordpress_in_scope":len(wp),"blogger":len(blogger),"catalogs_ready":sum(x["status"]=="ready" for x in catalogs),"catalogs_missing_or_incomplete":sum(x["status"]!="ready" for x in catalogs)},
  "youtube":{"registry_channels":len(yt_channels),"target_channels":YT.get("target_count",POLICY["platform_scope"]["youtube"]["target_channels"]),"identity_verified_channels":sum(bool(c.get("verified")) for c in yt_channels)},
  "social":platforms,
  "catalog_detail":catalogs,
