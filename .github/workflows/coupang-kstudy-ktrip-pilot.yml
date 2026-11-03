@@ -1,0 +1,41 @@
+name: Coupang Partners KStudy365 and K-trip365 pilot
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "true = preview only; false = insert and read-back verify"
+        required: true
+        default: true
+        type: boolean
+      post_limit_per_site:
+        description: "Maximum published posts per site"
+        required: true
+        default: "5"
+        type: string
+permissions:
+  contents: read
+jobs:
+  insert:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: Insert Coupang CTA and verify each post
+        env:
+          WP_USER: ${{ secrets.WP_USER }}
+          KSTUDY365COM: ${{ secrets.KSTUDY365COM }}
+          KTRIP365COM: ${{ secrets.KTRIP365COM }}
+          DRY_RUN: ${{ inputs.dry_run }}
+          POST_LIMIT_PER_SITE: ${{ inputs.post_limit_per_site }}
+        run: python scripts/coupang_kstudy_ktrip_pilot.py
+      - name: Upload verified report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coupang-kstudy-ktrip-pilot-report
+          path: coupang_kstudy_ktrip_pilot_report.json
+          if-no-files-found: warn
