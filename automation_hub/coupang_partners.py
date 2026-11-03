@@ -32,8 +32,8 @@ def _resolve_site_key(site_id):
                 return sid[3:] if sid.startswith("wp_") else sid
         return host
     key = raw.lower()
-    if key.startswith("blogger_"):
-        key = key[len("blogger_"):]
+    # Keep Blogger and WordPress destination keys distinct. Product pools and
+    # provider links must never silently bleed between different domains.
     if key.startswith("wp_"):
         key = key[len("wp_"):]
     return key
