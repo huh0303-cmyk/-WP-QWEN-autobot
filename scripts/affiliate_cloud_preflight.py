@@ -1,5 +1,5 @@
-"""Cloud-only, read-only preflight for the 24 general WordPress sites.
-This job never edits posts. It creates a manifest for the affiliate placement stage.
+"""Read-only affiliate preflight for every enabled WordPress destination in the control-room registry.
+No WordPress site is excluded by domain or prior protection status. This job never edits posts.
 """
 from __future__ import annotations
 import json, os, sys
@@ -10,12 +10,17 @@ import requests
 ROOT = Path(__file__).resolve().parents[1]
 REGISTRY = json.loads((ROOT / "config" / "automation_hub_sites.json").read_text(encoding="utf-8"))
 WP_USER = os.getenv("WP_USER", "").strip()
-EXCLUDED = {"wp_khealth365", "wp_koreanews", "wp_seouljournal"}
-rows = [s for s in REGISTRY.get("sites", []) if s.get("platform") == "wordpress" and s.get("site_id") not in EXCLUDED and s.get("enabled", True)]
+# The registry is authoritative. Naver and Tistory are outside this affiliate workflow;
+# every enabled WordPress destination, including previously protected sites, is included.
+rows = [
+    s for s in REGISTRY.get("sites", [])
+    if s.get("platform") == "wordpress" and s.get("enabled", True)
+]
 report = {
     "generated_at": datetime.now(timezone.utc).isoformat(),
     "execution": "github_actions_cloud",
     "mode": "read_only_preflight",
+    "scope_policy": "all_enabled_wordpress_sites_no_domain_exclusions",
     "target_sites": len(rows),
     "sites": [],
     "totals": {"authenticated": 0, "blocked": 0, "posts_seen": 0, "missing_tags": 0, "missing_featured_images": 0},
@@ -59,7 +64,7 @@ for site in rows:
                 "tags_count": len(p.get("tags") or []),
                 "featured_media": p.get("featured_media") or 0,
                 "missing_tags": missing_tags, "missing_featured_image": missing_image,
-                "affiliate_slots_target": "5-10",
+                "affiliate_slots_target": "10",
                 "affiliate_status": "not_inserted"
             })
         report["totals"]["posts_seen"] += item["posts_seen"]

@@ -179,14 +179,53 @@
     "platform_credentials_must_be_verified": true,
     "unavailable_edit_surface_action": "create_followup_or_hold_not_claim_success",
     "social_queue_mode": "validation_and_artifact_only",
-    "social_live_publish_enabled": false
+    "social_live_publish_enabled": false,
+    "domain_based_exclusions": false,
+    "control_room_registry_is_authoritative": true
   },
   "rollout_order": [
-    "K-trip365 pilot: complete the four-provider ten-offer catalog",
-    "KStudy365 pilot: independent ten-offer catalog",
-    "remaining eligible WordPress destinations",
-    "33 Blogger destinations",
-    "23 YouTube channels",
-    "TikTok, Instagram, Threads and Facebook registered accounts"
-  ]
+    "All 26 enabled WordPress registry destinations, including KSA-Korea and every previously protected domain",
+    "All 33 registered Blogspot destinations",
+    "All 23 registered YouTube channels",
+    "All registered TikTok, Facebook, Instagram and Threads accounts (6 each)"
+  ],
+  "scope_exclusions": [
+    "naver",
+    "tistory"
+  ],
+  "scope_inclusions": {
+    "wordpress": {
+      "all_registered_enabled_sites": true,
+      "target_count_from_control_room": 26,
+      "domain_exclusions": [],
+      "registered_registry_count": 26
+    },
+    "blogspot": {
+      "all_registered_enabled_sites": true,
+      "target_count_from_control_room": 33,
+      "separate_catalog_per_blog": true
+    },
+    "youtube": {
+      "all_registered_channels": true,
+      "target_count_from_control_room": 23
+    },
+    "tiktok": {
+      "all_registered_accounts": true,
+      "target_count_from_control_room": 6
+    },
+    "facebook": {
+      "all_registered_accounts_or_pages": true,
+      "target_count_from_control_room": 6
+    },
+    "instagram": {
+      "all_registered_accounts": true,
+      "target_count_from_control_room": 6
+    },
+    "threads": {
+      "all_registered_accounts": true,
+      "target_count_from_control_room": 6
+    }
+  },
+  "total_target_destinations": 106,
+  "dashboard_reconciliation_note": "Automation registry contains 26 enabled WordPress sites, including KSA-Korea; current dashboard label shows 25. Reconcile dashboard count without dropping any registry destination."
 }
