@@ -87,13 +87,6 @@ def youtube_destinations():
                 "catalog_key": f"youtube_{channel.get('key','')}",
                 "group": group,
             })
-    for channel in YT.get("planned_shopping_slots", []):
-        rows.append({
-            "platform": "youtube", "destination_key": channel.get("key", ""),
-            "display_name": channel.get("display_name", ""), "channel_id": channel.get("channel_id"),
-            "identity_verified": False, "publish_connected": False,
-            "catalog_key": f"youtube_{channel.get('key','')}", "group": "planned",
-        })
     return rows
 
 def social_destinations():
