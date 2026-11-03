@@ -164,8 +164,9 @@ for post in posts:
     }
     if marker in raw:
         section = raw.split(marker, 1)[1]
-        links = re.findall(r'<a[^>]+href="(https://link\.coupang\.com/[^"]+)"', section)
-        imgs = re.findall(r'<img[^>]+src="([^"]+)"', section)
+        card_section = section.split('<section class="ktrip365-coupang-recommendations"', 1)[-1]
+        links = re.findall(r'<a[^>]+href="(https://link\.coupang\.com/[^"]+)"', card_section)
+        imgs = re.findall(r'<img[^>]+src="([^"]+)"', card_section)
         ok = (
             section.count('class="ktrip365-coupang-card"') == 10 and
             len(imgs) == 10 and all(x.startswith("https://") for x in imgs) and
@@ -210,8 +211,9 @@ for post, editorial, removed_old in plans:
     q = v.json()
     body = q.get("content", {}).get("raw") or ""
     section = body.split(marker, 1)[1] if marker in body else ""
-    hrefs = re.findall(r'<a[^>]+href="(https://link\.coupang\.com/[^"]+)"', section)
-    imgs = re.findall(r'<img[^>]+src="([^"]+)"', section)
+    card_section = section.split('<section class="ktrip365-coupang-recommendations"', 1)[-1]
+    hrefs = re.findall(r'<a[^>]+href="(https://link\.coupang\.com/[^"]+)"', card_section)
+    imgs = re.findall(r'<img[^>]+src="([^"]+)"', card_section)
     checks = {
         "ten_cards": section.count('class="ktrip365-coupang-card"') == 10,
         "ten_images": len(imgs) == 10,
@@ -232,7 +234,8 @@ for post, editorial, removed_old in plans:
     checks["public_http_200"] = public.status_code == 200
     checks["public_ten_cards"] = public_section.count(b'class="ktrip365-coupang-card"') == 10
     checks["public_ten_absolute_images"] = len(re.findall(rb'<img[^>]+src="https://', public_section, re.I)) == 10
-    checks["public_ten_coupang_links"] = len(set(re.findall(rb'href="(https://link\.coupang\.com/[^"]+)"', public_section, re.I))) == 10
+    public_card_section = public_section.split(b'<section class="ktrip365-coupang-recommendations"', 1)[-1]
+    checks["public_ten_coupang_links"] = len(set(re.findall(rb'href="(https://link\.coupang\.com/[^"]+)"', public_card_section, re.I))) == 10
     checks["old_block_removed"] = "coupang-partners-cta" not in body and "coupang-partners-banner" not in body
     ok = all(checks.values())
     report.append({
