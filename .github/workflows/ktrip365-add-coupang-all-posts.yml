@@ -1,0 +1,27 @@
+name: Add Coupang Partners cards to all K-Trip365 posts
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: Add 10 verified Coupang products to every published K-Trip365 post
+        env:
+          KTRIP365COM: ${{ secrets.KTRIP365COM }}
+        run: python scripts/ktrip365_add_coupang_to_all_posts.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ktrip365-coupang-all-posts-backup-and-report
+          path: |
+            reports/ktrip365-coupang-all-posts-repair-2026-11-03.json
+            reports/ktrip365-coupang-all-posts-backup-2026-11-03.json
+          if-no-files-found: warn
