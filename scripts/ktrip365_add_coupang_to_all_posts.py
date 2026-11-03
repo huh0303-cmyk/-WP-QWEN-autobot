@@ -67,6 +67,10 @@ def strip_old_affiliate_blocks(raw):
     )
     raw = re.sub(r'<!--\s*coupang-partners-generic-cta-20261103\s*-->', '', raw, flags=re.I)
     raw = re.sub(
+        r'(?:<!--\s*coupang-partners-disclosure-20261103\s*-->\s*)?<p\b(?=[^>]*\bclass=["\'][^"\']*\baffiliate-disclosure\b)[^>]*>.*?</p>',
+        '', raw, flags=re.I | re.S
+    )
+    raw = re.sub(
         r'<!--\s*KTRIP365_COUPANG_[^>]*-->\s*<section\b[^>]*>.*?</section>',
         '', raw, flags=re.I | re.S
     )
