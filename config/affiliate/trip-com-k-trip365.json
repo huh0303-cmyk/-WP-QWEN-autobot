@@ -1,9 +1,9 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "2.0",
   "provider": "trip.com",
   "program": "Trip.com Affiliate",
   "site": "k-trip365.com",
-  "purpose": "Permanent master record of account-generated Trip.com tracking links. Reuse these links; do not ask the user to recreate them.",
+  "status": "three_category_links_redirect_validated",
   "links": [
     {
       "category": "hotel",
@@ -11,7 +11,7 @@
       "url": "https://www.trip.com/t/aQYZrw101X2",
       "trip_sub1": "ktrip365_hotel",
       "destination": "Seoul",
-      "status": "user-provided-generated-link"
+      "status": "redirect_validated"
     },
     {
       "category": "flight",
@@ -20,24 +20,24 @@
       "trip_sub1": "ktrip365_flight",
       "departure": "Seoul",
       "arrival": "Hanoi",
-      "status": "user-provided-generated-link"
+      "status": "redirect_validated"
     },
     {
       "category": "tour",
-      "label": "K-Trip365 Attractions and Tours",
+      "label": "K-Trip365 Tours and Packages",
       "url": "https://www.trip.com/t/gLWOuLU01X2",
       "trip_sub1": "ktrip365_tour",
       "destination": "Seoul",
-      "source_tripcom_url": "https://www.trip.com/things-to-do",
-      "status": "user-provided-generated-link"
+      "status": "redirect_validated"
     }
   ],
-  "operating_rules": [
-    "These three URLs are the canonical saved Trip.com links for k-trip365.com.",
-    "Reuse the existing URLs for K-Trip365; do not ask the user to generate them again.",
-    "Do not assume these links are valid for other registered sites unless the Trip.com affiliate dashboard confirms cross-site tracking.",
-    "Use hotel and tour as the primary Trip.com placements; flight is a supporting link for flight-related content.",
-    "Never alter, shorten manually, or fabricate tracking URLs."
-  ],
-  "notes": "The user supplied all three tracking URLs in chat on 2026-11-03. Destination and sub1 metadata are transcribed from the conversation."
+  "homepage_button": {
+    "url": "https://www.trip.com/t/KwZ0AV4s0X2",
+    "status": "redirect_validated"
+  },
+  "rules": [
+    "These three URLs are canonical and must be reused unchanged for K-Trip365.",
+    "Do not assume cross-site tracking for other destinations.",
+    "All ten product cards remain Coupang Partners only."
+  ]
 }

@@ -1,5 +1,5 @@
 {
-  "policy_version": "3.0.0",
+  "policy_version": "4.0.0",
   "effective_date": "2026-11-03",
   "timezone": "Asia/Seoul",
   "per_article_total": 10,
@@ -8,73 +8,63 @@
   },
   "required_slots": [
     {
-      "slot": "coupang_beauty_1",
+      "slot": "coupang_01",
       "provider": "coupang_partners",
-      "category": "beauty",
-      "purpose": "site_and_article_relevant",
+      "purpose": "best_article_relevance_and_click_intent",
       "position": 1
     },
     {
-      "slot": "coupang_beauty_2",
+      "slot": "coupang_02",
       "provider": "coupang_partners",
-      "category": "beauty",
-      "purpose": "site_and_article_relevant",
+      "purpose": "best_article_relevance_and_click_intent",
       "position": 2
     },
     {
-      "slot": "coupang_electronics_1",
+      "slot": "coupang_03",
       "provider": "coupang_partners",
-      "category": "electronics",
-      "purpose": "site_and_article_relevant",
+      "purpose": "best_article_relevance_and_click_intent",
       "position": 3
     },
     {
-      "slot": "coupang_electronics_2",
+      "slot": "coupang_04",
       "provider": "coupang_partners",
-      "category": "electronics",
-      "purpose": "site_and_article_relevant",
+      "purpose": "best_article_relevance_and_click_intent",
       "position": 4
     },
     {
-      "slot": "coupang_health_functional_foods_1",
+      "slot": "coupang_05",
       "provider": "coupang_partners",
-      "category": "health_functional_foods",
-      "purpose": "site_and_article_relevant",
+      "purpose": "best_article_relevance_and_click_intent",
       "position": 5
     },
     {
-      "slot": "coupang_health_functional_foods_2",
+      "slot": "coupang_06",
       "provider": "coupang_partners",
-      "category": "health_functional_foods",
-      "purpose": "site_and_article_relevant",
+      "purpose": "best_article_relevance_and_click_intent",
       "position": 6
     },
     {
-      "slot": "coupang_korea_travel_packages_1",
+      "slot": "coupang_07",
       "provider": "coupang_partners",
-      "category": "korea_travel_packages",
-      "purpose": "site_and_article_relevant",
+      "purpose": "best_article_relevance_and_click_intent",
       "position": 7
     },
     {
-      "slot": "coupang_korea_travel_packages_2",
+      "slot": "coupang_08",
       "provider": "coupang_partners",
-      "category": "korea_travel_packages",
-      "purpose": "site_and_article_relevant",
+      "purpose": "best_article_relevance_and_click_intent",
       "position": 8
     },
     {
-      "slot": "coupang_korea_hotels_1",
+      "slot": "coupang_09",
       "provider": "coupang_partners",
-      "category": "korea_hotels",
-      "purpose": "site_and_article_relevant",
+      "purpose": "best_article_relevance_and_click_intent",
       "position": 9
     },
     {
-      "slot": "coupang_korea_hotels_2",
+      "slot": "coupang_10",
       "provider": "coupang_partners",
-      "category": "korea_hotels",
-      "purpose": "site_and_article_relevant",
+      "purpose": "best_article_relevance_and_click_intent",
       "position": 10
     }
   ],
@@ -82,10 +72,7 @@
     "separate_catalog_per_destination": true,
     "never_share_between_wordpress_and_blogger": true,
     "minimum_verified_offers_per_provider_per_site": {
-      "coupang_partners": 10,
-      "olive_young_global": 0,
-      "trip_com": 0,
-      "agoda": 0
+      "coupang_partners": 10
     },
     "required_fields": [
       "slot",
@@ -109,7 +96,7 @@
     "mobile_columns": 2,
     "include_product_image": true,
     "include_title": true,
-    "cta": "쇼핑하기",
+    "cta": "\uc1fc\ud551\ud558\uae30",
     "affiliate_disclosure": true,
     "link_rel": "sponsored nofollow noopener",
     "idempotent_marker": "london-affiliate-engine:v3"
@@ -205,8 +192,8 @@
     "agoda_enabled": false
   },
   "rollout_order": [
-    "K-Trip365 pilot: top 3 provider buttons + 10 Coupang cards",
-    "After K-Trip365 read-back/public verification, expand to each enabled destination with its own catalog"
+    "K-Trip365 pilot completed: 3 header providers + 10 Coupang-only cards",
+    "Expand to each registered destination using its own verified Coupang catalog and site-specific provider URLs"
   ],
   "scope_exclusions": [
     "naver",

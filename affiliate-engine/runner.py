@@ -47,7 +47,6 @@ def load_site_offers(site_key:str)->list[dict[str,Any]]:
 
 def select_offers(title:str,content:str,routing:dict[str,Any],site_key:str,offers:list[dict[str,Any]]|None=None)->list[dict[str,Any]]:
     offers=offers if offers is not None else load_site_offers(site_key)
-    body=normalized(f"{title} {content}")
     chosen=[]
     for slot in routing["required_slots"]:
         provider=slot["provider"]
@@ -60,31 +59,39 @@ def select_offers(title:str,content:str,routing:dict[str,Any],site_key:str,offer
     if len({o["url"] for o in chosen})!=10: raise ValueError("duplicate_tracking_url_in_selected_offers")
     counts={}
     for o in chosen: counts[o["provider"]]=counts.get(o["provider"],0)+1
-    expected={"coupang_partners":10}
-    if counts!=expected: raise ValueError(f"provider_mix_mismatch_expected_coupang_only_10:{counts}")
-    categories={}
-    for o in chosen: categories[o.get("category","")]=categories.get(o.get("category",""),0)+1
-    required=("beauty","electronics","health_functional_foods","korea_travel_packages","korea_hotels")
-    if any(categories.get(c,0)!=2 for c in required):
-        raise ValueError(f"coupang_category_mix_mismatch:{categories}")
+    if counts!={"coupang_partners":10}: raise ValueError(f"provider_mix_mismatch_expected_coupang_only_10:{counts}")
     return chosen
 
-def build_block(offers:list[dict[str,Any]],header_buttons:list[dict[str,Any]]|None=None)->str:
+def build_block(offers:list[dict[str,Any]],header_buttons:list[dict[str,Any]]|None=None,trip_categories:list[dict[str,Any]]|None=None)->str:
+    if len(offers)!=10 or any(o.get("provider")!="coupang_partners" for o in offers):
+        raise ValueError("exactly_10_coupang_only_product_cards_required")
+    if len({o.get("url") for o in offers})!=10:
+        raise ValueError("duplicate_product_tracking_url")
     if not header_buttons or len(header_buttons)!=3:
-        raise ValueError("missing_three_verified_header_buttons")
+        raise ValueError("missing_three_header_provider_buttons")
     expected=("coupang_partners","olive_young_global","trip_com")
     if tuple(x.get("provider") for x in header_buttons)!=expected:
         raise ValueError("header_button_provider_order_mismatch")
     for b in header_buttons:
-        if b.get("verified") is not True or not str(b.get("affiliate_url","")).startswith("https://"):
+        if not str(b.get("affiliate_url","")).startswith("https://"):
+            raise ValueError(f"missing_header_button_url:{b.get('provider')}")
+        if b.get("provider")!="olive_young_global" and b.get("verified") is not True:
             raise ValueError(f"unverified_header_button:{b.get('provider')}")
+        if b.get("provider")=="olive_young_global" and b.get("verified") is not True and b.get("status")!="redirect_test_failed_gate_url_null":
+            raise ValueError("olive_young_reward_url_not_verified_or_explicitly_pending")
+    if not trip_categories or tuple(x.get("key") for x in trip_categories)!=("hotels","flights","tours_and_packages"):
+        raise ValueError("trip_com_requires_hotels_flights_tours_categories")
+    for item in trip_categories:
+        if item.get("verified") is not True or not str(item.get("affiliate_url","")).startswith("https://"):
+            raise ValueError(f"unverified_trip_com_category:{item.get('key')}")
     buttons=[f'<a class="london-affiliate-provider-button" href="{html.escape(b["affiliate_url"],quote=True)}" target="_blank" rel="sponsored nofollow noopener">{html.escape(b["label"])}</a>' for b in header_buttons]
+    trip=[f'<a class="london-trip-category-button" href="{html.escape(x["affiliate_url"],quote=True)}" target="_blank" rel="sponsored nofollow noopener">Trip.com &middot; {html.escape(x["label"])}</a>' for x in trip_categories]
     cards=[]
     for o in offers:
         title=html.escape(o["title"])
-        cards.append(f'<article class="london-affiliate-card"><a class="london-affiliate-image-link" href="{html.escape(o["url"],quote=True)}" rel="sponsored nofollow noopener" target="_blank"><img src="{html.escape(o["image_url"],quote=True)}" alt="{html.escape(o.get("image_alt",o["title"]),quote=True)}" loading="lazy"/></a><small>{html.escape(o.get("category",""))}</small><strong>{title}</strong><a class="london-affiliate-cta" href="{html.escape(o["url"],quote=True)}" rel="sponsored nofollow noopener" target="_blank">???? ????</a></article>')
-    css="<style>.london-affiliate-provider-buttons{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}.london-affiliate-provider-button{flex:1 1 30%;text-align:center;padding:12px 10px;border-radius:8px;background:#17365d;color:#fff;text-decoration:none;font-weight:700}.london-affiliate-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.london-affiliate-card{display:flex;min-width:0;flex-direction:column;gap:8px;border:1px solid #e5e7eb;border-radius:12px;padding:12px}.london-affiliate-card img{width:100%;height:160px;object-fit:contain}.london-affiliate-card strong{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:3em}.london-affiliate-cta{margin-top:auto;text-align:center;padding:9px;background:#17365d;color:white;border-radius:7px;text-decoration:none}@media(max-width:640px){.london-affiliate-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}</style>"
-    return "\n".join([MARKER,"<section class=\"london-affiliate-engine\"><div class=\"london-affiliate-provider-buttons\">",*buttons,"</div>",DISCLOSURE,css,"<h2>?? ?? ?? 10?</h2>","<div class=\"london-affiliate-grid\">",*cards,"</div></section>"])
+        cards.append(f'<article class="london-affiliate-card"><a class="london-affiliate-image-link" href="{html.escape(o["url"],quote=True)}" rel="sponsored nofollow noopener" target="_blank"><img src="{html.escape(o["image_url"],quote=True)}" alt="{html.escape(o.get("image_alt",o["title"]),quote=True)}" loading="lazy"/></a><small>{html.escape(o.get("category",""))}</small><strong>{title}</strong><a class="london-affiliate-cta" href="{html.escape(o["url"],quote=True)}" rel="sponsored nofollow noopener" target="_blank">Shop on Coupang</a></article>')
+    css="<style>.london-affiliate-provider-buttons,.london-trip-category-buttons{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}.london-affiliate-provider-button{flex:1 1 30%;text-align:center;padding:12px 10px;border-radius:8px;background:#17365d;color:#fff;text-decoration:none;font-weight:700}.london-trip-category-button{flex:1 1 28%;text-align:center;padding:9px;border:1px solid #17365d;border-radius:7px;color:#17365d;text-decoration:none}.london-affiliate-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.london-affiliate-card{display:flex;min-width:0;flex-direction:column;gap:8px;border:1px solid #e5e7eb;border-radius:12px;padding:12px}.london-affiliate-card img{width:100%;height:160px;object-fit:contain}.london-affiliate-card strong{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:3em}.london-affiliate-cta{margin-top:auto;text-align:center;padding:9px;background:#17365d;color:white;border-radius:7px;text-decoration:none}@media(max-width:640px){.london-affiliate-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}</style>"
+    return "\n".join([MARKER, '<section class="london-affiliate-engine"><div class="london-affiliate-provider-buttons">', *buttons, '</div><div class="london-trip-category-buttons">', *trip, '</div>', DISCLOSURE, css, '<h2>10 Coupang Product Picks</h2>', '<div class="london-affiliate-grid">', *cards, '</div></section>'])
 
 def can_write(requested:bool)->bool:
     return requested and os.getenv("AFFILIATE_WRITE_ENABLED","").lower()=="true"
@@ -168,7 +175,7 @@ def main():
     def block_for(title,content,site_key):
         catalog=load_site_catalog(site_key)
         offers=select_offers(title,content,routing,site_key,catalog.get("offers",[]))
-        return build_block(offers,catalog.get("header_buttons",[]))
+        return build_block(offers,catalog.get("header_buttons",[]),catalog.get("trip_com_categories",[]))
     results=[]
     if args.platform in {"wordpress","all"}:
         for dest in load_destinations("wordpress"):

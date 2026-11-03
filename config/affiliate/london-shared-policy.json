@@ -1,6 +1,6 @@
 {
-  "version": 2,
-  "name": "London Project shared affiliate layout standard v3",
+  "version": 3,
+  "name": "London Project affiliate layout standard v4",
   "platforms": [
     "wordpress",
     "blogger"
@@ -25,23 +25,15 @@
   "disabled_providers": [
     "agoda"
   ],
-  "ktrip365_category_mix": {
-    "beauty": 2,
-    "electronics": 2,
-    "health_functional_foods": 2,
-    "korea_travel_packages": 2,
-    "korea_hotels": 2
-  },
   "selection_principles": [
-    "Every article has exactly three verified provider buttons: Coupang Partners, Olive Young Global, Trip.com.",
-    "The ten product cards below the buttons are exclusively account-generated Coupang Partners offers.",
-    "Trip.com hotel, flight, and tours/packages links are separate tracked category links; copy account-generated URLs unchanged.",
-    "K-Trip365 requires two Coupang offers in each of five categories: beauty, electronics, health functional foods, Korea travel packages, Korea hotels.",
-    "Other sites use their own site-specific, topic-relevant pool of ten Coupang products.",
-    "Prioritize attractive but credible price points, sales/ranking signals and review evidence only when actually available.",
-    "Never invent products, images, tracking URLs, prices, or sales claims. Missing verified inventory blocks publication.",
-    "Preserve article body, publication status/date, featured image and SEO metadata; replace only the marked affiliate block.",
-    "Affiliate disclosure must be visible and all tracked links use sponsored nofollow noopener."
+    "Every post has three header provider buttons: Coupang Partners, Olive Young, Trip.com.",
+    "All 10 product cards are Coupang Partners products only.",
+    "Choose products for article relevance, attractive and credible price points, purchase intent and popularity evidence where available.",
+    "Do not impose a fixed category quota; use a site-specific product pool and vary products when suitable verified offers exist.",
+    "Trip.com uses three account-generated tracked category links: hotels, flights, tours/packages.",
+    "Olive Young is a header button only; its account reward URL must be verified before claiming commission attribution.",
+    "Never invent products, images, tracking URLs, prices, sales figures or commission rates.",
+    "Preserve article body, publication status/date, featured image and SEO metadata; replace only the marked affiliate block."
   ],
   "display": {
     "position": "end_of_article",
@@ -51,6 +43,7 @@
     "show_product_image": true,
     "show_product_title": true,
     "show_affiliate_cta": true,
+    "show_price_when_freshly_verified": true,
     "disclosure_required": true
   },
   "guardrails": {
@@ -63,7 +56,6 @@
     "require_verified_site_header_links": true,
     "require_exactly_ten_coupang_cards": true,
     "agoda_enabled": false,
-    "never_auto_modify_existing_published_posts_during_new_post_integration": true,
     "require_trip_com_three_tracked_categories": true,
     "olive_young_reward_url_verification_pending": true
   }

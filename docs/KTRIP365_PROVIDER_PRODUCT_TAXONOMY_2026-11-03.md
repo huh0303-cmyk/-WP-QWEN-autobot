@@ -1,33 +1,14 @@
-# K-Trip365 Affiliate Taxonomy ? Standard v3.0
-Effective: 2026-11-03
-Site: https://k-trip365.com
+# K-Trip365 provider taxonomy ? current standard v4.0
 
-## Fixed layout
-The article affiliate area has three provider buttons at the top: Coupang Partners, Olive Young Global, and Trip.com. The product grid below contains exactly 10 Coupang Partners products. Olive Young and Trip.com do not occupy product-card slots. Agoda is excluded.
+Top provider buttons: Coupang Partners, Olive Young Global, Trip.com.
 
-## Coupang product mix
-K-Trip365 starts with 10 account-generated Coupang Partners product links:
-- 2 K-Beauty products
-- 2 electronics products (laptops/tablets or relevant travel electronics)
-- 2 health functional food products
-- 2 Korea travel package products
-- 2 Korea hotel/accommodation products
+All ten bottom product cards are Coupang Partners only. Choose products based on article relevance, credible click-attractive price points, purchase intent and evidence-based popularity. Do not impose fixed category quotas. Each item requires a real account-generated Coupang link and permitted official product image.
 
-Select items with strong purchase intent and an attractive, credible price range rather than only the cheapest items. Prioritize sales/ranking signals, review volume and ratings, product availability, relevance to Korea visitors, and variety of price points. Avoid misleading discount anchors and do not claim exact sales volume unless the portal provides it. Every card requires an account-generated Coupang tracking URL and permitted official product image.
+Trip.com has three separate account-generated links:
+1. Hotels ? https://www.trip.com/t/aQYZrw101X2
+2. Flights ? https://www.trip.com/t/f4V2USA01X2
+3. Tours/Packages ? https://www.trip.com/t/gLWOuLU01X2
 
-## Trip.com navigation categories
-Trip.com is the third header button. The travel paths are:
-1. Hotels ? begin with Seoul hotel search and add destination-specific Korea hotels.
-2. Flights ? Korea-bound and Korea-departure flight search.
-3. Tours and packages ? Korea tours, attraction tickets, activities and eligible flight+hotel packages.
+All three links were redirect-tested and returned HTTP 200 with Trip.com attribution parameters. The Trip.com homepage button uses the saved account-generated homepage link. Agoda is disabled. Olive Young appears as a header button only; its account reward URL remains pending a successful redirect/attribution test.
 
-The Trip.com homepage and Seoul hotel tracking links currently exist. Flight and tours/package tracking links still need to be generated in the authenticated Trip.com Affiliate Platform. Copy generated links unchanged. Ordinary Trip.com destination URLs are not commission-tracking links.
-
-## Olive Young
-Use the user's account-specific reward URL only after redirect and attribution checks pass. Product-level Olive Young cards are not part of this layout.
-
-## Rendering and backfill
-Show the three provider buttons first, then the Trip.com category links, then the 10 Coupang cards. Use consistent image frames, compact two-line titles, aligned CTA buttons, desktop four-column and mobile two-column layout, and clear affiliate disclosure. Preserve article text, editorial links and featured images. Replace only the previous affiliate section. Backfill must be idempotent and verified by WordPress read-back and public-page checks.
-
-## Rollout
-K-Trip365 is the first pilot. Expand only after the pilot passes and each site has a separate verified 10-product Coupang catalog and verified provider-button URLs. Never invent tracking URLs or claim publication without a platform receipt and public read-back.
+The K-Trip365 71-post backfill is complete: 70 updated, one already compliant, zero verification failures. Preserve article content, publication metadata and featured images in future changes.

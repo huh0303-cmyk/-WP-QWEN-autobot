@@ -1,0 +1,36 @@
+{
+  "site": "https://k-trip365.com",
+  "standard_version": "4.0.0",
+  "workflow_run_id": 41643104260,
+  "checked_posts": 71,
+  "updated_and_verified": 70,
+  "already_compliant": 1,
+  "verification_failures": 0,
+  "header_buttons": [
+    "coupang_partners",
+    "olive_young_global",
+    "trip_com"
+  ],
+  "trip_com_categories": [
+    "hotels",
+    "flights",
+    "tours_and_packages"
+  ],
+  "product_cards": {
+    "count": 10,
+    "provider": "coupang_partners"
+  },
+  "agoda_enabled": false,
+  "olive_young_reward_url_status": "pending_redirect_and_attribution_verification",
+  "checks": [
+    "WordPress editable-content read-back",
+    "public HTTP 200",
+    "10 Coupang cards",
+    "10 unique Coupang product links",
+    "10 product images",
+    "3 provider buttons",
+    "3 Trip.com category links",
+    "affiliate disclosure once",
+    "status/date/featured image preserved"
+  ]
+}

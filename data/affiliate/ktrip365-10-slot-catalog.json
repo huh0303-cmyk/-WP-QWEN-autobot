@@ -1,0 +1,184 @@
+{
+  "site": "https://k-trip365.com",
+  "standard_version": "4.0.0",
+  "provider_allocation": {
+    "coupang_partners": 10
+  },
+  "header_buttons": [
+    {
+      "provider": "coupang_partners",
+      "label": "Coupang Partners",
+      "affiliate_url": "https://link.coupang.com/a/ihRMHfQzKf",
+      "status": "account_link_on_file",
+      "link_type": "general_affiliate_destination",
+      "verified": true
+    },
+    {
+      "provider": "olive_young_global",
+      "label": "Olive Young",
+      "affiliate_url": "https://global.oliveyoung.com/if/rd?su=HUH556423",
+      "status": "redirect_test_failed_gate_url_null",
+      "link_type": "reward_code_entry",
+      "verified": false
+    },
+    {
+      "provider": "trip_com",
+      "label": "Trip.com",
+      "affiliate_url": "https://www.trip.com/t/KwZ0AV4s0X2",
+      "status": "redirect_validated",
+      "link_type": "homepage",
+      "verified": true
+    }
+  ],
+  "trip_com_categories": [
+    {
+      "key": "hotels",
+      "label": "\\uD638\\uD154",
+      "status": "redirect_validated",
+      "affiliate_url": "https://www.trip.com/t/aQYZrw101X2",
+      "destination_url": "https://kr.trip.com/hotels",
+      "verified": true
+    },
+    {
+      "key": "flights",
+      "label": "\\uD56D\\uACF5\\uAD8C",
+      "status": "redirect_validated",
+      "affiliate_url": "https://www.trip.com/t/f4V2USA01X2",
+      "destination_url": "https://www.trip.com/flights/Seoul-to-Hanoi/tickets-SEL-HAN",
+      "verified": true
+    },
+    {
+      "key": "tours_and_packages",
+      "label": "\\uD22C\\uC5B4\\u00B7\\uD328\\uD0A4\\uC9C0",
+      "status": "redirect_validated",
+      "affiliate_url": "https://www.trip.com/t/gLWOuLU01X2",
+      "destination_url": "https://www.trip.com/things-to-do",
+      "verified": true
+    }
+  ],
+  "agoda_enabled": false,
+  "product_cards": [
+    {
+      "slot": "coupang_01",
+      "provider": "coupang_partners",
+      "title": "[\ud55c\uad6d]  \ud55c\uad6d\uc774\uc2ec eSIM 5G \ub370\uc774\ud130 \ubb34\uc81c\ud55c",
+      "affiliate_url": "https://link.coupang.com/a/imNZuMzqbQ",
+      "image_url": "https://thumbnail12.coupangcdn.com/thumbnails/remote/212x212ex/image/travel_reactor/travelSeller/common/A00188737/e53cdd6d-2093-4124-9246-d4bad0896496.png",
+      "product_id": "30000011239081",
+      "price_krw": 1520,
+      "category": "korea_digital_esim_sim",
+      "verified": true,
+      "account_generated": true
+    },
+    {
+      "slot": "coupang_02",
+      "provider": "coupang_partners",
+      "title": "\ubc84\ud2f0\ud0ed \ud2b8\ub808\ube14\ub7ec \uc5d0\uc5b4 PD 25W \uba40\ud2f0 \uc5b4\ub311\ud130 \ud574\uc678 \uc804\uc138\uacc4 \uc5ec\ud589\uc6a9 \uba40\ud2f0\ud0ed usb \ucf58\uc13c\ud2b8 \ud50c\ub7ec\uadf8 \ub3fc\uc9c0\ucf54 \uc77c\ubcf8 \ubca0\ud2b8\ub0a8 \uc911\uad6d \ud64d\ucf69 \ud0dc\uad6d \ub300\ub9cc \ud544\ub9ac\ud540 \ubbf8\uad6d \uc720\ub7fd, 1\uac1c, \ud551\ud06c",
+      "affiliate_url": "https://link.coupang.com/a/imOi7CHG2u",
+      "image_url": "https://t4a.coupangcdn.com/thumbnails/remote/212x212ex/image/vendor_inventory/04e8/5d7193ad051c10a15ebb25bb1968cf2b508101d9229c598db2fbea8fa7fb.png",
+      "product_id": "9066446599",
+      "price_krw": 20900,
+      "category": "korea_travel_power",
+      "verified": true,
+      "account_generated": true
+    },
+    {
+      "slot": "coupang_03",
+      "provider": "coupang_partners",
+      "title": "\ud55c\uad6d \uc720\uc2ec \uce69 USIM \uc804\uc9c0\uc5ed \ub9e4\uc77c \uc644\uc804\ubb34\uc81c\ud55c, 1\uac1c, \uc644\uc804 \ubb34\uc81c\ud55c, 3\uc77c",
+      "affiliate_url": "https://link.coupang.com/a/imOmUt0IcS",
+      "image_url": "https://thumbnail6.coupangcdn.com/thumbnails/remote/212x212ex/image/vendor_inventory/6dac/0e6d489ddbf4aa65668c63df06a952d10b871ece17663c11569ecbf06e25.jpg",
+      "product_id": "9624926280",
+      "price_krw": 11500,
+      "category": "korea_digital_esim_sim",
+      "verified": true,
+      "account_generated": true
+    },
+    {
+      "slot": "coupang_04",
+      "provider": "coupang_partners",
+      "title": "\ub8e8\ubca0\uc544 45W \ud574\uc678 \uc5ec\ud589\uc6a9 \ucd08\uace0\uc18d \ucda9\uc804 5\ud3ec\ud2b8 \uba40\ud2f0 \uc5b4\ub311\ud130, 1\uc138\ud2b8, \ub808\ubaac \uc610\ub85c",
+      "affiliate_url": "https://link.coupang.com/a/imOoeAoOe4",
+      "image_url": "https://t4a.coupangcdn.com/thumbnails/remote/212x212ex/image/vendor_inventory/0c42/c2c7f8b1a03b13319d1007e77c1bfe944d9d04a82de87518a6d03770c219.jpg",
+      "product_id": "9042484303",
+      "price_krw": 24800,
+      "category": "korea_travel_power",
+      "verified": true,
+      "account_generated": true
+    },
+    {
+      "slot": "coupang_05",
+      "provider": "coupang_partners",
+      "title": "\ubcf4\ubc14 \uadf8\ub9bd 22.5W \uace0\uc18d\ucda9\uc804 \ubcf4\uc870\ubc30\ud130\ub9ac 20000mAh, \uc624\ub80c\uc9c0, VA-123",
+      "affiliate_url": "https://link.coupang.com/a/imOpuSDPz2",
+      "image_url": "https://thumbnail7.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/2026/02/13/15/2/717acede-bc74-4aae-803e-7231d4b8d3b1.jpg",
+      "product_id": "9326353225",
+      "price_krw": 45400,
+      "category": "korea_travel_power",
+      "verified": true,
+      "account_generated": true
+    },
+    {
+      "slot": "coupang_06",
+      "provider": "coupang_partners",
+      "title": "70 % \uc904\uc5ec\uc8fc\ub294 \uc5ec\ud589\uc6a9 \uc555\ucd95 \ud30c\uc6b0\uce58 6\uc885 \uc138\ud2b8 \uce90\ub9ac\uc5b4 \uacf5\uac04\uc815\ub9ac \uc758\ub958 \uc555\ucd95\ud329",
+      "affiliate_url": "https://link.coupang.com/a/imOqO5qtcO",
+      "image_url": "https://t1a.coupangcdn.com/thumbnails/remote/212x212ex/image/vendor_inventory/65f2/faba3c491ffad9e34f45d2b01bbd38a8c97e27a689f5c6652b16a7e2f902.jpg",
+      "product_id": "9492918616",
+      "price_krw": 24800,
+      "category": "korea_travel_accessory",
+      "verified": true,
+      "account_generated": true
+    },
+    {
+      "slot": "coupang_07",
+      "provider": "coupang_partners",
+      "title": "\ub8e8\uc774\uc258 \uce90\ub9ac\uc5b4 \uc218\ud654\ubb3c \ud578\ub514 \uc800\uc6b8 \ub09a\uc2dc \uc2a4\ud2b8\ub7a9\ud615 \ub514\uc9c0\ud138, 1\uac1c",
+      "affiliate_url": "https://link.coupang.com/a/imOr5nW5FQ",
+      "image_url": "https://thumbnail3.coupangcdn.com/thumbnails/remote/212x212ex/image/vendor_inventory/2733/e92f6698ed5fbca8179e12ead330a8f4d1f07736b5bb3d2c8bbcf15355cb.png",
+      "product_id": "9277715386",
+      "price_krw": 8680,
+      "category": "korea_travel_accessory",
+      "verified": true,
+      "account_generated": true
+    },
+    {
+      "slot": "coupang_08",
+      "provider": "coupang_partners",
+      "title": "\uc5e0\ub3c4\uc528 \uc120 \uc2a4\ud0a8 \ud50c\ub7ec\uc2a4 \ud06c\ub9bc, 1\uac1c, 100ml",
+      "affiliate_url": "https://link.coupang.com/a/imOtptDK20",
+      "image_url": "https://thumbnail11.coupangcdn.com/thumbnails/remote/212x212ex/image/vendor_inventory/image_audit/prod/d4aa2acf-b1d8-4fb3-926e-fbad2b9bb06f_fixing_v2.png",
+      "product_id": "7996610657",
+      "price_krw": 27100,
+      "category": "k_beauty_olive_young",
+      "verified": true,
+      "account_generated": true
+    },
+    {
+      "slot": "coupang_09",
+      "provider": "coupang_partners",
+      "title": "\ube44\uc544\uc774\ud399\ud2b8 \uc5b4\uc131\ucd08 \ucf5c\ub77c\uac90 \ub2e4\uc774\uc5b4\ub9ac \uc570\ud50c \ub9c8\uc2a4\ud06c\ud329 25ml, 1\uac1c\uc785, 100\uac1c",
+      "affiliate_url": "https://link.coupang.com/a/imOuFwqcXA",
+      "image_url": "https://thumbnail7.coupangcdn.com/thumbnails/remote/212x212ex/image/vendor_inventory/fc2c/948e8c1fc47a112c1a8fc1111c98d8a90f5ca6cbc32222df0d4f674e005a.jpg",
+      "product_id": "6496810440",
+      "price_krw": 39910,
+      "category": "k_beauty_olive_young",
+      "verified": true,
+      "account_generated": true
+    },
+    {
+      "slot": "coupang_10",
+      "provider": "coupang_partners",
+      "title": "\ucf04\uc9c0 \uc77c\ubcf8\uc815\ud488 \ubaa9\ubca0\uac1c \uc5ec\ud589\uae30\ub0b4\uc6a9\uba54\ubaa8\ub9ac\ud3fc \ucfe0\uc158\ubc30\uac8c",
+      "affiliate_url": "https://link.coupang.com/a/imOCJ13HUG",
+      "image_url": "https://thumbnail4.coupangcdn.com/thumbnails/remote/212x212ex/image/vendor_inventory/d5ab/1f364f05bb41c31855e7f70a468789af9bedf0a361a6301493c683947acd.jpg",
+      "product_id": "8839789682",
+      "price_krw": 27700,
+      "category": "korea_travel_comfort",
+      "verified": true,
+      "account_generated": true
+    }
+  ],
+  "status": "71_POSTS_UPDATED_AND_VERIFIED",
+  "note": "All ten product slots are Coupang Partners only. Header provider buttons are separate from product cards; no fixed product category quotas."
+}

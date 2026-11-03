@@ -1,75 +1,103 @@
 {
-  "version": 1,
-  "description": "Provider registry for the London Project affiliate commerce engine.",
+  "version": 2,
+  "description": "Only three affiliate providers are enabled by the current London Project standard.",
   "security": {
-    "credentials_location": "GitHub Actions Secrets or server environment only",
+    "credentials_location": "GitHub Actions Secrets or local environment only",
     "never_commit_credentials": true,
     "never_invent_affiliate_urls": true,
     "never_publish_unverified_offers": true
   },
   "providers": [
     {
-      "id": "coupang",
+      "id": "coupang_partners",
       "name": "Coupang Partners",
-      "status": "active_manual_portal_capture",
+      "status": "active",
       "adapter": "manual_portal",
-      "allowed_affiliate_hosts": ["link.coupang.com"],
+      "allowed_affiliate_hosts": [
+        "link.coupang.com"
+      ],
       "catalog_scope": "per_site",
       "link_creation": "authenticated_partner_portal",
-      "creative_source": "official_partner_portal_image_or_html"
+      "creative_source": "official_partner_portal_image_or_html",
+      "product_cards_per_post": 10
+    },
+    {
+      "id": "olive_young_global",
+      "name": "Olive Young Global",
+      "status": "active_header_button_only",
+      "adapter": "account_reward_code",
+      "allowed_affiliate_hosts": [
+        "global.oliveyoung.com"
+      ],
+      "catalog_scope": "per_site",
+      "link_creation": "account_reward_code_or_generated_reward_link",
+      "product_cards_per_post": 0,
+      "reward_code": "HUH556423"
+    },
+    {
+      "id": "trip_com",
+      "name": "Trip.com",
+      "status": "active_header_button_and_category_links",
+      "adapter": "account_generated_deeplink",
+      "allowed_affiliate_hosts": [
+        "trip.com",
+        "www.trip.com"
+      ],
+      "catalog_scope": "per_site",
+      "link_creation": "authenticated_affiliate_platform",
+      "product_cards_per_post": 0,
+      "categories": [
+        "hotels",
+        "flights",
+        "tours_and_packages"
+      ]
+    }
+  ],
+  "disabled_providers": [
+    {
+      "id": "agoda",
+      "status": "disabled_pending_site_approval"
     },
     {
       "id": "alibaba",
-      "name": "Alibaba Affiliate",
-      "status": "planned",
-      "adapter": "manual_portal",
-      "allowed_affiliate_hosts": [],
-      "catalog_scope": "per_site",
-      "link_creation": "official_affiliate_program_or_network_api",
-      "notes": "Enable only after account approval and official link/feed/API access are confirmed."
+      "status": "disabled_not_in_current_standard"
     },
     {
       "id": "airbnb",
-      "name": "Airbnb",
-      "status": "planned_review_required",
-      "adapter": "manual_portal",
-      "allowed_affiliate_hosts": [],
-      "catalog_scope": "per_site",
-      "link_creation": "official_program_if_available",
-      "notes": "Do not assume a public affiliate program or generate tracking links until eligibility and current program terms are verified."
-    },
-    {
-      "id": "agoda",
-      "name": "Agoda",
-      "status": "planned",
-      "adapter": "manual_portal",
-      "allowed_affiliate_hosts": [],
-      "catalog_scope": "per_site",
-      "link_creation": "official_partner_portal_or_network_api"
+      "status": "disabled_not_in_current_standard"
     },
     {
       "id": "awin",
-      "name": "Awin",
-      "status": "planned",
-      "adapter": "api_or_feed",
-      "allowed_affiliate_hosts": [],
-      "catalog_scope": "per_site",
-      "link_creation": "approved_advertiser_deep_link_api",
-      "notes": "Awin APIs support publisher link building and performance reporting subject to account access."
+      "status": "disabled_not_in_current_standard"
     }
   ],
   "normalized_offer_fields": [
-    "provider", "offer_id", "site_id", "title", "destination_url",
-    "affiliate_url", "image_url", "category", "keywords", "currency",
-    "price", "availability", "popularity_evidence", "creative_source", "verified"
+    "provider",
+    "offer_id",
+    "site_id",
+    "title",
+    "destination_url",
+    "affiliate_url",
+    "image_url",
+    "category",
+    "keywords",
+    "currency",
+    "price",
+    "availability",
+    "popularity_evidence",
+    "creative_source",
+    "verified"
   ],
   "selection": {
     "cards_per_post": 10,
-    "first_two": "highest article relevance",
-    "remaining_eight": "site-specific mix of Korea lifestyle, health, K-beauty, digital connectivity, travel and accommodation offers",
-    "provider_mix": "choose the strongest eligible offers across enabled providers; no fixed provider quota",
+    "card_provider": "coupang_partners",
+    "selection": "best_article_relevance_plus_click_intent_and_price_mix",
+    "provider_mix": "coupang_only_10",
     "site_catalog_isolation": true,
-    "deduplicate_by": ["provider", "affiliate_url"],
+    "deduplicate_by": [
+      "provider",
+      "affiliate_url"
+    ],
     "require_verified_tracking_link": true,
     "require_official_image": true
   }

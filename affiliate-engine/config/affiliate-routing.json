@@ -1,76 +1,76 @@
 {
   "engine": "London Project Affiliate Engine",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "mode": "safe",
   "default_locale": "ko-KR",
   "required_slots": [
     {
-      "slot": "coupang_beauty_1",
+      "slot": "coupang_01",
       "count": 1,
-      "category": "beauty",
+      "category": "site_and_article_relevant",
       "required": true,
       "provider": "coupang_partners"
     },
     {
-      "slot": "coupang_beauty_2",
+      "slot": "coupang_02",
       "count": 1,
-      "category": "beauty",
+      "category": "site_and_article_relevant",
       "required": true,
       "provider": "coupang_partners"
     },
     {
-      "slot": "coupang_electronics_1",
+      "slot": "coupang_03",
       "count": 1,
-      "category": "electronics",
+      "category": "site_and_article_relevant",
       "required": true,
       "provider": "coupang_partners"
     },
     {
-      "slot": "coupang_electronics_2",
+      "slot": "coupang_04",
       "count": 1,
-      "category": "electronics",
+      "category": "site_and_article_relevant",
       "required": true,
       "provider": "coupang_partners"
     },
     {
-      "slot": "coupang_health_functional_foods_1",
+      "slot": "coupang_05",
       "count": 1,
-      "category": "health_functional_foods",
+      "category": "site_and_article_relevant",
       "required": true,
       "provider": "coupang_partners"
     },
     {
-      "slot": "coupang_health_functional_foods_2",
+      "slot": "coupang_06",
       "count": 1,
-      "category": "health_functional_foods",
+      "category": "site_and_article_relevant",
       "required": true,
       "provider": "coupang_partners"
     },
     {
-      "slot": "coupang_korea_travel_packages_1",
+      "slot": "coupang_07",
       "count": 1,
-      "category": "korea_travel_packages",
+      "category": "site_and_article_relevant",
       "required": true,
       "provider": "coupang_partners"
     },
     {
-      "slot": "coupang_korea_travel_packages_2",
+      "slot": "coupang_08",
       "count": 1,
-      "category": "korea_travel_packages",
+      "category": "site_and_article_relevant",
       "required": true,
       "provider": "coupang_partners"
     },
     {
-      "slot": "coupang_korea_hotels_1",
+      "slot": "coupang_09",
       "count": 1,
-      "category": "korea_hotels",
+      "category": "site_and_article_relevant",
       "required": true,
       "provider": "coupang_partners"
     },
     {
-      "slot": "coupang_korea_hotels_2",
+      "slot": "coupang_10",
       "count": 1,
-      "category": "korea_hotels",
+      "category": "site_and_article_relevant",
       "required": true,
       "provider": "coupang_partners"
     }
@@ -78,28 +78,22 @@
   "affiliate_programs": {
     "coupang_partners": {
       "enabled": true,
-      "priority": "fixed_10_cards",
-      "tracking_url_required": true,
-      "product_types": [
-        "beauty",
-        "electronics",
-        "health_functional_foods",
-        "korea_travel_packages",
-        "korea_hotels"
-      ]
+      "priority": "all_10_product_cards",
+      "tracking_url_required": true
     },
     "olive_young_global": {
       "enabled": true,
       "priority": "header_button_only",
       "tracking_url_required": true,
-      "product_types": [],
+      "product_cards": false,
       "reward_code": "HUH556423"
     },
     "trip_com": {
       "enabled": true,
-      "priority": "header_button_and_trip_subcategories",
+      "priority": "header_button_and_three_category_links",
       "tracking_url_required": true,
-      "product_types": [
+      "product_cards": false,
+      "categories": [
         "hotels",
         "flights",
         "tours_and_packages"
@@ -109,7 +103,7 @@
       "enabled": false,
       "priority": "disabled",
       "tracking_url_required": false,
-      "product_types": []
+      "product_cards": false
     }
   },
   "selection_policy": {
@@ -179,7 +173,7 @@
   },
   "rollout": {
     "pilot_site": "https://k-trip365.com",
-    "pilot_batch_size": 5,
+    "pilot_status": "completed_71_of_71_verified",
     "expand_after_verified_pilot": true,
     "network_expansion_requires_per_site_catalog": true
   },

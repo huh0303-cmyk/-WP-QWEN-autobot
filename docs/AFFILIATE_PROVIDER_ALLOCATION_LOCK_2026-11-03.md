@@ -1,7 +1,12 @@
-﻿# London Project affiliate distribution policy
+# Affiliate provider allocation ? current standard v4.0
 
-The canonical 10-item split is 4 Coupang Partners + 2 Olive Young Global + 2 Trip.com + 2 Agoda. The portfolio policy is stored in config/affiliate_distribution_policy.json.
+This file supersedes every earlier provider allocation.
 
-This policy supersedes the previous 10-slot category allocation and any 40-card-per-article draft matrix. The previous matrix must not be enabled for production. The runner/workflows must validate the provider allocation exactly and hold incomplete catalogs.
+- Header buttons: Coupang Partners, Olive Young Global, Trip.com.
+- Product cards below: exactly 10, all Coupang Partners.
+- Agoda is disabled and excluded.
+- Trip.com category links: Hotels, Flights, Tours/Packages.
+- Olive Young is a header button only; its reward URL must be verified before commission attribution is claimed.
+- Mixed-provider product cards and fixed category quotas are not part of the current standard.
 
-See docs/LONDON_AFFILIATE_OMNICHANNEL_STANDARD_2026-11-03.md for the complete publishing scope and staged rollout.
+Canonical machine-readable sources: config/affiliate_distribution_policy.json, affiliate-engine/config/affiliate-routing.json, and config/affiliate/london-shared-policy.json.

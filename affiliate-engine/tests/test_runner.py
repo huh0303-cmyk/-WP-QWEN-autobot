@@ -9,30 +9,33 @@ class AffiliatePolicyTests(unittest.TestCase):
   routing=json.loads((ROOT/"affiliate-engine/config/affiliate-routing.json").read_text(encoding="utf-8-sig"))
   offers=[]
   for slot in routing["required_slots"]:
-   offers.append({"slot":slot["slot"],"provider":"coupang_partners","category":slot["category"],"title":slot["slot"],"url":"https://link.coupang.com/"+slot["slot"],"image_url":"https://img.example/"+slot["slot"]+".jpg","affiliate_link_verified":True,"image_rights_verified":True,"keywords":["travel"]})
+   offers.append({"slot":slot["slot"],"provider":"coupang_partners","category":"travel","title":slot["slot"],"url":"https://link.coupang.com/"+slot["slot"],"image_url":"https://img.example/"+slot["slot"]+".jpg","affiliate_link_verified":True,"image_rights_verified":True})
   return routing,offers
- def test_exactly_ten_coupang_cards_and_five_categories(self):
+ def buttons(self):
+  labels={"coupang_partners":"Coupang Partners","olive_young_global":"Olive Young","trip_com":"Trip.com"}
+  return [{"provider":p,"label":labels[p],"affiliate_url":"https://track.example/"+p,"verified":True} for p in labels]
+ def categories(self):
+  return [{"key":k,"label":k,"affiliate_url":"https://trip.example/"+k,"verified":True} for k in ["hotels","flights","tours_and_packages"]]
+ def test_exactly_ten_coupang_cards_without_fixed_category_quota(self):
   routing,offers=self.fixture()
   chosen=runner.select_offers("Travel guide","travel",routing,"test_site",offers)
   self.assertEqual(len(chosen),10)
   self.assertEqual({x["provider"] for x in chosen},{"coupang_partners"})
-  self.assertEqual({c:sum(x["category"]==c for x in chosen) for c in ["beauty","electronics","health_functional_foods","korea_travel_packages","korea_hotels"]},{c:2 for c in ["beauty","electronics","health_functional_foods","korea_travel_packages","korea_hotels"]})
+  self.assertEqual(len({x["url"] for x in chosen}),10)
  def test_wrong_provider_is_rejected(self):
-  routing,offers=self.fixture()
-  offers[0]["provider"]="wrong"
+  routing,offers=self.fixture(); offers[0]["provider"]="wrong"
   with self.assertRaises(ValueError): runner.select_offers("Travel guide","travel",routing,"test_site",offers)
  def test_unverified_image_or_tracking_link_is_rejected(self):
-  routing,offers=self.fixture()
-  offers[0]["image_rights_verified"]=False
+  routing,offers=self.fixture(); offers[0]["image_rights_verified"]=False
   with self.assertRaises(ValueError): runner.select_offers("Travel guide","travel",routing,"test_site",offers)
- def test_header_button_gate_and_coupang_only_cards(self):
-  labels={"coupang_partners":"Coupang Partners","olive_young_global":"Olive Young","trip_com":"Trip.com"}
-  buttons=[{"provider":p,"label":labels[p],"affiliate_url":"https://track.example/"+p,"verified":True} for p in ["coupang_partners","olive_young_global","trip_com"]]
-  offers=[{"title":"Example","url":"https://link.coupang.com/a","image_url":"https://img.example/a.jpg","category":"beauty"}]
-  block=runner.build_block(offers,buttons)
-  self.assertIn("Coupang Partners",block)
-  self.assertIn("Olive Young",block)
-  self.assertIn("Trip.com",block)
-  self.assertIn("???? ????",block)
-  with self.assertRaises(ValueError): runner.build_block(offers,buttons[:2])
+ def test_header_and_trip_category_links_are_rendered(self):
+  routing,offers=self.fixture()
+  chosen=runner.select_offers("Travel guide","travel",routing,"test_site",offers)
+  block=runner.build_block(chosen,self.buttons(),self.categories())
+  self.assertEqual(block.count('<article class="london-affiliate-card">'),10)
+  self.assertIn("Coupang Partners",block); self.assertIn("Olive Young",block); self.assertIn("Trip.com",block)
+  self.assertIn("hotels",block); self.assertIn("flights",block); self.assertIn("tours_and_packages",block)
+ def test_agoda_or_missing_trip_category_is_rejected(self):
+  routing,offers=self.fixture(); chosen=runner.select_offers("Travel guide","travel",routing,"test_site",offers)
+  with self.assertRaises(ValueError): runner.build_block(chosen,self.buttons(),self.categories()[:2])
 if __name__=="__main__": unittest.main()

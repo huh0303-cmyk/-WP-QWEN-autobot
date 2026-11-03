@@ -1,20 +1,9 @@
-# Affiliate provider priority
+# Affiliate provider priority ? current standard v4.0
 
-## Core rule
+1. Header button row: Coupang Partners, Olive Young Global, Trip.com.
+2. Product grid: exactly ten Coupang Partners products only.
+3. Trip.com has three separate tracked destinations: Hotels, Flights, Tours/Packages.
+4. Agoda is disabled; it must not appear in current article affiliate blocks.
+5. Olive Young is a header button only, not a product-card provider. Do not claim attribution until its reward URL has passed redirect and account attribution checks.
 
-Coupang Partners is the network default and the primary provider for topical
-items, K-health, Korea daily essentials, and K-pop products. A verified Coupang
-Travel offer may also be used for eligible travel products.
-
-## Specialist routing
-
-| Need | Selection order |
-| --- | --- |
-| K-beauty | Olive Young Global, then Coupang Partners |
-| Hotel, flight, train, tour, ticket, activity | Coupang Travel, Trip.com, then Agoda for accommodation |
-| eSIM, SIM, data | Trip.com, then Coupang Travel |
-| Korea daily life, K-health, K-pop | Coupang Partners |
-
-The engine never claims that a supplier has a product or a commission rate. An
-offer is eligible only after its account-generated tracking URL is saved in the
-catalogue with its exact provider name.
+Product selection should optimize article relevance, purchase intent, credible price range, popularity evidence where available, and product diversity. Do not invent sales rankings or commissions. Keep a separate verified catalog for each site.

@@ -1,4 +1,13 @@
 # 런던프로젝트클로드 — 상태 원장 (State Ledger)
+## 2026-11-03 ? Affiliate standard v4.0
+
+- Current article layout: three header buttons only ? Coupang Partners, Olive Young Global, Trip.com.
+- Bottom product cards: exactly 10, all Coupang Partners. No mixed-provider card allocation and no fixed category quotas.
+- Trip.com categories: Hotels, Flights, Tours/Packages. K-Trip365 tracking links are recorded in config/affiliate/trip-com-k-trip365.json.
+- Agoda is disabled and excluded. Olive Young is a header button only; its reward URL still requires a successful redirect/attribution check.
+- K-Trip365 existing-post pilot completed: 71 posts checked, 70 updated, 1 already compliant, 0 failures. GitHub Actions run 41643104260; public read-back verified.
+- Canonical policy: config/affiliate_distribution_policy.json, affiliate-engine/config/affiliate-routing.json, config/affiliate/london-shared-policy.json, and docs/LONDON_AFFILIATE_OMNICHANNEL_STANDARD_2026-11-03.md.
+
 
 **이 파일을 먼저 읽어라.** 어떤 세션이든(토큰 소진으로 끊긴 뒤 새 세션이든) 이
 문서 하나만 읽으면 지금까지 뭐가 됐고 다음에 뭘 해야 하는지 알 수 있어야 한다.
