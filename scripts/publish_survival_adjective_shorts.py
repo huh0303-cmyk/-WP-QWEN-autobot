@@ -6,12 +6,14 @@ import argparse
 import datetime as dt
 import json
 import os
+import hashlib
 import time
 from pathlib import Path
 
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
+from survival_adjective_short import LANGUAGES, channel_map
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -20,7 +22,9 @@ DEFAULT_OUTPUT = ROOT / "artifacts" / "youtube" / "language-adjectives"
 
 def env_for(code: str, name: str) -> str:
     suffix = f"LANGUAGE_{code.upper()}"
-    value = os.environ.get(f"YOUTUBE_OAUTH_{name}_{suffix}") or os.environ.get(f"YOUTUBE_OAUTH_{name}")
+    # Language-specific credentials only. A generic OAuth fallback can silently
+    # authenticate a different language channel, so it is intentionally forbidden.
+    value = os.environ.get(f"YOUTUBE_OAUTH_{name}_{suffix}")
     if not value:
         raise RuntimeError(f"Missing YOUTUBE_OAUTH_{name}_{suffix}")
     return value
@@ -197,10 +201,60 @@ def assert_no_recent_duplicate(service, manifest: dict, channel_id: str) -> None
             + json.dumps(duplicates[:10], ensure_ascii=False)
         )
 
+def validate_language_asset(manifest_path: Path, manifest: dict) -> tuple[str, str, Path]:
+    """Bind language, canonical channel, voice, asset path and bytes before upload."""
+    registry = channel_map()
+    code = str(manifest.get("language_code", "")).strip()
+    if code not in LANGUAGES or code not in registry:
+        raise RuntimeError(f"Unsupported or unregistered language code: {code!r}")
+    profile = LANGUAGES[code]
+    canonical = registry[code]
+    manifest_path = manifest_path.resolve()
+    if manifest_path.parent.name != code:
+        raise RuntimeError(
+            f"Language folder mismatch: manifest is under {manifest_path.parent.name!r}, expected {code!r}"
+        )
+    if manifest.get("channel_id") != canonical["channel_id"]:
+        raise RuntimeError(
+            f"Manifest channel mismatch for {code}: expected {canonical['channel_id']}, "
+            f"got {manifest.get('channel_id')!r}"
+        )
+    if manifest.get("language_label") != profile.label:
+        raise RuntimeError(f"Language label mismatch for {code}")
+    if manifest.get("voice") != profile.voice or manifest.get("voice_locale") != profile.locale:
+        raise RuntimeError(
+            f"Voice/locale mismatch for {code}: expected {profile.voice}/{profile.locale}"
+        )
+    if not str(manifest.get("content_key", "")).startswith(f"{code}:"):
+        raise RuntimeError(f"Content key does not match language {code}")
+    tags = [str(tag).casefold() for tag in manifest.get("tags", [])]
+    if not any(tag.startswith(f"content-{code}-") for tag in tags):
+        raise RuntimeError(f"Language-specific content tag missing for {code}")
+    video_path = Path(manifest.get("video_path", "")).resolve()
+    try:
+        video_path.relative_to(manifest_path.parent)
+    except ValueError:
+        raise RuntimeError("Video asset must be inside its language-specific manifest folder")
+    expected_prefix = f"{manifest.get('date', '')}_{code}_"
+    if not video_path.name.startswith(expected_prefix) or video_path.suffix.lower() != ".mp4":
+        raise RuntimeError(
+            f"Video filename does not match language/date: expected prefix {expected_prefix!r}, "
+            f"got {video_path.name!r}"
+        )
+    if not video_path.is_file():
+        raise FileNotFoundError(video_path)
+    expected_hash = str(manifest.get("video_sha256", "")).strip().lower()
+    if len(expected_hash) != 64:
+        raise RuntimeError("Manifest has no valid video SHA-256; regenerate this language asset")
+    actual_hash = hashlib.sha256(video_path.read_bytes()).hexdigest()
+    if actual_hash != expected_hash:
+        raise RuntimeError("Video bytes changed after language-specific rendering; upload blocked")
+    return code, canonical["channel_id"], video_path
+
+
 def publish_one(manifest_path: Path, privacy: str, publish_at: str | None = None) -> dict:
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    code = manifest["language_code"]
-    expected_channel = manifest["channel_id"]
+    code, expected_channel, video_path = validate_language_asset(manifest_path, manifest)
     receipt_path = manifest_path.with_name("publication_receipt.json")
     service = youtube_service(code)
     mine = authenticated_channel_id(service)
@@ -212,9 +266,6 @@ def publish_one(manifest_path: Path, privacy: str, publish_at: str | None = None
         return receipt
     # Fail closed if duplicate content is detected on this channel.
     assert_no_recent_duplicate(service, manifest, expected_channel)
-    video_path = Path(manifest["video_path"])
-    if not video_path.exists():
-        raise FileNotFoundError(video_path)
     status = {"privacyStatus": privacy, "selfDeclaredMadeForKids": False}
     if publish_at:
         if privacy != "private":

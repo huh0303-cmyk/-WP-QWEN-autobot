@@ -398,6 +398,7 @@ async def build_language(target_date: dt.date, pair: dict, code: str, channel: d
         "channel_id": channel["channel_id"],
         "series_name": channel["series_name"],
         "video_path": str(output.resolve()),
+        "video_sha256": hashlib.sha256(output.read_bytes()).hexdigest(),
         "duration_seconds": round(duration, 3),
         "duration_policy": "date-language-pair-seeded randomized slide timing; 1.8-4.0s per word repetition, randomized intro/outro",
         "title": title,

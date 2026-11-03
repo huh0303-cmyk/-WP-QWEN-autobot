@@ -32,6 +32,14 @@
 - Run read-only OAuth preflight for every channel; then test-render one private canary per channel family and inspect its artifact.
 - Enable recurring schedules only after the channel-specific canary passes. Public release remains an explicit approval step.
 
+## Multilingual Survival language isolation (2026-11-03)
+- Use config/survival_language_channels.json as the canonical language-to-channel registry.
+- The retired multilang_quiz/scripts/upload_youtube.py two-token uploader must not be used.
+- Each Survival upload requires a language-specific OAuth refresh token; generic OAuth fallback is forbidden.
+- Before upload, verify manifest language code, canonical channel ID, language label, native voice and locale, language-specific content key/tag, asset directory and filename, and SHA-256 of the rendered MP4.
+- Any mismatch blocks upload. Regenerate the asset; never relabel a foreign-language video or continue on a warning.
+- A private upload is still subject to the same language gate. Human review must confirm the actual rendered audio and on-screen text before public release.
+
 ## Safety invariants
 - No API keys, client secrets, refresh tokens, or private credential files in repository code or logs.
 - No public upload during setup or validation.

@@ -132,6 +132,12 @@ def upload_one(access_token, path, title, desc):
     return r2.json().get("id")
 
 def main():
+    raise RuntimeError(
+        "This legacy multilingual uploader is retired: its two-token routing model "
+        "does not match the locked 10-language channel registry. Use "
+        "scripts/publish_survival_adjective_shorts.py, which verifies language, "
+        "asset hash, voice locale and exact channel ID before upload."
+    )
     videos = list_videos(SOCIAL_LANGS)
     if not videos:
         print("업로드할 영상이 없습니다 (outputs/quiz_*_beginner.mp4)")
