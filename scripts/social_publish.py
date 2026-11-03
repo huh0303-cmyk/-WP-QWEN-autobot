@@ -108,23 +108,61 @@ def recommended_publish_times(meta):
 # ════════════════════════════════════════════════════════════
 # YouTube Shorts
 # ════════════════════════════════════════════════════════════
+def language_channel_identity(meta):
+    """Resolve language-tagged content to its exact registered YouTube channel."""
+    lang = str(meta.get("lang", "")).strip().lower()
+    if not lang:
+        return None
+    from pathlib import Path
+    root = Path(__file__).resolve().parents[1]
+    registry = json.loads((root / "config" / "survival_language_channels.json").read_text(encoding="utf-8"))
+    matches = [row for row in registry.get("languages", []) if row.get("language_code") == lang]
+    if len(matches) != 1 or not matches[0].get("upload_enabled", True):
+        raise RuntimeError(f"No unique enabled channel for language={lang!r}")
+    channel_id = matches[0].get("channel_id", "")
+    if not channel_id.startswith("UC") or len(channel_id) != 24:
+        raise RuntimeError(f"Invalid registered channel ID for language={lang}")
+    requested = os.environ.get("TARGET_LANG", "").strip().lower()
+    if requested and requested != lang:
+        raise RuntimeError(f"Content language mismatch: metadata={lang}, TARGET_LANG={requested}")
+    secret_name = f"YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_{lang.upper()}"
+    refresh = os.environ.get(secret_name, "").strip()
+    if not refresh:
+        raise RuntimeError(f"Missing {secret_name}; generic OAuth fallback is forbidden")
+    return lang, channel_id, refresh
+
+
 def publish_youtube(video_path, meta):
-    if not all([YOUTUBE_OAUTH_CLIENT_ID, YOUTUBE_OAUTH_CLIENT_SECRET, YOUTUBE_OAUTH_REFRESH_TOKEN]):
-        return {"ok": False, "skipped": True, "reason": "YOUTUBE_OAUTH_* 시크릿 없음"}
+    identity = language_channel_identity(meta)
+    if identity:
+        lang, expected_channel, refresh_token = identity
+        if not all([YOUTUBE_OAUTH_CLIENT_ID, YOUTUBE_OAUTH_CLIENT_SECRET]):
+            return {"ok": False, "skipped": True, "reason": "YouTube OAuth client credentials missing"}
+    else:
+        if not all([YOUTUBE_OAUTH_CLIENT_ID, YOUTUBE_OAUTH_CLIENT_SECRET, YOUTUBE_OAUTH_REFRESH_TOKEN]):
+            return {"ok": False, "skipped": True, "reason": "YOUTUBE_OAUTH_* 시크릿 없음"}
+        refresh_token = YOUTUBE_OAUTH_REFRESH_TOKEN
+        expected_channel = None
 
     from google.oauth2.credentials import Credentials
+
     from googleapiclient.discovery import build
     from googleapiclient.http import MediaFileUpload
 
     creds = Credentials(
         token=None,
-        refresh_token=YOUTUBE_OAUTH_REFRESH_TOKEN,
+        refresh_token=refresh_token,
         token_uri="https://oauth2.googleapis.com/token",
         client_id=YOUTUBE_OAUTH_CLIENT_ID,
         client_secret=YOUTUBE_OAUTH_CLIENT_SECRET,
         scopes=["https://www.googleapis.com/auth/youtube.upload"],
     )
     service = build("youtube", "v3", credentials=creds)
+    if expected_channel:
+        mine = service.channels().list(part="id", mine=True).execute().get("items", [])
+        actual = [row.get("id", "") for row in mine]
+        if len(actual) != 1 or actual[0] != expected_channel:
+            raise RuntimeError(f"Language/channel mismatch blocked: lang={lang}, expected={expected_channel}, actual={actual}")
 
     title = meta.get("youtube_title", "TOPIK Word Quiz")[:100]
     description = (meta.get("youtube_description", "") + "\n\n#Shorts").strip()
@@ -150,8 +188,18 @@ def publish_youtube(video_path, meta):
             time.sleep(min(2 ** retries, 8))
 
     video_id = response["id"]
+    if expected_channel:
+        rows = service.videos().list(part="snippet,status", id=video_id).execute().get("items", [])
+        if len(rows) != 1:
+            raise RuntimeError(f"Uploaded video {video_id} could not be verified; automatic retry is forbidden")
+        video = rows[0]
+        actual_channel = video.get("snippet", {}).get("channelId")
+        actual_privacy = video.get("status", {}).get("privacyStatus")
+        if actual_channel != expected_channel or actual_privacy != "private":
+            raise RuntimeError(f"Post-upload verification failed: expected {expected_channel}/private, got {actual_channel}/{actual_privacy}")
     return {"ok": True, "note": "비공개 업로드 완료 — 스튜디오에서 검수 후 직접 공개 필요",
-            "url": f"https://studio.youtube.com/video/{video_id}/edit"}
+            "url": f"https://studio.youtube.com/video/{video_id}/edit",
+            "channel_id": expected_channel, "language": meta.get("lang")}
 
 
 # ════════════════════════════════════════════════════════════
@@ -317,6 +365,12 @@ def main():
             log(f"❌ 알 수 없는 플랫폼: {only_platform} (선택지: {', '.join(PLATFORMS)})")
             raise SystemExit(1)
         platforms = {only_platform: PLATFORMS[only_platform]}
+
+    if "youtube" in platforms:
+        if os.environ.get("TARGET_LANG") and not meta.get("lang"):
+            raise RuntimeError("TARGET_LANG is set but language metadata is missing; YouTube upload blocked")
+        if meta.get("lang"):
+            language_channel_identity(meta)  # exact language/channel preflight
 
     log(f"게시 시작 — {label}, 영상: {video_path}, 대상: {', '.join(platforms)}")
     results = {}

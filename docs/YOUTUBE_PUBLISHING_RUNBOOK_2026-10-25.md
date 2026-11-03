@@ -40,6 +40,8 @@
 - Any mismatch blocks upload. Regenerate the asset; never relabel a foreign-language video or continue on a warning.
 - A private upload is still subject to the same language gate. Human review must confirm the actual rendered audio and on-screen text before public release.
 
+- TOPIK localized quiz uploads in `scripts/social_publish.py` must resolve `meta.lang` through `config/survival_language_channels.json` and use `YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_<CODE>`; generic OAuth fallback is forbidden. Verify `channels.list(mine=true)` before upload and verify the resulting video channel ID and private status after upload.
+
 ## Safety invariants
 - No API keys, client secrets, refresh tokens, or private credential files in repository code or logs.
 - No public upload during setup or validation.
