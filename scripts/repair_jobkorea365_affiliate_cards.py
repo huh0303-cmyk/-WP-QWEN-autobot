@@ -62,7 +62,21 @@ for row in rows:
 
     marker = f"<!-- JOBKOREA365_AFFILIATE_REPAIRED:{post_id} -->"
     if marker in raw:
-        report.append({"post_id": post_id, "status": "ALREADY_REPAIRED"})
+        existing_section = raw.split(marker, 1)[1]
+        existing_hrefs = re.findall(r'<a[^>]+href="(https://link\.coupang\.com/[^"]+)"', existing_section)
+        existing_imgs = re.findall(r'<img[^>]+src="([^"]+)"', existing_section)
+        existing_checks = {
+            "eight_cards": existing_section.count('class="jk365-product-card"') == 8,
+            "eight_images": len(existing_imgs) == 8,
+            "all_images_absolute": all(x.startswith("https://") for x in existing_imgs),
+            "eight_distinct_affiliate_links": len(set(existing_hrefs)) == 8,
+            "single_disclosure": raw.count(DISC) == 1,
+            "no_mojibake_question_marks": "????" not in existing_section
+        }
+        existing_ok = all(existing_checks.values())
+        report.append({"post_id": post_id, "checks": existing_checks, "status": "ALREADY_REPAIRED" if existing_ok else "VERIFY_FAILED"})
+        if not existing_ok:
+            break
         continue
     if DISC not in raw:
         raise SystemExit(f"Post {post_id}: affiliate disclosure anchor missing; refusing to truncate content")
@@ -99,8 +113,9 @@ for row in rows:
     v.raise_for_status()
     check = v.json()
     body = check.get("content", {}).get("raw") or ""
-    hrefs = re.findall(r'<a[^>]+href="(https://link\.coupang\.com/[^"]+)"', body)
-    imgs = re.findall(r'<img[^>]+src="([^"]+)"', body)
+    repaired_section = body.split(marker, 1)[1] if marker in body else ""
+    hrefs = re.findall(r'<a[^>]+href="(https://link\.coupang\.com/[^"]+)"', repaired_section)
+    imgs = re.findall(r'<img[^>]+src="([^"]+)"', repaired_section)
     checks = {
         "single_marker": body.count(marker) == 1,
         "eight_cards": body.count('class="jk365-product-card"') == 8,
