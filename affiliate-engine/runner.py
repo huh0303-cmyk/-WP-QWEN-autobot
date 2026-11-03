@@ -39,7 +39,8 @@ def load_destinations(platform:str)->list[dict[str,str]]:
         if platform=="wordpress" and target.get("content_type") in {"news_ko","news_en"}:
             continue
         seen.add(key)
-        out.append({"site_key":site_key,"url":str(target.get("url","")),"secret_name":str(target.get("secret_name","")),"destination_id":str(target.get("destination_id",""))})
+        catalog_key=("wp_" if platform=="wordpress" else "blogger_")+site_key
+        out.append({"site_key":catalog_key,"url":str(target.get("url","")),"secret_name":str(target.get("secret_name","")),"destination_id":str(target.get("destination_id",""))})
     return out
 
 def load_site_offers(site_key:str)->list[dict[str,Any]]:

@@ -1,0 +1,35 @@
+﻿name: London Project — Omnichannel Affiliate Preflight
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "40 18 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: london-omnichannel-preflight
+  cancel-in-progress: false
+
+jobs:
+  portfolio-preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate affiliate policy and destination inventories
+        run: |
+          python affiliate-engine/validate_config.py
+          python scripts/london_omnichannel_preflight.py
+      - name: Upload preflight report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: london-omnichannel-preflight-${{ github.run_id }}
+          path: reports/london-omnichannel-preflight.json
+          if-no-files-found: error
+          retention-days: 30
