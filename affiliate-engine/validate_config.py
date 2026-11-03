@@ -15,5 +15,5 @@ assert routing['new_content_automation']['scheduled_mode']=='dry_run'
 print('AFFILIATE_CONFIG_VALID=PASS')
 print('PROVIDER_ALLOCATION=4+2+2+2')
 print('PER_DESTINATION_CATALOG=REQUIRED')
-print('PROTECTED_WORDPRESS_SITES=EXCLUDED')
+print('ALL_REGISTERED_WORDPRESS_BLOGS=IN_SCOPE')
 print('LIVE_PUBLISH=NOT_ENABLED')
