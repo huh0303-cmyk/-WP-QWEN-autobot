@@ -1,81 +1,186 @@
 {
   "engine": "London Project Affiliate Engine",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "mode": "safe",
   "default_locale": "ko-KR",
   "required_slots": [
-    {"slot":"topic_1","count":1,"category":"topic_related","required":true},
-    {"slot":"topic_2","count":1,"category":"topic_related","required":true},
-    {"slot":"beauty_1","count":1,"category":"k_beauty","required":true},
-    {"slot":"beauty_2","count":1,"category":"k_beauty","required":true},
-    {"slot":"health_1","count":1,"category":"k_health","required":true},
-    {"slot":"health_2","count":1,"category":"k_health","required":true},
-    {"slot":"living_essential","count":1,"category":"korea_living_essential","required":true},
-    {"slot":"travel_activity","count":1,"category":"travel_package_tour_activity","required":true},
-    {"slot":"kpop","count":1,"category":"kpop_album_official_merch","required":true},
-    {"slot":"esim","count":1,"category":"data_esim_sim","required":true}
+    {
+      "slot": "coupang_topic_1",
+      "count": 1,
+      "category": "article_topic_related",
+      "required": true,
+      "provider": "coupang_partners"
+    },
+    {
+      "slot": "coupang_topic_2",
+      "count": 1,
+      "category": "article_topic_related",
+      "required": true,
+      "provider": "coupang_partners"
+    },
+    {
+      "slot": "coupang_health_or_lifestyle",
+      "count": 1,
+      "category": "site_audience_relevant",
+      "required": true,
+      "provider": "coupang_partners"
+    },
+    {
+      "slot": "coupang_daily_essential",
+      "count": 1,
+      "category": "Korea_daily_essential",
+      "required": true,
+      "provider": "coupang_partners"
+    },
+    {
+      "slot": "olive_young_1",
+      "count": 1,
+      "category": "beauty_or_personal_care_relevant",
+      "required": true,
+      "provider": "olive_young_global"
+    },
+    {
+      "slot": "olive_young_2",
+      "count": 1,
+      "category": "beauty_or_personal_care_relevant",
+      "required": true,
+      "provider": "olive_young_global"
+    },
+    {
+      "slot": "trip_com_1",
+      "count": 1,
+      "category": "travel_hotel_transport_activity_or_esim",
+      "required": true,
+      "provider": "trip_com"
+    },
+    {
+      "slot": "trip_com_2",
+      "count": 1,
+      "category": "travel_hotel_transport_activity_or_esim",
+      "required": true,
+      "provider": "trip_com"
+    },
+    {
+      "slot": "agoda_1",
+      "count": 1,
+      "category": "accommodation_or_hotel",
+      "required": true,
+      "provider": "agoda"
+    },
+    {
+      "slot": "agoda_2",
+      "count": 1,
+      "category": "accommodation_or_hotel",
+      "required": true,
+      "provider": "agoda"
+    }
   ],
   "affiliate_programs": {
-    "coupang_partners":{"enabled":true,"priority":"primary","tracking_url_required":true,"image_policy":"merchant_or_affiliate_permitted_image","product_types":["topic_related","k_beauty","k_health","korea_living_essential","kpop_album_official_merch"]},
-    "coupang_travel":{"enabled":true,"priority":"primary_travel","tracking_url_required":true,"product_types":["hotel_if_eligible","flight_if_eligible","tour_ticket","activity","travel_essential"]},
-    "trip_com":{"enabled":true,"priority":"primary_travel","tracking_url_required":true,"product_types":["flight","cruise_if_eligible","hotel","train","tour_ticket","rental_car","airport_transfer","package","esim"]},
-    "agoda":{"enabled":true,"priority":"hotel_fallback_or_comparison","tracking_url_required":true,"domain_verification_required":true,"product_types":["hotel","accommodation"]},
-    "olive_young_global":{"enabled":true,"priority":"primary_k_beauty","tracking_url_required":true,"reward_code":"HUH556423","product_types":["k_beauty"]},
-    "naver_travel_connect":{"enabled":true,"priority":"conditional","tracking_url_required":true,"approval_required":true}
-  },
-  "selection_policy": {
-    "objective":"maximize_confirmed_commission_per_qualified_visitor",
-    "ranking_factors":["topic_relevance","purchase_intent","effective_commission_rate","average_order_value","conversion_evidence","cookie_window","availability","refund_cancellation_risk"],
-    "never_rank_by_commission_rate_alone":true,
-    "no_invented_tracking_urls":true,
-    "no_unverified_commission_claims":true,
-    "no_unlicensed_images":true,
-    "disclosure_required":true,
-    "rotating_slots":["living_essential","travel_activity","kpop","esim"],
-    "provider_priority":{
-      "topic_1":["coupang_partners","coupang_travel","trip_com"],
-      "topic_2":["coupang_partners","coupang_travel","trip_com","agoda"],
-      "beauty_1":["olive_young_global","coupang_partners"],
-      "beauty_2":["olive_young_global","coupang_partners"],
-      "health_1":["coupang_partners"],
-      "health_2":["coupang_partners"],
-      "living_essential":["coupang_partners"],
-      "travel_activity":["coupang_travel","trip_com","agoda"],
-      "kpop":["coupang_partners"],
-      "esim":["trip_com","coupang_travel"]
+    "coupang_partners": {
+      "enabled": true,
+      "priority": "fixed_4",
+      "tracking_url_required": true,
+      "product_types": [
+        "article_topic_related",
+        "site_audience_relevant",
+        "Korea_daily_essential"
+      ]
+    },
+    "olive_young_global": {
+      "enabled": true,
+      "priority": "fixed_2",
+      "tracking_url_required": true,
+      "product_types": [
+        "beauty_or_personal_care_relevant"
+      ],
+      "reward_code": "HUH556423"
+    },
+    "trip_com": {
+      "enabled": true,
+      "priority": "fixed_2",
+      "tracking_url_required": true,
+      "product_types": [
+        "travel_hotel_transport_activity_esim"
+      ]
+    },
+    "agoda": {
+      "enabled": true,
+      "priority": "fixed_2",
+      "tracking_url_required": true,
+      "product_types": [
+        "accommodation_or_hotel"
+      ]
     }
   },
+  "selection_policy": {
+    "objective": "maximize_confirmed_commission_per_qualified_visitor",
+    "require_exact_provider_per_slot": true,
+    "never_rank_by_commission_rate_alone": true,
+    "no_invented_tracking_urls": true,
+    "no_unverified_commission_claims": true,
+    "no_unlicensed_images": true,
+    "disclosure_required": true
+  },
   "publishing_policy": {
-    "wordpress":{"enabled":true,"preserve_existing_body":true,"preserve_existing_affiliate_links":true,"idempotency_key":"post_id+affiliate_engine_version","append_only":true},
-    "blogger":{"enabled":true,"preserve_existing_body":true,"preserve_existing_affiliate_links":true,"idempotency_key":"blog_id+post_id+affiliate_engine_version","append_only":true,"rewrite_independently":true},
-    "youtube":{"enabled":true,"destinations":["description","pinned_comment"],"platform_policy_check":true},
-    "tiktok":{"enabled":true,"destinations":["profile_link","supported_product_link"],"account_feature_check":true}
+    "wordpress": {
+      "enabled": true,
+      "preserve_existing_body": true,
+      "preserve_existing_affiliate_links": true,
+      "idempotency_key": "post_id+affiliate_engine_v3",
+      "append_only": true
+    },
+    "blogger": {
+      "enabled": true,
+      "preserve_existing_body": true,
+      "preserve_existing_affiliate_links": true,
+      "idempotency_key": "blog_id+post_id+affiliate_engine_v3",
+      "append_only": true,
+      "rewrite_independently": true
+    },
+    "youtube": {
+      "enabled": true,
+      "destinations": [
+        "description",
+        "pinned_comment"
+      ],
+      "platform_policy_check": true
+    },
+    "tiktok": {
+      "enabled": true,
+      "destinations": [
+        "profile_link",
+        "supported_product_link"
+      ],
+      "account_feature_check": true
+    }
   },
   "safety_gates": {
-    "require_real_tracking_url":true,
-    "require_image_source":true,
-    "require_exactly_10_slots_before_publish":true,
-    "dry_run_default":true,
-    "bulk_write_requires_explicit_enable_flag":true,
-    "never_delete_posts":true,
-    "never_remove_existing_links":true
+    "require_real_tracking_url": true,
+    "require_image_source": true,
+    "require_exactly_10_slots_before_publish": true,
+    "dry_run_default": true,
+    "bulk_write_requires_explicit_enable_flag": true,
+    "never_delete_posts": true,
+    "never_remove_existing_links": true,
+    "require_exact_provider_allocation": true,
+    "require_per_destination_catalog": true
   },
   "new_content_automation": {
-    "enabled":true,
-    "wordpress_and_blogger_only":true,
-    "lookback_hours":36,
-    "backfill_batch_size_per_site":5,
-    "backfill_requires_manual_workflow_dispatch":true,
-    "scheduled_mode":"dry_run",
-    "manual_write_requires":"AFFILIATE_WRITE_ENABLED=true",
-    "social_platforms":"blocked_until_registered_credentials_and_supported_api_scopes"
+    "enabled": true,
+    "wordpress_and_blogger_only": true,
+    "lookback_hours": 36,
+    "backfill_batch_size_per_site": 5,
+    "backfill_requires_manual_workflow_dispatch": true,
+    "scheduled_mode": "dry_run",
+    "manual_write_requires": "AFFILIATE_WRITE_ENABLED=true",
+    "social_platforms": "separate_verified_adapters_required"
   },
   "rollout": {
-    "pilot_site":"https://k-trip365.com",
-    "pilot_published_posts_expected":71,
-    "pilot_batch_size":5,
-    "expand_after_verified_pilot":true,
-    "wordpress_network":"inventory_required",
-    "blogger_network":"blog_id_and_oauth_inventory_required"
+    "pilot_site": "https://k-trip365.com",
+    "pilot_published_posts_expected": 71,
+    "pilot_batch_size": 5,
+    "expand_after_verified_pilot": true,
+    "wordpress_network": "inventory_required",
+    "blogger_network": "blog_id_and_oauth_inventory_required"
   }
 }
