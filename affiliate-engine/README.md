@@ -51,3 +51,20 @@ the `AFFILIATE_WRITE_ENABLED=true` GitHub secret.
 
 Add approved tracking URLs to `data/catalogs/{site_key}.json`; do not commit API keys,
 passwords, tokens, or unverified URLs.
+
+
+## YouTube and social 10-link workflow
+
+The canonical workflow is `.github/workflows/london-social-affiliate-10-links.yml`.
+It covers all 23 current YouTube master channels and every TikTok, Facebook,
+Instagram and Threads account row in `config/sns_six_channel_policy.json`.
+It creates one independently retryable job per destination and validates the
+exact 4+2+2+2 allocation (10 total) against a destination-specific catalog.
+See `docs/LONDON_SOCIAL_YOUTUBE_10_LINK_WORKFLOW_2026-11-03.md`.
+
+The queue builder is intentionally non-publishing. New-content publishers can
+send the `london_content_published` repository_dispatch event; existing-content
+backfills can be started manually. The workflow stores a queue artifact and
+explicit blockers. Platform OAuth write adapters and receipt-backed live
+publishing remain disabled until each account is authorized and the adapter
+is implemented.
