@@ -1,6 +1,6 @@
 # London Project Affiliate Engine
 
-Shared monetization engine for WordPress, Blogger/Blogspot, YouTube and TikTok.
+Shared monetization engine for every enabled destination in the control.korea365.org registry, excluding only Naver Blog and Tistory; includes WordPress, Blogger/Blogspot and supported social/video destinations.
 
 ## Business rule
 Every eligible article gets exactly 10 affiliate placements:
@@ -39,7 +39,7 @@ This commit establishes the shared policy/configuration and a manual validation 
 4. Dry-run K-Trip365's published posts in batches of five.
 5. Review generated cards and link checks.
 6. Enable writes only after pilot verification.
-7. Expand to the full WordPress and Blogspot inventories.
+7. Expand to every enabled WordPress and Blogger destination in the control-center registry.
 
 ## New-content runner
 
