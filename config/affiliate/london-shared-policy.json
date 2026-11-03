@@ -1,25 +1,47 @@
 {
-  "version": 1,
-  "name": "London Project shared Coupang Partners policy",
-  "platforms": ["wordpress", "blogger"],
-  "target_cards_per_post": 10,
-  "category_guideline": [
-    {"key": "article_relevance", "soft_target": 2, "priority": 1},
-    {"key": "korea_lifestyle_hot_items", "soft_target": 2, "priority": 2},
-    {"key": "k_beauty_olive_young", "soft_target": 2, "priority": 3},
-    {"key": "k_health_supplements", "soft_target": 2, "priority": 4},
-    {"key": "korea_digital_esim_sim", "soft_target": 2, "priority": 5}
+  "version": 2,
+  "name": "London Project shared affiliate layout standard v3",
+  "platforms": [
+    "wordpress",
+    "blogger"
   ],
+  "header_buttons": [
+    "coupang_partners",
+    "olive_young_global",
+    "trip_com"
+  ],
+  "product_cards": {
+    "count": 10,
+    "provider": "coupang_partners",
+    "provider_count": {
+      "coupang_partners": 10
+    }
+  },
+  "trip_com_categories": [
+    "hotels",
+    "flights",
+    "tours_and_packages"
+  ],
+  "disabled_providers": [
+    "agoda"
+  ],
+  "ktrip365_category_mix": {
+    "beauty": 2,
+    "electronics": 2,
+    "health_functional_foods": 2,
+    "korea_travel_packages": 2,
+    "korea_hotels": 2
+  },
   "selection_principles": [
-    "The category counts are flexible guidance, not hard quotas; the total of ten unique product cards is mandatory.",
-    "The first two selections should be the most naturally relevant to the article title and subject.",
-    "Prefer verified account-generated affiliate links and official product image creatives.",
-    "Favor familiar, broadly useful, easy-to-understand, lower-friction products; use observed sales/popularity data only when actually available.",
-    "Do not claim a sales ranking when only search-result ordering or a product pool is available.",
-    "Fill missing category slots with the strongest available verified products; never invent links, images, prices, sales figures, or products.",
-    "Do not repeat the same product URL in one post.",
-    "Exactly ten unique verified products with usable official images are mandatory for every new post. If a site catalog has fewer than ten, block that post from publication and report the missing catalog coverage; never publish a partial block or fabricate cards.",
-    "Keep affiliate disclosure visible and links marked sponsored nofollow noopener."
+    "Every article has exactly three verified provider buttons: Coupang Partners, Olive Young Global, Trip.com.",
+    "The ten product cards below the buttons are exclusively account-generated Coupang Partners offers.",
+    "Trip.com hotel, flight, and tours/packages links are separate tracked category links; copy account-generated URLs unchanged.",
+    "K-Trip365 requires two Coupang offers in each of five categories: beauty, electronics, health functional foods, Korea travel packages, Korea hotels.",
+    "Other sites use their own site-specific, topic-relevant pool of ten Coupang products.",
+    "Prioritize attractive but credible price points, sales/ranking signals and review evidence only when actually available.",
+    "Never invent products, images, tracking URLs, prices, or sales claims. Missing verified inventory blocks publication.",
+    "Preserve article body, publication status/date, featured image and SEO metadata; replace only the marked affiliate block.",
+    "Affiliate disclosure must be visible and all tracked links use sponsored nofollow noopener."
   ],
   "display": {
     "position": "end_of_article",
@@ -38,12 +60,11 @@
     "preserve_featured_image": true,
     "preserve_seo_metadata": true,
     "idempotent_marker": "LONDON-COUPANG-PARTNERS-START/END",
-    "newsroom_excluded_by_default": false,
-    "never_auto_modify_existing_published_posts_during_new_post_integration": true
-  },
-  "product_sources": [
-    "data/affiliate/oliveyoung-kskin365-verified-product-pool.json",
-    "config/affiliate/k-health365-sitewide-10.json",
-    "config/affiliate/k-health365-products.json"
-  ]
+    "require_verified_site_header_links": true,
+    "require_exactly_ten_coupang_cards": true,
+    "agoda_enabled": false,
+    "never_auto_modify_existing_published_posts_during_new_post_integration": true,
+    "require_trip_com_three_tracked_categories": true,
+    "olive_young_reward_url_verification_pending": true
+  }
 }

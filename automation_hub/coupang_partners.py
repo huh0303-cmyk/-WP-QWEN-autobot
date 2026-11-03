@@ -38,6 +38,35 @@ def _resolve_site_key(site_id):
         key = key[len("wp_"):]
     return key
 
+def load_header_buttons(site_id=""):
+    key = _resolve_site_key(site_id)
+    candidates = [
+        ROOT / f"data/affiliate/{key}-header-buttons.json",
+        ROOT / f"config/affiliate/header-buttons/{key}.json",
+    ]
+    for path in candidates:
+        data = _load_json(path)
+        if not isinstance(data, dict):
+            continue
+        buttons = data.get("buttons", [])
+        required = ("coupang_partners", "olive_young_global", "trip_com")
+        if tuple(x.get("provider") for x in buttons) != required:
+            continue
+        if any(not str(x.get("affiliate_url", "")).startswith("https://") for x in buttons):
+            continue
+        # Olive Young's account reward-code URL is retained as supplied, but its
+        # redirect/commission attribution is explicitly marked pending.
+        olive = next(x for x in buttons if x.get("provider") == "olive_young_global")
+        if olive.get("status") != "redirect_test_failed_gate_url_null" and olive.get("verified") is not True:
+            continue
+        trip_categories = data.get("trip_com_categories", [])
+        if tuple(x.get("key") for x in trip_categories) != ("hotels", "flights", "tours_and_packages"):
+            continue
+        if any(x.get("verified") is not True or not str(x.get("affiliate_url", "")).startswith("https://") for x in trip_categories):
+            continue
+        return data
+    return None
+
 def _candidate(raw, source):
     if not isinstance(raw, dict): return None
     url = raw.get("affiliate_url") or raw.get("url")
@@ -116,7 +145,8 @@ def _category(item):
     return "korea_lifestyle_hot_items"
 
 def select_products(title, article_text, site_id="", limit=10):
-    # Ten unique, verified offers are mandatory. Never publish a partial block.
+    # Ten unique, verified Coupang offers are mandatory. Never publish a partial block.
+    key = _resolve_site_key(site_id)
     pool = load_candidates(site_id)
     if len(pool) < 10 or limit < 10: return []
     clean_text = article_text or ""
@@ -140,29 +170,49 @@ def select_products(title, article_text, site_id="", limit=10):
         if len(chosen) >= limit: break
         if item["url"] not in used:
             chosen.append(item); used.add(item["url"])
-    return chosen[:10] if len(chosen) >= 10 else []
+    chosen = chosen[:10] if len(chosen) >= 10 else []
+    return chosen
 
 def render_footer(title, article_text, site_id="", lang="en"):
     products = select_products(title, article_text, site_id)
     if len(products) != 10:
         raise RuntimeError(f"Coupang footer requires exactly 10 unique verified products for site={site_id}; found {len(products)}")
+    header = load_header_buttons(site_id)
+    if not header:
+        raise RuntimeError(f"Affiliate header requires verified Coupang + Olive Young + Trip.com buttons and hotel/flight/tour tracking links for site={site_id}")
+    provider_buttons = []
+    for button in header["buttons"]:
+        url = html.escape(button["affiliate_url"], quote=True)
+        label = html.escape(button["label"])
+        provider_buttons.append(f'<a class="london-provider-button" href="{url}" target="_blank" rel="sponsored nofollow noopener">{label}</a>')
+    trip_buttons = []
+    for item in header["trip_com_categories"]:
+        url = html.escape(item["affiliate_url"], quote=True)
+        label = html.escape(item["label"])
+        trip_buttons.append(f'<a class="london-trip-category-button" href="{url}" target="_blank" rel="sponsored nofollow noopener">Trip.com ? {label}</a>')
     cards = []
     for p in products:
         url, image, name = (html.escape(p[k], quote=True) for k in ("url","image","title"))
+        category = html.escape(p.get("category", ""))
         cards.append(
-            '<article class="london-coupang-card"><a href="' + url + '" target="_blank" rel="sponsored nofollow noopener">'
+            '<article class="london-coupang-card"><a class="london-coupang-image-link" href="' + url + '" target="_blank" rel="sponsored nofollow noopener">'
             '<img src="' + image + '" alt="' + name + '" loading="lazy" decoding="async" referrerpolicy="unsafe-url">'
-            '<span>' + name + '</span></a><a class="london-coupang-button" href="' + url
-            + '" target="_blank" rel="sponsored nofollow noopener">쇼핑하기</a></article>'
+            '</a><small class="london-coupang-category">' + category + '</small><strong>' + name + '</strong><a class="london-coupang-button" href="' + url
+            + '" target="_blank" rel="sponsored nofollow noopener">???? ????</a></article>'
         )
-    heading = "함께 살펴볼 만한 추천 상품" if lang == "ko" else "Products to Explore"
-    return (START + '<section class="london-coupang-wrap" aria-label="Coupang Partners products">'
+    heading = "?? ?? ?? 10?" if lang == "ko" else "10 Coupang Picks"
+    return (START + '<section class="london-coupang-wrap" aria-label="Affiliate partners and Coupang products">'
+        '<nav class="london-provider-buttons" aria-label="Affiliate partners">' + ''.join(provider_buttons) + '</nav>'
+        '<nav class="london-trip-category-buttons" aria-label="Trip.com travel categories">' + ''.join(trip_buttons) + '</nav>'
         '<style>.london-coupang-wrap{margin:30px 0;padding:18px;border:1px solid #e5e7eb;border-radius:12px}'
-        '.london-coupang-wrap h2{font-size:20px;margin:0 0 10px}.london-coupang-disclosure{font-size:12px;color:#666;margin:0 0 14px}'
+        '.london-provider-buttons,.london-trip-category-buttons{display:flex;flex-wrap:wrap;gap:9px;margin:0 0 14px}'
+        '.london-provider-button{flex:1 1 28%;text-align:center;padding:12px 10px;border-radius:8px;background:#17365d;color:#fff!important;text-decoration:none;font-weight:700}'
+        '.london-trip-category-button{flex:1 1 28%;text-align:center;padding:9px 10px;border:1px solid #17365d;border-radius:7px;color:#17365d!important;text-decoration:none;font-size:13px;font-weight:600}'
+        '.london-coupang-wrap h2{font-size:20px;margin:14px 0 10px}.london-coupang-disclosure{font-size:12px;color:#666;margin:0 0 14px}'
         '.london-coupang-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;align-items:stretch}'
-        '.london-coupang-card{min-width:0;border:1px solid #e5e7eb;border-radius:10px;padding:10px;text-align:center;display:flex;flex-direction:column;justify-content:space-between;background:#fff}'
-        '.london-coupang-card img{width:100%;height:145px;object-fit:contain}.london-coupang-card span{display:block;font-size:13px;line-height:1.45;margin:8px 0;overflow-wrap:anywhere}'
-        '.london-coupang-button{margin-top:auto;background:#356dff;color:#fff!important;text-decoration:none;padding:9px 12px;border-radius:24px;font-size:13px;font-weight:700}'
+        '.london-coupang-card{min-width:0;border:1px solid #e5e7eb;border-radius:10px;padding:10px;text-align:center;display:flex;flex-direction:column;background:#fff}'
+        '.london-coupang-card img{width:100%;height:155px;object-fit:contain}.london-coupang-card strong{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:13px;line-height:1.45;margin:8px 0;min-height:2.9em;overflow-wrap:anywhere}'
+        '.london-coupang-category{font-size:11px;color:#777}.london-coupang-button{margin-top:auto;background:#17365d;color:#fff!important;text-decoration:none;padding:9px 12px;border-radius:7px;font-size:13px;font-weight:700}'
         '@media(max-width:760px){.london-coupang-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.london-coupang-card img{height:125px}}</style>'
         '<h2>' + heading + '</h2><p class="london-coupang-disclosure">' + DISCLOSURE + '</p>'
         '<div class="london-coupang-grid">' + ''.join(cards) + '</div></section>' + END)

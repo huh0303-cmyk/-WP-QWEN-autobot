@@ -30,7 +30,7 @@
   "trip_com_categories": [
     {
       "key": "hotels",
-      "label": "??",
+      "label": "\\uD638\\uD154",
       "status": "redirect_validated",
       "affiliate_url": "https://www.trip.com/t/aQYZrw101X2",
       "destination_url": "https://kr.trip.com/hotels",
@@ -38,7 +38,7 @@
     },
     {
       "key": "flights",
-      "label": "???",
+      "label": "\\uD56D\\uACF5\\uAD8C",
       "status": "redirect_validated",
       "affiliate_url": "https://www.trip.com/t/f4V2USA01X2",
       "destination_url": "https://www.trip.com/flights/Seoul-to-Hanoi/tickets-SEL-HAN",
@@ -46,7 +46,7 @@
     },
     {
       "key": "tours_and_packages",
-      "label": "??????",
+      "label": "\\uD22C\\uC5B4\\u00B7\\uD328\\uD0A4\\uC9C0",
       "status": "redirect_validated",
       "affiliate_url": "https://www.trip.com/t/gLWOuLU01X2",
       "destination_url": "https://www.trip.com/things-to-do",
