@@ -27,14 +27,11 @@ def recent_since(hours:int)->str:
 
 def load_destinations(platform:str)->list[dict[str,str]]:
     registry=load_json(ROOT/"config"/"automation_hub_sites.json")["sites"]
-    protected={"wp_khealth365","wp_krealestate","wp_kworld365","wp_oliveyoung","wp_ksa"}
     out=[]
     for row in registry:
         if row.get("platform")!=platform or row.get("content_type")!="blog":
             continue
         site_id=str(row.get("site_id",""))
-        if platform=="wordpress" and site_id in protected:
-            continue
         if row.get("enabled",True) is not True:
             continue
         out.append({"site_key":site_id,"url":str(row.get("url","")),"secret_name":str(row.get("secret_name","")),"destination_id":str(row.get("blog_id") or row.get("destination_id") or "")})
@@ -161,7 +158,7 @@ def main():
             try: results.extend(wordpress(dest,since,block_for,write,args.scope,args.batch_size))
             except (requests.RequestException,ValueError,RuntimeError) as exc: results.append({"platform":"wordpress","site":dest["site_key"],"action":"blocked","reason":str(exc)[:240]})
     if args.platform in {"blogger","all"}:
-        for dest in load_destinations("blogspot"):
+        for dest in load_destinations("blogger"):
             try: results.extend(blogger(dest,since,block_for,write,args.scope,args.batch_size))
             except (requests.RequestException,ValueError,RuntimeError) as exc: results.append({"platform":"blogger","site":dest["site_key"],"action":"blocked","reason":str(exc)[:240]})
     report={"generated_at":datetime.now(UTC).isoformat(),"scope":args.scope,"since":since,"batch_size":args.batch_size,"write":write,"policy":"4+2+2+2","results":results}
