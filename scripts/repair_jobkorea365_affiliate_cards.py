@@ -39,7 +39,7 @@ for row in rows:
             raise SystemExit(f"Post {post_id}: invalid official image URL")
         if not p.get("product_title") or "?" in p["product_title"]:
             raise SystemExit(f"Post {post_id}: corrupt product title")
-        ir = s.get(p["official_image_url"], timeout=25, allow_redirects=True)
+        ir = s.head(p["official_image_url"], timeout=25, allow_redirects=True)
         if ir.status_code != 200 or not ir.headers.get("content-type", "").startswith("image/"):
             raise SystemExit(f"Post {post_id}: official image failed for {p.get('candidate_id')}")
 
