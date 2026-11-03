@@ -131,6 +131,12 @@ for post in posts:
     editorial, changed = strip_old_affiliate_blocks(raw)
     # Any remaining affiliate URL after known block removal is unexpected; do not erase editorial material.
     if "link.coupang.com/" in editorial or "coupang-partners-" in editorial:
+        idx = editorial.find("link.coupang.com/")
+        if idx >= 0:
+            print("UNRECOGNIZED_LINK_CONTEXT", pid, repr(editorial[max(0, idx-500):idx+500]))
+        idx = editorial.find("coupang-partners-")
+        if idx >= 0:
+            print("UNRECOGNIZED_CLASS_CONTEXT", pid, repr(editorial[max(0, idx-300):idx+500]))
         raise SystemExit(f"Post {pid}: unrecognized legacy affiliate markup remains; refusing unsafe overwrite")
     plans.append((post, editorial, changed))
 
