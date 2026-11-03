@@ -1,3 +1,5 @@
+> **SUPERSEDED FOR LIVE PRODUCT ALLOCATION:** The authoritative v5 rule is `docs/AFFILIATE_STANDARD_LOCK_V5_2026-11-03.md`. Use exactly 2 beauty, 1 laptop, 1 tablet, 2 health supplements, 2 Korea travel packages, and 2 hotel products per article; all ten are Coupang Partners. Build a 100-item per-site pool (20/10/10/20/20/20) and randomize per article.
+
 # K-Trip365 provider taxonomy ? current standard v4.0
 
 Top provider buttons: Coupang Partners, Olive Young Global, Trip.com.

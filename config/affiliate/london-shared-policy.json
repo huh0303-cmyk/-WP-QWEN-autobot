@@ -1,6 +1,6 @@
 {
-  "version": 3,
-  "name": "London Project affiliate layout standard v4",
+  "version": 5,
+  "name": "London Project affiliate layout standard v5 - fixed 6-category randomized Coupang mix",
   "platforms": [
     "wordpress",
     "blogger"
@@ -15,25 +15,44 @@
     "provider": "coupang_partners",
     "provider_count": {
       "coupang_partners": 10
-    }
+    },
+    "per_article_category_count": {
+      "beauty_cosmetics": 2,
+      "laptop": 1,
+      "tablet": 1,
+      "health_supplements": 2,
+      "korea_travel_packages": 2,
+      "hotel_products": 2
+    },
+    "pool_target_per_site": 100,
+    "pool_category_count": {
+      "beauty_cosmetics": 20,
+      "laptop": 10,
+      "tablet": 10,
+      "health_supplements": 20,
+      "korea_travel_packages": 20,
+      "hotel_products": 20
+    },
+    "randomize_per_article": true,
+    "avoid_repeating_same_ten_item_set": true
   },
-  "trip_com_categories": [
-    "hotels",
-    "flights",
-    "tours_and_packages"
-  ],
+  "trip_com_categories": [],
   "disabled_providers": [
     "agoda"
   ],
   "selection_principles": [
-    "Every post has three header provider buttons: Coupang Partners, Olive Young, Trip.com.",
-    "All 10 product cards are Coupang Partners products only.",
-    "Choose products for article relevance, attractive and credible price points, purchase intent and popularity evidence where available.",
-    "Do not impose a fixed category quota; use a site-specific product pool and vary products when suitable verified offers exist.",
-    "Trip.com uses three account-generated tracked category links: hotels, flights, tours/packages.",
-    "Olive Young is a header button only; its account reward URL must be verified before claiming commission attribution.",
-    "Never invent products, images, tracking URLs, prices, sales figures or commission rates.",
-    "Preserve article body, publication status/date, featured image and SEO metadata; replace only the marked affiliate block."
+    "This v5 policy supersedes every older affiliate category-mix instruction in the repository.",
+    "Each article has exactly three branded header buttons in one horizontal row: Coupang Partners (orange), OLIVE YOUNG (green), Trip.com (blue), in that order.",
+    "The header must use branded/logo-style tiles and each button must use a real verified tracking URL authorized for that destination.",
+    "Do not render the old large navy generic buttons or raw Unicode-escaped Trip.com category link rows.",
+    "All ten bottom product cards are Coupang Partners products only.",
+    "Every article must contain exactly: 2 beauty/cosmetics, 1 laptop, 1 tablet, 2 health supplements, 2 Korea travel packages, and 2 hotel products.",
+    "Build a site-specific pool of approximately 100 verified Coupang offers: 20 beauty, 10 laptops, 10 tablets, 20 health supplements, 20 Korea travel packages, 20 hotel products.",
+    "Randomly select products independently per article while preserving the exact category counts; avoid repeating the same ten-product set across articles.",
+    "Use genuine account-generated Coupang tracking links and verified official product images. Never invent products, links, images, prices, sales, reviews or commission rates.",
+    "Keep separate product pools per destination; never share WordPress and Blogger catalogs.",
+    "Agoda remains disabled. Olive Young and Trip.com are header buttons only, not product-card providers.",
+    "Preserve editorial body, status, publication date, featured image and SEO metadata; replace only the designated affiliate block."
   ],
   "display": {
     "position": "end_of_article",
@@ -57,6 +76,16 @@
     "require_exactly_ten_coupang_cards": true,
     "agoda_enabled": false,
     "require_trip_com_three_tracked_categories": true,
-    "olive_young_reward_url_verification_pending": true
+    "olive_young_reward_url_verification_pending": true,
+    "require_exact_category_mix": true,
+    "require_site_pool_target_100": true,
+    "randomize_per_article": true,
+    "avoid_repeated_ten_product_set": true,
+    "no_trip_category_text_link_row": true,
+    "header_brand_colors": {
+      "coupang_partners": "orange",
+      "olive_young_global": "green",
+      "trip_com": "blue"
+    }
   }
 }

@@ -1,23 +1,35 @@
-# London Project ? Affiliate standard v4.0
+# London Project Affiliate Engine ? Authoritative Standard v5.0
 
-Effective 2026-11-03. This is the sole active provider and product-card standard.
+**LOCKED / OVERRIDES ALL OLDER AFFILIATE MIX RULES. Effective 2026-11-03.**
 
-## Article layout
-- Header buttons: exactly three ? Coupang Partners, Olive Young Global, Trip.com.
-- Product cards below the buttons: exactly 10, all from Coupang Partners.
-- Olive Young and Trip.com are not product-card providers.
-- Agoda is disabled and excluded from the active provider set.
+## Header (top of every eligible article)
+Render exactly one horizontal row of three branded/logo-style buttons, in this order:
+1. Coupang Partners ? orange
+2. OLIVE YOUNG ? green
+3. Trip.com ? blue
 
-## Product selection
-Each destination uses its own verified Coupang Partners catalog. Choose ten unique products based on article relevance, click intent, credible and attractive price points, purchase intent, and popularity/review evidence only when the source provides it. No fixed category quotas. Never invent prices, sales volume, rankings, products, images, or affiliate URLs.
+Use the real brand marks/logos where licensed/available and each destination's verified, authorized tracking URL. Do not render generic oversized navy buttons, escaped `\uXXXX` labels, or an extra row of Trip.com category text links.
 
-## Trip.com navigation
-Trip.com has three separate tracked destinations: Hotels, Flights, and Tours/Packages. For K-Trip365, use the saved account-generated links in config/affiliate/trip-com-k-trip365.json. Do not assume those links are approved for another site or destination.
+## Bottom product cards ? exactly 10, Coupang Partners only
+Every article must use this exact category mix:
+- Beauty/cosmetics: 2
+- Laptop: 1
+- Tablet: 1
+- Health supplements: 2
+- Korea travel packages: 2
+- Hotel products: 2
 
-## Olive Young
-Olive Young is a header button only. Use the account reward-code URL only after redirect and commission-attribution checks pass. Do not place Olive Young products in the ten-card section.
+No Olive Young, Trip.com, Agoda or other provider product cards.
 
-## Rendering and rollout
-Use a compact responsive 10-card grid (4 columns desktop, 2 mobile), consistent image frames, two-line title limits, aligned CTAs, sponsored/nofollow/noopener links, and visible affiliate disclosure. Preserve article content, editorial links, featured images, publication status/date, and SEO metadata. Replace only the old affiliate section. Ensure idempotency and public read-back verification.
+## Per-destination pool and random allocation
+Build a separate verified pool of approximately 100 Coupang offers for each destination:
+- Beauty/cosmetics 20; laptops 10; tablets 10; health supplements 20; Korea travel packages 20; hotel products 20.
 
-K-Trip365 pilot: 71 posts checked, 70 updated, 1 already compliant, 0 failures. Expand to other destinations only with a separate site catalog and verified provider links.
+Randomly select a fresh ten-item set for each article while preserving the exact 2/1/1/2/2/2 mix. Do not repeat the same ten-item set across articles when alternatives exist. Never share catalogs across unrelated domains or between WordPress and Blogger.
+
+Every offer must have a genuine account-generated Coupang tracking URL, verified product title and official/authorized image. Do not invent URLs, images, prices, popularity, sales or review evidence. If a category pool is short, hold that article and report the shortage; never silently substitute another category.
+
+## Publishing safeguards
+Preserve the editorial body, publication status/date, featured image and SEO metadata. Replace only the marked affiliate section. Keep affiliate disclosure and `sponsored nofollow noopener`. Validate exactly ten cards and the exact category mix before any write; verify public read-back after publishing.
+
+Agoda is disabled. Olive Young and Trip.com are header buttons only. This file and `config/affiliate_distribution_policy.json` are the canonical rules; if an older document conflicts, this v5 standard wins.

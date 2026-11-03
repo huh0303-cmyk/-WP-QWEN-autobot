@@ -1,5 +1,5 @@
 {
-  "policy_version": "4.0.0",
+  "policy_version": "5.0.0",
   "effective_date": "2026-11-03",
   "timezone": "Asia/Seoul",
   "per_article_total": 10,
@@ -10,61 +10,61 @@
     {
       "slot": "coupang_01",
       "provider": "coupang_partners",
-      "purpose": "best_article_relevance_and_click_intent",
+      "category": "beauty_cosmetics",
       "position": 1
     },
     {
       "slot": "coupang_02",
       "provider": "coupang_partners",
-      "purpose": "best_article_relevance_and_click_intent",
+      "category": "beauty_cosmetics",
       "position": 2
     },
     {
       "slot": "coupang_03",
       "provider": "coupang_partners",
-      "purpose": "best_article_relevance_and_click_intent",
+      "category": "laptop",
       "position": 3
     },
     {
       "slot": "coupang_04",
       "provider": "coupang_partners",
-      "purpose": "best_article_relevance_and_click_intent",
+      "category": "tablet",
       "position": 4
     },
     {
       "slot": "coupang_05",
       "provider": "coupang_partners",
-      "purpose": "best_article_relevance_and_click_intent",
+      "category": "health_supplements",
       "position": 5
     },
     {
       "slot": "coupang_06",
       "provider": "coupang_partners",
-      "purpose": "best_article_relevance_and_click_intent",
+      "category": "health_supplements",
       "position": 6
     },
     {
       "slot": "coupang_07",
       "provider": "coupang_partners",
-      "purpose": "best_article_relevance_and_click_intent",
+      "category": "korea_travel_packages",
       "position": 7
     },
     {
       "slot": "coupang_08",
       "provider": "coupang_partners",
-      "purpose": "best_article_relevance_and_click_intent",
+      "category": "korea_travel_packages",
       "position": 8
     },
     {
       "slot": "coupang_09",
       "provider": "coupang_partners",
-      "purpose": "best_article_relevance_and_click_intent",
+      "category": "hotel_products",
       "position": 9
     },
     {
       "slot": "coupang_10",
       "provider": "coupang_partners",
-      "purpose": "best_article_relevance_and_click_intent",
+      "category": "hotel_products",
       "position": 10
     }
   ],
@@ -88,7 +88,27 @@
     "do_not_invent_commission_rates": true,
     "commission_rate_source": "provider_dashboard_or_current_partner_terms",
     "missing_or_irrelevant_offer_action": "hold_and_report_no_publish",
-    "top_button_links_separate_from_product_cards": true
+    "top_button_links_separate_from_product_cards": true,
+    "target_verified_pool_per_site": 100,
+    "pool_category_counts": {
+      "beauty_cosmetics": 20,
+      "laptop": 10,
+      "tablet": 10,
+      "health_supplements": 20,
+      "korea_travel_packages": 20,
+      "hotel_products": 20
+    },
+    "per_article_category_counts": {
+      "beauty_cosmetics": 2,
+      "laptop": 1,
+      "tablet": 1,
+      "health_supplements": 2,
+      "korea_travel_packages": 2,
+      "hotel_products": 2
+    },
+    "randomize_products_per_article": true,
+    "avoid_same_ten_product_set_on_different_articles": true,
+    "require_unique_products_within_article": true
   },
   "rendering": {
     "blog_cards": true,
@@ -96,10 +116,13 @@
     "mobile_columns": 2,
     "include_product_image": true,
     "include_title": true,
-    "cta": "\uc1fc\ud551\ud558\uae30",
+    "cta": "쇼핑하기",
     "affiliate_disclosure": true,
     "link_rel": "sponsored nofollow noopener",
-    "idempotent_marker": "london-affiliate-engine:v3"
+    "idempotent_marker": "london-affiliate-engine:v5",
+    "header_buttons": true,
+    "header_button_layout": "three_brand_tiles_one_row",
+    "product_card_count": 10
   },
   "platform_scope": {
     "wordpress": {
@@ -187,13 +210,18 @@
     "social_live_publish_enabled": false,
     "domain_based_exclusions": false,
     "control_room_registry_is_authoritative": true,
-    "provider_card_mix": "coupang_only_10",
+    "provider_card_mix": "coupang_only_10_fixed_category_mix",
     "top_buttons_separate_from_cards": true,
-    "agoda_enabled": false
+    "agoda_enabled": false,
+    "must_validate_exact_category_mix_before_publish": true,
+    "must_validate_unique_randomized_set_per_post": true,
+    "never_publish_with_pool_below_required_category_counts": true
   },
   "rollout_order": [
-    "K-Trip365 pilot completed: 3 header providers + 10 Coupang-only cards",
-    "Expand to each registered destination using its own verified Coupang catalog and site-specific provider URLs"
+    "Authoritative v5 standard: three branded header buttons + ten Coupang-only cards with exact six-category mix",
+    "Build and verify a 100-product Coupang pool for each destination",
+    "Randomly allocate 2 beauty, 1 laptop, 1 tablet, 2 health supplements, 2 Korea travel packages, 2 hotel products to every article",
+    "Backfill and validate each destination independently; apply same rule to every new article"
   ],
   "scope_exclusions": [
     "naver",
@@ -259,5 +287,28 @@
         "tours_and_packages"
       ]
     }
-  ]
+  ],
+  "header_design": {
+    "layout": "single_horizontal_row_three_branded_buttons",
+    "order": [
+      "coupang_partners",
+      "olive_young_global",
+      "trip_com"
+    ],
+    "labels": [
+      "Coupang Partners",
+      "OLIVE YOUNG",
+      "Trip.com"
+    ],
+    "brand_colors": {
+      "coupang_partners": "coupang_orange",
+      "olive_young_global": "olive_young_green",
+      "trip_com": "trip_blue"
+    },
+    "logo_or_brand_mark_required": true,
+    "no_plain_navy_text_button_replacement": true,
+    "no_escaped_unicode_or_raw_backslash_u_labels": true,
+    "no_extra_trip_category_text_link_row_below_buttons": true,
+    "each_button_uses_its_own_verified_site_authorized_tracking_url": true
+  }
 }
