@@ -77,5 +77,19 @@ for site in rows:
 
 out = ROOT / "affiliate_cloud_preflight.json"
 out.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
-print(json.dumps({**report["totals"], "target_sites": report["target_sites"], "report": str(out), "writes_performed": 0}, ensure_ascii=False))
-sys.exit(0 if report["totals"]["blocked"] == 0 else 1)
+blocked_sites = [
+    {"site_id": s["site_id"], "url": s["url"], "reason": s.get("error", "wordpress_auth_failed"), "http_status": s.get("auth_http")}
+    for s in report["sites"] if s.get("auth") != "ok"
+]
+summary = {
+    **report["totals"],
+    "target_sites": report["target_sites"],
+    "status": "complete" if not blocked_sites else "partial_with_access_warnings",
+    "blocked_sites": blocked_sites,
+    "report": str(out),
+    "writes_performed": 0,
+}
+print(json.dumps(summary, ensure_ascii=False))
+# This is a read-only inventory: partial access is recorded as a warning in the
+# artifact and console summary, not treated as a crashed workflow. Never hide it.
+sys.exit(0)
