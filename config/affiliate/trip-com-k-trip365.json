@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "provider": "trip.com",
+  "program": "Trip.com Affiliate",
+  "site": "k-trip365.com",
+  "purpose": "Permanent master record of account-generated Trip.com tracking links. Reuse these links; do not ask the user to recreate them.",
+  "links": [
+    {
+      "category": "hotel",
+      "label": "K-Trip365 Hotel",
+      "url": "https://www.trip.com/t/aQYZrw101X2",
+      "trip_sub1": "ktrip365_hotel",
+      "destination": "Seoul",
+      "status": "user-provided-generated-link"
+    },
+    {
+      "category": "flight",
+      "label": "K-Trip365 Flight Seoul-Hanoi",
+      "url": "https://www.trip.com/t/f4V2USA01X2",
+      "trip_sub1": "ktrip365_flight",
+      "departure": "Seoul",
+      "arrival": "Hanoi",
+      "status": "user-provided-generated-link"
+    },
+    {
+      "category": "tour",
+      "label": "K-Trip365 Attractions and Tours",
+      "url": "https://www.trip.com/t/gLWOuLU01X2",
+      "trip_sub1": "ktrip365_tour",
+      "destination": "Seoul",
+      "source_tripcom_url": "https://www.trip.com/things-to-do",
+      "status": "user-provided-generated-link"
+    }
+  ],
+  "operating_rules": [
+    "These three URLs are the canonical saved Trip.com links for k-trip365.com.",
+    "Reuse the existing URLs for K-Trip365; do not ask the user to generate them again.",
+    "Do not assume these links are valid for other registered sites unless the Trip.com affiliate dashboard confirms cross-site tracking.",
+    "Use hotel and tour as the primary Trip.com placements; flight is a supporting link for flight-related content.",
+    "Never alter, shorten manually, or fabricate tracking URLs."
+  ],
+  "notes": "The user supplied all three tracking URLs in chat on 2026-11-03. Destination and sub1 metadata are transcribed from the conversation."
+}
