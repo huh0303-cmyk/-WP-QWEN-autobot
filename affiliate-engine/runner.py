@@ -29,11 +29,9 @@ def load_destinations(platform:str)->list[dict[str,str]]:
     registry=load_json(ROOT/"config"/"automation_hub_sites.json")["sites"]
     out=[]
     for row in registry:
-        if row.get("platform")!=platform or row.get("content_type")!="blog":
+        if row.get("platform")!=platform:
             continue
         site_id=str(row.get("site_id",""))
-        if row.get("enabled",True) is not True:
-            continue
         out.append({"site_key":site_id,"url":str(row.get("url","")),"secret_name":str(row.get("secret_name","")),"destination_id":str(row.get("blog_id") or row.get("destination_id") or "")})
     return out
 
