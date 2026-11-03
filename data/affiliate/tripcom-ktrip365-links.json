@@ -2,59 +2,89 @@
   "site": "k-trip365.com",
   "provider": "trip_com",
   "captured_at_kst": "2026-11-03",
-  "source": "Trip.com Affiliate Platform / selected website k-trip365.com",
+  "source": "Canonical GitHub record config/affiliate/trip-com-k-trip365.json; redirect-tested 2026-11-03",
   "links": [
     {
-      "slot": "trip_com_1",
-      "title": "트립닷컴 홈페이지",
+      "slot": "trip_com_home",
+      "title": "Trip.com homepage",
       "destination_url": "https://kr.trip.com/",
       "affiliate_url": "https://www.trip.com/t/KwZ0AV4s0X2",
       "website": "k-trip365.com",
-      "short_link": true,
       "account_generated": true,
-      "verified_in_portal": true
+      "verified_in_portal": true,
+      "redirect_http_status": 200
     },
     {
-      "slot": "trip_com_2",
-      "title": "서울 호텔 검색",
+      "slot": "trip_com_hotel",
+      "title": "Seoul hotel search",
       "destination_url": "https://kr.trip.com/hotels",
-      "destination_city": "서울",
-      "affiliate_url": "https://www.trip.com/t/4IST9BCs0X2",
+      "affiliate_url": "https://www.trip.com/t/aQYZrw101X2",
       "website": "k-trip365.com",
-      "short_link": true,
+      "destination_city": "Seoul",
       "account_generated": true,
-      "verified_in_portal": true
+      "verified_in_portal": true,
+      "redirect_http_status": 200,
+      "trip_sub1": "ktrip365_hotel"
+    },
+    {
+      "slot": "trip_com_flight",
+      "title": "Seoul?Hanoi flight search",
+      "destination_url": "https://www.trip.com/flights/Seoul-to-Hanoi/tickets-SEL-HAN",
+      "affiliate_url": "https://www.trip.com/t/f4V2USA01X2",
+      "website": "k-trip365.com",
+      "departure": "Seoul",
+      "arrival": "Hanoi",
+      "account_generated": true,
+      "verified_in_portal": true,
+      "redirect_http_status": 200,
+      "trip_sub1": "ktrip365_flight"
+    },
+    {
+      "slot": "trip_com_tour",
+      "title": "Seoul tours and attractions",
+      "destination_url": "https://www.trip.com/things-to-do",
+      "affiliate_url": "https://www.trip.com/t/gLWOuLU01X2",
+      "website": "k-trip365.com",
+      "destination_city": "Seoul",
+      "account_generated": true,
+      "verified_in_portal": true,
+      "redirect_http_status": 200,
+      "trip_sub1": "ktrip365_tour"
     }
   ],
-  "status": "HOME_AND_HOTEL_LINKS_AVAILABLE_FLIGHT_AND_TOURS_LINKS_PENDING",
-  "note": "Trip.com requires account-generated links copied unchanged from Affiliate Platform. Flight and tours/package URLs above are destinations only until a tracked URL is generated.",
+  "status": "FOUR_ACCOUNT_GENERATED_LINKS_REDIRECT_VALIDATED",
+  "note": "All links were tested by following one redirect and returned HTTP 200 with Trip.com Allianceid, SID and linkhub_token parameters. Keep original affiliate short URLs unchanged.",
   "categories": [
     {
       "key": "hotels",
       "label": "??",
-      "status": "portal_link_available",
-      "affiliate_url": "https://www.trip.com/t/4IST9BCs0X2",
-      "destination_url": "https://kr.trip.com/hotels"
+      "status": "redirect_validated",
+      "affiliate_url": "https://www.trip.com/t/aQYZrw101X2",
+      "destination_url": "https://kr.trip.com/hotels",
+      "verified": true
     },
     {
       "key": "flights",
       "label": "???",
-      "status": "tracking_link_required",
-      "affiliate_url": null,
-      "destination_url": "https://kr.trip.com/flights/"
+      "status": "redirect_validated",
+      "affiliate_url": "https://www.trip.com/t/f4V2USA01X2",
+      "destination_url": "https://www.trip.com/flights/Seoul-to-Hanoi/tickets-SEL-HAN",
+      "verified": true
     },
     {
       "key": "tours_and_packages",
       "label": "??????",
-      "status": "tracking_link_required",
-      "affiliate_url": null,
-      "destination_url": "https://kr.trip.com/things-to-do/"
+      "status": "redirect_validated",
+      "affiliate_url": "https://www.trip.com/t/gLWOuLU01X2",
+      "destination_url": "https://www.trip.com/things-to-do",
+      "verified": true
     }
   ],
   "homepage_button": {
     "label": "Trip.com",
-    "status": "portal_link_available",
+    "status": "redirect_validated",
     "affiliate_url": "https://www.trip.com/t/KwZ0AV4s0X2",
-    "destination_url": "https://kr.trip.com/"
+    "destination_url": "https://kr.trip.com/",
+    "verified": true
   }
 }

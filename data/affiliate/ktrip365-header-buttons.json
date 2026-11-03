@@ -22,7 +22,7 @@
       "provider": "trip_com",
       "label": "Trip.com",
       "affiliate_url": "https://www.trip.com/t/KwZ0AV4s0X2",
-      "status": "account_generated_portal_verified",
+      "status": "redirect_validated",
       "link_type": "homepage",
       "verified": true
     }
@@ -31,26 +31,26 @@
     {
       "key": "hotels",
       "label": "??",
-      "status": "portal_link_available",
-      "affiliate_url": "https://www.trip.com/t/4IST9BCs0X2",
+      "status": "redirect_validated",
+      "affiliate_url": "https://www.trip.com/t/aQYZrw101X2",
       "destination_url": "https://kr.trip.com/hotels",
       "verified": true
     },
     {
       "key": "flights",
       "label": "???",
-      "status": "tracking_link_required",
-      "affiliate_url": null,
-      "destination_url": "https://kr.trip.com/flights/",
-      "verified": false
+      "status": "redirect_validated",
+      "affiliate_url": "https://www.trip.com/t/f4V2USA01X2",
+      "destination_url": "https://www.trip.com/flights/Seoul-to-Hanoi/tickets-SEL-HAN",
+      "verified": true
     },
     {
       "key": "tours_and_packages",
       "label": "??????",
-      "status": "tracking_link_required",
-      "affiliate_url": null,
-      "destination_url": "https://kr.trip.com/things-to-do/",
-      "verified": false
+      "status": "redirect_validated",
+      "affiliate_url": "https://www.trip.com/t/gLWOuLU01X2",
+      "destination_url": "https://www.trip.com/things-to-do",
+      "verified": true
     }
   ],
   "agoda": {

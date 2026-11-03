@@ -27,15 +27,15 @@
   "trip_com_categories": {
     "hotels": {
       "verified": true,
-      "status": "portal_link_available"
+      "status": "redirect_validated"
     },
     "flights": {
-      "verified": false,
-      "status": "tracking_link_required"
+      "verified": true,
+      "status": "redirect_validated"
     },
     "tours_and_packages": {
-      "verified": false,
-      "status": "tracking_link_required"
+      "verified": true,
+      "status": "redirect_validated"
     }
   },
   "wordpress_secret_present_in_current_process": false,
@@ -64,18 +64,13 @@
       "status": "redirect_test_failed_gate_url_null"
     },
     {
-      "type": "trip_category",
-      "category": "flights",
-      "status": "tracking_link_required"
-    },
-    {
-      "type": "trip_category",
-      "category": "tours_and_packages",
-      "status": "tracking_link_required"
-    },
-    {
       "type": "wordpress_auth",
       "status": "KTRIP365COM environment variable not present in this process"
+    },
+    {
+      "type": "header_button",
+      "provider": "olive_young_global",
+      "status": "redirect_test_failed_gate_url_null"
     }
   ],
   "writes_performed": 0
