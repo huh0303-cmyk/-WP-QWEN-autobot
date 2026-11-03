@@ -60,20 +60,18 @@ if len(posts) < 1:
 # Remove only known previous affiliate blocks; all unrelated article HTML is retained.
 def strip_old_affiliate_blocks(raw):
     before = raw
+    # Remove any element carrying the legacy CTA/banner class, regardless of wrapper paragraphs or Gutenberg comments.
     raw = re.sub(
-        r'<p>\s*<!--\s*coupang-partners-generic-cta-20261103\s*-->\s*</p>\s*'
-        r'<section\b[^>]*class=["\'][^"\']*\bcoupang-partners-cta\b[^"\']*["\'][^>]*>.*?</section>',
+        r'<(?:section|div)\b(?=[^>]*\bclass=["\'][^"\']*\bcoupang-partners-(?:cta|banner)\b)[^>]*>.*?</(?:section|div)>',
         '', raw, flags=re.I | re.S
     )
-    raw = re.sub(
-        r'<div\b[^>]*class=["\'][^"\']*\bcoupang-partners-banner\b[^"\']*["\'][^>]*>.*?</div>',
-        '', raw, flags=re.I | re.S
-    )
-    # Legacy one-link blocks may use this exact comment and wrapper.
+    raw = re.sub(r'<!--\s*coupang-partners-generic-cta-20261103\s*-->', '', raw, flags=re.I)
     raw = re.sub(
         r'<!--\s*KTRIP365_COUPANG_[^>]*-->\s*<section\b[^>]*>.*?</section>',
         '', raw, flags=re.I | re.S
     )
+    # Remove empty paragraphs left behind by the old marker.
+    raw = re.sub(r'<p>\s*</p>', '', raw, flags=re.I)
     return raw, raw != before
 
 cards = []
