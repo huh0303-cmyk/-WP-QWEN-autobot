@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Four-network affiliate card engine for WordPress and Blogger.
 
-Catalog contract: data/affiliate/{site_key}-affiliate-matrix.json
+Catalog contract: data/affiliate/{site_id}-affiliate-matrix.json
 Each site owns exactly 10 verified offers per provider (40 cards total).
 Preview is read-only; writes require --confirm APPLY-AFFILIATE-MATRIX and
 AFFILIATE_MATRIX_WRITE_ENABLED=true.
