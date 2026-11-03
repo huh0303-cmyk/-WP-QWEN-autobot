@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 import json
 from collections import Counter
 from datetime import datetime, timezone
@@ -7,7 +7,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 POLICY=json.loads((ROOT/"config/affiliate_distribution_policy.json").read_text(encoding="utf-8-sig"))
 PROFILES=json.loads((ROOT/"config/content_engine_profiles.json").read_text(encoding="utf-8-sig"))["profiles"]
-YT=json.loads((ROOT/"config/youtube_channels.json").read_text(encoding="utf-8-sig"))
+YT=json.loads((ROOT/"config/YOUTUBE_23_CHANNEL_MASTER_LOCK_2026-09-27.json").read_text(encoding="utf-8-sig"))
 SNS=json.loads((ROOT/"config/sns_six_channel_policy.json").read_text(encoding="utf-8-sig"))
 PROTECTED={"khealth365","krealestate365","kworld365","oliveyoung","ksa"}
 CATALOGS=ROOT/"affiliate-engine"/"data"/"catalogs"
@@ -50,3 +50,4 @@ out=ROOT/"reports"/"london-omnichannel-preflight.json"
 out.parent.mkdir(parents=True,exist_ok=True)
 out.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 print(json.dumps({"wordpress_eligible":len(wp),"blogger":len(blogger),"youtube_registry":len(yt_channels),"catalogs_ready":report["blogs"]["catalogs_ready"],"catalogs_missing_or_incomplete":report["blogs"]["catalogs_missing_or_incomplete"],"social_publish_connected":{k:v["publish_connected"] for k,v in platforms.items()},"report":str(out)},ensure_ascii=False))
+
