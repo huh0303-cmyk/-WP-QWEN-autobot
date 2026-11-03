@@ -1,74 +1,91 @@
 {
-  "policy_version": "2.0.0",
+  "policy_version": "3.0.0",
   "effective_date": "2026-11-03",
   "timezone": "Asia/Seoul",
   "per_article_total": 10,
   "provider_allocation": {
-    "coupang_partners": 4,
-    "olive_young_global": 2,
-    "trip_com": 2,
-    "agoda": 2
+    "coupang_partners": 10
   },
   "required_slots": [
     {
-      "slot": "coupang_topic_1",
+      "slot": "coupang_beauty_1",
       "provider": "coupang_partners",
-      "purpose": "article_topic_related"
+      "category": "beauty",
+      "purpose": "site_and_article_relevant",
+      "position": 1
     },
     {
-      "slot": "coupang_topic_2",
+      "slot": "coupang_beauty_2",
       "provider": "coupang_partners",
-      "purpose": "article_topic_related"
+      "category": "beauty",
+      "purpose": "site_and_article_relevant",
+      "position": 2
     },
     {
-      "slot": "coupang_health_or_lifestyle",
+      "slot": "coupang_electronics_1",
       "provider": "coupang_partners",
-      "purpose": "site_audience_relevant"
+      "category": "electronics",
+      "purpose": "site_and_article_relevant",
+      "position": 3
     },
     {
-      "slot": "coupang_daily_essential",
+      "slot": "coupang_electronics_2",
       "provider": "coupang_partners",
-      "purpose": "Korea_daily_essential"
+      "category": "electronics",
+      "purpose": "site_and_article_relevant",
+      "position": 4
     },
     {
-      "slot": "olive_young_1",
-      "provider": "olive_young_global",
-      "purpose": "beauty_or_personal_care_relevant"
+      "slot": "coupang_health_functional_foods_1",
+      "provider": "coupang_partners",
+      "category": "health_functional_foods",
+      "purpose": "site_and_article_relevant",
+      "position": 5
     },
     {
-      "slot": "olive_young_2",
-      "provider": "olive_young_global",
-      "purpose": "beauty_or_personal_care_relevant"
+      "slot": "coupang_health_functional_foods_2",
+      "provider": "coupang_partners",
+      "category": "health_functional_foods",
+      "purpose": "site_and_article_relevant",
+      "position": 6
     },
     {
-      "slot": "trip_com_1",
-      "provider": "trip_com",
-      "purpose": "travel_hotel_transport_activity_or_esim"
+      "slot": "coupang_korea_travel_packages_1",
+      "provider": "coupang_partners",
+      "category": "korea_travel_packages",
+      "purpose": "site_and_article_relevant",
+      "position": 7
     },
     {
-      "slot": "trip_com_2",
-      "provider": "trip_com",
-      "purpose": "travel_hotel_transport_activity_or_esim"
+      "slot": "coupang_korea_travel_packages_2",
+      "provider": "coupang_partners",
+      "category": "korea_travel_packages",
+      "purpose": "site_and_article_relevant",
+      "position": 8
     },
     {
-      "slot": "agoda_1",
-      "provider": "agoda",
-      "purpose": "accommodation_or_hotel"
+      "slot": "coupang_korea_hotels_1",
+      "provider": "coupang_partners",
+      "category": "korea_hotels",
+      "purpose": "site_and_article_relevant",
+      "position": 9
     },
     {
-      "slot": "agoda_2",
-      "provider": "agoda",
-      "purpose": "accommodation_or_hotel"
+      "slot": "coupang_korea_hotels_2",
+      "provider": "coupang_partners",
+      "category": "korea_hotels",
+      "purpose": "site_and_article_relevant",
+      "position": 10
     }
   ],
   "catalog_rules": {
     "separate_catalog_per_destination": true,
     "never_share_between_wordpress_and_blogger": true,
     "minimum_verified_offers_per_provider_per_site": {
-      "coupang_partners": 4,
-      "olive_young_global": 2,
-      "trip_com": 2,
-      "agoda": 2
+      "coupang_partners": 10,
+      "olive_young_global": 0,
+      "trip_com": 0,
+      "agoda": 0
     },
     "required_fields": [
       "slot",
@@ -83,7 +100,8 @@
     "require_verified_image_rights": true,
     "do_not_invent_commission_rates": true,
     "commission_rate_source": "provider_dashboard_or_current_partner_terms",
-    "missing_or_irrelevant_offer_action": "hold_and_report_no_publish"
+    "missing_or_irrelevant_offer_action": "hold_and_report_no_publish",
+    "top_button_links_separate_from_product_cards": true
   },
   "rendering": {
     "blog_cards": true,
@@ -181,17 +199,19 @@
     "social_queue_mode": "validation_and_artifact_only",
     "social_live_publish_enabled": false,
     "domain_based_exclusions": false,
-    "control_room_registry_is_authoritative": true
+    "control_room_registry_is_authoritative": true,
+    "provider_card_mix": "coupang_only_10",
+    "top_buttons_separate_from_cards": true,
+    "agoda_enabled": false
   },
   "rollout_order": [
-    "All 26 enabled WordPress registry destinations, including KSA-Korea and every previously protected domain",
-    "All 33 registered Blogspot destinations",
-    "All 23 registered YouTube channels",
-    "All registered TikTok, Facebook, Instagram and Threads accounts (6 each)"
+    "K-Trip365 pilot: top 3 provider buttons + 10 Coupang cards",
+    "After K-Trip365 read-back/public verification, expand to each enabled destination with its own catalog"
   ],
   "scope_exclusions": [
     "naver",
-    "tistory"
+    "tistory",
+    "agoda_as_provider"
   ],
   "scope_inclusions": {
     "wordpress": {
@@ -227,5 +247,30 @@
     }
   },
   "total_target_destinations": 106,
-  "dashboard_reconciliation_note": "Automation registry contains 26 enabled WordPress sites, including KSA-Korea; current dashboard label shows 25. Reconcile dashboard count without dropping any registry destination."
+  "dashboard_reconciliation_note": "Automation registry contains 26 enabled WordPress sites, including KSA-Korea; current dashboard label shows 25. Reconcile dashboard count without dropping any registry destination.",
+  "top_buttons": [
+    {
+      "provider": "coupang_partners",
+      "label": "Coupang Partners",
+      "position": 1,
+      "tracking_url_required": true
+    },
+    {
+      "provider": "olive_young_global",
+      "label": "Olive Young",
+      "position": 2,
+      "tracking_url_required": true
+    },
+    {
+      "provider": "trip_com",
+      "label": "Trip.com",
+      "position": 3,
+      "tracking_url_required": true,
+      "subcategories": [
+        "hotels",
+        "flights",
+        "tours_and_packages"
+      ]
+    }
+  ]
 }

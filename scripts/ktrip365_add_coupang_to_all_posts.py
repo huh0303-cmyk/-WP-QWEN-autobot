@@ -16,6 +16,29 @@ if not PW:
 
 catalog = json.load(open(DATA, encoding="utf-8"))
 products = catalog.get("products", [])
+BUTTONS_FILE = "data/affiliate/ktrip365-header-buttons.json"
+buttons_cfg = json.load(open(BUTTONS_FILE, encoding="utf-8"))
+required_providers = ["coupang_partners", "olive_young_global", "trip_com"]
+button_map = {x.get("provider"): x for x in buttons_cfg.get("buttons", [])}
+if list(button_map.keys()) != required_providers:
+    raise SystemExit("Header buttons must be exactly Coupang Partners, Olive Young, Trip.com in that order")
+for provider in required_providers:
+    button = button_map[provider]
+    if button.get("verified") is not True or not str(button.get("affiliate_url", "")).startswith("https://"):
+        raise SystemExit(f"Header button tracking link is not verified: {provider}")
+trip_categories = buttons_cfg.get("trip_com_categories", [])
+if [x.get("key") for x in trip_categories] != ["hotels", "flights", "tours_and_packages"]:
+    raise SystemExit("Trip.com categories must be hotels, flights, tours_and_packages")
+for category in trip_categories:
+    if category.get("verified") is not True or not str(category.get("affiliate_url", "")).startswith("https://"):
+        raise SystemExit(f"Trip.com category tracking link is not verified: {category.get('key')}")
+expected_categories = {"beauty": 2, "electronics": 2, "health_functional_foods": 2, "korea_travel_packages": 2, "korea_hotels": 2}
+actual_categories = {}
+for product in products:
+    category = product.get("category")
+    actual_categories[category] = actual_categories.get(category, 0) + 1
+if actual_categories != expected_categories:
+    raise SystemExit(f"K-Trip365 needs exactly 2 Coupang products in each category; current mix: {actual_categories}")
 if catalog.get("site", "").rstrip("/") != "https://k-trip365.com" or len(products) != 10:
     raise SystemExit("K-Trip365 product catalog mismatch or not exactly 10 products")
 if len({p.get("affiliate_url") for p in products}) != 10:
@@ -92,7 +115,24 @@ for p in products:
         f'<a href="{url}" target="_blank" rel="sponsored nofollow noopener" style="display:inline-block;margin-top:auto;padding:9px 16px;border-radius:7px;background:#17365d;color:#fff;text-decoration:none;font-size:14px;">{CTA}</a>'
         '</article>'
     )
+provider_buttons_html = (
+    '<nav class="ktrip365-provider-buttons" aria-label="Partner links" style="display:flex;flex-wrap:wrap;gap:10px;margin:20px 0;">'
+    + ''.join(
+        f'<a href="{html.escape(button_map[p]["affiliate_url"], quote=True)}" target="_blank" rel="sponsored nofollow noopener" style="flex:1 1 28%;text-align:center;padding:12px 10px;background:#17365d;color:#fff;border-radius:8px;text-decoration:none;font-weight:700;">{html.escape(button_map[p]["label"])}</a>'
+        for p in required_providers
+    )
+    + '</nav>'
+)
+trip_category_html = (
+    '<nav class="ktrip365-trip-categories" aria-label="Trip.com travel categories" style="display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 20px;">'
+    + ''.join(
+        f'<a href="{html.escape(x["affiliate_url"], quote=True)}" target="_blank" rel="sponsored nofollow noopener" style="padding:8px 12px;border:1px solid #17365d;border-radius:7px;color:#17365d;text-decoration:none;">Trip.com ? {html.escape(x["label"])}</a>'
+        for x in trip_categories
+    )
+    + '</nav>'
+)
 block = (
+    provider_buttons_html + trip_category_html +
     '<section class="ktrip365-coupang-recommendations" style="clear:both;display:block;width:100%;box-sizing:border-box;margin:34px 0 20px;padding:22px 18px;border:1px solid #e5e7eb;border-radius:14px;background:#fff;">'
     f'<p style="font-size:12px;line-height:1.6;color:#666;margin:0 0 16px;">{DISC}</p>'
     f'<h2 style="font-size:22px;line-height:1.4;margin:0 0 18px;">{HEADING}</h2>'
@@ -171,6 +211,8 @@ for post, editorial, removed_old in plans:
         "ten_distinct_coupang_links": len(set(hrefs)) == 10,
         "single_disclosure": body.count(DISC) == 1,
         "only_coupang_provider": all(x.startswith("https://link.coupang.com/") for x in hrefs),
+        "three_provider_buttons": all(f'href="{html.escape(button_map[p]["affiliate_url"], quote=True)}"' in body for p in required_providers),
+        "three_trip_categories": all(f'href="{html.escape(x["affiliate_url"], quote=True)}"' in body for x in trip_categories),
         "no_corrupt_titles": "????" not in section,
         "status_preserved": q.get("status") == post.get("status"),
         "date_preserved": q.get("date") == post.get("date"),

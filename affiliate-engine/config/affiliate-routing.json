@@ -1,115 +1,115 @@
 {
   "engine": "London Project Affiliate Engine",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "mode": "safe",
   "default_locale": "ko-KR",
   "required_slots": [
     {
-      "slot": "coupang_topic_1",
+      "slot": "coupang_beauty_1",
       "count": 1,
-      "category": "article_topic_related",
+      "category": "beauty",
       "required": true,
       "provider": "coupang_partners"
     },
     {
-      "slot": "coupang_topic_2",
+      "slot": "coupang_beauty_2",
       "count": 1,
-      "category": "article_topic_related",
+      "category": "beauty",
       "required": true,
       "provider": "coupang_partners"
     },
     {
-      "slot": "coupang_health_or_lifestyle",
+      "slot": "coupang_electronics_1",
       "count": 1,
-      "category": "site_audience_relevant",
+      "category": "electronics",
       "required": true,
       "provider": "coupang_partners"
     },
     {
-      "slot": "coupang_daily_essential",
+      "slot": "coupang_electronics_2",
       "count": 1,
-      "category": "Korea_daily_essential",
+      "category": "electronics",
       "required": true,
       "provider": "coupang_partners"
     },
     {
-      "slot": "olive_young_1",
+      "slot": "coupang_health_functional_foods_1",
       "count": 1,
-      "category": "beauty_or_personal_care_relevant",
+      "category": "health_functional_foods",
       "required": true,
-      "provider": "olive_young_global"
+      "provider": "coupang_partners"
     },
     {
-      "slot": "olive_young_2",
+      "slot": "coupang_health_functional_foods_2",
       "count": 1,
-      "category": "beauty_or_personal_care_relevant",
+      "category": "health_functional_foods",
       "required": true,
-      "provider": "olive_young_global"
+      "provider": "coupang_partners"
     },
     {
-      "slot": "trip_com_1",
+      "slot": "coupang_korea_travel_packages_1",
       "count": 1,
-      "category": "travel_hotel_transport_activity_or_esim",
+      "category": "korea_travel_packages",
       "required": true,
-      "provider": "trip_com"
+      "provider": "coupang_partners"
     },
     {
-      "slot": "trip_com_2",
+      "slot": "coupang_korea_travel_packages_2",
       "count": 1,
-      "category": "travel_hotel_transport_activity_or_esim",
+      "category": "korea_travel_packages",
       "required": true,
-      "provider": "trip_com"
+      "provider": "coupang_partners"
     },
     {
-      "slot": "agoda_1",
+      "slot": "coupang_korea_hotels_1",
       "count": 1,
-      "category": "accommodation_or_hotel",
+      "category": "korea_hotels",
       "required": true,
-      "provider": "agoda"
+      "provider": "coupang_partners"
     },
     {
-      "slot": "agoda_2",
+      "slot": "coupang_korea_hotels_2",
       "count": 1,
-      "category": "accommodation_or_hotel",
+      "category": "korea_hotels",
       "required": true,
-      "provider": "agoda"
+      "provider": "coupang_partners"
     }
   ],
   "affiliate_programs": {
     "coupang_partners": {
       "enabled": true,
-      "priority": "fixed_4",
+      "priority": "fixed_10_cards",
       "tracking_url_required": true,
       "product_types": [
-        "article_topic_related",
-        "site_audience_relevant",
-        "Korea_daily_essential"
+        "beauty",
+        "electronics",
+        "health_functional_foods",
+        "korea_travel_packages",
+        "korea_hotels"
       ]
     },
     "olive_young_global": {
       "enabled": true,
-      "priority": "fixed_2",
+      "priority": "header_button_only",
       "tracking_url_required": true,
-      "product_types": [
-        "beauty_or_personal_care_relevant"
-      ],
+      "product_types": [],
       "reward_code": "HUH556423"
     },
     "trip_com": {
       "enabled": true,
-      "priority": "fixed_2",
+      "priority": "header_button_and_trip_subcategories",
       "tracking_url_required": true,
       "product_types": [
-        "travel_hotel_transport_activity_esim"
+        "hotels",
+        "flights",
+        "tours_and_packages"
       ]
     },
     "agoda": {
-      "enabled": true,
-      "priority": "fixed_2",
-      "tracking_url_required": true,
-      "product_types": [
-        "accommodation_or_hotel"
-      ]
+      "enabled": false,
+      "priority": "disabled",
+      "tracking_url_required": false,
+      "product_types": []
     }
   },
   "selection_policy": {
@@ -163,7 +163,9 @@
     "never_delete_posts": true,
     "never_remove_existing_links": true,
     "require_exact_provider_allocation": true,
-    "require_per_destination_catalog": true
+    "require_per_destination_catalog": true,
+    "provider_card_mix": "coupang_only_10",
+    "top_button_links_verified_separately": true
   },
   "new_content_automation": {
     "enabled": true,
@@ -177,10 +179,33 @@
   },
   "rollout": {
     "pilot_site": "https://k-trip365.com",
-    "pilot_published_posts_expected": 71,
     "pilot_batch_size": 5,
     "expand_after_verified_pilot": true,
-    "wordpress_network": "inventory_required",
-    "blogger_network": "blog_id_and_oauth_inventory_required"
-  }
+    "network_expansion_requires_per_site_catalog": true
+  },
+  "top_buttons": [
+    {
+      "provider": "coupang_partners",
+      "label": "Coupang Partners",
+      "required": true,
+      "tracking_url_required": true
+    },
+    {
+      "provider": "olive_young_global",
+      "label": "Olive Young",
+      "required": true,
+      "tracking_url_required": true
+    },
+    {
+      "provider": "trip_com",
+      "label": "Trip.com",
+      "required": true,
+      "tracking_url_required": true,
+      "categories": [
+        "hotels",
+        "flights",
+        "tours_and_packages"
+      ]
+    }
+  ]
 }

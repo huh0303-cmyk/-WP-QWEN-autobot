@@ -1,0 +1,60 @@
+{
+  "site": "k-trip365.com",
+  "provider": "trip_com",
+  "captured_at_kst": "2026-11-03",
+  "source": "Trip.com Affiliate Platform / selected website k-trip365.com",
+  "links": [
+    {
+      "slot": "trip_com_1",
+      "title": "트립닷컴 홈페이지",
+      "destination_url": "https://kr.trip.com/",
+      "affiliate_url": "https://www.trip.com/t/KwZ0AV4s0X2",
+      "website": "k-trip365.com",
+      "short_link": true,
+      "account_generated": true,
+      "verified_in_portal": true
+    },
+    {
+      "slot": "trip_com_2",
+      "title": "서울 호텔 검색",
+      "destination_url": "https://kr.trip.com/hotels",
+      "destination_city": "서울",
+      "affiliate_url": "https://www.trip.com/t/4IST9BCs0X2",
+      "website": "k-trip365.com",
+      "short_link": true,
+      "account_generated": true,
+      "verified_in_portal": true
+    }
+  ],
+  "status": "HOME_AND_HOTEL_LINKS_AVAILABLE_FLIGHT_AND_TOURS_LINKS_PENDING",
+  "note": "Trip.com requires account-generated links copied unchanged from Affiliate Platform. Flight and tours/package URLs above are destinations only until a tracked URL is generated.",
+  "categories": [
+    {
+      "key": "hotels",
+      "label": "??",
+      "status": "portal_link_available",
+      "affiliate_url": "https://www.trip.com/t/4IST9BCs0X2",
+      "destination_url": "https://kr.trip.com/hotels"
+    },
+    {
+      "key": "flights",
+      "label": "???",
+      "status": "tracking_link_required",
+      "affiliate_url": null,
+      "destination_url": "https://kr.trip.com/flights/"
+    },
+    {
+      "key": "tours_and_packages",
+      "label": "??????",
+      "status": "tracking_link_required",
+      "affiliate_url": null,
+      "destination_url": "https://kr.trip.com/things-to-do/"
+    }
+  ],
+  "homepage_button": {
+    "label": "Trip.com",
+    "status": "portal_link_available",
+    "affiliate_url": "https://www.trip.com/t/KwZ0AV4s0X2",
+    "destination_url": "https://kr.trip.com/"
+  }
+}

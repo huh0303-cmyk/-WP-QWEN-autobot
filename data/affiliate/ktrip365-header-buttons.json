@@ -1,0 +1,60 @@
+{
+  "site": "https://k-trip365.com",
+  "version": "1.0.0",
+  "buttons": [
+    {
+      "provider": "coupang_partners",
+      "label": "Coupang Partners",
+      "affiliate_url": "https://link.coupang.com/a/ihRMHfQzKf",
+      "status": "account_link_on_file",
+      "link_type": "general_affiliate_destination",
+      "verified": true
+    },
+    {
+      "provider": "olive_young_global",
+      "label": "Olive Young",
+      "affiliate_url": "https://global.oliveyoung.com/if/rd?su=HUH556423",
+      "status": "redirect_test_failed_gate_url_null",
+      "link_type": "reward_code_entry",
+      "verified": false
+    },
+    {
+      "provider": "trip_com",
+      "label": "Trip.com",
+      "affiliate_url": "https://www.trip.com/t/KwZ0AV4s0X2",
+      "status": "account_generated_portal_verified",
+      "link_type": "homepage",
+      "verified": true
+    }
+  ],
+  "trip_com_categories": [
+    {
+      "key": "hotels",
+      "label": "??",
+      "status": "portal_link_available",
+      "affiliate_url": "https://www.trip.com/t/4IST9BCs0X2",
+      "destination_url": "https://kr.trip.com/hotels",
+      "verified": true
+    },
+    {
+      "key": "flights",
+      "label": "???",
+      "status": "tracking_link_required",
+      "affiliate_url": null,
+      "destination_url": "https://kr.trip.com/flights/",
+      "verified": false
+    },
+    {
+      "key": "tours_and_packages",
+      "label": "??????",
+      "status": "tracking_link_required",
+      "affiliate_url": null,
+      "destination_url": "https://kr.trip.com/things-to-do/",
+      "verified": false
+    }
+  ],
+  "agoda": {
+    "enabled": false,
+    "reason": "excluded_by_current_policy_pending_site_approval"
+  }
+}

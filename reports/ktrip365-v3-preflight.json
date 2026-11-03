@@ -1,0 +1,82 @@
+{
+  "site": "https://k-trip365.com",
+  "standard": "v3.0",
+  "generated_at_kst": "2026-11-03",
+  "product_count": 10,
+  "product_category_counts": {
+    "korea_digital_esim_sim": 2,
+    "korea_travel_power": 3,
+    "korea_travel_accessory": 2,
+    "k_beauty_olive_young": 2,
+    "korea_travel_comfort": 1
+  },
+  "header_buttons": {
+    "coupang_partners": {
+      "verified": true,
+      "status": "account_link_on_file"
+    },
+    "olive_young_global": {
+      "verified": false,
+      "status": "redirect_test_failed_gate_url_null"
+    },
+    "trip_com": {
+      "verified": true,
+      "status": "account_generated_portal_verified"
+    }
+  },
+  "trip_com_categories": {
+    "hotels": {
+      "verified": true,
+      "status": "portal_link_available"
+    },
+    "flights": {
+      "verified": false,
+      "status": "tracking_link_required"
+    },
+    "tours_and_packages": {
+      "verified": false,
+      "status": "tracking_link_required"
+    }
+  },
+  "wordpress_secret_present_in_current_process": false,
+  "publish_ready": false,
+  "blockers": [
+    {
+      "type": "coupang_product_mix",
+      "actual": {
+        "korea_digital_esim_sim": 2,
+        "korea_travel_power": 3,
+        "korea_travel_accessory": 2,
+        "k_beauty_olive_young": 2,
+        "korea_travel_comfort": 1
+      },
+      "required": {
+        "beauty": 2,
+        "electronics": 2,
+        "health_functional_foods": 2,
+        "korea_travel_packages": 2,
+        "korea_hotels": 2
+      }
+    },
+    {
+      "type": "header_button",
+      "provider": "olive_young_global",
+      "status": "redirect_test_failed_gate_url_null"
+    },
+    {
+      "type": "trip_category",
+      "category": "flights",
+      "status": "tracking_link_required"
+    },
+    {
+      "type": "trip_category",
+      "category": "tours_and_packages",
+      "status": "tracking_link_required"
+    },
+    {
+      "type": "wordpress_auth",
+      "status": "KTRIP365COM environment variable not present in this process"
+    }
+  ],
+  "writes_performed": 0
+}

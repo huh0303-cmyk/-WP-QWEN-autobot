@@ -35,12 +35,15 @@ def load_destinations(platform:str)->list[dict[str,str]]:
         out.append({"site_key":site_id,"url":str(row.get("url","")),"secret_name":str(row.get("secret_name","")),"destination_id":str(row.get("blog_id") or row.get("destination_id") or "")})
     return out
 
-def load_site_offers(site_key:str)->list[dict[str,Any]]:
+def load_site_catalog(site_key:str)->dict[str,Any]:
     path=CATALOG_DIR/f"{site_key}.json"
     if not path.exists(): raise ValueError(f"missing_site_catalog:{site_key}")
     payload=load_json(path)
     if payload.get("status") not in {"verified","ready"}: raise ValueError(f"catalog_not_verified:{site_key}")
-    return payload.get("offers",[])
+    return payload
+
+def load_site_offers(site_key:str)->list[dict[str,Any]]:
+    return load_site_catalog(site_key).get("offers",[])
 
 def select_offers(title:str,content:str,routing:dict[str,Any],site_key:str,offers:list[dict[str,Any]]|None=None)->list[dict[str,Any]]:
     offers=offers if offers is not None else load_site_offers(site_key)
@@ -50,8 +53,6 @@ def select_offers(title:str,content:str,routing:dict[str,Any],site_key:str,offer
         provider=slot["provider"]
         candidates=[o for o in offers if o.get("slot")==slot["slot"] and o.get("provider")==provider]
         candidates=[o for o in candidates if o.get("affiliate_link_verified") is True and o.get("image_rights_verified") is True and all(urlparse(str(o.get(k,""))).scheme=="https" and urlparse(str(o.get(k,""))).netloc for k in ("url","image_url"))]
-        if slot["slot"].startswith("coupang_topic_"):
-            candidates=[o for o in candidates if any(normalized(k) in body for k in o.get("keywords",[]) if k)]
         if not candidates: raise ValueError(f"missing_verified_offer:{slot['slot']}:{provider}")
         candidates.sort(key=lambda o:hashlib.sha256(f"{title}:{slot['slot']}:{o['url']}".encode()).hexdigest())
         chosen.append(candidates[0])
@@ -59,16 +60,31 @@ def select_offers(title:str,content:str,routing:dict[str,Any],site_key:str,offer
     if len({o["url"] for o in chosen})!=10: raise ValueError("duplicate_tracking_url_in_selected_offers")
     counts={}
     for o in chosen: counts[o["provider"]]=counts.get(o["provider"],0)+1
-    expected={"coupang_partners":4,"olive_young_global":2,"trip_com":2,"agoda":2}
-    if counts!=expected: raise ValueError(f"provider_mix_mismatch:{counts}")
+    expected={"coupang_partners":10}
+    if counts!=expected: raise ValueError(f"provider_mix_mismatch_expected_coupang_only_10:{counts}")
+    categories={}
+    for o in chosen: categories[o.get("category","")]=categories.get(o.get("category",""),0)+1
+    required=("beauty","electronics","health_functional_foods","korea_travel_packages","korea_hotels")
+    if any(categories.get(c,0)!=2 for c in required):
+        raise ValueError(f"coupang_category_mix_mismatch:{categories}")
     return chosen
 
-def build_block(offers:list[dict[str,Any]])->str:
+def build_block(offers:list[dict[str,Any]],header_buttons:list[dict[str,Any]]|None=None)->str:
+    if not header_buttons or len(header_buttons)!=3:
+        raise ValueError("missing_three_verified_header_buttons")
+    expected=("coupang_partners","olive_young_global","trip_com")
+    if tuple(x.get("provider") for x in header_buttons)!=expected:
+        raise ValueError("header_button_provider_order_mismatch")
+    for b in header_buttons:
+        if b.get("verified") is not True or not str(b.get("affiliate_url","")).startswith("https://"):
+            raise ValueError(f"unverified_header_button:{b.get('provider')}")
+    buttons=[f'<a class="london-affiliate-provider-button" href="{html.escape(b["affiliate_url"],quote=True)}" target="_blank" rel="sponsored nofollow noopener">{html.escape(b["label"])}</a>' for b in header_buttons]
     cards=[]
     for o in offers:
-        cards.append("<article class=\"london-affiliate-card\"><a href=\"%s\" rel=\"sponsored nofollow noopener\" target=\"_blank\"><img src=\"%s\" alt=\"%s\" loading=\"lazy\"/><strong>%s</strong><span>쇼핑하기</span></a></article>"%(html.escape(o["url"],quote=True),html.escape(o["image_url"],quote=True),html.escape(o.get("image_alt",o["title"]),quote=True),html.escape(o["title"])))
-    css="<style>.london-affiliate-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.london-affiliate-card img{width:100%;aspect-ratio:1/1;object-fit:cover}.london-affiliate-card a{display:flex;flex-direction:column;gap:8px;text-decoration:none}.london-affiliate-card span{font-weight:700}@media(max-width:640px){.london-affiliate-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}</style>"
-    return "\n".join([MARKER,"<section class=\"london-affiliate-engine\"><h2>Recommended products and travel offers</h2>",DISCLOSURE,css,"<div class=\"london-affiliate-grid\">",*cards,"</div></section>"])
+        title=html.escape(o["title"])
+        cards.append(f'<article class="london-affiliate-card"><a class="london-affiliate-image-link" href="{html.escape(o["url"],quote=True)}" rel="sponsored nofollow noopener" target="_blank"><img src="{html.escape(o["image_url"],quote=True)}" alt="{html.escape(o.get("image_alt",o["title"]),quote=True)}" loading="lazy"/></a><small>{html.escape(o.get("category",""))}</small><strong>{title}</strong><a class="london-affiliate-cta" href="{html.escape(o["url"],quote=True)}" rel="sponsored nofollow noopener" target="_blank">???? ????</a></article>')
+    css="<style>.london-affiliate-provider-buttons{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}.london-affiliate-provider-button{flex:1 1 30%;text-align:center;padding:12px 10px;border-radius:8px;background:#17365d;color:#fff;text-decoration:none;font-weight:700}.london-affiliate-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.london-affiliate-card{display:flex;min-width:0;flex-direction:column;gap:8px;border:1px solid #e5e7eb;border-radius:12px;padding:12px}.london-affiliate-card img{width:100%;height:160px;object-fit:contain}.london-affiliate-card strong{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:3em}.london-affiliate-cta{margin-top:auto;text-align:center;padding:9px;background:#17365d;color:white;border-radius:7px;text-decoration:none}@media(max-width:640px){.london-affiliate-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}</style>"
+    return "\n".join([MARKER,"<section class=\"london-affiliate-engine\"><div class=\"london-affiliate-provider-buttons\">",*buttons,"</div>",DISCLOSURE,css,"<h2>?? ?? ?? 10?</h2>","<div class=\"london-affiliate-grid\">",*cards,"</div></section>"])
 
 def can_write(requested:bool)->bool:
     return requested and os.getenv("AFFILIATE_WRITE_ENABLED","").lower()=="true"
@@ -149,7 +165,10 @@ def main():
     args=parser.parse_args(); routing=load_json(ROUTING); write=can_write(args.write)
     if args.write and not write: raise SystemExit("write blocked: set AFFILIATE_WRITE_ENABLED=true as a GitHub secret")
     since=recent_since(args.since_hours)
-    def block_for(title,content,site_key): return build_block(select_offers(title,content,routing,site_key))
+    def block_for(title,content,site_key):
+        catalog=load_site_catalog(site_key)
+        offers=select_offers(title,content,routing,site_key,catalog.get("offers",[]))
+        return build_block(offers,catalog.get("header_buttons",[]))
     results=[]
     if args.platform in {"wordpress","all"}:
         for dest in load_destinations("wordpress"):
@@ -159,7 +178,7 @@ def main():
         for dest in load_destinations("blogger"):
             try: results.extend(blogger(dest,since,block_for,write,args.scope,args.batch_size))
             except (requests.RequestException,ValueError,RuntimeError) as exc: results.append({"platform":"blogger","site":dest["site_key"],"action":"blocked","reason":str(exc)[:240]})
-    report={"generated_at":datetime.now(UTC).isoformat(),"scope":args.scope,"since":since,"batch_size":args.batch_size,"write":write,"policy":"4+2+2+2","results":results}
+    report={"generated_at":datetime.now(UTC).isoformat(),"scope":args.scope,"since":since,"batch_size":args.batch_size,"write":write,"policy":"3_header_buttons_plus_10_coupang_cards","results":results}
     out=ENGINE/"reports"/f"latest-{args.scope}-run.json"; out.parent.mkdir(parents=True,exist_ok=True); out.write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding="utf-8")
     print(json.dumps({"write":write,"processed":len(results),"appended_verified":sum(r["action"]=="appended_verified" for r in results),"blocked":sum(r["action"]=="blocked" for r in results)},ensure_ascii=False))
     return 0
