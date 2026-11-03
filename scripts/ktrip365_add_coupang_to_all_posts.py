@@ -94,7 +94,11 @@ def strip_old_affiliate_blocks(raw):
         '', raw, flags=re.I | re.S
     )
     raw = re.sub(
-        r'<!--\s*KTRIP365_COUPANG_[^>]*-->\s*<section\b[^>]*>.*?</section>',
+        r'<!-- KTRIP365_COUPANG_ALL_POSTS_V1:[0-9]+ -->.*?</section>',
+        '', raw, flags=re.I | re.S
+    )
+    raw = re.sub(
+        r'<!-- KTRIP365_COUPANG_[^>]*-->.*?</section>',
         '', raw, flags=re.I | re.S
     )
     # Remove empty paragraphs left behind by the old marker.
@@ -126,7 +130,7 @@ provider_buttons_html = (
 trip_category_html = (
     '<nav class="ktrip365-trip-categories" aria-label="Trip.com travel categories" style="display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 20px;">'
     + ''.join(
-        f'<a href="{html.escape(x["affiliate_url"], quote=True)}" target="_blank" rel="sponsored nofollow noopener" style="padding:8px 12px;border:1px solid #17365d;border-radius:7px;color:#17365d;text-decoration:none;">Trip.com ? {html.escape(x["label"])}</a>'
+        f'<a href="{html.escape(x["affiliate_url"], quote=True)}" target="_blank" rel="sponsored nofollow noopener" style="padding:8px 12px;border:1px solid #17365d;border-radius:7px;color:#17365d;text-decoration:none;">Trip.com \u00b7 {html.escape(x["label"])}</a>'
         for x in trip_categories
     )
     + '</nav>'
@@ -146,10 +150,10 @@ plans = []
 already = []
 for post in posts:
     pid = int(post["id"])
+    marker = f"<!-- KTRIP365_COUPANG_ALL_POSTS_V1:{pid} -->"
     raw = post.get("content", {}).get("raw")
     if not isinstance(raw, str):
         raise SystemExit(f"Post {pid}: editable raw content missing")
-    marker = f"<!-- KTRIP365_COUPANG_ALL_POSTS_V1:{pid} -->"
     backup[str(pid)] = {
         "link": post.get("link"),
         "title": post.get("title", {}).get("raw") or post.get("title", {}).get("rendered"),
@@ -167,10 +171,14 @@ for post in posts:
             len(imgs) == 10 and all(x.startswith("https://") for x in imgs) and
             len(set(links)) == 10 and raw.count(DISC) == 1
         )
-        if not ok:
-            raise SystemExit(f"Post {pid}: existing V1 marker but block fails validation")
-        already.append({"post_id": pid, "status": "ALREADY_REPAIRED"})
-        continue
+        has_new_header = (
+            all(f'href="{html.escape(button_map[p]["affiliate_url"], quote=True)}"' in section for p in required_providers) and
+            all(f'href="{html.escape(x["affiliate_url"], quote=True)}"' in section for x in trip_categories)
+        )
+        if ok and has_new_header:
+            already.append({"post_id": pid, "status": "ALREADY_REPAIRED"})
+            continue
+        # Existing old-format affiliate block is replaced below.
 
     editorial, changed = strip_old_affiliate_blocks(raw)
     # Any remaining affiliate URL after known block removal is unexpected; do not erase editorial material.
