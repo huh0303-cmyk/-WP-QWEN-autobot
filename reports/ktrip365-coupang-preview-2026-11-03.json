@@ -1,0 +1,29 @@
+{
+  "mode": "preview",
+  "platform": "wordpress",
+  "started_at": "2026-11-03T00:18:33Z",
+  "sites": [
+    {
+      "site_id": "wp_ktrip365",
+      "url": "https://k-trip365.com",
+      "platform": "wordpress",
+      "verified_products": 0,
+      "posts_seen": 0,
+      "updated": 0,
+      "already_ten": 0,
+      "needs_catalog": 1,
+      "skipped_legacy": 0,
+      "errors": [
+        "site catalog has 0/10 verified unique products; no cross-site borrowing"
+      ]
+    }
+  ],
+  "totals": {
+    "posts_seen": 0,
+    "updated": 0,
+    "already_ten": 0,
+    "needs_catalog": 1,
+    "skipped_legacy": 0,
+    "errors": 0
+  }
+}
