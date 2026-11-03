@@ -1,0 +1,27 @@
+name: Repair all JobKorea365 affiliate cards
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: Repair all published JobKorea365 posts and verify public pages
+        env:
+          JOBKOREA365COM: ${{ secrets.JOBKOREA365COM }}
+        run: python scripts/repair_jobkorea365_all_posts.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: jobkorea365-all-posts-repair-and-backup
+          path: |
+            reports/jobkorea365-all-posts-repair-2026-11-03.json
+            reports/jobkorea365-all-posts-original-backup-2026-11-03.json
+          if-no-files-found: warn
