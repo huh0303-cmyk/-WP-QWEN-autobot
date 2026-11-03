@@ -29,7 +29,7 @@ If a site's own verified catalog has fewer than ten eligible products, the publi
 - Blogger/Blogspot queue + four-agent publisher: `automation_hub/blogger_adapter.py::BloggerPublisher.publish`.
 - Blogger/Blogspot direct 33-site publisher: `scripts/publish_blogger_33_now.py`.
 - Product pools are read from verified repository catalogs. Product records without official affiliate URLs and usable Coupang CDN images are excluded.
-- Current verified pools include the Olive Young / K-Skin 45-product capture and K-Health365's affiliate catalog. Broader lifestyle and digital pools must be populated from the user's authenticated Coupang Partners portal before those categories can be guaranteed across every destination.
+- Current verified pools include the Olive Young / K-Skin 45-product capture, K-Health365's affiliate catalog, and K-trip365's site-specific 10-product portal capture at `data/affiliate/ktrip365-products.json`. KStudy365 still requires its own portal-captured catalog; never borrow K-trip365 records for it.
 
 The footer displays ten cards on every device. The grid is responsive: four columns on desktop and two on narrow/mobile screens, with natural card heights and row wrapping.
 
