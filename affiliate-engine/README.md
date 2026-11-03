@@ -3,16 +3,17 @@
 Shared monetization engine for WordPress, Blogger/Blogspot, YouTube and TikTok.
 
 ## Business rule
-Every article gets exactly 10 placements:
-- 2 directly related to the article topic
-- 2 K-beauty
-- 2 K-health / health-food
-- 1 Korea daily-life essential
-- 1 travel package / tour / activity
-- 1 K-pop album / official merchandise
-- 1 data eSIM / SIM
+Every eligible article gets exactly 10 affiliate placements:
+- 4 Coupang Partners
+- 2 Olive Young Global
+- 2 Trip.com
+- 2 Agoda
 
-Coupang Partners is mandatory in the affiliate mix. Trip.com, Agoda, Olive Young Global and Naver Travel Connect are selected when the product type is eligible and a real tracking URL is available.
+Every WordPress domain and every Blogger blog has its own separate catalog. Each
+catalog must have verified, topic-appropriate offers, real account-generated
+tracking URLs, and permitted product images. The engine blocks a post if any
+provider slot is missing or irrelevant; it never invents links or commission
+rates. Commission rates are read from the current provider dashboard/terms.
 
 ## Revenue objective
 Optimize confirmed commission per qualified visitor, not commission percentage alone. Evaluate topic relevance, intent, effective commission, order value, conversion evidence, cookie/attribution rules, availability and cancellations/refunds.
@@ -48,5 +49,5 @@ and skips any post already containing the marker. The scheduled GitHub Actions
 workflow is dry-run only. A real write needs an explicit manual `write` run and
 the `AFFILIATE_WRITE_ENABLED=true` GitHub secret.
 
-Add approved tracking URLs to `data/offers.json`; do not commit API keys,
+Add approved tracking URLs to `data/catalogs/{site_key}.json`; do not commit API keys,
 passwords, tokens, or unverified URLs.

@@ -1,0 +1,19 @@
+{
+  "site_key": "REPLACE_WITH_EXACT_SITE_KEY",
+  "status": "draft",
+  "offers": [
+    {
+      "slot": "coupang_topic_1",
+      "provider": "coupang_partners",
+      "title": "REPLACE_WITH_VERIFIED_PRODUCT",
+      "url": "https://REPLACE_WITH_REAL_TRACKING_URL",
+      "image_url": "https://REPLACE_WITH_PERMITTED_IMAGE_URL",
+      "image_alt": "Product image",
+      "keywords": [
+        "RELEVANT_TOPIC"
+      ],
+      "affiliate_link_verified": false,
+      "image_rights_verified": false
+    }
+  ]
+}

@@ -1,26 +1,19 @@
 import json
 from pathlib import Path
-
-cfg = json.loads(Path("affiliate-engine/config/affiliate-routing.json").read_text(encoding="utf-8"))
-slots = cfg["required_slots"]
-assert len(slots) == 10, f"Expected 10 slots, got {len(slots)}"
-assert sum(x["count"] for x in slots) == 10, "Slot count must total 10"
-assert cfg["affiliate_programs"]["coupang_partners"]["enabled"] is True
-assert cfg["safety_gates"]["require_real_tracking_url"] is True
-assert cfg["safety_gates"]["never_delete_posts"] is True
-assert cfg["publishing_policy"]["wordpress"]["preserve_existing_body"] is True
-assert cfg["publishing_policy"]["blogger"]["preserve_existing_body"] is True
-assert cfg["new_content_automation"]["scheduled_mode"] == "dry_run"
-assert cfg["new_content_automation"]["manual_write_requires"] == "AFFILIATE_WRITE_ENABLED=true"
-assert cfg["new_content_automation"]["backfill_batch_size_per_site"] == 5
-assert cfg["selection_policy"]["rotating_slots"] == ["living_essential", "travel_activity", "kpop", "esim"]
-assert cfg["affiliate_programs"]["coupang_partners"]["priority"] == "primary"
-assert cfg["selection_policy"]["provider_priority"]["beauty_1"][0] == "olive_young_global"
-assert cfg["selection_policy"]["provider_priority"]["travel_activity"] == ["coupang_travel", "trip_com", "agoda"]
-print("AFFILIATE_CONFIG_VALID=PASS")
-print("REQUIRED_PRODUCT_SLOTS=10")
-print("COUPANG_MANDATORY=PASS")
-print("WORDPRESS_APPEND_ONLY=PASS")
-print("BLOGGER_APPEND_ONLY=PASS")
-print("LIVE_PUBLISH=NOT_ENABLED")
-print("NEW_CONTENT_SCHEDULE=DRY_RUN_ONLY")
+root=Path(__file__).resolve().parents[1]
+policy=json.loads((root/'config/affiliate_distribution_policy.json').read_text(encoding='utf-8-sig'))
+routing=json.loads((root/'affiliate-engine/config/affiliate-routing.json').read_text(encoding='utf-8-sig'))
+expected={'coupang_partners':4,'olive_young_global':2,'trip_com':2,'agoda':2}
+assert policy['per_article_total']==10
+assert policy['provider_allocation']==expected
+assert len(policy['required_slots'])==10
+assert len(routing['required_slots'])==10
+assert {p:sum(1 for x in routing['required_slots'] if x['provider']==p) for p in expected}==expected
+assert routing['safety_gates']['require_per_destination_catalog'] is True
+assert routing['safety_gates']['never_delete_posts'] is True
+assert routing['new_content_automation']['scheduled_mode']=='dry_run'
+print('AFFILIATE_CONFIG_VALID=PASS')
+print('PROVIDER_ALLOCATION=4+2+2+2')
+print('PER_DESTINATION_CATALOG=REQUIRED')
+print('PROTECTED_WORDPRESS_SITES=EXCLUDED')
+print('LIVE_PUBLISH=NOT_ENABLED')

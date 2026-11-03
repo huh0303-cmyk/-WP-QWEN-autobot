@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """Append verified, per-destination affiliate offers to WordPress and Blogger."""
 from __future__ import annotations
 import argparse, hashlib, html, json, os, sys
@@ -27,13 +27,19 @@ def recent_since(hours:int)->str:
 
 def load_destinations(platform:str)->list[dict[str,str]]:
     profiles=load_json(ROOT/"config"/"content_engine_profiles.json")["profiles"]
+    protected={"khealth365","krealestate365","kworld365","oliveyoung","ksa"}
     seen=set(); out=[]
     for profile in profiles:
+        site_key=str(profile.get("site_key",""))
+        if platform=="wordpress" and site_key in protected:
+            continue
         target=profile.get(platform,{})
         key=str(target.get("url") or target.get("destination_id") or "").strip()
         if not key or key in seen or not target.get("ready_for_automation",True): continue
+        if platform=="wordpress" and target.get("content_type") in {"news_ko","news_en"}:
+            continue
         seen.add(key)
-        out.append({"site_key":str(profile["site_key"]),"url":str(target.get("url","")),"secret_name":str(target.get("secret_name","")),"destination_id":str(target.get("destination_id",""))})
+        out.append({"site_key":site_key,"url":str(target.get("url","")),"secret_name":str(target.get("secret_name","")),"destination_id":str(target.get("destination_id",""))})
     return out
 
 def load_site_offers(site_key:str)->list[dict[str,Any]]:
@@ -157,7 +163,7 @@ def main():
             try: results.extend(wordpress(dest,since,block_for,write,args.scope,args.batch_size))
             except (requests.RequestException,ValueError,RuntimeError) as exc: results.append({"platform":"wordpress","site":dest["site_key"],"action":"blocked","reason":str(exc)[:240]})
     if args.platform in {"blogger","all"}:
-        for dest in load_destinations("blogger"):
+        for dest in load_destinations("blogspot"):
             try: results.extend(blogger(dest,since,block_for,write,args.scope,args.batch_size))
             except (requests.RequestException,ValueError,RuntimeError) as exc: results.append({"platform":"blogger","site":dest["site_key"],"action":"blocked","reason":str(exc)[:240]})
     report={"generated_at":datetime.now(UTC).isoformat(),"scope":args.scope,"since":since,"batch_size":args.batch_size,"write":write,"policy":"4+2+2+2","results":results}
