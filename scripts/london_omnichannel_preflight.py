@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 import json
 from collections import Counter
 from datetime import datetime, timezone
@@ -24,16 +24,10 @@ def catalog_status(key:str)->dict:
     valid=data.get("status") in {"ready","verified"} and not missing and len(offers)==10
     return {"site_key":key,"status":"ready" if valid else "incomplete","verified_offers":sum(counts.values()),"provider_counts":dict(counts),"missing":missing}
 
-wp=[]; blogger=[]
-for p in PROFILES:
-    key=str(p.get("site_key",""))
-    w=p.get("wordpress",{})
-    if key not in PROTECTED and w.get("url") and w.get("content_type") not in {"news_ko","news_en"}:
-        wp.append("wp_"+key)
-    b=p.get("blogspot",{})
-    if b.get("url") and b.get("ready_for_automation",True):
-        blogger.append("blogger_"+key)
-yt_channels=YT.get("channels",[])
+registry=json.loads((ROOT/"config"/"automation_hub_sites.json").read_text(encoding="utf-8-sig"))["sites"]
+wp=[s["site_id"] for s in registry if s.get("platform")=="wordpress" and s.get("content_type")=="blog" and s.get("enabled",True) and s["site_id"] not in {"wp_khealth365","wp_krealestate","wp_kworld365","wp_oliveyoung","wp_ksa"}]
+blogger=[s["site_id"] for s in registry if s.get("platform")=="blogger" and s.get("content_type")=="blog" and s.get("enabled",True)]
+yt_channels=[c for group in YT.get("groups",{}).values() for c in group]
 sns_accounts=SNS.get("accounts",[])
 platforms={}
 for platform in ["TikTok","Instagram","Threads","Facebook"]:
@@ -45,8 +39,8 @@ report={
  "policy_version":POLICY["policy_version"],
  "affiliate_allocation":EXPECTED,
  "total_offers_per_article":POLICY["per_article_total"],
- "blogs":{"wordpress_eligible_excluding_locked_and_news":len(wp),"blogger":len(blogger),"catalogs_ready":sum(x["status"]=="ready" for x in catalogs),"catalogs_missing_or_incomplete":sum(x["status"]!="ready" for x in catalogs)},
- "youtube":{"registry_channels":len(yt_channels),"target_channels":POLICY["platform_scope"]["youtube"]["target_channels"],"enabled_channels":sum(c.get("enabled") is True for c in yt_channels)},
+ "blogs":{"wordpress_registry":len([s for s in registry if s.get("platform")=="wordpress" and s.get("content_type")=="blog" and s.get("enabled",True)]),"wordpress_locked_excluded":5,"wordpress_eligible_excluding_locked":len(wp),"blogger":len(blogger),"catalogs_ready":sum(x["status"]=="ready" for x in catalogs),"catalogs_missing_or_incomplete":sum(x["status"]!="ready" for x in catalogs)},
+ "youtube":{"registry_channels":len(yt_channels),"target_channels":YT.get("target_count",POLICY["platform_scope"]["youtube"]["target_channels"]),"identity_verified_channels":sum(bool(c.get("verified")) for c in yt_channels)},
  "social":platforms,
  "catalog_detail":catalogs,
  "live_writes_enabled":False,

@@ -26,21 +26,18 @@ def recent_since(hours:int)->str:
     return (datetime.now(UTC)-timedelta(hours=hours)).isoformat().replace("+00:00","Z")
 
 def load_destinations(platform:str)->list[dict[str,str]]:
-    profiles=load_json(ROOT/"config"/"content_engine_profiles.json")["profiles"]
-    protected={"khealth365","krealestate365","kworld365","oliveyoung","ksa"}
-    seen=set(); out=[]
-    for profile in profiles:
-        site_key=str(profile.get("site_key",""))
-        if platform=="wordpress" and site_key in protected:
+    registry=load_json(ROOT/"config"/"automation_hub_sites.json")["sites"]
+    protected={"wp_khealth365","wp_krealestate","wp_kworld365","wp_oliveyoung","wp_ksa"}
+    out=[]
+    for row in registry:
+        if row.get("platform")!=platform or row.get("content_type")!="blog":
             continue
-        target=profile.get(platform,{})
-        key=str(target.get("url") or target.get("destination_id") or "").strip()
-        if not key or key in seen or not target.get("ready_for_automation",True): continue
-        if platform=="wordpress" and target.get("content_type") in {"news_ko","news_en"}:
+        site_id=str(row.get("site_id",""))
+        if platform=="wordpress" and site_id in protected:
             continue
-        seen.add(key)
-        catalog_key=("wp_" if platform=="wordpress" else "blogger_")+site_key
-        out.append({"site_key":catalog_key,"url":str(target.get("url","")),"secret_name":str(target.get("secret_name","")),"destination_id":str(target.get("destination_id",""))})
+        if row.get("enabled",True) is not True:
+            continue
+        out.append({"site_key":site_id,"url":str(row.get("url","")),"secret_name":str(row.get("secret_name","")),"destination_id":str(row.get("blog_id") or row.get("destination_id") or "")})
     return out
 
 def load_site_offers(site_key:str)->list[dict[str,Any]]:
