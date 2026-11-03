@@ -18,8 +18,8 @@ Every WordPress domain and every Blogger blog has its own catalog. A WordPress c
 New articles receive a responsive 10-card affiliate section: four columns on desktop and two on mobile. Every card contains the permitted product image, title, tracking URL and “쇼핑하기” CTA. Add an affiliate disclosure and sponsored/nofollow attributes. Existing content is backfilled in small, reportable batches, append-only and idempotent. Preserve existing copy and links.
 
 ## Omnichannel distribution
-- WordPress: 25 requested destinations; new-content insertion and existing-post backfill.
-- Blogger: 33 requested destinations; new-content insertion and existing-post backfill.
+- WordPress: every enabled WordPress blog destination registered in control.korea365.org; new-content insertion and existing-post backfill.
+- Blogger: every enabled Blogger destination registered in control.korea365.org; new-content insertion and existing-post backfill.
 - YouTube: 23 channels; place relevant tracking links in descriptions and pinned comments only where allowed. Existing video-description edits require verified channel OAuth permissions.
 - TikTok: registered accounts; use bio/product-link surfaces supported by that account and region. Do not assume arbitrary clickable caption links.
 - Instagram: registered accounts; use profile/story/product-link surfaces available to the account. Do not assume caption URLs are clickable.
@@ -31,11 +31,11 @@ Each social platform receives a native adaptation of the source content rather t
 ## Rollout and safety
 1. Finish and validate K-trip365's own 10-offer catalog.
 2. Build KStudy365's separate catalog.
-3. Expand to the remaining eligible WordPress sites, then 33 Blogger blogs.
+3. Expand to all enabled WordPress blog destinations in the control-center registry, then all enabled Blogger blogs.
 4. Connect and verify the 23 YouTube channels.
 5. Verify each TikTok, Instagram, Threads and Facebook account and its publish/edit permissions.
 6. Run preview first. Live writes require an explicit manual approval gate and verified credentials.
 7. Never delete content, replace existing affiliate links, or claim an edit/publish succeeded without reading back a platform receipt.
 
 ## Current implementation status
-This policy is the approved target architecture, not a claim that every account is connected or every post has already been edited. The existing affiliate runner and four-network matrix still need to be aligned to this 10-total allocation before enabling live writes. Social connectors and existing-post edit scopes must be verified per account. Missing credentials, partner links, media, or API permissions are reported as blocked/awaiting setup, not silently skipped.
+Scope rule: all enabled site destinations listed in control.korea365.org are in scope except Naver Blog and Tistory. No WordPress site is excluded by a protected-site rule. This policy is the approved target architecture, not a claim that every account is connected or every post has already been edited. The existing affiliate runner and four-network matrix still need to be aligned to this 10-total allocation before enabling live writes. Social connectors and existing-post edit scopes must be verified per account. Missing credentials, partner links, media, or API permissions are reported as blocked/awaiting setup, not silently skipped.
