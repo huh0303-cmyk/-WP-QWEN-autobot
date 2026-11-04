@@ -200,6 +200,8 @@ def render_footer(title, article_text, site_id="", lang="en"):
         raise RuntimeError(f"Affiliate header requires verified Coupang + Olive Young + Trip.com buttons and hotel/flight/tour tracking links for site={site_id}")
     provider_buttons = []
     for button in header["buttons"]:
+        if button.get("provider") == "coupang_partners":
+            continue
         url = html.escape(button["affiliate_url"], quote=True)
         label = html.escape(button["label"])
         code = str(button.get("reward_code", "")).strip()
@@ -222,20 +224,22 @@ def render_footer(title, article_text, site_id="", lang="en"):
         )
     heading = "함께 살펴볼 추천 상품" if lang == "ko" else "10 Coupang Picks"
     return (START + '<section class="london-coupang-wrap" aria-label="Affiliate partners and Coupang products">'
-        '<nav class="london-provider-buttons" aria-label="Affiliate partners">' + ''.join(provider_buttons) + '</nav>'
-        '<nav class="london-trip-category-buttons" aria-label="Trip.com travel categories">' + ''.join(trip_buttons) + '</nav>'
         '<style>.london-coupang-wrap{margin:30px 0;padding:18px;border:1px solid #e5e7eb;border-radius:12px}'
         '.london-provider-buttons,.london-trip-category-buttons{display:flex;flex-wrap:wrap;gap:9px;margin:0 0 14px}'
         '.london-provider-button{flex:1 1 28%;text-align:center;padding:12px 10px;border-radius:8px;background:#17365d;color:#fff!important;text-decoration:none;font-weight:700}'
         '.london-reward-code{display:block;font-size:11px;font-weight:500;margin-top:4px}.london-trip-category-button{flex:1 1 28%;text-align:center;padding:9px 10px;border:1px solid #17365d;border-radius:7px;color:#17365d!important;text-decoration:none;font-size:13px;font-weight:600}'
-        '.london-coupang-wrap h2{font-size:20px;margin:14px 0 10px}.london-coupang-disclosure{font-size:12px;color:#666;margin:0 0 14px}'
+        '.london-coupang-wrap h2{font-size:20px;margin:14px 0 10px}.london-partner-heading{border-top:1px solid #e5e7eb;padding-top:18px;margin-top:24px!important}.london-coupang-disclosure{font-size:12px;color:#666;margin:0 0 14px}'
         '.london-coupang-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;align-items:stretch}'
         '.london-coupang-card{min-width:0;border:1px solid #e5e7eb;border-radius:10px;padding:10px;text-align:center;display:flex;flex-direction:column;background:#fff}'
         '.london-coupang-card img{width:100%;height:155px;object-fit:contain}.london-coupang-card strong{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:13px;line-height:1.45;margin:8px 0;min-height:2.9em;overflow-wrap:anywhere}'
         '.london-coupang-category{font-size:11px;color:#777}.london-coupang-button{margin-top:auto;background:#17365d;color:#fff!important;text-decoration:none;padding:9px 12px;border-radius:7px;font-size:13px;font-weight:700}'
         '@media(max-width:760px){.london-coupang-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.london-coupang-card img{height:125px}}</style>'
         '<h2>' + heading + '</h2><p class="london-coupang-disclosure">' + DISCLOSURE + '</p>'
-        '<div class="london-coupang-grid">' + ''.join(cards) + '</div></section>' + END)
+        '<div class="london-coupang-grid">' + ''.join(cards) + '</div>'
+        '<h2 class="london-partner-heading">함께 둘러볼 제휴 쇼핑·여행 사이트</h2>'
+        '<nav class="london-provider-buttons" aria-label="Partner stores">' + ''.join(provider_buttons) + '</nav>'
+        '<nav class="london-trip-category-buttons" aria-label="Trip.com travel categories">' + ''.join(trip_buttons) + '</nav>'
+        '</section>' + END)
 
 def apply_footer(content, title, site_id="", lang="en"):
     """Replace shared/K-Health legacy marker blocks or append once; never duplicate."""
