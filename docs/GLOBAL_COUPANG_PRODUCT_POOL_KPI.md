@@ -40,4 +40,4 @@ Maintain one shared, verified Coupang Partners product pool for all current and 
 - Future domains register to the shared pool; do not create a separate duplicate catalog unless a legal/provider constraint requires it.
 
 ## Current truthful status
-The code and import schema are being prepared. The repository's current verified per-site lists do not yet constitute 200 distinct cross-domain offers. The pool remains empty until real account-generated URLs and official images are imported. This prevents fabricated links or placeholder products from being published.
+The shared-pool code, importer, and existing-renderer integration are prepared in PR #245. The first seed contains 14 existing account-confirmed offers migrated from the K-Health365 and K-Trip365 catalogs (6 health, 2 beauty, 1 electronics/SIM, 5 lifestyle/travel accessories). The remaining 186 offers are not yet captured. Korea travel package and hotel categories currently have zero verified Coupang offers; do not invent or replace them with unrelated inventory. No posts have been backfilled by this PR.
