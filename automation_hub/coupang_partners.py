@@ -212,7 +212,7 @@ def render_footer(title, article_text, site_id="", lang="en"):
             '<article class="london-coupang-card"><a class="london-coupang-image-link" href="' + url + '" target="_blank" rel="sponsored nofollow noopener">'
             '<img src="' + image + '" alt="' + name + '" loading="lazy" decoding="async" referrerpolicy="unsafe-url">'
             '</a><small class="london-coupang-category">' + category + '</small><strong>' + name + '</strong><a class="london-coupang-button" href="' + url
-            + '" target="_blank" rel="sponsored nofollow noopener">???? ????</a></article>'
+            + '" target="_blank" rel="sponsored nofollow noopener">쿠팡에서 확인하기</a></article>'
         )
     heading = "함께 살펴볼 추천 상품" if lang == "ko" else "10 Coupang Picks"
     return (START + '<section class="london-coupang-wrap" aria-label="Affiliate partners and Coupang products">'
