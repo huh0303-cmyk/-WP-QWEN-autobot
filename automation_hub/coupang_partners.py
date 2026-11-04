@@ -15,6 +15,9 @@ CATEGORY_TERMS = {
     "k_beauty_olive_young": ("beauty", "skincare", "toner", "serum", "sunscreen", "cream", "cleanser", "에센스", "토너", "선크림", "화장품", "스킨", "앰플"),
     "k_health_supplements": ("health", "supplement", "vitamin", "omega", "probiotic", "lutein", "collagen", "칼슘", "비타민", "오메가", "유산균", "건강", "영양제", "콜라겐"),
     "korea_digital_esim_sim": ("esim", "e-sim", "sim card", "usim", "유심", "이심", "데이터"),
+    "k_electronics": ("laptop", "notebook", "tablet", "desktop pc", "monitor", "노트북", "랩탑", "태블릿", "데스크톱", "모니터", "컴퓨터"),
+    "korea_travel": ("korea tour", "seoul tour", "jeju tour", "busan tour", "한국 여행 패키지", "서울 투어", "제주 투어", "부산 투어"),
+    "korea_hotels": ("korea hotel", "seoul hotel", "hotel booking", "한국 호텔", "서울 호텔", "명동 호텔", "강남 호텔", "제주 호텔"),
     "korea_lifestyle_hot_items": ("kitchen", "travel", "household", "daily", "lifestyle", "생활", "주방", "여행", "생활용품", "핫아이템"),
 }
 def _load_json(path):
@@ -125,6 +128,12 @@ def load_candidates(site_id=""):
             item = _candidate(raw, key)
             if item and item["url"] not in seen:
                 seen.add(item["url"]); out.append(item)
+    # Shared cross-domain catalog: every registered blog draws from this one pool.
+    shared = _load_json(ROOT / "data/affiliate/global-coupang-product-pool.json") or {}
+    for raw in shared.get("products", []):
+        item = _candidate(raw, "global_shared_pool")
+        if item and item["url"] not in seen:
+            seen.add(item["url"]); out.append(item)
     return out
 
 def _score(item, text):
@@ -137,7 +146,12 @@ def _category(item):
     raw = item.get("category", "")
     if raw in {"kbeauty", "beauty", "toner", "serum", "mask", "cleanser", "moisturizer", "sunscreen", "device", "luxury"}: return "k_beauty_olive_young"
     if raw in {"health", "k_health", "supplement", "vitamin"}: return "k_health_supplements"
-    if raw in {"korean_life", "korea_life", "daily_life", "lifestyle"}: return "korea_lifestyle_hot_items"
+    if raw in {"k_beauty", "beauty", "kbeauty"}: return "k_beauty_olive_young"
+    if raw in {"k_health", "health", "supplement", "vitamin"}: return "k_health_supplements"
+    if raw in {"k_electronics", "electronics", "laptop", "tablet", "pc"}: return "k_electronics"
+    if raw in {"korea_travel", "travel_package", "tour_package"}: return "korea_travel"
+    if raw in {"korea_hotels", "hotel", "accommodation"}: return "korea_hotels"
+    if raw in {"k_lifestyle", "korean_life", "korea_life", "daily_life", "lifestyle"}: return "korea_lifestyle_hot_items"
     if raw in {"digital", "esim", "usim", "sim"}: return "korea_digital_esim_sim"
     s = item["search_text"]
     for cat, terms in CATEGORY_TERMS.items():
@@ -161,7 +175,7 @@ def select_products(title, article_text, site_id="", limit=10):
         if item["url"] not in used:
             chosen.append(item); used.add(item["url"])
     # Then softly seek the 2/2/2/2 category mix; missing categories are filled by best remaining products.
-    for cat in ("korea_lifestyle_hot_items", "k_beauty_olive_young", "k_health_supplements", "korea_digital_esim_sim"):
+    for cat in ("k_beauty_olive_young", "k_electronics", "k_health_supplements", "korea_travel", "korea_hotels", "korea_lifestyle_hot_items", "korea_digital_esim_sim"):
         cat_items = [p for p in ranked if _category(p) == cat and p["url"] not in used]
         for item in cat_items[:2]:
             if len(chosen) >= limit: break
@@ -200,7 +214,7 @@ def render_footer(title, article_text, site_id="", lang="en"):
             '</a><small class="london-coupang-category">' + category + '</small><strong>' + name + '</strong><a class="london-coupang-button" href="' + url
             + '" target="_blank" rel="sponsored nofollow noopener">???? ????</a></article>'
         )
-    heading = "?? ?? ?? 10?" if lang == "ko" else "10 Coupang Picks"
+    heading = "함께 살펴볼 추천 상품" if lang == "ko" else "10 Coupang Picks"
     return (START + '<section class="london-coupang-wrap" aria-label="Affiliate partners and Coupang products">'
         '<nav class="london-provider-buttons" aria-label="Affiliate partners">' + ''.join(provider_buttons) + '</nav>'
         '<nav class="london-trip-category-buttons" aria-label="Trip.com travel categories">' + ''.join(trip_buttons) + '</nav>'
@@ -209,7 +223,7 @@ def render_footer(title, article_text, site_id="", lang="en"):
         '.london-provider-button{flex:1 1 28%;text-align:center;padding:12px 10px;border-radius:8px;background:#17365d;color:#fff!important;text-decoration:none;font-weight:700}'
         '.london-trip-category-button{flex:1 1 28%;text-align:center;padding:9px 10px;border:1px solid #17365d;border-radius:7px;color:#17365d!important;text-decoration:none;font-size:13px;font-weight:600}'
         '.london-coupang-wrap h2{font-size:20px;margin:14px 0 10px}.london-coupang-disclosure{font-size:12px;color:#666;margin:0 0 14px}'
-        '.london-coupang-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;align-items:stretch}'
+        '.london-coupang-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;align-items:stretch}'
         '.london-coupang-card{min-width:0;border:1px solid #e5e7eb;border-radius:10px;padding:10px;text-align:center;display:flex;flex-direction:column;background:#fff}'
         '.london-coupang-card img{width:100%;height:155px;object-fit:contain}.london-coupang-card strong{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:13px;line-height:1.45;margin:8px 0;min-height:2.9em;overflow-wrap:anywhere}'
         '.london-coupang-category{font-size:11px;color:#777}.london-coupang-button{margin-top:auto;background:#17365d;color:#fff!important;text-decoration:none;padding:9px 12px;border-radius:7px;font-size:13px;font-weight:700}'
