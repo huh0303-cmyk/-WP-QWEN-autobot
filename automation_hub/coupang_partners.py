@@ -15,6 +15,9 @@ CATEGORY_TERMS = {
     "k_beauty_olive_young": ("beauty", "skincare", "toner", "serum", "sunscreen", "cream", "cleanser", "에센스", "토너", "선크림", "화장품", "스킨", "앰플"),
     "k_health_supplements": ("health", "supplement", "vitamin", "omega", "probiotic", "lutein", "collagen", "칼슘", "비타민", "오메가", "유산균", "건강", "영양제", "콜라겐"),
     "korea_digital_esim_sim": ("esim", "e-sim", "sim card", "usim", "유심", "이심", "데이터"),
+    "k_electronics": ("laptop", "notebook", "tablet", "desktop pc", "monitor", "노트북", "랩탑", "태블릿", "데스크톱", "모니터", "컴퓨터"),
+    "korea_travel": ("korea tour", "seoul tour", "jeju tour", "busan tour", "한국 여행 패키지", "서울 투어", "제주 투어", "부산 투어"),
+    "korea_hotels": ("korea hotel", "seoul hotel", "hotel booking", "한국 호텔", "서울 호텔", "명동 호텔", "강남 호텔", "제주 호텔"),
     "korea_lifestyle_hot_items": ("kitchen", "travel", "household", "daily", "lifestyle", "생활", "주방", "여행", "생활용품", "핫아이템"),
 }
 def _load_json(path):
@@ -43,6 +46,7 @@ def load_header_buttons(site_id=""):
     candidates = [
         ROOT / f"data/affiliate/{key}-header-buttons.json",
         ROOT / f"config/affiliate/header-buttons/{key}.json",
+        ROOT / "data/affiliate/global-header-buttons.json",
     ]
     for path in candidates:
         data = _load_json(path)
@@ -54,10 +58,11 @@ def load_header_buttons(site_id=""):
             continue
         if any(not str(x.get("affiliate_url", "")).startswith("https://") for x in buttons):
             continue
-        # Olive Young's account reward-code URL is retained as supplied, but its
-        # redirect/commission attribution is explicitly marked pending.
+        # A Reward Code may be displayed beside the official store link. Do not
+        # fabricate a Reward Link: Olive Young says tracking is embedded in links
+        # generated from its Affiliate dashboard. Keep code-only routing explicit.
         olive = next(x for x in buttons if x.get("provider") == "olive_young_global")
-        if olive.get("status") != "redirect_test_failed_gate_url_null" and olive.get("verified") is not True:
+        if olive.get("status") != "reward_code_only" and olive.get("verified") is not True:
             continue
         trip_categories = data.get("trip_com_categories", [])
         if tuple(x.get("key") for x in trip_categories) != ("hotels", "flights", "tours_and_packages"):
@@ -88,7 +93,9 @@ def _candidate(raw, source):
     price_raw = raw.get("price_krw") or raw.get("price") or raw.get("displayed_price") or ""
     digits = re.sub(r"[^0-9]", "", str(price_raw))
     price = int(digits) if digits else None
+    if price is not None and price < 10000: return None
     return {"url": url, "title": title.strip(), "image": image, "official_tag": official_tag, "source": source, "price_krw": price,
+            "popularity_score": float(raw.get("popularity_score") or 0), "rating": float(raw.get("rating") or 0), "review_count": int(raw.get("review_count") or 0),
             "category": str(raw.get("category", "")).lower(),
             "search_text": " ".join([title, str(raw.get("query","")), str(raw.get("category","")), str(raw.get("relevance","")), str(raw.get("description_en",""))]).lower()}
 
@@ -125,6 +132,12 @@ def load_candidates(site_id=""):
             item = _candidate(raw, key)
             if item and item["url"] not in seen:
                 seen.add(item["url"]); out.append(item)
+    # Shared cross-domain catalog: every registered blog draws from this one pool.
+    shared = _load_json(ROOT / "data/affiliate/global-coupang-product-pool.json") or {}
+    for raw in shared.get("products", []):
+        item = _candidate(raw, "global_shared_pool")
+        if item and item["url"] not in seen:
+            seen.add(item["url"]); out.append(item)
     return out
 
 def _score(item, text):
@@ -137,7 +150,12 @@ def _category(item):
     raw = item.get("category", "")
     if raw in {"kbeauty", "beauty", "toner", "serum", "mask", "cleanser", "moisturizer", "sunscreen", "device", "luxury"}: return "k_beauty_olive_young"
     if raw in {"health", "k_health", "supplement", "vitamin"}: return "k_health_supplements"
-    if raw in {"korean_life", "korea_life", "daily_life", "lifestyle"}: return "korea_lifestyle_hot_items"
+    if raw in {"k_beauty", "beauty", "kbeauty"}: return "k_beauty_olive_young"
+    if raw in {"k_health", "health", "supplement", "vitamin"}: return "k_health_supplements"
+    if raw in {"k_electronics", "electronics", "laptop", "tablet", "pc"}: return "k_electronics"
+    if raw in {"korea_travel", "travel_package", "tour_package"}: return "korea_travel"
+    if raw in {"korea_hotels", "hotel", "accommodation"}: return "korea_hotels"
+    if raw in {"k_lifestyle", "korean_life", "korea_life", "daily_life", "lifestyle"}: return "korea_lifestyle_hot_items"
     if raw in {"digital", "esim", "usim", "sim"}: return "korea_digital_esim_sim"
     s = item["search_text"]
     for cat, terms in CATEGORY_TERMS.items():
@@ -153,7 +171,7 @@ def select_products(title, article_text, site_id="", limit=10):
     for old_start, old_end in LEGACY_MARKERS:
         clean_text = re.sub(re.escape(old_start) + r".*?" + re.escape(old_end), " ", clean_text, flags=re.S)
     subject = f"{title} {clean_text[:5000]}"
-    ranked = sorted(pool, key=lambda p: (_score(p, subject), p.get("price_krw") is not None and p["price_krw"] <= 30000, p["source"] == "beauty"), reverse=True)
+    ranked = sorted(pool, key=lambda p: (_score(p, subject), p.get("popularity_score", 0), p.get("review_count", 0), p.get("rating", 0), p.get("price_krw") is not None and p["price_krw"] >= 20000), reverse=True)
     chosen, used = [], set()
     # First two are always selected by article relevance, not by a rigid category quota.
     for item in ranked:
@@ -161,7 +179,7 @@ def select_products(title, article_text, site_id="", limit=10):
         if item["url"] not in used:
             chosen.append(item); used.add(item["url"])
     # Then softly seek the 2/2/2/2 category mix; missing categories are filled by best remaining products.
-    for cat in ("korea_lifestyle_hot_items", "k_beauty_olive_young", "k_health_supplements", "korea_digital_esim_sim"):
+    for cat in ("k_beauty_olive_young", "k_electronics", "k_health_supplements", "korea_travel", "korea_hotels", "korea_lifestyle_hot_items", "korea_digital_esim_sim"):
         cat_items = [p for p in ranked if _category(p) == cat and p["url"] not in used]
         for item in cat_items[:2]:
             if len(chosen) >= limit: break
@@ -182,14 +200,18 @@ def render_footer(title, article_text, site_id="", lang="en"):
         raise RuntimeError(f"Affiliate header requires verified Coupang + Olive Young + Trip.com buttons and hotel/flight/tour tracking links for site={site_id}")
     provider_buttons = []
     for button in header["buttons"]:
+        if button.get("provider") == "coupang_partners":
+            continue
         url = html.escape(button["affiliate_url"], quote=True)
         label = html.escape(button["label"])
-        provider_buttons.append(f'<a class="london-provider-button" href="{url}" target="_blank" rel="sponsored nofollow noopener">{label}</a>')
+        code = str(button.get("reward_code", "")).strip()
+        code_html = f'<small class="london-reward-code">Reward code: {html.escape(code)}</small>' if code else ""
+        provider_buttons.append(f'<a class="london-provider-button" href="{url}" target="_blank" rel="sponsored nofollow noopener">{label}{code_html}</a>')
     trip_buttons = []
     for item in header["trip_com_categories"]:
         url = html.escape(item["affiliate_url"], quote=True)
         label = html.escape(item["label"])
-        trip_buttons.append(f'<a class="london-trip-category-button" href="{url}" target="_blank" rel="sponsored nofollow noopener">Trip.com ? {label}</a>')
+        trip_buttons.append(f'<a class="london-trip-category-button" href="{url}" target="_blank" rel="sponsored nofollow noopener">Trip.com · {label}</a>')
     cards = []
     for p in products:
         url, image, name = (html.escape(p[k], quote=True) for k in ("url","image","title"))
@@ -198,24 +220,26 @@ def render_footer(title, article_text, site_id="", lang="en"):
             '<article class="london-coupang-card"><a class="london-coupang-image-link" href="' + url + '" target="_blank" rel="sponsored nofollow noopener">'
             '<img src="' + image + '" alt="' + name + '" loading="lazy" decoding="async" referrerpolicy="unsafe-url">'
             '</a><small class="london-coupang-category">' + category + '</small><strong>' + name + '</strong><a class="london-coupang-button" href="' + url
-            + '" target="_blank" rel="sponsored nofollow noopener">???? ????</a></article>'
+            + '" target="_blank" rel="sponsored nofollow noopener">쿠팡에서 확인하기</a></article>'
         )
-    heading = "?? ?? ?? 10?" if lang == "ko" else "10 Coupang Picks"
+    heading = "함께 살펴볼 추천 상품" if lang == "ko" else "10 Coupang Picks"
     return (START + '<section class="london-coupang-wrap" aria-label="Affiliate partners and Coupang products">'
-        '<nav class="london-provider-buttons" aria-label="Affiliate partners">' + ''.join(provider_buttons) + '</nav>'
-        '<nav class="london-trip-category-buttons" aria-label="Trip.com travel categories">' + ''.join(trip_buttons) + '</nav>'
         '<style>.london-coupang-wrap{margin:30px 0;padding:18px;border:1px solid #e5e7eb;border-radius:12px}'
         '.london-provider-buttons,.london-trip-category-buttons{display:flex;flex-wrap:wrap;gap:9px;margin:0 0 14px}'
         '.london-provider-button{flex:1 1 28%;text-align:center;padding:12px 10px;border-radius:8px;background:#17365d;color:#fff!important;text-decoration:none;font-weight:700}'
-        '.london-trip-category-button{flex:1 1 28%;text-align:center;padding:9px 10px;border:1px solid #17365d;border-radius:7px;color:#17365d!important;text-decoration:none;font-size:13px;font-weight:600}'
-        '.london-coupang-wrap h2{font-size:20px;margin:14px 0 10px}.london-coupang-disclosure{font-size:12px;color:#666;margin:0 0 14px}'
-        '.london-coupang-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;align-items:stretch}'
+        '.london-reward-code{display:block;font-size:11px;font-weight:500;margin-top:4px}.london-trip-category-button{flex:1 1 28%;text-align:center;padding:9px 10px;border:1px solid #17365d;border-radius:7px;color:#17365d!important;text-decoration:none;font-size:13px;font-weight:600}'
+        '.london-coupang-wrap h2{font-size:20px;margin:14px 0 10px}.london-partner-heading{border-top:1px solid #e5e7eb;padding-top:18px;margin-top:24px!important}.london-coupang-disclosure{font-size:12px;color:#666;margin:0 0 14px}'
+        '.london-coupang-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;align-items:stretch}'
         '.london-coupang-card{min-width:0;border:1px solid #e5e7eb;border-radius:10px;padding:10px;text-align:center;display:flex;flex-direction:column;background:#fff}'
         '.london-coupang-card img{width:100%;height:155px;object-fit:contain}.london-coupang-card strong{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:13px;line-height:1.45;margin:8px 0;min-height:2.9em;overflow-wrap:anywhere}'
         '.london-coupang-category{font-size:11px;color:#777}.london-coupang-button{margin-top:auto;background:#17365d;color:#fff!important;text-decoration:none;padding:9px 12px;border-radius:7px;font-size:13px;font-weight:700}'
         '@media(max-width:760px){.london-coupang-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.london-coupang-card img{height:125px}}</style>'
         '<h2>' + heading + '</h2><p class="london-coupang-disclosure">' + DISCLOSURE + '</p>'
-        '<div class="london-coupang-grid">' + ''.join(cards) + '</div></section>' + END)
+        '<div class="london-coupang-grid">' + ''.join(cards) + '</div>'
+        '<h2 class="london-partner-heading">함께 둘러볼 제휴 쇼핑·여행 사이트</h2>'
+        '<nav class="london-provider-buttons" aria-label="Partner stores">' + ''.join(provider_buttons) + '</nav>'
+        '<nav class="london-trip-category-buttons" aria-label="Trip.com travel categories">' + ''.join(trip_buttons) + '</nav>'
+        '</section>' + END)
 
 def apply_footer(content, title, site_id="", lang="en"):
     """Replace shared/K-Health legacy marker blocks or append once; never duplicate."""

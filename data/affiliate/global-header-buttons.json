@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "scope": "shared_blog_footer_all_domains",
+  "buttons": [
+    {
+      "provider": "coupang_partners",
+      "label": "쿠팡 추천 상품 10개",
+      "affiliate_url": "https://partners.coupang.com/",
+      "status": "product_cards_use_individual_item_tracking_urls",
+      "verified": true
+    },
+    {
+      "provider": "olive_young_global",
+      "label": "OLIVE YOUNG 바로가기",
+      "affiliate_url": "https://global.oliveyoung.com/",
+      "reward_code": "HUH556423",
+      "status": "reward_code_only",
+      "verified": false,
+      "note": "Use official store homepage and display code. Do not invent Reward Link; replace with dashboard-generated Reward Link when supplied."
+    },
+    {
+      "provider": "trip_com",
+      "label": "Trip.com 바로가기",
+      "affiliate_url": "https://www.trip.com/t/aQYZrw101X2",
+      "status": "user_supplied_tracking_link",
+      "verified": true
+    }
+  ],
+  "trip_com_categories": [
+    {
+      "key": "hotels",
+      "label": "호텔",
+      "affiliate_url": "https://www.trip.com/t/aQYZrw101X2",
+      "verified": true,
+      "source": "user_supplied"
+    },
+    {
+      "key": "flights",
+      "label": "항공권",
+      "affiliate_url": "https://www.trip.com/t/f4V2USA01X2",
+      "verified": true,
+      "source": "user_supplied"
+    },
+    {
+      "key": "tours_and_packages",
+      "label": "투어·패키지",
+      "affiliate_url": "https://www.trip.com/t/gLWOuLU01X2",
+      "verified": true,
+      "source": "user_supplied"
+    }
+  ],
+  "disabled_providers": [
+    "agoda"
+  ],
+  "notes": [
+    "Trip.com primary button routes to supplied hotel tracking link; category shortcuts use the supplied hotel, flight, and tour tracking URLs.",
+    "Olive Young button routes to official Global homepage and displays Reward Code HUH556423. Code-only homepage routing is not represented as a verified Reward Link.",
+    "Agoda remains disabled until an approved account tracking URL is supplied."
+  ]
+}

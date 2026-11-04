@@ -1,6 +1,6 @@
 {
-  "version": 6,
-  "name": "London Project affiliate layout standard v6 - five category Coupang mix",
+  "version": 7,
+  "name": "London Project shared global Coupang pool v7",
   "platforms": [
     "wordpress",
     "blogger"
@@ -17,50 +17,51 @@
       "coupang_partners": 10
     },
     "per_article_category_count": {
-      "beauty_cosmetics": 2,
-      "laptop": 1,
-      "desktop_pc": 1,
+      "beauty": 2,
+      "electronics": 2,
       "health_supplements": 2,
-      "korea_travel_packages": 2,
-      "hotel_products": 2
+      "korea_travel": 1,
+      "korea_hotels": 1,
+      "k_lifestyle": 2
     },
     "pool_target_per_site": 100,
     "pool_category_count": {
-      "beauty_cosmetics": 20,
-      "laptop": 10,
-      "desktop_pc": 10,
-      "health_supplements": 20,
-      "korea_travel_packages": 20,
-      "hotel_products": 20
+      "k_beauty": 40,
+      "k_electronics": 40,
+      "k_health": 40,
+      "korea_travel": 30,
+      "korea_hotels": 30,
+      "k_lifestyle": 20
     },
     "randomize_per_article": true,
     "avoid_repeating_same_ten_item_set": true,
     "rotation_window_posts": {
-      "min": 10,
+      "min": 1,
       "max": 20
-    }
+    },
+    "pool_target_global": 200,
+    "shared_across_all_domains": true
   },
   "trip_com_categories": [],
   "disabled_providers": [
     "agoda"
   ],
   "selection_principles": [
-    "This v6 policy supersedes every older affiliate category-mix instruction in the repository.",
-    "Each article has exactly three branded header buttons in this order: Coupang Partners, OLIVE YOUNG, Trip.com.",
-    "All ten bottom product cards are genuine Coupang Partners products only.",
-    "Every article contains exactly 2 beauty/cosmetics, 1 laptop, 1 desktop PC, 2 health supplements, 2 Korea travel packages, and 2 Korea hotel products.",
-    "Each site's product pool is site-specific and targets approximately 100 verified Coupang offers: 20 beauty, 10 laptops, 10 desktop PCs, 20 health supplements, 20 Korea travel packages, 20 hotel products.",
-    "Rotate product selections so the ten-item set generally changes every 10 to 20 posts; do not force every single article to have a completely unique set.",
-    "Use article topic relevance for selection within the five required categories without changing the category counts.",
-    "Use only genuine account-generated Coupang tracking links and official product images captured from Coupang Partners. Never invent links, products, images, prices, sales, reviews or commissions.",
-    "Olive Young and Trip.com are branded header buttons only, not bottom product-card providers.",
+    "All enabled blogs and future registered domains draw from one shared global Coupang product pool; do not create isolated site catalogs by default.",
+    "Every published article receives exactly 10 Coupang Partners product cards with account-generated tracking URLs and official Coupang images.",
+    "Initial shared catalog target is 200 offers: 40 K-Beauty, 40 K-Electronics, 40 K-Health, 30 Korea Travel, 30 Korea Hotels, 20 K-Lifestyle.",
+    "Per-article target mix: 2 beauty, 2 electronics, 2 health supplements, 1 Korea travel, 1 Korea hotel, 2 lifestyle. If a category has no eligible products, backfill with the strongest remaining verified products and record the shortfall.",
+    "Products are selected by article relevance, genuine popularity/review evidence, and deterministic rotation keyed by domain and post ID. A post keeps a stable selection; different posts should not all repeat the same ten items.",
+    "Use only account-generated Coupang Partners tracking URLs and official product images. Never invent links, products, images, prices, sales, reviews, or commissions.",
+    "Prioritize broadly appealing, credible products and mid-to-premium price points. Avoid low-price filler. Health products must not carry unsupported treatment or prevention claims.",
+    "Hotel and travel package inventory must be real purchasable Coupang offers with valid tracking links. If no eligible offer exists, report the shortage; never invent or substitute a non-Coupang booking link.",
     "Preserve editorial body, status, publication date, featured image and SEO metadata; replace only the designated affiliate block.",
-    "Apply this policy to both existing published articles (backfill) and every newly created article before it is published."
+    "Apply to both existing published articles (backfill) and new articles before publication, after catalog and destination verification."
   ],
   "display": {
     "position": "end_of_article",
     "layout": "responsive_product_cards",
-    "desktop_columns": 4,
+    "desktop_columns": 5,
     "mobile_columns": 2,
     "show_product_image": true,
     "show_product_title": true,
@@ -80,7 +81,7 @@
     "agoda_enabled": false,
     "require_trip_com_three_tracked_categories": true,
     "olive_young_reward_url_verification_pending": true,
-    "require_exact_category_mix": true,
+    "require_exact_category_mix": false,
     "require_site_pool_target_100": true,
     "randomize_per_article": true,
     "avoid_repeated_ten_product_set": true,
@@ -91,9 +92,14 @@
       "trip_com": "blue"
     },
     "rotation_window_posts": {
-      "min": 10,
+      "min": 1,
       "max": 20
     },
-    "future_posts_must_include_affiliate_block": true
+    "future_posts_must_include_affiliate_block": true,
+    "require_global_pool_target_200": true,
+    "shared_pool_all_domains": true,
+    "require_account_generated_links": true,
+    "require_official_images": true,
+    "never_publish_unverified_products": true
   }
 }

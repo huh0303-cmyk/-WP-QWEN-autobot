@@ -9,6 +9,8 @@ on:
       - "data/affiliate/catalogs/**"
       - "data/affiliate/*-products.json"
       - "automation_hub/coupang_partners.py"
+      - "automation_hub/global_coupang_pool.py"
+      - "data/affiliate/global-coupang-product-pool.json"
       - "scripts/audit_coupang_catalog_coverage.py"
 permissions:
   contents: read
