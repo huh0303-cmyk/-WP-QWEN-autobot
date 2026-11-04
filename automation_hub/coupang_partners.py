@@ -46,6 +46,7 @@ def load_header_buttons(site_id=""):
     candidates = [
         ROOT / f"data/affiliate/{key}-header-buttons.json",
         ROOT / f"config/affiliate/header-buttons/{key}.json",
+        ROOT / "data/affiliate/global-header-buttons.json",
     ]
     for path in candidates:
         data = _load_json(path)
@@ -57,10 +58,11 @@ def load_header_buttons(site_id=""):
             continue
         if any(not str(x.get("affiliate_url", "")).startswith("https://") for x in buttons):
             continue
-        # Olive Young's account reward-code URL is retained as supplied, but its
-        # redirect/commission attribution is explicitly marked pending.
+        # A Reward Code may be displayed beside the official store link. Do not
+        # fabricate a Reward Link: Olive Young says tracking is embedded in links
+        # generated from its Affiliate dashboard. Keep code-only routing explicit.
         olive = next(x for x in buttons if x.get("provider") == "olive_young_global")
-        if olive.get("status") != "redirect_test_failed_gate_url_null" and olive.get("verified") is not True:
+        if olive.get("status") != "reward_code_only" and olive.get("verified") is not True:
             continue
         trip_categories = data.get("trip_com_categories", [])
         if tuple(x.get("key") for x in trip_categories) != ("hotels", "flights", "tours_and_packages"):
@@ -200,12 +202,14 @@ def render_footer(title, article_text, site_id="", lang="en"):
     for button in header["buttons"]:
         url = html.escape(button["affiliate_url"], quote=True)
         label = html.escape(button["label"])
-        provider_buttons.append(f'<a class="london-provider-button" href="{url}" target="_blank" rel="sponsored nofollow noopener">{label}</a>')
+        code = str(button.get("reward_code", "")).strip()
+        code_html = f'<small class="london-reward-code">Reward code: {html.escape(code)}</small>' if code else ""
+        provider_buttons.append(f'<a class="london-provider-button" href="{url}" target="_blank" rel="sponsored nofollow noopener">{label}{code_html}</a>')
     trip_buttons = []
     for item in header["trip_com_categories"]:
         url = html.escape(item["affiliate_url"], quote=True)
         label = html.escape(item["label"])
-        trip_buttons.append(f'<a class="london-trip-category-button" href="{url}" target="_blank" rel="sponsored nofollow noopener">Trip.com ? {label}</a>')
+        trip_buttons.append(f'<a class="london-trip-category-button" href="{url}" target="_blank" rel="sponsored nofollow noopener">Trip.com · {label}</a>')
     cards = []
     for p in products:
         url, image, name = (html.escape(p[k], quote=True) for k in ("url","image","title"))
@@ -223,7 +227,7 @@ def render_footer(title, article_text, site_id="", lang="en"):
         '<style>.london-coupang-wrap{margin:30px 0;padding:18px;border:1px solid #e5e7eb;border-radius:12px}'
         '.london-provider-buttons,.london-trip-category-buttons{display:flex;flex-wrap:wrap;gap:9px;margin:0 0 14px}'
         '.london-provider-button{flex:1 1 28%;text-align:center;padding:12px 10px;border-radius:8px;background:#17365d;color:#fff!important;text-decoration:none;font-weight:700}'
-        '.london-trip-category-button{flex:1 1 28%;text-align:center;padding:9px 10px;border:1px solid #17365d;border-radius:7px;color:#17365d!important;text-decoration:none;font-size:13px;font-weight:600}'
+        '.london-reward-code{display:block;font-size:11px;font-weight:500;margin-top:4px}.london-trip-category-button{flex:1 1 28%;text-align:center;padding:9px 10px;border:1px solid #17365d;border-radius:7px;color:#17365d!important;text-decoration:none;font-size:13px;font-weight:600}'
         '.london-coupang-wrap h2{font-size:20px;margin:14px 0 10px}.london-coupang-disclosure{font-size:12px;color:#666;margin:0 0 14px}'
         '.london-coupang-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;align-items:stretch}'
         '.london-coupang-card{min-width:0;border:1px solid #e5e7eb;border-radius:10px;padding:10px;text-align:center;display:flex;flex-direction:column;background:#fff}'
