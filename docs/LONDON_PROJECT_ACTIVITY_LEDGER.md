@@ -675,3 +675,14 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - Existing preflight (generated 2026-11-03) is preview-only (live_writes_enabled=false); 23 YouTube channels listed; social publish connections show 0 for TikTok, Instagram, Threads and Facebook. Treat as stale baseline and re-run before rollout. Do not claim social publication without receipts.
 - Power settings changed on AC: standby timeout = Never (0); hibernate timeout = Never (0). Monitor may turn off; PC must remain awake and powered for local DC/PS work. Reverify after reboot or power-plan change.
 - Next actions: audit master products (deduplicate, count per category, check image/link fields); finalize SeoulMall six collections and add 20 products through authenticated Coupang portal; verify public store; then build/test reusable responsive banner component and apply to K-trip365 first, followed by the locked site sequence. Keep all writes backed up and verified.
+
+
+## seoulmall-global-link-rollout-20261104-user-directive
+- 2026-11-04 KST — 사용자가 서울몰의 목적을 명확히 확정: 보유/등록된 모든 WordPress, Blogspot, YouTube, TikTok, Facebook, Instagram, Threads의 기존 콘텐츠와 향후 신규 콘텐츠에 SeoulMall 링크를 삽입한다.
+- 오늘 실행 순서는 사용자 지정 순서로 고정: **WordPress → Blogspot → YouTube → TikTok → Facebook → Instagram → Threads**. 기존의 다른 플랫폼 순서가 있으면 이 지시가 우선한다.
+- 사용자는 공개 스토어 slug를 `seoulshop`에서 `seoulmall`로 바꾸라고 명시했다. 현재 검증된 URL은 여전히 `https://influencers.coupang.com/s/seoulshop`; `https://influencers.coupang.com/s/seoulmall`은 아직 확인되지 않았다. 인증된 스토어 설정에서 변경 가능 여부를 확인하고, UI에 변경 기능이 없으면 쿠팡 공식 지원에 변경 요청한다. 새 URL이 실제로 열리고 사용자 스토어를 표시하기 전에는 새 주소를 콘텐츠에 삽입하지 않는다.
+- 플랫폼별 적용 방식은 assistant가 판단한다: WordPress/Blogspot은 반응형 배너·CTA, YouTube는 채널 링크 및 영상 설명란, SNS는 각 플랫폼이 허용하는 프로필/바이오/게시물 위치. 기존 콘텐츠는 원문·메타데이터·미디어를 보존하고 중복 삽입을 방지한다. 향후 신규 콘텐츠에는 발행 파이프라인에서 자동 포함한다.
+- 기존 게시물 수정이 불가능하거나 API가 허용하지 않는 플랫폼은 지원되는 프로필/바이오 표면과 신규 콘텐츠에 적용하고, 기존 게시물 수정 불가 범위를 정확히 보고한다. 공식 API 또는 인증된 UI만 사용한다.
+- 플랫폼별 실행 절차: 전체 대상 인벤토리 → 백업/내보내기(가능한 경우) → dry-run → 대표 1건 테스트 → 승인/권한 확인 → 단계별 적용 → 읽기/공개 결과 재검증. 플랫폼별 eligible/changed/skipped/failed 수량과 증거를 기록한다. 확인되지 않은 완료 주장은 금지.
+- 기존 5개 잠금 WordPress 사이트는 다른 설정/콘텐츠를 건드리지 않는다. 이번 명시적 전역 지시는 서울몰 링크만 삽입하는 범위에 한해 적용하며, 그 외 변경은 금지한다.
+- 지시 기록 시점에는 전체 플랫폼에 서울몰 링크 삽입이 실행되지 않았고, slug 변경도 검증되지 않았다.
