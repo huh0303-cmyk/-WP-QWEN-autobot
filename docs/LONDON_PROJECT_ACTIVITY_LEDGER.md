@@ -663,3 +663,16 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - Affiliate insertion script and workflow: scripts/oliveyoung_kskin365_insert_coupang.py; .github/workflows/oliveyoung-kskin365-coupang-insert.yml. Run dry_run before apply; final public verification required.
 - Product pool: data/affiliate/oliveyoung-kskin365-verified-product-pool.json; placement map: reports/oliveyoung-kskin365-affiliate-placement-map-2026-11-01.json.
 - WPVibe remains prohibited; DC + PowerShell required.
+
+
+## seoulmall-omnichannel-rollout-20261104
+
+- User authorized execution of the SeoulMall storefront completion and omnichannel rollout. Locked order: SeoulMall storefront; K-trip365.com; JobKorea365.com; JobKoreaGlobal.com; KoreaWedding365.com; KStudy365.com; StudyInKorea365.com; K-Health365.com; then all eligible websites and YouTube/TikTok/Facebook/Instagram/Threads channels registered in control.korea365.org.
+- Brand standard: SEOUL MALL / “Beyond BTS, Discover Korea.” Six collections: K-Beauty, K-Health, K-Tour, K-Hotels, K-Digitals, K-Life. Initial target 20 products total with images and verified account-generated Coupang tracking links. Actual tours/hotels only in K-Tour/K-Hotels; accessories belong in K-Life.
+- Live browser inspection: SeoulMall display name and slogan are present; public store slug remains seoulshop; five legacy collections contain two products each (10 total). No six-category rename or 20-product storefront completion is verified yet.
+- Local PC ChrisHUH is online. Repo C:\Users\huh03\LondonProject, branch main initially ahead 1 of origin/main; working tree contains many existing uncommitted/untracked changes. Do not reset, clean, or bulk-stage unrelated files. Existing Coupang master product file has 70 unique product IDs; all 70 records have account-generated affiliate URLs and official image URLs: 16 beauty, 19 health, 11 tour packages, 10 hotel products, 10 tablets and 4 laptops. No K-Life essentials or mobile phones yet; popularity and current availability require verification.
+- Existing K-trip365 backfill preview is blocked by missing site-specific catalog ktrip365-affiliate-matrix.json; no bulk post update is authorized until catalog and dry-run checks pass.
+- Existing preflight (generated 2026-11-03) is preview-only (live_writes_enabled=false); 23 YouTube channels listed; social publish connections show 0 for TikTok, Instagram, Threads and Facebook. Treat as stale baseline and re-run before rollout. Do not claim social publication without receipts.
+- Power settings changed on AC: standby timeout = Never (0); hibernate timeout = Never (0). Monitor may turn off; PC must remain awake and powered for local DC/PS work. Reverify after reboot or power-plan change.
+- GitHub plan file created on main: docs/SEOULMALL_OMNICHANNEL_ROLLOUT_2026-11-04.md (commit 3aaea54af3d5220f5a960f687b9931f78ce08128). Local push was rejected because origin/main has remote commits not yet fetched; do not force-push. Reconcile local/remote history before the next push.
+- Next actions: complete six storefront collections and add 20 relevant products via authenticated Coupang portal; verify public store; build/test reusable responsive banner component and apply to K-trip365 first, followed by the locked site sequence. Keep all writes backed up and verified.
