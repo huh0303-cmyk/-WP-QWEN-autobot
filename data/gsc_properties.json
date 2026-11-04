@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-03T12:25:19.942454+09:00",
+  "generated_at": "2026-11-04T11:05:42.132013+09:00",
   "count": 119,
   "properties": [
     {
@@ -296,7 +296,7 @@
     },
     {
       "siteUrl": "https://sis-korea.com/",
-      "permissionLevel": "siteOwner"
+      "permissionLevel": "siteUnverifiedUser"
     },
     {
       "siteUrl": "https://skin.k-health365.com/",
@@ -328,7 +328,7 @@
     },
     {
       "siteUrl": "https://theseouljournal.com/",
-      "permissionLevel": "siteOwner"
+      "permissionLevel": "siteUnverifiedUser"
     },
     {
       "siteUrl": "https://wearable-device.k-health365.com/",
@@ -468,7 +468,7 @@
     },
     {
       "siteUrl": "sc-domain:sis-korea.com",
-      "permissionLevel": "siteOwner"
+      "permissionLevel": "siteUnverifiedUser"
     },
     {
       "siteUrl": "sc-domain:studyinkorea365.com",
@@ -476,7 +476,7 @@
     },
     {
       "siteUrl": "sc-domain:theseouljournal.com",
-      "permissionLevel": "siteOwner"
+      "permissionLevel": "siteUnverifiedUser"
     }
   ]
 }
