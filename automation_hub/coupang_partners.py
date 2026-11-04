@@ -91,7 +91,9 @@ def _candidate(raw, source):
     price_raw = raw.get("price_krw") or raw.get("price") or raw.get("displayed_price") or ""
     digits = re.sub(r"[^0-9]", "", str(price_raw))
     price = int(digits) if digits else None
+    if price is not None and price < 10000: return None
     return {"url": url, "title": title.strip(), "image": image, "official_tag": official_tag, "source": source, "price_krw": price,
+            "popularity_score": float(raw.get("popularity_score") or 0), "rating": float(raw.get("rating") or 0), "review_count": int(raw.get("review_count") or 0),
             "category": str(raw.get("category", "")).lower(),
             "search_text": " ".join([title, str(raw.get("query","")), str(raw.get("category","")), str(raw.get("relevance","")), str(raw.get("description_en",""))]).lower()}
 
@@ -167,7 +169,7 @@ def select_products(title, article_text, site_id="", limit=10):
     for old_start, old_end in LEGACY_MARKERS:
         clean_text = re.sub(re.escape(old_start) + r".*?" + re.escape(old_end), " ", clean_text, flags=re.S)
     subject = f"{title} {clean_text[:5000]}"
-    ranked = sorted(pool, key=lambda p: (_score(p, subject), p.get("price_krw") is not None and p["price_krw"] <= 30000, p["source"] == "beauty"), reverse=True)
+    ranked = sorted(pool, key=lambda p: (_score(p, subject), p.get("popularity_score", 0), p.get("review_count", 0), p.get("rating", 0), p.get("price_krw") is not None and p["price_krw"] >= 20000), reverse=True)
     chosen, used = [], set()
     # First two are always selected by article relevance, not by a rigid category quota.
     for item in ranked:
