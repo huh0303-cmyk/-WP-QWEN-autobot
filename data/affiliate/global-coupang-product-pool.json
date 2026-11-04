@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "policy": "cross_domain_shared_pool",
+  "targets": {
+    "k_beauty": 40,
+    "k_electronics": 40,
+    "k_health": 40,
+    "korea_travel": 30,
+    "korea_hotels": 30,
+    "k_lifestyle": 20
+  },
+  "products": []
+}
