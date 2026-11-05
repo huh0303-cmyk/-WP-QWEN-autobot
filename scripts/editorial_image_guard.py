@@ -82,19 +82,19 @@ def strip_title_duplicate_lead_image(content, title):
     source = content.lstrip()
     # Only inspect the very first content block; never sweep the full article.
     patterns = (
-        r"^(<figure\\b[^>]*>.*?</figure>\\s*)",
-        r"^(<p\\b[^>]*>\\s*<img\\b[^>]*>\\s*</p>\\s*)",
-        r"^(<img\\b[^>]*>\\s*)",
+        r"^(<figure\b[^>]*>.*?</figure>\s*)",
+        r"^(<p\b[^>]*>\s*<img\b[^>]*>\s*</p>\s*)",
+        r"^(<img\b[^>]*>\s*)",
     )
     for pattern in patterns:
         match = re.match(pattern, source, flags=re.IGNORECASE | re.DOTALL)
         if not match:
             continue
         block = match.group(1)
-        image = re.search(r"<img\\b[^>]*>", block, flags=re.IGNORECASE | re.DOTALL)
+        image = re.search(r"<img\b[^>]*>", block, flags=re.IGNORECASE | re.DOTALL)
         if not image:
             return content
-        alt = re.search(r"""\\balt\\s*=\\s*(['"])(.*?)\\1""", image.group(0),
+        alt = re.search(r"""\balt\s*=\s*(['"])(.*?)\1""", image.group(0),
                         flags=re.IGNORECASE | re.DOTALL)
         if not alt:
             return content
