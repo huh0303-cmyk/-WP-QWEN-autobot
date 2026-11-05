@@ -104,7 +104,7 @@ def select_next_ready(rows, now, enabled, limit=1):
     This ignores the planned clock time but keeps identity, duplicate, active-work,
     topic, and private-upload guards intact. Past calendar history is never reused.
     """
-    blocked = {r["key"] for r in rows if r["status"] in {"자료수집", "대본작성", "검수중"}}
+    blocked = _recent_active_channels(rows, now)
     occupied = {(r["key"], r["when"].date()) for r in rows
                 if r["status"] != READY or r["url"] or "[yt-calendar:" in r["notes"]}
     candidates = [
