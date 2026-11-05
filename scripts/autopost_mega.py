@@ -3080,7 +3080,7 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
 
     from automation_hub.repetition_guard import fetch_wp_history, repetition_issues, clean_opening, opening
     body_html = clean_opening(title, body_html)
-    try:
+    # If the generator embedded the title hero inline, remove only that first image;\n    # the theme will render featured_media and all later editorial/product images stay intact.\n    from editorial_image_guard import strip_title_duplicate_lead_image\n    body_html = strip_title_duplicate_lead_image(body_html, title)\n    try:
         repeat_errors = repetition_issues(title, body_html, fetch_wp_history(requests, url, (WP_USER, pw)))
         if repeat_errors:
             return {"ok": False, "error": "; ".join(repeat_errors)}
