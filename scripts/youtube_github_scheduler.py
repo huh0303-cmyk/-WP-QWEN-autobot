@@ -2,6 +2,7 @@
 """GitHub Actions scheduler for one due YouTube calendar row per run."""
 from __future__ import annotations
 
+import argparse
 import datetime as dt
 import os
 import sys
@@ -18,8 +19,8 @@ from gsheets_direct import get_sheets_service
 from youtube_github_worker import process_one
 
 
-def has_due_calendar_row() -> bool:
-    """Read calendar and channel enablement without claiming or changing a row."""
+def find_due_channel(channel_filter: str = "") -> str:
+    """Return the exact enabled channel key for the next due calendar row."""
     spreadsheet_id = os.environ.get("SHEET_ID", "").strip()
     if not spreadsheet_id:
         raise RuntimeError("SHEET_ID is required for the GitHub YouTube scheduler")
@@ -41,22 +42,33 @@ def has_due_calendar_row() -> bool:
         if len(row) >= 7 and row[6] in {"ON", "TRUE", "1"}
     }
     enabled = set(channels) & sheet_enabled
+    if channel_filter:
+        if channel_filter not in channels:
+            raise ValueError(f"Unknown YouTube channel key: {channel_filter}")
+        enabled &= {channel_filter}
     selected, _ = select_due(
         read_calendar(service, spreadsheet_id),
         dt.datetime.now(KST),
         enabled,
         1,
     )
-    return bool(selected)
+    return selected[0]["key"] if selected else ""
 
 
 def main() -> int:
-    check_cost_hold()
-    if not has_due_calendar_row():
-        print("No due YouTube calendar row; no job enqueued.")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--channel", default="", help="Optionally restrict dispatch to one locked channel key")
+    args = parser.parse_args()
+
+    channel_key = find_due_channel(args.channel)
+    if not channel_key:
+        print(f"No due YouTube calendar row for {args.channel or 'enabled channels'}; no job enqueued.")
         return 0
 
-    enqueue("", "Scheduled YouTube calendar item", "youtube_scheduler", run_now=False)
+    # Check the actual selected channel, not an empty scheduler placeholder.
+    # This is required for narrowly scoped free-only exceptions during cost hold.
+    check_cost_hold(channel_key)
+    enqueue(channel_key, "Scheduled YouTube calendar item", f"youtube_{channel_key}", run_now=False)
     if not process_one():
         raise RuntimeError("GitHub scheduler did not process the due calendar row")
     return 0
