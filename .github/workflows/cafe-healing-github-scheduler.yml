@@ -1,0 +1,86 @@
+name: CAFE HEALING Free-Only GitHub Scheduler
+
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: youtube-github-publisher
+  cancel-in-progress: false
+
+jobs:
+  publish-due-healing:
+    runs-on: ubuntu-latest
+    environment: youtube-channels
+    timeout-minutes: 180
+    env:
+      PYTHONUNBUFFERED: "1"
+      YOUTUBE_COST_HOLD: ${{ vars.YOUTUBE_COST_HOLD }}
+      PLAYLIST_FREE_ONLY_CHANNEL: healing
+      PLAYLIST_MUSIC_SOURCE: procedural_free
+      PLAYLIST_IMAGE_SOURCE: pexels_direct_free
+      PLAYLIST_PAID_API_ENABLED: "false"
+      AUTO_TOPIC: "false"
+      HEALING_VARIANT: random
+      GEMINI_API_KEY: ""
+      OPENAI_API_KEY: ""
+      LYRIA_API_KEY: ""
+      FISH_AUDIO_API_KEY: ""
+      PIXABAY_KEY: ""
+      PEXELS_API_KEY: ""
+      SHEET_ID: ${{ secrets.SHEET_ID }}
+      GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+      GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+      GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+      YOUTUBE_OAUTH_CLIENT_ID_HEALING: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_HEALING }}
+      YOUTUBE_OAUTH_CLIENT_SECRET_HEALING: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_HEALING }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_HEALING: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_HEALING }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install free runner tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --upgrade pip
+          python -m pip install --disable-pip-version-check requests Pillow google-api-python-client google-auth google-auth-httplib2 google-auth-oauthlib pydub mutagen numpy scipy moviepy
+      - name: Validate isolated free-only healing path
+        run: |
+          set -euo pipefail
+          test "${PLAYLIST_FREE_ONLY_CHANNEL}" = "healing"
+          test "${PLAYLIST_PAID_API_ENABLED}" = "false"
+          test "${AUTO_TOPIC}" = "false"
+          test "${HEALING_VARIANT}" = "random"
+          test -z "${GEMINI_API_KEY}"
+          test -z "${OPENAI_API_KEY}"
+          test -z "${LYRIA_API_KEY}"
+          test -z "${FISH_AUDIO_API_KEY}"
+          test -z "${PIXABAY_KEY}"
+          test -n "${SHEET_ID}"
+          test -n "${GOOGLE_OAUTH_CLIENT_ID}"
+          test -n "${GOOGLE_OAUTH_CLIENT_SECRET}"
+          test -n "${GOOGLE_OAUTH_REFRESH_TOKEN}"
+          test -n "${YOUTUBE_OAUTH_CLIENT_ID_HEALING}"
+          test -n "${YOUTUBE_OAUTH_CLIENT_SECRET_HEALING}"
+          test -n "${YOUTUBE_OAUTH_REFRESH_TOKEN_HEALING}"
+          test -f assets/playlist-review/forest-birds-cc0.mp3
+          echo "Free-only CAFE HEALING checks passed; paid generation providers are disabled."
+      - name: Process only a due CAFE HEALING calendar row
+        run: python scripts/youtube_github_scheduler.py --channel healing
+      - name: Save sanitized healing receipts and logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cafe-healing-github-scheduler-${{ github.run_id }}
+          path: |
+            artifacts/youtube_playlist_result.json
+            data/youtube_github_queue/logs/
+          if-no-files-found: warn
+          retention-days: 30
