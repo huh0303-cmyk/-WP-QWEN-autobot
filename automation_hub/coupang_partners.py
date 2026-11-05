@@ -140,15 +140,17 @@ def _score(item, text):
     return len(tokens & words)
 
 def _category(item):
-    raw = item.get("category", "")
-    if raw in {"kbeauty", "beauty", "toner", "serum", "mask", "cleanser", "moisturizer", "sunscreen", "device", "luxury"}: return "k_beauty_olive_young"
-    if raw in {"health", "k_health", "supplement", "vitamin"}: return "k_health_supplements"
-    if raw in {"korean_life", "korea_life", "daily_life", "lifestyle"}: return "korea_lifestyle_hot_items"
-    if raw in {"digital", "esim", "usim", "sim"}: return "korea_digital_esim_sim"
+    raw = str(item.get("category", "")).lower()
+    if raw in {"kbeauty", "beauty", "toner", "serum", "mask", "cleanser", "moisturizer", "sunscreen", "k_beauty_skincare"}:
+        return "k_beauty_skincare"
+    if raw in {"health", "k_health", "supplement", "vitamin", "health_functional_foods"}:
+        return "health_functional_foods"
     s = item["search_text"]
-    for cat, terms in CATEGORY_TERMS.items():
-        if any(term in s for term in terms): return cat
-    return "korea_lifestyle_hot_items"
+    if any(term in s for term in CATEGORY_TERMS["k_beauty_olive_young"]):
+        return "k_beauty_skincare"
+    if any(term in s for term in CATEGORY_TERMS["k_health_supplements"]):
+        return "health_functional_foods"
+    return "other"
 
 def _canonical_asset_url(value):
     """Normalize equivalent escaped/unescaped URLs for duplicate-image checks."""
@@ -224,24 +226,13 @@ def select_products(title, article_text, site_id="", limit=10):
         unique_pool.append(item)
     pool = unique_pool
     if not pool: return []
-    subject = f"{title} {clean_text[:5000]}"
-    ranked = sorted(pool, key=lambda p: (_score(p, subject), p.get("price_krw") is not None and p["price_krw"] <= 30000, p["source"] == "beauty"), reverse=True)
-    chosen, used = [], set()
-    # First two are always selected by article relevance, not by a rigid category quota.
-    for item in ranked:
-        if len(chosen) >= min(2, limit): break
-        if item["url"] not in used:
-            chosen.append(item); used.add(item["url"])
-    # Then softly seek the 2/2/2/2 category mix; missing categories are filled by best remaining products.
-    for cat in ("korea_lifestyle_hot_items", "k_beauty_olive_young", "k_health_supplements", "korea_digital_esim_sim"):
-        cat_items = [p for p in ranked if _category(p) == cat and p["url"] not in used]
-        for item in cat_items[:2]:
-            if len(chosen) >= limit: break
-            chosen.append(item); used.add(item["url"])
-    for item in ranked:
-        if len(chosen) >= limit: break
-        if item["url"] not in used:
-            chosen.append(item); used.add(item["url"])
+    ranked = sorted(pool, key=lambda p: (_category(p) != "health_functional_foods", p["title"].lower()))
+    chosen = []
+    for category in ("health_functional_foods", "k_beauty_skincare"):
+        candidates = [p for p in ranked if _category(p) == category]
+        if len(candidates) < 5:
+            raise ValueError(f"affiliate_catalog_requires_five_{category}:found_{len(candidates)}")
+        chosen.extend(candidates[:5])
     chosen = chosen[:min(limit, 10)]
     return chosen
 
