@@ -119,8 +119,8 @@ def main():
                 # A Coupang product page may deny automated image resolution (403).
                 # Never fail the whole fleet or substitute an unverified image.
                 khealth_image_error = type(exc).__name__ + ": " + str(exc)[:180]
-        if platform == "wordpress" and (not policy or policy.get("provider") != "coupang"):
-            report["sites"].append({"site_id":sid,"url":site.get("url"),"platform":platform,"status":"held_by_master_policy","provider":(policy or {}).get("provider","unlisted"),"reason":"This Coupang-only workflow does not process no-affiliate, excluded, Trip.com, or Olive Young destinations."})
+        if platform == "wordpress" and (not policy or policy.get("provider") in {"none", "excluded"}):
+            report["sites"].append({"site_id":sid,"url":site.get("url"),"platform":platform,"status":"held_by_master_policy","provider":(policy or {}).get("provider","unlisted"),"reason":"Master policy excludes commercial product blocks for this destination."})
             continue
         catalog_count = len(load_candidates(sid))
         entry = {"site_id":sid,"url":site.get("url"),"platform":platform,
