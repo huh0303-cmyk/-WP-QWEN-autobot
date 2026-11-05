@@ -93,7 +93,7 @@ def build_block(offers:list[dict[str,Any]],header_buttons:list[dict[str,Any]]|No
         if b.get("verified") is not True and not (b.get("provider")=="olive_young_global" and b.get("status")=="redirect_test_failed_gate_url_null"):
             raise ValueError(f"unverified_header_button:{b.get('provider')}")
         provider=b["provider"]; label=labels[provider]
-        logo_url=b.get("logo_url") or logo_fallback[provider]
+        logo_url=logo_fallback[provider]
         logo=f'<img class="london-affiliate-brand-logo" src="{html.escape(logo_url,quote=True)}" alt="{label} official company logo" loading="lazy" decoding="async"/>'
         buttons.append(f'<a class="london-affiliate-provider-button {provider}" style="--brand-color:{colors[provider]}" href="{html.escape(b["affiliate_url"],quote=True)}" target="_blank" rel="sponsored nofollow noopener" aria-label="{label} affiliate link">{logo}<span>{label}</span></a>')
     cards=[]
