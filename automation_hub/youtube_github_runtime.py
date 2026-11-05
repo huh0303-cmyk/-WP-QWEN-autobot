@@ -17,41 +17,47 @@ def cost_hold_active() -> bool:
 
 
 def free_only_channel_allowed(channel_key: str) -> bool:
-    """Allow only explicitly isolated, no-paid-API playlist paths during the global cost hold."""
-    if os.environ.get("PLAYLIST_FREE_ONLY_CHANNEL", "") != channel_key:
+    """Permit narrowly configured no-paid-API playlist paths while global cost hold remains active."""
+    channel = channel_key.strip().lower()
+    if channel not in {"globalmusic", "mbb"}:
         return False
-    if os.environ.get("PLAYLIST_PAID_API_ENABLED", "true").strip().lower() not in {"false", "0", "no", "off"}:
+    if os.environ.get("PLAYLIST_FREE_ONLY_CHANNEL", "").strip().lower() != channel:
         return False
-    if any(os.environ.get(key, "").strip() for key in
-           ("GEMINI_API_KEY", "OPENAI_API_KEY", "LYRIA_API_KEY", "FISH_AUDIO_API_KEY", "PIXABAY_KEY")):
+    if os.environ.get("PLAYLIST_PAID_API_ENABLED", "false").strip().lower() not in {"false", "0", "no", "off"}:
         return False
-    if os.environ.get("AUTO_TOPIC", "").strip().lower() != "false":
+    if any(os.environ.get(key, "").strip() for key in ("GEMINI_API_KEY", "OPENAI_API_KEY", "LYRIA_API_KEY")):
         return False
-    if channel_key == "globalmusic":
+
+    if channel == "globalmusic":
         if os.environ.get("PLAYLIST_MUSIC_SOURCE", "") != "owner_drive":
             return False
         if os.environ.get("PLAYLIST_IMAGE_SOURCE", "") != "pexels_api":
+            return False
+        if os.environ.get("AUTO_TOPIC", "").strip().lower() != "false":
+            return False
+        if not os.environ.get("CAPTION_TEXT", "").strip():
             return False
         required_free = (
             "GOOGLE_OAUTH_REFRESH_TOKEN", "MUSIC_SOURCE_FOLDER_ID_GLOBALMUSIC",
             "THUMBNAIL_FOLDER_ID_GLOBALMUSIC", "PEXELS_API_KEY",
             "YOUTUBE_OAUTH_REFRESH_TOKEN_GLOBALMUSIC",
         )
-        return all(os.environ.get(key, "").strip() for key in required_free)
-    if channel_key == "healing":
-        if os.environ.get("PLAYLIST_MUSIC_SOURCE", "") != "procedural_free":
+    else:
+        # Mozart: existing approved Drive recordings + free Pexels photography only.
+        if os.environ.get("PLAYLIST_MUSIC_SOURCE", "") != "approved_bank":
             return False
-        if os.environ.get("PLAYLIST_IMAGE_SOURCE", "") != "pexels_direct_free":
+        if os.environ.get("PLAYLIST_IMAGE_SOURCE", "") != "pexels_api":
             return False
-        if os.environ.get("HEALING_VARIANT", "") != "random":
+        if os.environ.get("AUTO_TOPIC", "").strip().lower() != "false":
             return False
         required_free = (
-            "SHEET_ID", "GOOGLE_OAUTH_CLIENT_ID", "GOOGLE_OAUTH_CLIENT_SECRET",
-            "GOOGLE_OAUTH_REFRESH_TOKEN", "YOUTUBE_OAUTH_CLIENT_ID_HEALING",
-            "YOUTUBE_OAUTH_CLIENT_SECRET_HEALING", "YOUTUBE_OAUTH_REFRESH_TOKEN_HEALING",
+            "GOOGLE_OAUTH_CLIENT_ID", "GOOGLE_OAUTH_CLIENT_SECRET", "GOOGLE_OAUTH_REFRESH_TOKEN",
+            "MUSIC_SOURCE_FOLDER_ID_MBB", "THUMBNAIL_FOLDER_ID_MBB", "PEXELS_API_KEY",
+            "YOUTUBE_OAUTH_CLIENT_ID_MBB", "YOUTUBE_OAUTH_CLIENT_SECRET_MBB",
+            "YOUTUBE_OAUTH_REFRESH_TOKEN_MBB",
         )
-        return all(os.environ.get(key, "").strip() for key in required_free)
-    return False
+    return all(os.environ.get(key, "").strip() for key in required_free)
+
 
 def check_cost_hold(channel_key: str = "") -> None:
     if cost_hold_active():
