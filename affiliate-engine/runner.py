@@ -90,7 +90,7 @@ def build_block(offers:list[dict[str,Any]],header_buttons:list[dict[str,Any]]|No
         cat=category_key(o.get("category")); counts[cat]=counts.get(cat,0)+1
     if counts!=expected_mix: raise ValueError(f"product_category_mix_mismatch:{counts}")
     if not header_buttons or len(header_buttons)!=3: raise ValueError("missing_three_header_provider_buttons")
-    expected=("coupang_partners","trip_com","olive_young_global")
+    expected=("coupang_partners","olive_young_global","trip_com")
     button_map={x.get("provider"):x for x in header_buttons}
     if set(button_map)!=set(expected): raise ValueError("header_button_provider_set_mismatch")
     header_buttons=[button_map[p] for p in expected]
