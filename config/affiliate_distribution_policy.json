@@ -1,5 +1,5 @@
 {
-  "policy_version": "6.0.0",
+  "policy_version": "7.0.0",
   "effective_date": "2026-11-05",
   "timezone": "Asia/Seoul",
   "per_article_total": 10,
@@ -69,8 +69,8 @@
     }
   ],
   "catalog_rules": {
-    "separate_catalog_per_destination": true,
-    "never_share_between_wordpress_and_blogger": true,
+    "separate_catalog_per_destination": false,
+    "never_share_between_wordpress_and_blogger": false,
     "minimum_verified_offers_per_provider_per_site": {
       "coupang_partners": 10
     },
@@ -100,7 +100,9 @@
     },
     "randomize_products_per_article": false,
     "avoid_same_ten_product_set_on_different_articles": false,
-    "require_unique_products_within_article": true
+    "require_unique_products_within_article": true,
+    "fixed_ten_product_set_per_week": true,
+    "weekly_catalog_path": "config/affiliate/global-weekly-10.json"
   },
   "rendering": {
     "blog_cards": true,
@@ -120,12 +122,14 @@
     "wordpress": {
       "target_count": 25,
       "new_content": true,
-      "existing_post_backfill": true
+      "existing_post_backfill": true,
+      "weekly_catalog_shared": true
     },
     "blogger": {
       "target_count": 33,
       "new_content": true,
-      "existing_post_backfill": true
+      "existing_post_backfill": true,
+      "weekly_catalog_shared": true
     },
     "youtube": {
       "target_channels": 23,
@@ -137,42 +141,37 @@
       ],
       "respect_video_privacy_and_channel_policy": true,
       "workflow": ".github/workflows/london-social-affiliate-10-links.yml",
-      "destination_catalog_pattern": "affiliate-engine/data/catalogs/youtube_{channel_key}.json"
+      "destination_catalog_pattern": "config/affiliate/global-weekly-10.json",
+      "weekly_catalog_shared": true
     },
     "tiktok": {
       "all_registered_accounts": true,
-      "new_content": true,
-      "existing_post_edit_only_if_api_supported": true,
+      "weekly_catalog_shared": true,
       "placement": [
-        "bio_link",
-        "supported_product_link",
-        "caption_when_allowed"
+        "canonical_weekly_landing_page",
+        "supported_product_link"
       ],
-      "workflow": ".github/workflows/london-social-affiliate-10-links.yml",
-      "destination_catalog_pattern": "affiliate-engine/data/catalogs/sns_{platform}_{role}.json"
+      "workflow": ".github/workflows/london-social-affiliate-10-links.yml"
     },
     "instagram": {
       "all_registered_accounts": true,
-      "new_content": true,
-      "existing_post_edit_only_if_api_supported": true,
+      "weekly_catalog_shared": true,
       "placement": [
-        "caption_when_allowed",
-        "profile_link",
-        "story_link_when_available"
+        "canonical_weekly_landing_page",
+        "story_link_when_available",
+        "caption_link_only_when_supported"
       ],
-      "workflow": ".github/workflows/london-social-affiliate-10-links.yml",
-      "destination_catalog_pattern": "affiliate-engine/data/catalogs/sns_{platform}_{role}.json"
+      "workflow": ".github/workflows/london-social-affiliate-10-links.yml"
     },
     "threads": {
       "all_registered_accounts": true,
-      "new_content": true,
-      "existing_post_edit_only_if_api_supported": true,
+      "weekly_catalog_shared": true,
       "placement": [
+        "canonical_weekly_landing_page",
         "post_link_when_allowed",
         "profile_link"
       ],
-      "workflow": ".github/workflows/london-social-affiliate-10-links.yml",
-      "destination_catalog_pattern": "affiliate-engine/data/catalogs/sns_{platform}_{role}.json"
+      "workflow": ".github/workflows/london-social-affiliate-10-links.yml"
     },
     "facebook": {
       "all_registered_pages": true,
@@ -207,14 +206,16 @@
     "agoda_enabled": false,
     "must_validate_exact_category_mix_before_publish": true,
     "must_validate_unique_randomized_set_per_post": false,
-    "never_publish_with_pool_below_required_category_counts": true
+    "never_publish_with_pool_below_required_category_counts": true,
+    "weekly_catalog_is_single_source": true,
+    "do_not_change_locked_set_without_exception": true
   },
   "rollout_order": [
-    "Canonical v6: three header affiliate buttons in order Coupang Partners, Trip.com, OLIVE YOUNG",
-    "Every article/video/social placement uses ten Coupang Partners products only: five health functional food/wellness products and five K-Beauty skincare products",
-    "Each destination has its own ten-product Coupang tracking catalog and official permitted product images",
-    "Weekly review: replace only selected products when needed; never invent tracking URLs or images",
-    "Pilot K-Health365 only; fleet rollout remains disabled until owner approves after reviewing the pilot"
+    "One global weekly catalog: exactly 10 Coupang Partners products shared by all registered channels for 168 hours",
+    "Fixed mix: five K-Beauty skincare and five health functional food/wellness products",
+    "Adapt display per platform; all URLs and image assets resolve to the same global product records",
+    "Review weekly using verified clicks, orders, confirmed commissions, availability, tracking and image health; selectively replace only when justified",
+    "Pilot on K-Health365; fleet publishing remains disabled until owner approves after pilot review"
   ],
   "scope_exclusions": [
     "naver",
@@ -309,5 +310,15 @@
     "pilot_only": true,
     "expand_to_all_control_korea365_org_destinations": false,
     "requires_owner_approval_after_public_pilot_review": true
+  },
+  "weekly_global_catalog": {
+    "path": "config/affiliate/global-weekly-10.json",
+    "source_of_truth": true,
+    "shared_across_all_platforms": true,
+    "lock_duration_hours": 168,
+    "active_set_id": "global-week-2026-11-05",
+    "separate_per_destination_catalogs": false,
+    "randomize": false,
+    "replace_only_for_verified_exceptions": true
   }
 }
