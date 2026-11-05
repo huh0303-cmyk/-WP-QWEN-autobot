@@ -391,21 +391,21 @@ def _remove_legacy_provider_and_product_shelf(content):
     """
     content = content or ""
     start = re.search(
-        r'<a\\b(?=[^>]*href=[\\x22\\x27]https://link\\.coupang\\.com/)[^>]*>\\s*Coupang\\s+Partners\\s*</a>',
+        r'<a\b(?=[^>]*href=[\x22\x27]https://link\.coupang\.com/)[^>]*>\s*Coupang\s+Partners\s*</a>',
         content, re.I | re.S
     )
     if not start:
         return content
     tail = content[start.start():]
     logo = re.search(
-        r'<a\\b(?=[^>]*aria-label=[\\x22\\x27]Trip\\.com company logo[\\x22\\x27])[^>]*>[\\s\\S]*?</a>',
+        r'<a\b(?=[^>]*aria-label=[\x22\x27]Trip\.com company logo[\x22\x27])[^>]*>[\s\S]*?</a>',
         tail, re.I
     )
     if logo:
         return content[:start.start()] + tail[logo.end():]
     # Fallback for older versions without a logo row: remove only the legacy
     # block up to the next canonical category/tags/footer boundary.
-    boundary = re.search(r'<(?:div|section)\\b[^>]*(?:class=[\\x22\\x27][^\\x22\\x27]*(?:post-categories|entry-footer|tags-links)[^\\x22\\x27]*[\\x22\\x27])', tail, re.I)
+    boundary = re.search(r'<(?:div|section)\b[^>]*(?:class=[\x22\x27][^\x22\x27]*(?:post-categories|entry-footer|tags-links)[^\x22\x27]*[\x22\x27])', tail, re.I)
     if boundary:
         return content[:start.start()] + tail[boundary.start():]
     return content
