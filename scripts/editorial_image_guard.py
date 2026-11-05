@@ -64,3 +64,43 @@ def filter_wp_images(site, images, auth=None):
     except Exception as exc:
         print(f"IMAGE_CHECK_UNAVAILABLE: {type(exc).__name__}; no unchecked image attached")
         return []
+
+
+def strip_title_duplicate_lead_image(content, title):
+    """Remove only a leading inline hero whose ALT exactly matches the post title.
+
+    WordPress themes render featured_media separately. Some article generators
+    already embed the same lead image in body HTML, producing two hero images.
+    This deliberately narrow rule preserves all later editorial/product images.
+    """
+    import html
+    import re
+
+    if not content or not title:
+        return content
+    title_key = " ".join(html.unescape(re.sub(r"<[^>]+>", "", str(title))).split()).casefold()
+    source = content.lstrip()
+    # Only inspect the very first content block; never sweep the full article.
+    patterns = (
+        r"^(<figure\\b[^>]*>.*?</figure>\\s*)",
+        r"^(<p\\b[^>]*>\\s*<img\\b[^>]*>\\s*</p>\\s*)",
+        r"^(<img\\b[^>]*>\\s*)",
+    )
+    for pattern in patterns:
+        match = re.match(pattern, source, flags=re.IGNORECASE | re.DOTALL)
+        if not match:
+            continue
+        block = match.group(1)
+        image = re.search(r"<img\\b[^>]*>", block, flags=re.IGNORECASE | re.DOTALL)
+        if not image:
+            return content
+        alt = re.search(r"""\\balt\\s*=\\s*(['"])(.*?)\\1""", image.group(0),
+                        flags=re.IGNORECASE | re.DOTALL)
+        if not alt:
+            return content
+        alt_key = " ".join(html.unescape(alt.group(2)).split()).casefold()
+        if alt_key == title_key:
+            leading_ws = len(content) - len(content.lstrip())
+            return content[:leading_ws] + source[match.end():].lstrip()
+        return content
+    return content
