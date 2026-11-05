@@ -11,14 +11,14 @@ on:
           - preview
           - apply
       limit:
-        description: "Keep 1 for this single-post pilot."
+        description: "0 processes every published K-Health365 post; use a positive number to limit."
         required: true
-        default: "1"
+        default: "0"
         type: string
       post_id:
-        description: "Exact K-Health365 post ID for the one-article pilot."
+        description: "Use 0 to process all published posts; otherwise process this exact post ID."
         required: true
-        default: "6987"
+        default: "0"
         type: string
 permissions:
   contents: read
