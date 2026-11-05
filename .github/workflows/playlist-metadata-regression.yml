@@ -9,6 +9,7 @@ on:
       - "automation_hub/youtube_github_runtime.py"
       - ".github/workflows/cafe-mozart-publish.yml"
       - "tests/test_playlist_owner_policy.py"
+      - "tests/test_cafe_mozart_free_publish.py"
       - ".github/workflows/playlist-metadata-regression.yml"
   pull_request:
     paths:
@@ -36,4 +37,4 @@ jobs:
       - name: Compile playlist publisher and cost-hold guard
         run: python -m compileall -q automation_hub/youtube_github_runtime.py scripts/youtube_playlist_maker.py scripts/youtube_github_worker.py scripts/youtube_publish_approved.py
       - name: Run playlist metadata regression tests
-        run: pytest -q tests/test_playlist_owner_policy.py
+        run: pytest -q tests/test_playlist_owner_policy.py tests/test_cafe_mozart_free_publish.py
