@@ -258,7 +258,7 @@ def _remove_legacy_single_product_modules(content):
             tag = match.group(0)
             if tag.startswith("</"):
                 continue
-            class_match = re.search(r"""\bclass\\s*=\\s*["']([^"']*)["']""", tag, re.I)
+            class_match = re.search(r"""\bclass\s*=\s*["']([^"']*)["']""", tag, re.I)
             classes = set((class_match.group(1).split() if class_match else []))
             if "affiliate-recommendation" in classes:
                 start_tag = match
