@@ -98,8 +98,9 @@ def main():
             tr.raise_for_status()
             blogger_token = tr.json()["access_token"]
 
-    dashboard = json.loads((ROOT / "docs/dashboard.json").read_text(encoding="utf-8-sig"))
-    dashboard_wp_hosts = {urlparse(str(r.get("url", ""))).netloc.lower() for r in dashboard.get("rows", []) if r.get("platform") in {"wordpress", "newsroom"} and r.get("url")}
+    # The control-room automation registry is authoritative. Do not silently
+    # exclude enabled WordPress destinations merely because dashboard metrics
+    # are missing or stale.
 
     report = {"mode":args.mode,"platform":args.platform,"started_at":time.strftime("%Y-%m-%dT%H:%M:%SZ",time.gmtime()),
               "sites":[],"totals":{"posts_seen":0,"updated":0,"already_ten":0,"needs_catalog":0,"skipped_legacy":0,"errors":0}}
@@ -112,10 +113,6 @@ def main():
         if not site.get("enabled", True): continue
         if args.site_id and sid != args.site_id: continue
         if args.platform != "all" and platform != args.platform: continue
-        if platform == "wordpress" and not args.site_id:
-            host = urlparse(str(site.get("url", ""))).netloc.lower()
-            if host not in dashboard_wp_hosts:
-                continue
         site_key = sid.split("_",1)[-1]
         site_domain = urlparse(site.get("url", "")).netloc.lower().removeprefix("www.")
         policy = WP_AFFILIATE_POLICY.get(site_domain) if platform == "wordpress" else None
@@ -131,9 +128,9 @@ def main():
                 # A Coupang product page may deny automated image resolution (403).
                 # Never fail the whole fleet or substitute an unverified image.
                 khealth_image_error = type(exc).__name__ + ": " + str(exc)[:180]
-        if platform == "wordpress" and (not policy or policy.get("provider") in {"none", "excluded"}):
-            report["sites"].append({"site_id":sid,"url":site.get("url"),"platform":platform,"status":"held_by_master_policy","provider":(policy or {}).get("provider","unlisted"),"reason":"Master policy excludes commercial product blocks for this destination."})
-            continue
+        # Owner's explicit 2026-11-05 network-wide instruction overrides
+        # older per-domain affiliate exclusions for this specific footer rollout.
+        # All enabled blog destinations use the one verified global weekly set.
         catalog_count = len(select_products("Global weekly set", "", sid))
         entry = {"site_id":sid,"url":site.get("url"),"platform":platform,
                  "verified_products":catalog_count,"posts_seen":0,"updated":0,
