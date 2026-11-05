@@ -139,7 +139,7 @@ def _knowledge(env: dict[str, str], log_handle) -> str:
 
 
 def run_job(job: dict) -> None:
-    check_cost_hold()
+    check_cost_hold(job.get("channel_key", ""))
     _update_dashboard(job, "running")
     log_dir = queue_root() / "logs"
     log_dir.mkdir(parents=True, exist_ok=True)
@@ -174,8 +174,6 @@ def run_job(job: dict) -> None:
 
 
 def process_one() -> bool:
-    if cost_hold_active():
-        return False
     root = queue_root()
     for name in ("pending", "running", "completed", "failed", "logs"):
         (root / name).mkdir(parents=True, exist_ok=True)
@@ -188,6 +186,8 @@ def process_one() -> bool:
         pending = sorted((root / "pending").glob("*.json"))
         if not pending:
             return False
+        job = json.loads(pending[0].read_text(encoding="utf-8"))
+        check_cost_hold(job.get("channel_key", ""))
         source = pending[0]
         running = root / "running" / source.name
         os.replace(source, running)
