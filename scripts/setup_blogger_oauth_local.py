@@ -143,7 +143,7 @@ def main() -> int:
     print(f"발급 완료: {OUTPUT}")
     print("토큰 값은 출력하지 않았습니다. 이 파일은 .gitignore의 .local/ 아래에 있습니다.")
     print("Drive scope 보존과 Blogger scope 추가가 확인됐습니다.")
-    print("새 GitHub Secret을 만들지 말고 기존 GOOGLE_OAUTH_REFRESH_TOKEN만 교체하세요.")
+    print("새 GitHub Secret을 만들지 마세요. Drive/Sheets/Blogger 검증 후 기존 GOOGLE_OAUTH_CLIENT_ID, GOOGLE_OAUTH_CLIENT_SECRET, GOOGLE_OAUTH_REFRESH_TOKEN을 함께 갱신하세요.")
     return 0
 
 
