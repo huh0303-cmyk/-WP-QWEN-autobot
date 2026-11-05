@@ -5,6 +5,8 @@ on:
     paths:
       - "config/affiliate/initial-rollout-trigger.json"
       - "config/affiliate/wordpress-rollout-trigger.json"
+      - "config/affiliate/portfolio-master-policy-2026-11-05.json"
+      - "scripts/backfill_coupang_all_existing_posts.py"
   workflow_dispatch:
     inputs:
       mode:
