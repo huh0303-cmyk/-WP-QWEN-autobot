@@ -28,6 +28,10 @@ def free_only_channel_allowed(channel_key: str) -> bool:
         return False
     if any(os.environ.get(key, "").strip() for key in ("GEMINI_API_KEY", "OPENAI_API_KEY", "LYRIA_API_KEY")):
         return False
+    if os.environ.get("AUTO_TOPIC", "").strip().lower() != "false":
+        return False
+    if not os.environ.get("CAPTION_TEXT", "").strip():
+        return False
     required_free = (
         "GOOGLE_OAUTH_REFRESH_TOKEN",
         "MUSIC_SOURCE_FOLDER_ID_GLOBALMUSIC",
