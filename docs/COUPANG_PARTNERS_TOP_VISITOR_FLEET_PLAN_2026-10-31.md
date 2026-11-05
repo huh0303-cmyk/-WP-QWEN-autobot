@@ -1,9 +1,7 @@
-# Coupang Partners fleet plan ? standard v4.0
+# SUPERSEDED — Affiliate Standard v6.0 (2026-11-05)
 
-The new affiliate layout supersedes earlier fleet allocations:
-- Three header buttons: Coupang Partners, Olive Young, Trip.com.
-- Ten product cards per article, all Coupang Partners.
-- Agoda disabled.
-- Trip.com navigation: Hotels, Flights, Tours/Packages.
+The former fleet rollout and product allocation instructions in this document are retired. The only current authority is `docs/AFFILIATE_STANDARD_LOCK_V6_2026-11-05.md`.
 
-The K-Trip365 pilot is complete (70 updated + 1 already compliant; all 71 verified). Next destinations must have their own verified ten-product Coupang catalog and site-specific header URLs. Prioritize by the control-room rollout order and visitor volume, but do not publish when the required catalog or tracking URLs are missing.
+Fixed rule: exactly ten Coupang Partners product cards per eligible content item: five health functional food/wellness products and five K-Beauty skincare products. The separate top banner row is Coupang Partners, Trip.com, OLIVE YOUNG. The 24-hour eligible-purchase commission disclosure is required. K-Health365 is the only pilot; fleet-wide rollout is disabled until the owner approves after public-page review.
+
+Do not execute any prior allocation, rollout sequence, or header order described by older documents.
