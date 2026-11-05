@@ -19,6 +19,7 @@ on:
       - "automation_hub/youtube_github_runtime.py"
       - ".github/workflows/cafe-mozart-publish.yml"
       - "tests/test_playlist_owner_policy.py"
+      - "tests/test_cafe_mozart_free_publish.py"
       - ".github/workflows/playlist-metadata-regression.yml"
 
 permissions:
