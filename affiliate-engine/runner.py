@@ -22,6 +22,12 @@ def load_json(path:Path)->Any:
 def normalized(value:str)->str:
     return " ".join("".join(c.lower() if c.isalnum() else " " for c in value).split())
 
+def category_key(value:str)->str:
+    raw=str(value or "").lower()
+    if raw in {"health_functional_foods","health_supplements","health","supplement","vitamins"}: return "health_functional_foods"
+    if raw in {"k_beauty_skincare","beauty_cosmetics","beauty","skincare","kbeauty"}: return "k_beauty_skincare"
+    return raw
+
 def recent_since(hours:int)->str:
     return (datetime.now(UTC)-timedelta(hours=hours)).isoformat().replace("+00:00","Z")
 
@@ -59,7 +65,7 @@ def select_offers(title:str,content:str,routing:dict[str,Any],site_key:str,offer
     for slot in required:
         provider=slot["provider"]
         category=slot["category"]
-        candidates=[o for o in offers if o.get("provider")==provider and o.get("category")==category]
+        candidates=[o for o in offers if o.get("provider")==provider and category_key(o.get("category"))==category]
         candidates=[o for o in candidates if o.get("affiliate_link_verified") is True and o.get("image_rights_verified") is True and all(urlparse(str(o.get(k,""))).scheme=="https" and urlparse(str(o.get(k,""))).netloc for k in ("url","image_url"))]
         # The destination catalog contains the ten fixed items: five per category.
         if not candidates: raise ValueError(f"missing_verified_offer:{slot['slot']}:{provider}:{category}")
@@ -72,6 +78,7 @@ def select_offers(title:str,content:str,routing:dict[str,Any],site_key:str,offer
     if len({o["url"] for o in chosen})!=10: raise ValueError("duplicate_tracking_url_in_selected_offers")
     counts={}
     for o in chosen: counts[o["category"]]=counts.get(o["category"],0)+1
+    counts={category_key(k):v for k,v in counts.items()}
     if counts!=expected: raise ValueError(f"category_mix_mismatch_expected_{expected}_got_{counts}")
     if any(o.get("provider")!="coupang_partners" for o in chosen): raise ValueError("provider_mix_mismatch_expected_coupang_only_10")
     return chosen
@@ -82,11 +89,14 @@ def build_block(offers:list[dict[str,Any]],header_buttons:list[dict[str,Any]]|No
         raise ValueError("exactly_10_coupang_only_product_cards_required")
     if len({o.get("url") for o in offers})!=10: raise ValueError("duplicate_product_tracking_url")
     counts={}
-    for o in offers: counts[o.get("category")]=counts.get(o.get("category"),0)+1
+    for o in offers:
+        cat=category_key(o.get("category")); counts[cat]=counts.get(cat,0)+1
     if counts!=expected_mix: raise ValueError(f"product_category_mix_mismatch:{counts}")
     if not header_buttons or len(header_buttons)!=3: raise ValueError("missing_three_header_provider_buttons")
     expected=("coupang_partners","trip_com","olive_young_global")
-    if tuple(x.get("provider") for x in header_buttons)!=expected: raise ValueError("header_button_provider_order_mismatch")
+    button_map={x.get("provider"):x for x in header_buttons}
+    if set(button_map)!=set(expected): raise ValueError("header_button_provider_set_mismatch")
+    header_buttons=[button_map[p] for p in expected]
     colors={"coupang_partners":"#e87518","olive_young_global":"#168a43","trip_com":"#1769d2"}
     labels={"coupang_partners":"Coupang Partners","olive_young_global":"OLIVE YOUNG","trip_com":"Trip.com"}
     buttons=[]
