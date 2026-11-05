@@ -1,20 +1,24 @@
 {
-  "version": 7,
-  "name": "London Project affiliate layout standard v7 - official partner logos and English product cards",
+  "version": 8,
+  "name": "London Project affiliate layout standard v8 - Coupang 5 health + 5 K-Beauty, three header partners",
   "platforms": [
     "wordpress",
     "blogger"
   ],
   "header_buttons": [
+    "coupang_partners",
     "trip_com",
-    "olive_young_global",
-    "coupang_partners"
+    "olive_young_global"
   ],
   "product_cards": {
     "count": 10,
     "provider": "coupang_partners",
     "provider_count": {
       "coupang_partners": 10
+    },
+    "category_count": {
+      "health_functional_foods": 5,
+      "k_beauty_skincare": 5
     },
     "randomize_per_article": false,
     "avoid_repeating_same_ten_item_set": false,
@@ -28,19 +32,16 @@
     "agoda"
   ],
   "selection_principles": [
-    "Each destination has its own fixed set of exactly ten Coupang Partners products.",
-    "Reuse the same ten products in the same order on every article until an operator deliberately replaces the catalog.",
-    "Do not perform per-article product search, random selection, image replacement, or rotation.",
-    "Each product must have one unique account-generated Coupang tracking URL and one unique official Coupang product image.",
-    "Render exactly three header buttons in this order: Trip.com, OLIVE YOUNG, Coupang Partners.",
-    "Trip.com and OLIVE YOUNG are header links only; the ten product cards are Coupang Partners only.",
-    "Use only the account's supplied affiliate URLs. Do not invent tracking links, image URLs, prices, sales, reviews, or commission rates.",
-    "Keep separate product catalogs and header links per destination; never share product pools across unrelated sites.",
-    "Preserve article body, status, publication date, featured image and SEO metadata; replace only the designated affiliate block.",
-    "Display the Coupang Partners commission disclosure with the product cards.",
-    "Each of the ten Coupang product cards must include an English-language product explanation.",
-    "Display the Coupang logo below the ten-card grid and include the affiliate commission disclosure and required Coupang trademark notice.",
-    "Do not make the Coupang logo itself a hyperlink; use a separate tracked text link in accordance with Coupang's current media asset guidelines."
+    "Every destination has exactly ten Coupang Partners product cards: five health functional food/wellness products and five K-Beauty skincare products.",
+    "All ten product cards use Coupang Partners account-generated tracking links and permitted product images. No Olive Young or Trip.com product cards.",
+    "Each destination keeps its own catalog of ten unique products; the same set is reused until the weekly review replaces selected items.",
+    "Header buttons are separate from product cards and appear in this exact order: Coupang Partners, Trip.com, OLIVE YOUNG.",
+    "Each header button uses its own authorized affiliate tracking URL and approved brand asset.",
+    "Do not invent links, images, prices, popularity, sales, reviews, or commission rates.",
+    "Preserve article body, status, publication date, featured image and SEO metadata; update only the managed affiliate area.",
+    "Display the Coupang logo with the product cards only using the official permitted asset; do not distort or recolor it and do not make it a hyperlink.",
+    "Disclose that purchases made within 24 hours after a visitor enters Coupang through the affiliate link, including purchases of other eligible products, may generate commission; attribution rules, cancellations and returns can affect eligibility.",
+    "Never claim every click or purchase guarantees commission."
   ],
   "display": {
     "position": "end_of_article",
@@ -79,18 +80,19 @@
   },
   "header_branding": {
     "order": [
+      "coupang_partners",
       "trip_com",
-      "olive_young_global",
-      "coupang_partners"
+      "olive_young_global"
     ],
-    "logo_assets": "official_or_brand-published logo assets",
-    "trip_com_and_olive_young": "Clickable tracked logo links to their landing pages",
-    "coupang": "Display official logo without hyperlink in accordance with current Coupang brand guidelines; use a separate tracked text link",
+    "logo_assets": "official_or_partner-authorized_brand_assets",
+    "trip_com_and_olive_young": "Clickable tracked logo links to their approved landing pages",
+    "coupang": "Official Coupang Partners logo; use separate tracked text link if required by brand terms",
     "responsive": true
   },
   "disclosure": {
     "language": "English",
-    "text": "This post contains Coupang Partners affiliate links. If you purchase through these links, we may earn a commission at no additional cost to you.",
+    "text": "This post contains Coupang Partners affiliate links. If you visit Coupang through one of these links and make a purchase within 24 hours, including a purchase of another eligible product, we may earn a commission at no additional cost to you. Attribution rules, cancellations and returns may affect commission eligibility.",
+    "text_ko": "이 게시물에는 쿠팡 파트너스 제휴 링크가 포함되어 있습니다. 이 링크를 통해 쿠팡에 방문한 뒤 24시간 이내에 다른 상품을 구매하더라도 운영정책상 실적으로 인정되는 구매라면 수수료를 제공받을 수 있습니다. 구매 경로의 최종 기여, 주문 취소 및 반품 등에 따라 수수료가 인정되지 않을 수 있습니다.",
     "trademark_notice": "Coupang’s trademarks are used under license from Coupang, LLC or its affiliates."
   }
 }
