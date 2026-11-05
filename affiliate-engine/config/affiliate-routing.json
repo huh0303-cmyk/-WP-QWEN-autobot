@@ -5,6 +5,41 @@
   "default_locale": "ko-KR",
   "required_slots": [
     {
+      "slot": "coupang_10",
+      "count": 1,
+      "category": "k_beauty_skincare",
+      "required": true,
+      "provider": "coupang_partners"
+    },
+    {
+      "slot": "coupang_09",
+      "count": 1,
+      "category": "k_beauty_skincare",
+      "required": true,
+      "provider": "coupang_partners"
+    },
+    {
+      "slot": "coupang_08",
+      "count": 1,
+      "category": "k_beauty_skincare",
+      "required": true,
+      "provider": "coupang_partners"
+    },
+    {
+      "slot": "coupang_07",
+      "count": 1,
+      "category": "k_beauty_skincare",
+      "required": true,
+      "provider": "coupang_partners"
+    },
+    {
+      "slot": "coupang_06",
+      "count": 1,
+      "category": "k_beauty_skincare",
+      "required": true,
+      "provider": "coupang_partners"
+    },
+    {
       "slot": "coupang_01",
       "count": 1,
       "category": "health_functional_foods",
@@ -36,41 +71,6 @@
       "slot": "coupang_05",
       "count": 1,
       "category": "health_functional_foods",
-      "required": true,
-      "provider": "coupang_partners"
-    },
-    {
-      "slot": "coupang_06",
-      "count": 1,
-      "category": "k_beauty_skincare",
-      "required": true,
-      "provider": "coupang_partners"
-    },
-    {
-      "slot": "coupang_07",
-      "count": 1,
-      "category": "k_beauty_skincare",
-      "required": true,
-      "provider": "coupang_partners"
-    },
-    {
-      "slot": "coupang_08",
-      "count": 1,
-      "category": "k_beauty_skincare",
-      "required": true,
-      "provider": "coupang_partners"
-    },
-    {
-      "slot": "coupang_09",
-      "count": 1,
-      "category": "k_beauty_skincare",
-      "required": true,
-      "provider": "coupang_partners"
-    },
-    {
-      "slot": "coupang_10",
-      "count": 1,
-      "category": "k_beauty_skincare",
       "required": true,
       "provider": "coupang_partners"
     }
