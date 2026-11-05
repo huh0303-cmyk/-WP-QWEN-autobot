@@ -269,24 +269,37 @@ def render_footer(title, article_text, site_id="", lang="en"):
     cards = []
     for p in products:
         url, image, name = (html.escape(p[k], quote=True) for k in ("url","image","title"))
-        category = html.escape(p.get("category", ""))
+        category = html.escape(p.get("category", "").replace("_", " ").title())
+        title_en = html.escape(p.get("display_title_en") or p["title"])
+        description = p.get("description_en") or {
+            "korea_digital_esim_sim": "Stay connected in Korea with convenient mobile data and SIM or eSIM access.",
+            "korea_travel_power": "A practical travel accessory designed to make charging devices easier on the go.",
+            "k_beauty_olive_young": "A Korean beauty pick for everyday skincare and personal care routines.",
+            "k_health_supplements": "A wellness supplement option. Review the ingredients and directions before use.",
+            "korea_lifestyle_hot_items": "A useful everyday item selected for convenience at home or while traveling.",
+        }.get(_category(p), "A useful product selected for everyday convenience. Check the product page for full specifications.")
+        description = html.escape(description)
         cards.append(
             '<article class="london-coupang-card"><a class="london-coupang-image-link" href="' + url + '" target="_blank" rel="sponsored nofollow noopener">'
-            '<img src="' + image + '" alt="' + name + '" loading="lazy" decoding="async" referrerpolicy="unsafe-url">'
-            '</a><small class="london-coupang-category">' + category + '</small><strong>' + name + '</strong><a class="london-coupang-button" href="' + url
-            + '" target="_blank" rel="sponsored nofollow noopener">쿠팡에서 상품 확인</a></article>'
+            '<img src="' + image + '" alt="' + title_en + '" loading="lazy" decoding="async" referrerpolicy="unsafe-url">'
+            '</a><small class="london-coupang-category">' + category + '</small><strong>' + title_en + '</strong>'
+            '<p class="london-coupang-description">' + description + '</p><a class="london-coupang-button" href="' + url
+            + '" target="_blank" rel="sponsored nofollow noopener">Shop on Coupang</a></article>'
         )
-    heading = "함께 살펴볼 추천 상품 10선" if lang == "ko" else "10 Coupang Picks"
+    heading = "10 Recommended Products"
     return (START + '<section class="london-coupang-wrap" aria-label="Coupang recommended products">'
         '<style>.london-coupang-wrap{margin:30px 0;padding:18px;border:1px solid #e5e7eb;border-radius:12px}'
         '.london-coupang-wrap h2{font-size:20px;margin:14px 0 10px}.london-coupang-disclosure{font-size:12px;color:#666;margin:0 0 14px}'
         '.london-coupang-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;align-items:stretch}'
         '.london-coupang-card{min-width:0;border:1px solid #e5e7eb;border-radius:10px;padding:10px;text-align:center;display:flex;flex-direction:column;background:#fff}'
         '.london-coupang-card img{width:100%;height:155px;object-fit:contain}.london-coupang-card strong{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:13px;line-height:1.45;margin:8px 0;min-height:2.9em;overflow-wrap:anywhere}'
-        '.london-coupang-category{font-size:11px;color:#777}.london-coupang-button{margin-top:auto;background:#17365d;color:#fff!important;text-decoration:none;padding:9px 12px;border-radius:7px;font-size:13px;font-weight:700}'
+        '.london-coupang-category{font-size:11px;color:#777}.london-coupang-description{font-size:12px;line-height:1.5;color:#555;margin:0 0 12px;min-height:4.5em}.london-coupang-button{margin-top:auto;background:#17365d;color:#fff!important;text-decoration:none;padding:9px 12px;border-radius:7px;font-size:13px;font-weight:700}'
+        '.london-coupang-brand{display:flex;align-items:center;justify-content:center;margin:16px 0 6px}.london-coupang-brand img{width:88px;height:auto;max-height:26px;object-fit:contain}.london-coupang-legal{font-size:10px;color:#777;text-align:center;margin:4px 0 0}'
         '@media(max-width:760px){.london-coupang-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.london-coupang-card img{height:125px}}</style>'
         '<h2>' + heading + '</h2><p class="london-coupang-disclosure">' + DISCLOSURE + '</p>'
-        '<div class="london-coupang-grid">' + ''.join(cards) + '</div></section>' + END)
+        '<div class="london-coupang-grid">' + ''.join(cards) + '</div>'
+        '<div class="london-coupang-brand"><img src="' + html.escape(LOGOS["coupang_partners"], quote=True) + '" alt="Coupang logo" loading="lazy"></div>'
+        '<p class="london-coupang-legal">' + COUPANG_TRADEMARK_NOTICE + '</p></section>' + END)
 
 def _remove_legacy_single_product_modules(content):
     """Remove only known standalone affiliate-recommendation divs; keep article images."""
