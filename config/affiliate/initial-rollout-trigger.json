@@ -7,7 +7,9 @@
   "preserve_post_status_and_dates": true,
   "no_delete": true,
   "note": "One-time trigger. Sites without ten verified site-scoped products are skipped and reported; no cross-site catalog borrowing.",
-  "retry": 3,
+  "retry": 4,
   "updated_at_utc": "2026-11-05T01:50:00Z",
-  "wp_username_confirmed": "huh0303@gmail.com"
+  "wp_username_confirmed": "huh0303@gmail.com",
+  "soft_quota_rollout": "2026-11-05",
+  "rollout_policy": "3 banners and disclosure on every published post; 0-10 verified site-scoped products"
 }
