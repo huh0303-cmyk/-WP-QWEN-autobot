@@ -45,7 +45,7 @@ def test_footer_replaces_own_marker_without_duplication(monkeypatch):
     assert updated.count(cp.END) == 1
     assert "<p>Article</p>" in updated
     assert updated.count("https://link.coupang.com/a/test") == 20
-    assert updated.index("Coupang") < updated.index("Trip.com") < updated.index("Olive Young")
+    assert updated.index("Coupang") < updated.index("Olive Young") < updated.index("Trip.com")
     assert "24 hours" in updated
 
 def test_unknown_legacy_affiliate_markup_is_preserved(monkeypatch):
