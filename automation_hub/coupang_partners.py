@@ -162,32 +162,33 @@ def _canonical_asset_url(value):
         return ""
 
 def select_products(title, article_text, site_id="", limit=10):
-    # Ten unique, verified Coupang offers are mandatory. Never publish a partial block.
+    # Soft quota: use up to ten verified, site-scoped offers; never fabricate products.
     key = _resolve_site_key(site_id)
-    if limit < 10:
+    if limit <= 0:
         return []
     # K-Health365 uses a fixed ten-product catalog. Reuse the same verified
     # offers in catalog order for every article until an operator replaces it.
     if key == "khealth365":
         fixed_path = ROOT / "config/affiliate/k-health365-sitewide-10.json"
         fixed_rows = _load_json(fixed_path)
-        if not isinstance(fixed_rows, list) or len(fixed_rows) != 10:
-            return []
+        if not isinstance(fixed_rows, list):
+            fixed_rows = []
         fixed = []
         seen_urls, seen_images = set(), set()
         for raw in fixed_rows:
             item = _candidate(raw, "health")
             if not item or raw.get("enabled") is not True:
-                return []
+                continue
             image_key = _canonical_asset_url(item["image"])
-            if item["url"] in seen_urls or not image_key or image_key in seen_images:
-                return []
+            if item["url"] in seen_urls or not image_key:
+                continue
             seen_urls.add(item["url"])
             seen_images.add(image_key)
             fixed.append(item)
-        return fixed
+        if fixed:
+            return fixed[:min(limit, 10)]
     pool = load_candidates(site_id)
-    if len(pool) < 10:
+    if not pool:
         return []
     clean_text = article_text or ""
     for old_start, old_end in LEGACY_MARKERS:
@@ -204,13 +205,13 @@ def select_products(title, article_text, site_id="", limit=10):
         image_key = _canonical_asset_url(item.get("image"))
         if item["url"] in existing_urls or (image_key and image_key in existing_images):
             continue
-        if item["url"] in seen_urls or not image_key or image_key in seen_images:
+        if item["url"] in seen_urls or not image_key:
             continue
         seen_urls.add(item["url"])
         seen_images.add(image_key)
         unique_pool.append(item)
     pool = unique_pool
-    if len(pool) < 10: return []
+    if not pool: return []
     subject = f"{title} {clean_text[:5000]}"
     ranked = sorted(pool, key=lambda p: (_score(p, subject), p.get("price_krw") is not None and p["price_krw"] <= 30000, p["source"] == "beauty"), reverse=True)
     chosen, used = [], set()
@@ -229,7 +230,7 @@ def select_products(title, article_text, site_id="", limit=10):
         if len(chosen) >= limit: break
         if item["url"] not in used:
             chosen.append(item); used.add(item["url"])
-    chosen = chosen[:10] if len(chosen) >= 10 else []
+    chosen = chosen[:min(limit, 10)]
     return chosen
 
 def render_header(site_id=""):
@@ -265,8 +266,7 @@ def render_header(site_id=""):
 
 def render_footer(title, article_text, site_id="", lang="en"):
     products = select_products(title, article_text, site_id)
-    if len(products) != 10:
-        raise RuntimeError(f"Coupang footer requires exactly 10 unique verified products for site={site_id}; found {len(products)}")
+    # A site may legitimately have 0–9 verified offers. Publish what is available.
     cards = []
     for p in products:
         url, image, name = (html.escape(p[k], quote=True) for k in ("url","image","title"))
@@ -287,7 +287,7 @@ def render_footer(title, article_text, site_id="", lang="en"):
             '<p class="london-coupang-description">' + description + '</p><a class="london-coupang-button" href="' + url
             + '" target="_blank" rel="sponsored nofollow noopener">Shop on Coupang</a></article>'
         )
-    heading = "10 Recommended Products"
+    heading = f"{len(products)} Recommended Products" if products else "Affiliate Disclosure"
     return (START + '<section class="london-coupang-wrap" aria-label="Coupang recommended products">'
         '<style>.london-coupang-wrap{margin:30px 0;padding:18px;border:1px solid #e5e7eb;border-radius:12px}'
         '.london-coupang-wrap h2{font-size:20px;margin:14px 0 10px}.london-coupang-disclosure{font-size:12px;color:#666;margin:0 0 14px}'
