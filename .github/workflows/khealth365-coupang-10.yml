@@ -5,7 +5,7 @@ on:
       mode:
         description: "preview audits every published post; apply replaces the managed footer"
         required: true
-        default: "preview"
+        default: "apply"
         type: choice
         options:
           - preview
