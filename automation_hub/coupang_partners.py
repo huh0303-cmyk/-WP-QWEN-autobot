@@ -361,6 +361,7 @@ def apply_footer(content, title, site_id="", lang="en"):
     marker_pairs = ((HEADER_START, HEADER_END), (START, END), *LEGACY_MARKERS[1:])
     for old_start, old_end in marker_pairs:
         clean = re.sub(re.escape(old_start) + r".*?" + re.escape(old_end), "", clean, flags=re.S)
-    header = render_header(site_id)
+    # K-Health365 pilot is Coupang-only; do not inject the legacy three-provider header.
+    header = "" if _resolve_site_key(site_id) == "khealth365" else render_header(site_id)
     footer = render_footer(title, clean, site_id, lang)
     return header + "\n" + clean.lstrip() + ("\n" if clean.strip() else "") + footer
