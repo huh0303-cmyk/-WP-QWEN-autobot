@@ -2,7 +2,7 @@ name: Daily scheduled ten-language vocabulary Shorts
 
 on:
   schedule:
-    - cron: "17 11 * * *"
+    - cron: "23 11 * * *"
   workflow_dispatch:
     inputs:
       target_date:
