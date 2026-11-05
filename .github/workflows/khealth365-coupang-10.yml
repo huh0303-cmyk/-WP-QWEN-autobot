@@ -1,5 +1,14 @@
 name: K-Health365 - Coupang 5 skincare + 5 health
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/khealth365-coupang-10.yml"
+      - "automation_hub/coupang_partners.py"
+      - "scripts/khealth365_sitewide_coupang_10.py"
+      - "config/affiliate/global-weekly-10.json"
+      - "config/affiliate/default-header-buttons.json"
   workflow_dispatch:
     inputs:
       mode:
@@ -40,10 +49,12 @@ jobs:
         env:
           WP_USER: ${{ secrets.WP_USER }}
           KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
-          MODE: ${{ inputs.mode }}
+          MODE: ${{ inputs.mode || 'apply' }}
+          LIMIT: ${{ inputs.limit || '0' }}
+          POST_ID: ${{ inputs.post_id || '0' }}
         run: |
           python -m py_compile automation_hub/coupang_partners.py scripts/khealth365_sitewide_coupang_10.py
-          python scripts/khealth365_sitewide_coupang_10.py --mode "${MODE}" --limit "${{ inputs.limit }}" --post-id "${{ inputs.post_id }}"
+          python scripts/khealth365_sitewide_coupang_10.py --mode "${MODE}" --limit "${LIMIT}" --post-id "${POST_ID}"
       - name: Upload audit report
         if: always()
         uses: actions/upload-artifact@v4
