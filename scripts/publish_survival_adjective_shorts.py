@@ -22,8 +22,8 @@ DEFAULT_OUTPUT = ROOT / "artifacts" / "youtube" / "language-adjectives"
 
 def env_for(code: str, name: str) -> str:
     suffix = f"LANGUAGE_{code.upper()}"
-    # Language-specific credentials only. A generic OAuth fallback can silently
-    # authenticate a different language channel, so it is intentionally forbidden.
+    # Refresh tokens must be language-specific. The OAuth application client ID
+    # and secret are shared safely; exact channel identity is verified separately.
     value = os.environ.get(f"YOUTUBE_OAUTH_{name}_{suffix}")
     # Existing channel secrets store the shared OAuth client ID/secret once;
     # refresh tokens remain strictly language-specific to prevent wrong-channel auth.
