@@ -156,6 +156,8 @@ def record_thumbnail(path, payload):
 def record_category(mode, token):
     path = _category_history_path()
     rows = _read_history(path)
+    if any(row.get("token") == token for row in rows):
+        return
     rows.append({"mode": mode, "token": token, "verified_release": True})
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(path.suffix + ".tmp")
@@ -254,7 +256,7 @@ def render():
            "-b:v", "2200k", "-maxrate", "2600k", "-bufsize", "5200k",
            "-pix_fmt", "yuv420p", work / "scene.mp4")
 
-    audio_path = work / "ambience.wav"
+    audio_path = work / "ambience.mp3"
     if MODE == "birds":
         if not BIRD_ASSET.is_file():
             raise RuntimeError("The bundled CC0 forest-bird recording is missing")
