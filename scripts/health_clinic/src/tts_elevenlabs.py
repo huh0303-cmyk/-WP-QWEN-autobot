@@ -80,6 +80,8 @@ def _tts_single(text: str, voice_id: str, lang: str, speaker: str) -> str:
             print(f"[TTS] Fish Audio failed ({type(exc).__name__}); falling back to free Edge TTS.")
     else:
         print("[TTS] FISH_AUDIO_API_KEY unavailable; using free Edge TTS fallback.")
+    if lang.split("-")[0].lower() == "ja" or lang.lower() == "jp":
+        raise RuntimeError("Japanese Health Clinic requires Fish Audio s2.1-pro-free; key or Fish request is unavailable. Refusing silent provider fallback.")
 
     voices = {
         "ko": ("ko-KR-SunHiNeural", "ko-KR-InJoonNeural"),
@@ -122,10 +124,10 @@ def synthesize_dialogue_with_timeline(script_text: str, lang: str):
     used_speakers = {s for s, _ in segments}
 
     print(f"[TTS] {len(segments)}개 대사 세그먼트 합성 시작 (화자: {sorted(used_speakers)})")
-    combined = AudioSegment.silent(duration=300)
+    combined = AudioSegment.silent(duration=0)
     silence = AudioSegment.silent(duration=SILENCE_BETWEEN_TURNS_MS)
     timeline = []
-    cursor = 300
+    cursor = 0
 
     for i, (speaker, text) in enumerate(segments):
         mp3_path = _tts_single(text, voice_map[speaker], lang, speaker)
