@@ -104,6 +104,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--mode", choices=["preview", "apply"], default=os.getenv("MODE", "preview"))
     ap.add_argument("--limit", type=int, default=0, help="0 means all published posts")
+    ap.add_argument("--post-id", type=int, default=0, help="Process exactly one WordPress post ID")
     args = ap.parse_args()
     user = os.getenv("KHEALTH365_WP_USER", "").strip()
     password = os.getenv("KHEALTH365_WP_APP_PASSWORD", "").strip()
@@ -113,18 +114,23 @@ def main():
     session.auth = (user, password)
     session.headers.update(UA)
     posts, page = [], 1
-    while True:
-        r = wp_request(session, "GET", SITE + "/wp-json/wp/v2/posts",
-            params={"status":"publish","per_page":100,"page":page,"context":"edit","_fields":"id,link,title,content,status"})
-        batch = r.json()
-        if not batch:
-            break
-        posts.extend(batch)
-        if len(batch) < 100:
-            break
-        page += 1
-    if args.limit:
-        posts = posts[:args.limit]
+    if args.post_id:
+        one = wp_request(session, "GET", SITE + "/wp-json/wp/v2/posts/" + str(args.post_id),
+            params={"context":"edit","_fields":"id,link,title,content,status"}).json()
+        posts = [one]
+    else:
+        while True:
+            r = wp_request(session, "GET", SITE + "/wp-json/wp/v2/posts",
+                params={"status":"publish","per_page":100,"page":page,"context":"edit","_fields":"id,link,title,content,status"})
+            batch = r.json()
+            if not batch:
+                break
+            posts.extend(batch)
+            if len(batch) < 100:
+                break
+            page += 1
+        if args.limit:
+            posts = posts[:args.limit]
     report = {"site":SITE,"mode":args.mode,"products_available":len(select_products("K-Health365", "", "wp_khealth365")),
         "posts_found":len(posts),"updated":0,"already_current":0,"skipped_legacy":0,"errors":[],"results":[]}
     for post in posts:
