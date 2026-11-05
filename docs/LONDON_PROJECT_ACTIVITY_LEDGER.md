@@ -686,3 +686,11 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - 플랫폼별 실행 절차: 전체 대상 인벤토리 → 백업/내보내기(가능한 경우) → dry-run → 대표 1건 테스트 → 승인/권한 확인 → 단계별 적용 → 읽기/공개 결과 재검증. 플랫폼별 eligible/changed/skipped/failed 수량과 증거를 기록한다. 확인되지 않은 완료 주장은 금지.
 - 기존 5개 잠금 WordPress 사이트는 다른 설정/콘텐츠를 건드리지 않는다. 이번 명시적 전역 지시는 서울몰 링크만 삽입하는 범위에 한해 적용하며, 그 외 변경은 금지한다.
 - 지시 기록 시점에는 전체 플랫폼에 서울몰 링크 삽입이 실행되지 않았고, slug 변경도 검증되지 않았다.
+
+## invention-story-publishing-stop-20261106
+- 2026-11-06 KST — 사용자 요청으로 INVENTION_STORY1 (`UCgNj-yS93A_fOHXXvG49fww`) 2026-08-25 이후 발행 중단 원인을 GitHub main 기준으로 점검.
+- 확인: 채널 잠금 ID 일치. 2026-11-05 read-only OAuth preflight snapshot은 invention의 정확한 UC ID를 verified_channels에 기록하지만 이는 공개 업로드 영수증이 아님.
+- 즉시 차단: `.github/workflows/youtube-github-scheduler.yml`은 `YOUTUBE_AUTO_PUBLISH_ENABLED=true` 및 `YOUTUBE_COST_HOLD=false`가 아니면 작업 전 종료. `youtube_github_runtime.check_cost_hold`도 Invention에 대해 비용 보류를 강제하며 Globalmusic 예외는 적용되지 않음.
+- 추가 코드 결함: `config/youtube_channels.json`의 invention.workflow가 퇴역한 `curio-longform-daily.yml`을 가리키고, registry validator도 지식 채널에 동일한 퇴역 경로를 요구. 현재 실행기는 `youtube-github-worker.yml` + `youtube_github_worker.py`.
+- 제작 선행조건: 지식 worker는 `FISH_AUDIO_API_KEY`가 없으면 중단. invention용 `archive_footage_longform.py`는 회차 날짜별 `assets/youtube/knowledge/<EPISODE_DATE>/invention-source.png` 또는 지정 이미지 루트의 검수 이미지를 필수로 요구. 현재 해당 날짜 파일 존재 여부 및 키 유무는 아직 비밀값을 열람하지 않고는 검증되지 않음.
+- 조치: 상세 감사 및 안전 복구 절차를 `docs/INVENTION_STORY1_PUBLISHING_STOP_AUDIT_2026-11-06.md`에 저장. 글로벌 비용 보류·시크릿·시트·영상은 변경하지 않았고 업로드도 시도하지 않음. 유료 API를 무단 활성화하지 않으며, 다음 단계는 registry/Sheet/dispatcher 계약을 현재 worker로 일괄 정합화하고 무료 경로/자산을 확인한 뒤 소유자 승인 canary를 실행하는 것.
