@@ -153,8 +153,31 @@ def _canonical_asset_url(value):
 def select_products(title, article_text, site_id="", limit=10):
     # Ten unique, verified Coupang offers are mandatory. Never publish a partial block.
     key = _resolve_site_key(site_id)
+    if limit < 10:
+        return []
+    # K-Health365 uses a fixed ten-product catalog. Reuse the same verified
+    # offers in catalog order for every article until an operator replaces it.
+    if key == "khealth365":
+        fixed_path = ROOT / "config/affiliate/k-health365-sitewide-10.json"
+        fixed_rows = _load_json(fixed_path)
+        if not isinstance(fixed_rows, list) or len(fixed_rows) != 10:
+            return []
+        fixed = []
+        seen_urls, seen_images = set(), set()
+        for raw in fixed_rows:
+            item = _candidate(raw, "health")
+            if not item or raw.get("enabled") is not True:
+                return []
+            image_key = _canonical_asset_url(item["image"])
+            if item["url"] in seen_urls or not image_key or image_key in seen_images:
+                return []
+            seen_urls.add(item["url"])
+            seen_images.add(image_key)
+            fixed.append(item)
+        return fixed
     pool = load_candidates(site_id)
-    if len(pool) < 10 or limit < 10: return []
+    if len(pool) < 10:
+        return []
     clean_text = article_text or ""
     for old_start, old_end in LEGACY_MARKERS:
         clean_text = re.sub(re.escape(old_start) + r".*?" + re.escape(old_end), " ", clean_text, flags=re.S)
