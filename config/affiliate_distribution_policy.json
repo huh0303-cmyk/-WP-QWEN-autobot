@@ -111,7 +111,7 @@
     "cta": "쇼핑하기",
     "affiliate_disclosure": true,
     "link_rel": "sponsored nofollow noopener",
-    "idempotent_marker": "london-affiliate-engine:v5",
+    "idempotent_marker": "london-affiliate-engine:v6",
     "header_buttons": true,
     "header_button_layout": "three_brand_tiles_one_row",
     "product_card_count": 10
