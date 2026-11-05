@@ -126,11 +126,18 @@ def main():
         entry = {"site_id":sid,"url":site.get("url"),"platform":platform,
                  "verified_products":catalog_count,"posts_seen":0,"updated":0,
                  "already_ten":0,"needs_catalog":0,"skipped_legacy":0,"errors":[]}
-        if catalog_count < 10:
+        if catalog_count == 0:
             entry["needs_catalog"] = 1
-            entry["catalog_note"] = f"{catalog_count}/10 verified site-specific products; apply available cards and all three banners"
+            entry["status"] = "held_missing_catalog"
+            entry["catalog_note"] = "0 verified destination-specific products; skipped this site and continued to the next"
             if khealth_image_error:
                 entry["image_note"] = "official image resolution blocked; no substitute used: " + khealth_image_error
+            report["totals"]["needs_catalog"] += 1
+            report["sites"].append(entry)
+            continue
+        if catalog_count < 10:
+            entry["needs_catalog"] = 1
+            entry["catalog_note"] = f"{catalog_count}/10 verified site-specific products; using all {min(catalog_count,10)} available cards"
             report["totals"]["needs_catalog"] += 1
         try:
             if platform == "wordpress":
@@ -156,6 +163,7 @@ def main():
                         if new == raw:
                             if HEADER_START in raw and HEADER_END in raw and START in raw and END in raw:
                                 entry["already_ten"] += 1
+                                report["totals"]["already_ten"] += 1
                             elif "link.coupang.com/" in raw or DISCLOSURE in raw:
                                 entry["skipped_legacy"] += 1
                             else:
@@ -195,7 +203,9 @@ def main():
                         new = apply_footer(raw,title,sid,lang_for(site,raw))
                         entry["posts_seen"] += 1; report["totals"]["posts_seen"] += 1
                         if new == raw:
-                            if HEADER_START in raw and HEADER_END in raw and START in raw and END in raw: entry["already_ten"] += 1
+                            if HEADER_START in raw and HEADER_END in raw and START in raw and END in raw:
+                                entry["already_ten"] += 1
+                                report["totals"]["already_ten"] += 1
                             elif "link.coupang.com/" in raw or DISCLOSURE in raw: entry["skipped_legacy"] += 1
                             else: entry["errors"].append({"post_id":post.get("id"),"reason":"footer unchanged; inspect catalog or legacy markup"})
                             continue
