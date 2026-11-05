@@ -1,76 +1,76 @@
 {
   "engine": "London Project Affiliate Engine",
-  "version": "5.0.0",
+  "version": "6.0.0",
   "mode": "safe",
   "default_locale": "ko-KR",
   "required_slots": [
     {
       "slot": "coupang_01",
       "count": 1,
-      "category": "beauty_cosmetics",
+      "category": "health_functional_foods",
       "required": true,
       "provider": "coupang_partners"
     },
     {
       "slot": "coupang_02",
       "count": 1,
-      "category": "beauty_cosmetics",
+      "category": "health_functional_foods",
       "required": true,
       "provider": "coupang_partners"
     },
     {
       "slot": "coupang_03",
       "count": 1,
-      "category": "laptop",
+      "category": "health_functional_foods",
       "required": true,
       "provider": "coupang_partners"
     },
     {
       "slot": "coupang_04",
       "count": 1,
-      "category": "tablet",
+      "category": "health_functional_foods",
       "required": true,
       "provider": "coupang_partners"
     },
     {
       "slot": "coupang_05",
       "count": 1,
-      "category": "health_supplements",
+      "category": "health_functional_foods",
       "required": true,
       "provider": "coupang_partners"
     },
     {
       "slot": "coupang_06",
       "count": 1,
-      "category": "health_supplements",
+      "category": "k_beauty_skincare",
       "required": true,
       "provider": "coupang_partners"
     },
     {
       "slot": "coupang_07",
       "count": 1,
-      "category": "korea_travel_packages",
+      "category": "k_beauty_skincare",
       "required": true,
       "provider": "coupang_partners"
     },
     {
       "slot": "coupang_08",
       "count": 1,
-      "category": "korea_travel_packages",
+      "category": "k_beauty_skincare",
       "required": true,
       "provider": "coupang_partners"
     },
     {
       "slot": "coupang_09",
       "count": 1,
-      "category": "hotel_products",
+      "category": "k_beauty_skincare",
       "required": true,
       "provider": "coupang_partners"
     },
     {
       "slot": "coupang_10",
       "count": 1,
-      "category": "hotel_products",
+      "category": "k_beauty_skincare",
       "required": true,
       "provider": "coupang_partners"
     }
@@ -114,26 +114,19 @@
     "no_unverified_commission_claims": true,
     "no_unlicensed_images": true,
     "disclosure_required": true,
-    "pool_target_per_site": 100,
+    "pool_target_per_site": 10,
     "pool_category_counts": {
-      "beauty_cosmetics": 20,
-      "laptop": 10,
-      "tablet": 10,
-      "health_supplements": 20,
-      "korea_travel_packages": 20,
-      "hotel_products": 20
+      "health_functional_foods": 5,
+      "k_beauty_skincare": 5
     },
     "per_article_category_counts": {
-      "beauty_cosmetics": 2,
-      "laptop": 1,
-      "tablet": 1,
-      "health_supplements": 2,
-      "korea_travel_packages": 2,
-      "hotel_products": 2
+      "health_functional_foods": 5,
+      "k_beauty_skincare": 5
     },
-    "randomize_per_article": true,
-    "avoid_repeated_ten_product_set": true,
-    "require_unique_products_within_article": true
+    "randomize_per_article": false,
+    "avoid_repeated_ten_product_set": false,
+    "require_unique_products_within_article": true,
+    "fixed_ten_product_set_per_destination": true
   },
   "publishing_policy": {
     "wordpress": {
@@ -178,12 +171,12 @@
     "never_remove_existing_links": true,
     "require_exact_provider_allocation": true,
     "require_per_destination_catalog": true,
-    "provider_card_mix": "coupang_only_10",
+    "provider_card_mix": "coupang_only_5_health_5_beauty",
     "top_button_links_verified_separately": true,
     "require_exact_category_mix_before_publish": true,
-    "require_site_pool_target_100": true,
-    "randomize_per_article": true,
-    "avoid_repeated_ten_product_set": true
+    "require_site_pool_target_100": false,
+    "randomize_per_article": false,
+    "avoid_repeated_ten_product_set": false
   },
   "new_content_automation": {
     "enabled": true,
@@ -196,10 +189,11 @@
     "social_platforms": "separate_verified_adapters_required"
   },
   "rollout": {
-    "pilot_site": "https://k-trip365.com",
-    "pilot_status": "completed_71_of_71_verified",
-    "expand_after_verified_pilot": true,
-    "network_expansion_requires_per_site_catalog": true
+    "pilot_site": "https://k-health365.com",
+    "pilot_status": "pending_owner_review",
+    "expand_after_verified_pilot": false,
+    "network_expansion_requires_per_site_catalog": true,
+    "network_expansion_requires_owner_approval": true
   },
   "top_buttons": [
     {
@@ -210,16 +204,16 @@
       "tracking_url_required": true
     },
     {
-      "provider": "olive_young_global",
-      "label": "OLIVE YOUNG",
-      "brand_color": "green",
+      "provider": "trip_com",
+      "label": "Trip.com",
+      "brand_color": "blue",
       "required": true,
       "tracking_url_required": true
     },
     {
-      "provider": "trip_com",
-      "label": "Trip.com",
-      "brand_color": "blue",
+      "provider": "olive_young_global",
+      "label": "OLIVE YOUNG",
+      "brand_color": "green",
       "required": true,
       "tracking_url_required": true
     }
@@ -229,6 +223,11 @@
     "logo_or_brand_mark_required": true,
     "no_plain_navy_buttons": true,
     "no_raw_unicode_escaped_link_text": true,
-    "no_extra_trip_category_link_row": true
+    "no_extra_trip_category_link_row": true,
+    "order": [
+      "coupang_partners",
+      "trip_com",
+      "olive_young_global"
+    ]
   }
 }
