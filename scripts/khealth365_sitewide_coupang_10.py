@@ -198,24 +198,33 @@ def main():
             continue
         report["results"].append({"id":pid,"url":post.get("link"),"status":"PREVIEW_READY","selected_products":len(selected)})
         if args.mode == "apply":
-            wp_request(session,"POST",SITE + "/wp-json/wp/v2/posts/" + str(pid),json={"content":new})
-            verify = wp_request(session,"GET",SITE + "/wp-json/wp/v2/posts/" + str(pid),
-                params={"context":"edit","_fields":"id,link,content,status"}).json()
-            check = verify.get("content",{}).get("raw","")
             expected = set(p["url"] for p in selected)
-            logo_assets_present = all(asset in check for asset in LOGOS.values())
-            if START not in check or END not in check or HEADER_START not in check or HEADER_END not in check or not logo_assets_present or len(expected) != 10 or not all(check.count(url) >= 2 for url in expected):
-                report["errors"].append({"id":pid,"reason":"REST read-back verification failed: footer markers, all three official logos, or ten tracked products missing","expected_products":len(expected),"logo_assets_present":logo_assets_present})
+            try:
+                # POST is attempted once only. If the connection drops, the
+                # next run reads the post and detects whether it was committed.
+                wp_request(session,"POST",SITE + "/wp-json/wp/v2/posts/" + str(pid),json={"content":new})
+                verify = wp_request(session,"GET",SITE + "/wp-json/wp/v2/posts/" + str(pid),
+                    params={"context":"edit","_fields":"id,link,content,status"}).json()
+                check = verify.get("content",{}).get("raw","")
+                logo_assets_present = all(asset in check for asset in LOGOS.values())
+                card_count = check.count('class="london-coupang-card"')
+                if START not in check or END not in check or HEADER_START not in check or HEADER_END not in check or not logo_assets_present or card_count != 10 or len(expected) != 10 or not all(check.count(url) >= 2 for url in expected):
+                    report["errors"].append({"id":pid,"reason":"REST read-back verification failed: footer markers, three logos, or exactly ten cards missing","expected_products":len(expected),"actual_cards":card_count,"logo_assets_present":logo_assets_present})
+                    continue
+                public = wp_request(session,"GET",SITE + "/wp-json/wp/v2/posts/" + str(pid),
+                    params={"_fields":"id,link,content,status"}).json()
+                rendered = public.get("content",{}).get("rendered","")
+                distinct = set(re.findall(r"""href=["'](https://link\.coupang\.com/a/[^"']+)""", rendered))
+                public_card_count = rendered.count('class="london-coupang-card"')
+                if len(expected.intersection(distinct)) != 10 or public_card_count != 10:
+                    report["errors"].append({"id":pid,"reason":"public page does not show exactly ten tracked product cards","public_cards":public_card_count,"tracked_links":len(expected.intersection(distinct))})
+                    continue
+                report["updated"] += 1
+                report["results"][-1]["status"] = "UPDATED_AND_VERIFIED"
+            except requests.exceptions.RequestException as exc:
+                report["errors"].append({"id":pid,"url":post.get("link"),"reason":"connection interrupted during save/read-back; POST was not replayed; recheck post on next run","error":str(exc)[:500]})
+                report["results"][-1]["status"] = "SAVE_OR_VERIFY_PENDING_RECHECK"
                 continue
-            public = wp_request(session,"GET",SITE + "/wp-json/wp/v2/posts/" + str(pid),
-                params={"_fields":"id,link,content,status"}).json()
-            rendered = public.get("content",{}).get("rendered","")
-            distinct = set(re.findall(r"""href=["'](https://link\.coupang\.com/a/[^"']+)""", rendered))
-            if len(expected.intersection(distinct)) != 10:
-                report["errors"].append({"id":pid,"reason":"public page missing one or more affiliate links"})
-                continue
-            report["updated"] += 1
-            report["results"][-1]["status"] = "UPDATED_AND_VERIFIED"
     OUT.parent.mkdir(parents=True,exist_ok=True)
     OUT.write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding="utf-8")
     print(json.dumps({k:report[k] for k in ("mode","products_available","posts_found","updated","already_current","skipped_legacy","errors")},ensure_ascii=False))
