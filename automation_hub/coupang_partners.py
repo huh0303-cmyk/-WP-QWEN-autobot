@@ -382,7 +382,7 @@ def _remove_managed_affiliate_blocks(content):
         offset = opening.start()
     # Drop the obsolete style block from the old partner strip; the new footer
     # supplies a single, self-contained style block.
-    content = re.sub(r"<style[^>]*>[^<]*(?:london-affiliate-partner-strip|london-coupang-wrap)[\s\\S]*?</style>", "", content, flags=re.I)
+    content = re.sub(r"<style[^>]*>[\s\S]*?(?:london-affiliate-partner-strip|london-coupang-wrap)[\s\S]*?</style>", "", content, flags=re.I)
     return content
 
 
