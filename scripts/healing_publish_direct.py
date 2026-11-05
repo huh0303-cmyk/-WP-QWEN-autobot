@@ -11,6 +11,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / "scripts"))
 
 from automation_hub.youtube_github_runtime import check_cost_hold
 from automation_hub.youtube_calendar import KST
