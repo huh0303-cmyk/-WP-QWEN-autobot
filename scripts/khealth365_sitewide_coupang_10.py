@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Replace or add exactly ten Coupang Partners cards on published K-Health365 posts."""
-import os, re, json, html, argparse, sys
+import os, re, json, html, argparse, sys, time
 from pathlib import Path
 from urllib.parse import urlparse
 import requests
@@ -112,10 +112,35 @@ def render_block(products):
     )
 
 def wp_request(session, method, url, **kwargs):
-    r = session.request(method, url, timeout=60, **kwargs)
-    if not r.ok:
-        die("WordPress API " + str(r.status_code) + ": " + r.text[:500])
-    return r
+    # Retry only safe reads. Never replay a POST automatically because the
+    # server may have committed the edit before a connection was interrupted.
+    attempts = 5 if method.upper() == "GET" else 1
+    last_error = None
+    for attempt in range(attempts):
+        try:
+            r = session.request(method, url, timeout=(20, 90), **kwargs)
+            if r.ok:
+                return r
+            if method.upper() == "GET" and (r.status_code == 429 or r.status_code in (500, 502, 503, 504)) and attempt + 1 < attempts:
+                retry_after = r.headers.get("Retry-After", "")
+                try:
+                    delay = min(30, max(3, int(retry_after)))
+                except (TypeError, ValueError):
+                    delay = min(30, 3 * (attempt + 1))
+                print(f"WordPress GET returned HTTP {r.status_code}; retry {attempt + 2}/{attempts} after {delay}s", flush=True)
+                time.sleep(delay)
+                continue
+            die("WordPress API " + str(r.status_code) + ": " + r.text[:500])
+        except requests.exceptions.RequestException as exc:
+            last_error = exc
+            if method.upper() != "GET" or attempt + 1 >= attempts:
+                raise
+            delay = min(30, 3 * (attempt + 1))
+            print(f"WordPress GET connection interrupted; retry {attempt + 2}/{attempts} after {delay}s: {exc}", flush=True)
+            time.sleep(delay)
+    if last_error:
+        raise last_error
+    die("WordPress API request failed after retries: " + url)
 
 def main():
     ap = argparse.ArgumentParser()
