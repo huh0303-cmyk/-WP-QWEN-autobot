@@ -1,0 +1,10 @@
+{
+  "rollout": "affiliate-existing-published-posts",
+  "authorized_by_user": true,
+  "mode": "apply",
+  "scope": "all-active-registered-sites-with-10-verified-site-scoped-products",
+  "only_update_existing_published_posts": true,
+  "preserve_post_status_and_dates": true,
+  "no_delete": true,
+  "note": "One-time trigger. Sites without ten verified site-scoped products are skipped and reported; no cross-site catalog borrowing."
+}
