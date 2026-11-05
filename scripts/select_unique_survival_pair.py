@@ -67,6 +67,19 @@ def channel_metadata(service, expected_channel: str) -> list[str]:
     return metadata
 
 
+
+def pair_is_used(pair: dict, language_code: str, normalized_history: list[str]) -> bool:
+    """Return true when this exact lesson already appears in one uploaded item."""
+    pair_id = norm(pair.get("id", ""))
+    words = [norm(word) for word in pair.get(language_code, []) if norm(word)]
+    for row in normalized_history:
+        # Keep each video's metadata together: do not accidentally combine one
+        # word from one old upload with the other word from a different upload.
+        if (pair_id and pair_id in row) or (len(words) >= 2 and all(word in row for word in words)):
+            return True
+    return False
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--languages", default="all")
@@ -94,17 +107,10 @@ def main() -> int:
         print(f"HISTORY_CHECK_OK language={code} uploads_scanned={len(rows)}", flush=True)
 
     for pair in catalog:
-        pair_id = str(pair.get("id", "")).casefold()
-        used = False
-        for code in codes:
-            words = [norm(word) for word in pair.get(code, []) if norm(word)]
-            for row in used_metadata[code]:
-                # Pair ID catches newer uploads; both localized words catch legacy uploads.
-                if (pair_id and norm(pair_id) in row) or (len(words) >= 2 and all(word in row for word in words)):
-                    used = True
-                    break
-            if used:
-                break
+        # Search all ten channels, and keep title/description/tags from each
+        # video as one record so only a complete localized pair or stable ID
+        # marks that lesson as used.
+        used = any(pair_is_used(pair, code, used_metadata[code]) for code in codes)
         if not used:
             print(f"SELECTED_PAIR_ID={pair['id']}", flush=True)
             github_output = os.getenv("GITHUB_OUTPUT")
