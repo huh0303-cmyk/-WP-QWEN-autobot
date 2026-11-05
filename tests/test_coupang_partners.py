@@ -24,10 +24,11 @@ def test_exactly_ten_unique_cards_are_selected(monkeypatch):
     assert sum(1 for x in items if cp._category(x) == "k_beauty_skincare") == 5
     assert len({x["url"] for x in items}) == 10
 
-def test_fewer_than_five_in_category_blocks_selection(monkeypatch):
+def test_fewer_than_five_in_category_uses_available_verified_products(monkeypatch):
     monkeypatch.setattr(cp, "load_candidates", lambda site_id="": fake_pool(9))
-    with pytest.raises(ValueError, match="affiliate_catalog_requires_five_k_beauty_skincare"):
-        cp.select_products("Article", "Body", "testsite")
+    items = cp.select_products("Article", "Body", "testsite")
+    assert len(items) == 9
+    assert len({x["url"] for x in items}) == 9
 
 def test_footer_replaces_own_marker_without_duplication(monkeypatch):
     monkeypatch.setattr(cp, "load_candidates", lambda site_id="": fake_pool(10))
@@ -45,7 +46,11 @@ def test_footer_replaces_own_marker_without_duplication(monkeypatch):
     assert updated.count(cp.END) == 1
     assert "<p>Article</p>" in updated
     assert updated.count("https://link.coupang.com/a/test") == 20
-    assert updated.index("Coupang") < updated.index("Olive Young") < updated.index("Trip.com")
+    assert updated.index("Coupang Partners") < updated.index("OLIVE YOUNG") < updated.index("Trip.com")
+    assert "https://influencers.coupang.com/logo-black.png" in updated
+    assert "https://dist.oliveyoung.com/fo/fe126e9b35/resources/images/common/logo.svg" in updated
+    assert "https://commons.wikimedia.org/wiki/Special:FilePath/Trip.com_logo.svg" in updated
+    assert updated.index(cp.HEADER_START) > updated.index("</p>")
     assert "24 hours" in updated
 
 def test_unknown_legacy_affiliate_markup_is_preserved(monkeypatch):
