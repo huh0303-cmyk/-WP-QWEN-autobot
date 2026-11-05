@@ -279,12 +279,12 @@ def render_header(site_id=""):
         + '</div>'
         + '<style>.london-affiliate-partner-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0 0 20px;padding:0}'
         '.london-provider-button{box-sizing:border-box;display:flex;min-width:0;min-height:96px;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:12px 8px;border:1px solid #e5e7eb;border-top:4px solid var(--brand-color);border-radius:10px;background:#fff;text-decoration:none!important;text-align:center}'
-        '.london-provider-button img{display:block;width:auto;max-width:100%;height:auto;max-height:42px;object-fit:contain}'
-        '.london-provider-button span{font-size:12px;line-height:1.3;font-weight:800;color:#202124}'
+        '.london-provider-button img{display:block;width:auto;max-width:100%;height:auto;max-height:72px;object-fit:contain}'
+        '.london-provider-button span{font-size:8px;line-height:1.2;font-weight:500;color:#777}'
         '.london-provider-button.coupang_partners{--brand-color:#e87518}'
         '.london-provider-button.olive_young_global{--brand-color:#168a43}'
         '.london-provider-button.trip_com{--brand-color:#1769d2}'
-        '@media(max-width:520px){.london-affiliate-partner-strip{gap:6px}.london-provider-button{min-height:82px;padding:8px 4px}.london-provider-button img{max-height:34px}.london-provider-button span{font-size:10px}}</style>'
+        '@media(max-width:520px){.london-affiliate-partner-strip{gap:6px}.london-provider-button{min-height:82px;padding:8px 4px}.london-provider-button img{max-height:56px}.london-provider-button span{font-size:7px}}</style>'
         + HEADER_END)
 
 def render_footer(title, article_text, site_id="", lang="en"):
