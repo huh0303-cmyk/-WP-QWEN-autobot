@@ -10,7 +10,7 @@ HEADER_END = "<!-- LONDON-AFFILIATE-HEADER-END -->"
 START = "<!-- LONDON-COUPANG-PARTNERS-START -->"
 END = "<!-- LONDON-COUPANG-PARTNERS-END -->"
 LEGACY_MARKERS = ((START, END), ("<!-- KHEALTH365-COUPANG-START -->", "<!-- KHEALTH365-COUPANG-END -->"))
-DISCLOSURE = "This post contains Coupang Partners affiliate links. If you purchase through these links, we may earn a commission at no additional cost to you."
+DISCLOSURE = "This post contains Coupang Partners affiliate links. If you visit Coupang through one of these links and make a purchase within 24 hours, including a purchase of another eligible product, we may earn a commission at no additional cost to you. Attribution rules, cancellations and returns may affect commission eligibility."
 COUPANG_TRADEMARK_NOTICE = "Coupang’s trademarks are used under license from Coupang, LLC or its affiliates."
 LOGOS = {
     "trip_com": "https://commons.wikimedia.org/wiki/Special:FilePath/Trip.com_logo.svg",
@@ -249,7 +249,7 @@ def render_header(site_id=""):
     header = load_header_buttons(site_id)
     if not header:
         raise RuntimeError(f"Affiliate header requires Trip.com + Olive Young + Coupang tracking URLs for site={site_id}")
-    button_order = ("trip_com", "olive_young_global", "coupang_partners")
+    button_order = ("coupang_partners", "trip_com", "olive_young_global")
     button_map = {item["provider"]: item for item in header["buttons"]}
     buttons = []
     for provider in button_order:
@@ -361,7 +361,6 @@ def apply_footer(content, title, site_id="", lang="en"):
     marker_pairs = ((HEADER_START, HEADER_END), (START, END), *LEGACY_MARKERS[1:])
     for old_start, old_end in marker_pairs:
         clean = re.sub(re.escape(old_start) + r".*?" + re.escape(old_end), "", clean, flags=re.S)
-    # K-Health365 pilot is Coupang-only; do not inject the legacy three-provider header.
-    header = "" if _resolve_site_key(site_id) == "khealth365" else render_header(site_id)
+    header = render_header(site_id)
     footer = render_footer(title, clean, site_id, lang)
     return header + "\n" + clean.lstrip() + ("\n" if clean.strip() else "") + footer
