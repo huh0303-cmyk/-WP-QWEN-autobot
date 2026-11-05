@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Daily 3-5 minute narrated video for the Health Clinic USA / Japan and Seoul_Jisoo1 shopping channels.
 
-Free-only stack: free LLM chain (economy_text) -> Microsoft Edge neural TTS -> Pexels/Pixabay
+Free-only stack: free LLM chain (economy_text) -> Fish Audio S2.1 Pro Free for Japanese narration (fail closed) -> Edge TTS for other channels -> Pexels/Pixabay
 footage and photos -> ffmpeg (Ken Burns, burned-in subtitles) -> YouTube Data API.
 Safety: exact authenticated channel ID must equal the locked UC ID before any upload; one video
 per KST day per channel (checked against the channel's uploads); health scripts pass a
@@ -301,11 +301,25 @@ def duration(path: Path) -> float:
     return float(run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", str(path)]).strip())
 
 
-async def _tts(text: str, voice: str, out: Path, elevenlabs_voice_id: str = ""):
-    """Free-only TTS: Fish Audio S2.1 Pro Free when configured, then Edge neural TTS.
-    Paid ElevenLabs is intentionally never called by this pipeline.
-    """
+def _trim_leading_silence(path: Path) -> None:
+    """Remove any encoded leading silence so narration starts with the first frame."""
+    trimmed = path.with_name(path.stem + ".trimmed.mp3")
+    result = subprocess.run(
+        ["ffmpeg", "-y", "-i", str(path),
+         "-af", "silenceremove=start_periods=1:start_duration=0.08:start_threshold=-50dB",
+         "-codec:a", "libmp3lame", "-q:a", "2", str(trimmed)],
+        capture_output=True, text=True,
+    )
+    if result.returncode != 0 or not trimmed.exists() or trimmed.stat().st_size <= 2000:
+        trimmed.unlink(missing_ok=True)
+        raise RuntimeError("Could not verify/trim leading silence from narration audio")
+    os.replace(trimmed, path)
+
+
+async def _tts(text: str, voice: str, out: Path, elevenlabs_voice_id: str = "", require_fish: bool = False):
+    """Fish Audio S2.1 Pro Free is mandatory for Japanese; Edge TTS is non-Japanese fallback only."""
     api_key = os.getenv("FISH_AUDIO_API_KEY", "").strip()
+    fish_error = "FISH_AUDIO_API_KEY unavailable"
     if api_key:
         try:
             response = requests.post(
@@ -317,20 +331,30 @@ async def _tts(text: str, voice: str, out: Path, elevenlabs_voice_id: str = ""):
             )
             if response.ok and len(response.content) > 2000 and not response.content.lstrip().startswith(b"{"):
                 out.write_bytes(response.content)
-                print(f"TTS_ENGINE=fish_audio model=s2.1-pro-free bytes={len(response.content)}", flush=True)
+                _trim_leading_silence(out)
+                print(f"TTS_ENGINE=fish_audio model=s2.1-pro-free bytes={out.stat().st_size}", flush=True)
                 return
-            print(f"Fish Audio TTS unavailable (HTTP {response.status_code}); using free Edge TTS.", flush=True)
+            fish_error = f"HTTP {response.status_code}"
         except Exception as exc:
-            print(f"Fish Audio TTS unavailable ({type(exc).__name__}); using free Edge TTS.", flush=True)
+            fish_error = type(exc).__name__
+
+    if require_fish:
+        raise RuntimeError(
+            f"Japanese Health Clinic requires Fish Audio s2.1-pro-free; {fish_error}. "
+            "Stopping instead of switching to Edge TTS."
+        )
+
     try:
         import edge_tts
         await edge_tts.Communicate(text, voice).save(str(out))
         if out.exists() and out.stat().st_size > 2000:
+            _trim_leading_silence(out)
             print(f"TTS_ENGINE=edge_tts voice={voice} bytes={out.stat().st_size}", flush=True)
             return
         raise RuntimeError("Edge TTS returned an empty/short audio file")
     except Exception as exc:
-        raise RuntimeError(f"All free TTS providers failed; no paid fallback was attempted: {type(exc).__name__}: {exc}") from exc
+        raise RuntimeError(f"All permitted free TTS providers failed: {type(exc).__name__}: {exc}") from exc
+
 
 def split_chunks(text: str, lang: str) -> list[str]:
     limit = 34 if lang == "en" else 17  # per line; two lines per cue
@@ -416,7 +440,7 @@ def build_video(channel: str, data: dict, outdir: Path) -> dict:
     clips, durs, texts, credits = [], [], [], []
     for i, sc in enumerate(scenes):
         audio = tmp / f"a_{i:02d}.mp3"
-        asyncio.run(_tts(sc["narration"], cfg["voice"], audio, selected_voice_id))
+        asyncio.run(_tts(sc["narration"], cfg["voice"], audio, selected_voice_id, require_fish=(lang == "ja")))
         dur = duration(audio) + 0.45
         media = fetch_media(sc["visual"], want_video=(i % 2 == 0), used=used, tmp=tmp, idx=i, kind=cfg["kind"])
         if media is None:
