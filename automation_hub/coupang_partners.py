@@ -240,7 +240,7 @@ def render_header(site_id=""):
     header = load_header_buttons(site_id)
     if not header:
         raise RuntimeError(f"Affiliate header requires Trip.com + Olive Young + Coupang tracking URLs for site={site_id}")
-    button_order = ("coupang_partners", "trip_com", "olive_young_global")
+    button_order = ("coupang_partners", "olive_young_global", "trip_com")
     button_map = {item["provider"]: item for item in header["buttons"]}
     buttons = []
     for provider in button_order:
