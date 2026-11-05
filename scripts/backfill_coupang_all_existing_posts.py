@@ -226,7 +226,10 @@ def main():
     REPORT.write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding="utf-8")
     print(json.dumps(report["totals"],ensure_ascii=False))
     print(f"REPORT={REPORT}")
-    if report["totals"]["errors"]: sys.exit(2)
+    if report["totals"]["errors"]:
+        print(f"COMPLETED WITH HOLDS — {report['totals']['errors']} item/site errors recorded; remaining sites were still processed.")
+    else:
+        print("COMPLETED — no item/site errors recorded.")
     if args.mode == "preview": print("PREVIEW ONLY — no published posts were modified.")
 
 if __name__ == "__main__":
