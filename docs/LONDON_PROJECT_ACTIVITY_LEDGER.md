@@ -694,3 +694,12 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - 추가 코드 결함: `config/youtube_channels.json`의 invention.workflow가 퇴역한 `curio-longform-daily.yml`을 가리키고, registry validator도 지식 채널에 동일한 퇴역 경로를 요구. 현재 실행기는 `youtube-github-worker.yml` + `youtube_github_worker.py`.
 - 제작 선행조건: 지식 worker는 `FISH_AUDIO_API_KEY`가 없으면 중단. invention용 `archive_footage_longform.py`는 회차 날짜별 `assets/youtube/knowledge/<EPISODE_DATE>/invention-source.png` 또는 지정 이미지 루트의 검수 이미지를 필수로 요구. 현재 해당 날짜 파일 존재 여부 및 키 유무는 아직 비밀값을 열람하지 않고는 검증되지 않음.
 - 조치: 상세 감사 및 안전 복구 절차를 `docs/INVENTION_STORY1_PUBLISHING_STOP_AUDIT_2026-11-06.md`에 저장. 글로벌 비용 보류·시크릿·시트·영상은 변경하지 않았고 업로드도 시도하지 않음. 유료 API를 무단 활성화하지 않으며, 다음 단계는 registry/Sheet/dispatcher 계약을 현재 worker로 일괄 정합화하고 무료 경로/자산을 확인한 뒤 소유자 승인 canary를 실행하는 것.
+
+
+## starbucks-vibes-publishing-stop-20261106
+- 2026-11-06 KST — 사용자 요청으로 CAFE_STARBUCKSVIBES (`starbucks`, `UC_e-sbLkVgwJNYEeobolNog`) 발행 중단 원인을 GitHub main에서 재점검.
+- 확인: 2026-11-05 read-only OAuth preflight에 정확한 채널 ID가 기록되어 있어 채널 ID 불일치는 현재 근거상 원인이 아님. 단, 이는 공개 업로드 영수증이 아님.
+- 확정 차단: GitHub-only YouTube worker는 수동 `workflow_dispatch` 전용이고 `confirm_publication=true`가 필요하다. 자동 10채널 cadence는 runbook에서 아직 비활성화 상태다. 런타임은 글로벌 `YOUTUBE_COST_HOLD`가 해제되지 않으면 Starbucks를 worker의 calendar claim 이전에 차단하며, 무료 예외는 Globalmusic만 존재한다.
+- 제작 차단: Starbucks는 worker에서 `PLAYLIST_MUSIC_SOURCE=owner_local` 또는 무료 썸네일 소스를 명시하지 않는다. 기본은 `approved_bank` 음악과 `gemini_app_export` 썸네일이며, 후자는 검수된 `gemini_*` 파일을 요구한다. 2026-10-01 기존 배치 영수증에도 Starbucks `WAITING_ASSETS`가 기록되어 있다. owner library 모듈에는 `instrumental_cafe`/SHA-256/rights/50–70분 검증 기능이 있지만 GitHub worker 경로에 연결되지 않았고, 현재 완전한 검수 오디오 풀·신규 1280x720 썸네일의 실행기 사전검사 영수증은 없다.
+- 조치: `docs/STARBUCKS_VIBES_PUBLISHING_STOP_AUDIT_2026-11-06.md`를 커밋 `f2ae3288625da40f22c94111d8a9529d57040393`로 저장. 글로벌 비용 보류·유료 API·OAuth 비밀·Google Sheet·기존 영상은 변경하지 않았고, publish workflow dispatch도 실행하지 않았다. 공개 업로드 완료를 주장하지 않는다.
+- 복구 조건: Starbucks 전용 private approved manifest/audio pool 및 신규 썸네일의 Drive preflight를 통과시키고, paid API가 완전히 비활성화된 free-only worker 경로와 CI를 추가한 뒤, 단일 canary에서 exact channel/video ID, 제목, 길이, 썸네일 CDN read-back, `privacyStatus=public`을 검증한다. 그 후에만 주 2–3회 자동 cadence를 활성화한다.
