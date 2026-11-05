@@ -7,11 +7,11 @@ import requests
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
-from automation_hub.coupang_partners import apply_footer, select_products, START, END
+from automation_hub.coupang_partners import apply_footer, select_products, START, END, HEADER_START, HEADER_END, LOGOS
 
 SITE = "https://k-health365.com"
 DISCLOSURE = "이 게시물에는 쿠팡 파트너스 제휴 링크가 포함되어 있습니다. 이 링크를 통해 쿠팡에 방문한 뒤 24시간 이내에 다른 상품을 구매하더라도 운영정책상 실적으로 인정되는 구매라면 수수료를 제공받을 수 있습니다. 구매 경로의 최종 기여, 주문 취소 및 반품 등에 따라 수수료가 인정되지 않을 수 있습니다."
-CATALOG = Path("config/affiliate/k-health365-sitewide-10.json")
+CATALOG = Path("config/affiliate/global-weekly-10.json")
 OUT = Path("output/khealth365-sitewide-10-report.json")
 UA = {"User-Agent": "Mozilla/5.0 (compatible; KHealth365AffiliateWorkflow/1.0)"}
 
@@ -40,7 +40,10 @@ def image_from_affiliate(url):
     die("상품 대표 이미지 확인 실패: " + url)
 
 def load_products():
-    items = json.loads(CATALOG.read_text(encoding="utf-8"))
+    weekly_data = json.loads(CATALOG.read_text(encoding="utf-8"))
+    if not isinstance(weekly_data, dict):
+        die("주간 상품 원본 파일 형식이 올바르지 않습니다.")
+    items = weekly_data.get("items", [])
     if len(items) != 10:
         die("상품 카탈로그는 정확히 10개여야 합니다.")
     urls = [p["url"] for p in items]
@@ -72,7 +75,8 @@ def load_products():
     image_urls = [p["image_url"] for p in items]
     if len(set(image_urls)) != 10:
         die("고정 상품 10개의 대표 이미지가 중복됩니다.")
-    CATALOG.write_text(json.dumps(items, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    weekly_data["items"] = items
+    CATALOG.write_text(json.dumps(weekly_data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return items
 
 def render_block(products):
@@ -174,8 +178,9 @@ def main():
                 params={"context":"edit","_fields":"id,link,content,status"}).json()
             check = verify.get("content",{}).get("raw","")
             expected = set(p["url"] for p in selected)
-            if START not in check or END not in check or len(expected) != 10 or not all(check.count(url) >= 2 for url in expected):
-                report["errors"].append({"id":pid,"reason":"REST read-back verification failed","expected_products":len(expected)})
+            logo_assets_present = all(asset in check for asset in LOGOS.values())
+            if START not in check or END not in check or HEADER_START not in check or HEADER_END not in check or not logo_assets_present or len(expected) != 10 or not all(check.count(url) >= 2 for url in expected):
+                report["errors"].append({"id":pid,"reason":"REST read-back verification failed: footer markers, all three official logos, or ten tracked products missing","expected_products":len(expected),"logo_assets_present":logo_assets_present})
                 continue
             public = wp_request(session,"GET",SITE + "/wp-json/wp/v2/posts/" + str(pid),
                 params={"_fields":"id,link,content,status"}).json()
