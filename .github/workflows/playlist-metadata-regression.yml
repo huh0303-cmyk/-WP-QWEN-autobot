@@ -8,15 +8,15 @@ on:
       - "scripts/youtube_playlist_maker.py"
       - "automation_hub/youtube_github_runtime.py"
       - ".github/workflows/cafe-mozart-publish.yml"
-      - "scripts/youtube_playlist_maker.py"
-      - "automation_hub/youtube_github_runtime.py"
-      - ".github/workflows/cafe-mozart-publish.yml"
       - "tests/test_playlist_owner_policy.py"
       - ".github/workflows/playlist-metadata-regression.yml"
   pull_request:
     paths:
       - "scripts/youtube_english_metadata.py"
       - "scripts/playlist_language_policy.py"
+      - "scripts/youtube_playlist_maker.py"
+      - "automation_hub/youtube_github_runtime.py"
+      - ".github/workflows/cafe-mozart-publish.yml"
       - "tests/test_playlist_owner_policy.py"
       - ".github/workflows/playlist-metadata-regression.yml"
 
