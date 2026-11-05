@@ -297,11 +297,11 @@ def render():
 
     seconds = float(subprocess.check_output([
         "ffprobe", "-v", "error", "-show_entries", "format=duration",
-        "-of", "default=nw=1:nk=1", str(work / "healing-ambience.mp4")
+        "-of", "default=nw=1:nk=1", str(work / "rain-75.mp4")
     ]))
     if abs(seconds - job.DURATION) > 2:
         raise RuntimeError(f"Rendered duration mismatch: expected {job.DURATION}, got {seconds}")
-    job.ff("-ss", "30", "-i", work / "healing-ambience.mp4", "-t", "20",
+    job.ff("-ss", "30", "-i", work / "rain-75.mp4", "-t", "20",
            "-c", "copy", work / "preview.mp4")
     record_thumbnail(history_path, {
         "token": job.MARKER.rsplit("-", 1)[-1],
