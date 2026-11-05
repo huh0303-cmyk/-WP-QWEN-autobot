@@ -16,16 +16,19 @@ assert routing['selection_policy']['pool_category_counts']==pool
 assert routing['selection_policy']['per_article_category_counts']==expected
 assert routing['selection_policy']['randomize_per_article'] is False
 assert [x['provider'] for x in routing['top_buttons']]==['coupang_partners','olive_young_global','trip_com']
-assert [x['brand_color'] for x in routing['top_buttons']]==['orange','blue','green']
+assert [x['brand_color'] for x in routing['top_buttons']]==['orange','green','blue']
 assert routing['affiliate_programs']['agoda']['enabled'] is False
 assert shared['product_cards']['category_count']==expected
 assert shared['header_buttons']==['coupang_partners','olive_young_global','trip_com']
 assert policy['header_design']['no_extra_trip_category_text_link_row_below_buttons'] is True
 assert policy['header_design']['order']==['coupang_partners','olive_young_global','trip_com']
+assert policy['header_design']['official_logo_image_required'] is True
+assert policy['article_placement']['location']=='absolute_article_footer_only'
+assert policy['article_placement']['sequence'][0]=='three_official_company_logo_banners_in_one_horizontal_row'
 print('AFFILIATE_CONFIG_VALID=PASS')
-print('POLICY=v6.0.0_LOCKED')
+print('POLICY=v7.0.0_LOCKED')
 print('HEADER=COUPANG_ORANGE+OLIVEYOUNG_GREEN+TRIPCOM_BLUE')
 print('PER_ARTICLE=HEALTH5+KBEAUTY_SKINCARE5')
 print('SITE_POOL=10 (HEALTH5+KBEAUTY5)')
-print('FIXED_TEN_PER_DESTINATION=REQUIRED')
+print('UP_TO_10_VERIFIED_PRODUCTS=REQUIRED')
 print('AGODA=DISABLED')
