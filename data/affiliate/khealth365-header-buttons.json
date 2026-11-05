@@ -12,14 +12,6 @@
       "verified": true
     },
     {
-      "provider": "trip_com",
-      "label": "Trip.com",
-      "affiliate_url": "https://www.trip.com/t/KwZ0AV4s0X2",
-      "status": "redirect_validated",
-      "link_type": "homepage",
-      "verified": true
-    },
-    {
       "provider": "olive_young_global",
       "label": "OLIVE YOUNG",
       "affiliate_url": "https://global.oliveyoung.com/if/rd?su=HUH556423",
@@ -27,6 +19,14 @@
       "link_type": "reward_code_entry",
       "verified": false,
       "note": "Account reward-code URL retained as supplied; commission attribution has not been independently confirmed."
+    },
+    {
+      "provider": "trip_com",
+      "label": "Trip.com",
+      "affiliate_url": "https://www.trip.com/t/KwZ0AV4s0X2",
+      "status": "redirect_validated",
+      "link_type": "homepage",
+      "verified": true
     }
   ],
   "trip_com_categories": [],
