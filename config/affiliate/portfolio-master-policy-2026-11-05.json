@@ -1,0 +1,739 @@
+{
+  "schema_version": "1.0.0",
+  "policy_name": "London Project Master Affiliate Portfolio Policy",
+  "effective_date": "2026-11-05",
+  "timezone": "Asia/Seoul",
+  "execution": {
+    "requested_order": "reverse_of_listed_order",
+    "wordpress_rollout": "reverse_order",
+    "blogger_rollout": "reverse_order_after_wordpress",
+    "youtube_rollout": "after_blogger",
+    "social_rollout": [
+      "facebook",
+      "tiktok",
+      "instagram",
+      "threads"
+    ],
+    "preserve_existing_article_body": true,
+    "preserve_post_status_and_dates": true,
+    "no_deletion": true,
+    "idempotent_updates_only": true,
+    "publish_only_after_provider_tracking_url_and_product_image_verified": true,
+    "report_per_site_and_content_id": true
+  },
+  "article_rules": {
+    "default_card_count": 10,
+    "placement": "article_footer",
+    "required_disclosure": true,
+    "no_medical_investment_or_legal_outcome_claims": true,
+    "separate_information_content_from_product_promotion": true,
+    "provider_logo_strip": "only_if_provider_brand_guidelines_allow",
+    "use_official_current_brand_assets": true
+  },
+  "wordpress": [
+    {
+      "domain": "k-health365.com",
+      "provider": "coupang",
+      "count": 10,
+      "categories": [
+        "건강기능식품",
+        "영양관리",
+        "수면",
+        "운동",
+        "건강관리 용품"
+      ],
+      "status": "approved_pilot_verified"
+    },
+    {
+      "domain": "koreamedicaltour.com",
+      "provider": "trip_com",
+      "count": 10,
+      "categories": [
+        "한국 방문 호텔",
+        "항공",
+        "교통",
+        "여행 예약"
+      ]
+    },
+    {
+      "domain": "koreainvest365.com",
+      "provider": "none",
+      "count": 0,
+      "categories": [],
+      "reason": "투자 정보 중심"
+    },
+    {
+      "domain": "ki-korea.com",
+      "provider": "none",
+      "count": 0,
+      "categories": [],
+      "reason": "투자·경제 정보 중심"
+    },
+    {
+      "domain": "koreainsurance365.com",
+      "provider": "none",
+      "count": 0,
+      "categories": [],
+      "reason": "보험 정보 신뢰성 우선"
+    },
+    {
+      "domain": "kfinance365.com",
+      "provider": "none",
+      "count": 0,
+      "categories": [],
+      "reason": "금융 정보와 소비재 판매 분리"
+    },
+    {
+      "domain": "koreataxnlaw.com",
+      "provider": "none",
+      "count": 0,
+      "categories": [],
+      "reason": "세금·법률 정보 중심"
+    },
+    {
+      "domain": "koreacrypto365.com",
+      "provider": "none",
+      "count": 0,
+      "categories": [],
+      "reason": "가상자산 정보 중심"
+    },
+    {
+      "domain": "krealestate365.com",
+      "provider": "coupang",
+      "count": 10,
+      "categories": [
+        "주거",
+        "수납",
+        "조명",
+        "청소",
+        "주방",
+        "생활용품"
+      ]
+    },
+    {
+      "domain": "ktech365.com",
+      "provider": "coupang",
+      "count": 10,
+      "categories": [
+        "노트북 주변기기",
+        "충전기",
+        "저장장치",
+        "키보드",
+        "이어폰"
+      ]
+    },
+    {
+      "domain": "kskin365.com",
+      "provider": "olive_young",
+      "count": 10,
+      "categories": [
+        "스킨케어",
+        "선케어",
+        "클렌징",
+        "보습",
+        "헤어"
+      ]
+    },
+    {
+      "domain": "oliveyoungkorea.com",
+      "provider": "olive_young",
+      "count": 10,
+      "categories": [
+        "올리브영 인기 뷰티 카테고리"
+      ]
+    },
+    {
+      "domain": "kworld365.com",
+      "provider": "coupang",
+      "count": 10,
+      "categories": [
+        "K-POP 앨범",
+        "공식 굿즈",
+        "응원용품",
+        "공연 준비용품"
+      ]
+    },
+    {
+      "domain": "k-trip365.com",
+      "provider": "trip_com",
+      "count": 10,
+      "categories": [
+        "한국 호텔",
+        "항공",
+        "기차",
+        "관광",
+        "여행 예약"
+      ]
+    },
+    {
+      "domain": "k-visa365.com",
+      "provider": "coupang",
+      "count": 10,
+      "categories": [
+        "한국 정착 준비",
+        "여행용 어댑터",
+        "수납",
+        "학습·생활용품"
+      ]
+    },
+    {
+      "domain": "koreawedding365.com",
+      "provider": "coupang",
+      "count": 10,
+      "categories": [
+        "웨딩 준비",
+        "선물",
+        "홈데코",
+        "생활용품"
+      ]
+    },
+    {
+      "domain": "kstudy365.com",
+      "provider": "coupang",
+      "count": 10,
+      "categories": [
+        "한국어 교재",
+        "학습도구",
+        "문구",
+        "노트북 주변기기"
+      ]
+    },
+    {
+      "domain": "studyinkorea365.com",
+      "provider": "coupang",
+      "count": 10,
+      "categories": [
+        "유학생 기숙사",
+        "생활 준비",
+        "학습 준비물"
+      ]
+    },
+    {
+      "domain": "kieca-korea.org",
+      "provider": "none",
+      "count": 0,
+      "categories": [],
+      "reason": "협회·교육 정보 중심, 상업성 최소화"
+    },
+    {
+      "domain": "ksa-korea.org",
+      "provider": "none",
+      "count": 0,
+      "categories": [],
+      "reason": "비영리 유학 정보와 대학 연결 중심"
+    },
+    {
+      "domain": "sis-korea.com",
+      "provider": "coupang",
+      "count": 10,
+      "categories": [
+        "TOPIK 교재",
+        "한국어 학습도구",
+        "문구",
+        "교육 장비"
+      ]
+    },
+    {
+      "domain": "jobkorea365.com",
+      "provider": "coupang",
+      "count": 10,
+      "categories": [
+        "취업 준비",
+        "면접",
+        "사무용품",
+        "업무 장비"
+      ]
+    },
+    {
+      "domain": "jobinkorea365.com",
+      "provider": "coupang",
+      "count": 10,
+      "categories": [
+        "한국 직장생활",
+        "출퇴근",
+        "사무·생활 준비물"
+      ]
+    },
+    {
+      "domain": "jobkoreaglobal.com",
+      "provider": "coupang",
+      "count": 10,
+      "categories": [
+        "글로벌 취업",
+        "면접",
+        "재택근무",
+        "업무 장비"
+      ]
+    },
+    {
+      "domain": "korea365.org",
+      "provider": "none",
+      "count": 0,
+      "categories": [],
+      "reason": "전체 네트워크 허브, 전문 사이트로 연결"
+    },
+    {
+      "domain": "koreanews365.com",
+      "provider": "none",
+      "count": 0,
+      "categories": [],
+      "reason": "뉴스 기사에는 상품 카드 삽입하지 않음"
+    },
+    {
+      "domain": "theseouljournal.com",
+      "provider": "excluded",
+      "count": 0,
+      "categories": [],
+      "reason": "기존 제외 지침 유지"
+    }
+  ],
+  "blogger": [
+    {
+      "domain": "k-trip365.blogspot.com",
+      "provider": "trip_com",
+      "count": 10,
+      "categories": [
+        "호텔",
+        "항공",
+        "교통",
+        "관광 예약"
+      ]
+    },
+    {
+      "domain": "kworld365seoul.blogspot.com",
+      "provider": "coupang",
+      "count": 10,
+      "categories": [
+        "K-POP 앨범",
+        "굿즈",
+        "공연 준비"
+      ]
+    },
+    {
+      "domain": "jobkorea365.blogspot.com",
+      "provider": "coupang",
+      "count": 10,
+      "categories": [
+        "취업",
+        "면접",
+        "사무용품"
+      ]
+    },
+    {
+      "domain": "kstudy365.blogspot.com",
+      "provider": "coupang",
+      "count": 10,
+      "categories": [
+        "한국어 교재",
+        "학습도구"
+      ]
+    },
+    {
+      "domain": "koreainsurance365.blogspot.com",
+      "provider": "none",
+      "count": 0,
+      "categories": [
+        "보험 정보"
+      ]
+    },
+    {
+      "domain": "kfinance365.blogspot.com",
+      "provider": "none",
+      "count": 0,
+      "categories": [
+        "금융 정보"
+      ]
+    },
+    {
+      "domain": "koreamedicaltour365.blogspot.com",
+      "provider": "trip_com",
+      "count": 10,
+      "categories": [
+        "의료관광 방문객 호텔",
+        "교통"
+      ]
+    },
+    {
+      "domain": "k-visa365.blogspot.com",
+      "provider": "coupang",
+      "count": 10,
+      "categories": [
+        "한국 정착",
+        "생활 준비물"
+      ]
+    },
+    {
+      "domain": "koreanews365daily.blogspot.com",
+      "provider": "none",
+      "count": 0,
+      "categories": [
+        "뉴스 콘텐츠"
+      ]
+    },
+    {
+      "domain": "koreainvest365.blogspot.com",
+      "provider": "none",
+      "count": 0,
+      "categories": [
+        "투자 정보"
+      ]
+    },
+    {
+      "domain": "oliveyoungkorea.blogspot.com",
+      "provider": "olive_young",
+      "count": 10,
+      "categories": [
+        "K-뷰티"
+      ]
+    },
+    {
+      "domain": "koreacrypto365.blogspot.com",
+      "provider": "none",
+      "count": 0,
+      "categories": [
+        "가상자산 정보"
+      ]
+    },
+    {
+      "domain": "jobinkorea365.blogspot.com",
+      "provider": "coupang",
+      "count": 10,
+      "categories": [
+        "직장생활",
+        "업무용품"
+      ]
+    },
+    {
+      "domain": "koreawedding365.blogspot.com",
+      "provider": "coupang",
+      "count": 10,
+      "categories": [
+        "웨딩",
+        "선물",
+        "홈데코"
+      ]
+    },
+    {
+      "domain": "theseouljournal.blogspot.com",
+      "provider": "excluded",
+      "count": 0,
+      "categories": [
+        "상업 제휴 제외"
+      ]
+    },
+    {
+      "domain": "ktech365.blogspot.com",
+      "provider": "coupang",
+      "count": 10,
+      "categories": [
+        "전자기기",
+        "액세서리"
+      ]
+    },
+    {
+      "domain": "kieca-korea.blogspot.com",
+      "provider": "none",
+      "count": 0,
+      "categories": [
+        "협회·교육 정보"
+      ]
+    },
+    {
+      "domain": "ki-korea.blogspot.com",
+      "provider": "none",
+      "count": 0,
+      "categories": [
+        "투자·경제 정보"
+      ]
+    },
+    {
+      "domain": "ksa-korea.blogspot.com",
+      "provider": "none",
+      "count": 0,
+      "categories": [
+        "유학협회 정보"
+      ]
+    },
+    {
+      "domain": "koreataxnlaw.blogspot.com",
+      "provider": "none",
+      "count": 0,
+      "categories": [
+        "세금·법률 정보"
+      ]
+    },
+    {
+      "domain": "jobkoreaglobal.blogspot.com",
+      "provider": "coupang",
+      "count": 10,
+      "categories": [
+        "글로벌 취업",
+        "업무 장비"
+      ]
+    },
+    {
+      "domain": "studyinkorea365.blogspot.com",
+      "provider": "coupang",
+      "count": 10,
+      "categories": [
+        "유학생 생활",
+        "학습 준비"
+      ]
+    },
+    {
+      "domain": "korea365guide.blogspot.com",
+      "provider": "none",
+      "count": 0,
+      "categories": [
+        "전문 사이트 연결"
+      ]
+    },
+    {
+      "domain": "sis-korea.blogspot.com",
+      "provider": "coupang",
+      "count": 10,
+      "categories": [
+        "TOPIK",
+        "한국어 학습 상품"
+      ]
+    },
+    {
+      "domain": "krealestate365.blogspot.com",
+      "provider": "coupang",
+      "count": 10,
+      "categories": [
+        "주거",
+        "수납",
+        "생활용품"
+      ]
+    },
+    {
+      "domain": "k-health365.blogspot.com",
+      "provider": "coupang",
+      "count": 10,
+      "categories": [
+        "건강관리",
+        "영양관리"
+      ]
+    },
+    {
+      "domain": "skin.k-health365.com",
+      "provider": "olive_young",
+      "count": 10,
+      "categories": [
+        "스킨케어",
+        "뷰티"
+      ]
+    },
+    {
+      "domain": "glow.k-health365.com",
+      "provider": "olive_young",
+      "count": 10,
+      "categories": [
+        "뷰티",
+        "퍼스널케어"
+      ]
+    },
+    {
+      "domain": "k-health365-edu.blogspot.com",
+      "provider": "coupang",
+      "count": 10,
+      "categories": [
+        "보건·의료 취업 학습 준비물"
+      ]
+    },
+    {
+      "domain": "korea-life-support365.blogspot.com",
+      "provider": "coupang",
+      "count": 10,
+      "categories": [
+        "한국 생활 정착용품"
+      ]
+    },
+    {
+      "domain": "koreamedicaltour1.blogspot.com",
+      "provider": "trip_com",
+      "count": 10,
+      "categories": [
+        "의료관광 방문객 여행",
+        "숙박"
+      ]
+    },
+    {
+      "domain": "kworld365.blogspot.com",
+      "provider": "coupang",
+      "count": 10,
+      "categories": [
+        "K-POP 앨범",
+        "공식 굿즈"
+      ]
+    },
+    {
+      "domain": "seoulintlschoolguide.blogspot.com",
+      "provider": "coupang",
+      "count": 10,
+      "categories": [
+        "국제학교",
+        "학생 학습 준비물"
+      ]
+    }
+  ],
+  "youtube": {
+    "target_channels": 23,
+    "no_affiliate": [
+      "CAFE_ROMANTIC",
+      "CAFE_HEALING",
+      "CAFE_STARBUCKSVIBES",
+      "CAFE_MOZART",
+      "CAFE_KPOP",
+      "NASA_XFILES",
+      "HISTORY_TV_TODAY",
+      "INVENTION_STORY1",
+      "SILENT_ERA_FILM",
+      "RETRO_USA1"
+    ],
+    "contextual_coupang": [
+      "서울국제대학-TOPIK센터",
+      "English Survival",
+      "Japanese Survival",
+      "Chinese Survival",
+      "Vietnamese Survival",
+      "Spanish Survival",
+      "French Survival",
+      "German Survival",
+      "Italian Survival",
+      "Portuguese Survival"
+    ],
+    "health_channels": [
+      "Health Clinic USA",
+      "Health Clinic Japan"
+    ],
+    "shopping_channel": {
+      "name": "Seoul_Jisoo1",
+      "rule": "영상별로 Trip.com 또는 OLIVE YOUNG 또는 쿠팡 중 한 곳만 사용",
+      "mapping": {
+        "travel": "Trip.com",
+        "beauty": "OLIVE YOUNG",
+        "health_lifestyle_general_shopping": "쿠팡"
+      }
+    },
+    "placement": [
+      "영상 설명란",
+      "고정 댓글"
+    ],
+    "rule": "영상 주제와 직접 관련된 경우에만 제휴 링크 사용"
+  },
+  "social": {
+    "facebook": [
+      {
+        "name": "서울국제대학 SIS - TOPIK Center",
+        "rule": "교육 콘텐츠 중심"
+      },
+      {
+        "name": "Japanese Survival 역할 페이지",
+        "rule": "언어교육 중심"
+      },
+      {
+        "name": "SIS-ENGLISH Center",
+        "rule": "영어교육 중심"
+      }
+    ],
+    "tiktok": [
+      {
+        "handle": "@sis_topik",
+        "status": "계정 확인",
+        "rule": "교육 중심"
+      },
+      {
+        "handle": "@sis_languagecenter",
+        "status": "계정 확인",
+        "rule": "영어교육 중심"
+      },
+      {
+        "handle": "Jisoo Picks",
+        "status": "쇼핑 계정 소유·핸들 확인 필요",
+        "rule": "확인 후 영상별 제휴사 하나만 선택"
+      }
+    ],
+    "instagram": [
+      {
+        "handle": "@sis_topik1",
+        "rule": "교육 콘텐츠"
+      },
+      {
+        "handle": "@englishsurvival1",
+        "rule": "영어 학습 콘텐츠"
+      },
+      {
+        "handle": "@japanese_survival1",
+        "rule": "일본어 학습 콘텐츠"
+      },
+      {
+        "handle": "@seoul_health365",
+        "provider": "coupang",
+        "rule": "건강·생활 상품"
+      },
+      {
+        "handle": "@seoul_trip365",
+        "provider": "trip_com",
+        "rule": "여행 예약"
+      },
+      {
+        "handle": "@seoul_jisoo",
+        "rule": "게시물 주제별 단일 제휴사"
+      }
+    ],
+    "threads": [
+      {
+        "handle": "@seoultopik",
+        "rule": "교육 콘텐츠"
+      },
+      {
+        "handle": "@english_survival_1",
+        "rule": "교육 콘텐츠"
+      },
+      {
+        "handle": "@seoul_health365",
+        "provider": "coupang",
+        "rule": "건강 상품"
+      },
+      {
+        "handle": "@seoul_life365",
+        "provider": "trip_com",
+        "rule": "여행·생활"
+      }
+    ],
+    "platform_policy_checks": {
+      "olive_young_global": "Reward Code가 승인된 플랫폼·계정에만 사용. 같은 플랫폼 내 여러 계정에 동일 코드 일괄 배포 금지 여부와 승인 범위 확인 후 적용.",
+      "account_ownership_and_api_permissions": "계정 이름만으로 게시 권한을 추정하지 않고 OAuth/API 권한 확인 후 작업.",
+      "unsupported_placement": "지원되지 않는 캡션·댓글·프로필 링크는 게시하지 않고 보류."
+    }
+  },
+  "compliance": {
+    "health": "치료·예방·완치 보장 금지. 건강정보와 상품 설명 분리.",
+    "finance": "수익·투자 결과 보장 금지. 투자 정보 사이트 상품 카드 제외.",
+    "legal_tax": "법률·세무 자문처럼 오인될 상품 권유 금지.",
+    "medical_tourism": "진료·치료 효과 보장 금지. Trip.com은 방문 관련 숙박·교통·여행 예약에 한정.",
+    "affiliate_links": "실제 계정에서 생성된 추적 URL만 사용. 일반 URL을 제휴 URL로 표시하지 않음.",
+    "product_images": "사용 권한 또는 공식 공급 이미지 확인 후 사용."
+  },
+  "rollout_order": {
+    "wordpress": "역순으로 처리",
+    "blogger": "워드프레스 완료 후 역순",
+    "youtube": "Blogger 완료 후",
+    "social": [
+      "Facebook",
+      "TikTok",
+      "Instagram",
+      "Threads"
+    ]
+  },
+  "execution_status": {
+    "policy_saved": false,
+    "wordpress_live_backfill": "not_started_by_this_policy",
+    "blogger_live_backfill": "not_started",
+    "youtube_backfill": "not_started",
+    "social_publish": "not_started",
+    "note": "This file is the authoritative routing plan. Do not claim a platform update until its own provider credentials, tracked URLs, media permissions, and post-level verification pass."
+  }
+}
