@@ -1,12 +1,7 @@
-name: "Automation Hub — verify Blogger OAuth (no LLM, no writes)"
+﻿name: "Automation Hub — Blogger 33 read-only API visibility check"
 
 on:
-  workflow_dispatch:
-    inputs:
-      verify_blog_id:
-        description: "Blogger destination_id to read (e.g. from config/content_engine_profiles.json)"
-        required: true
-        type: string
+  workflow_dispatch: {}
 
 permissions:
   contents: read
@@ -14,17 +9,25 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-          cache: pip
       - run: pip install requests -q
-      - env:
-          BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
-          BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
-          BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
-          VERIFY_BLOG_ID: ${{ inputs.verify_blog_id }}
-        run: python scripts/verify_blogger_oauth.py
+      # Read-only Blogger API check only. General Google OAuth is not reused by
+      # publishing workflows; a dedicated Blogger write-scoped OAuth grant is
+      # still required before any Blogger post can be created or edited.
+      - name: Verify OAuth can read the exact 33 configured Blogger IDs
+        env:
+          BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+        run: python scripts/blogger_verify_account.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: blogger-readonly-connection-report-${{ github.run_id }}
+          path: blogger_connection_report.json
+          if-no-files-found: warn
