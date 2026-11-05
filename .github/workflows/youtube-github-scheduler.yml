@@ -24,6 +24,7 @@ jobs:
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
       PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
+      FISH_AUDIO_API_KEY: ${{ secrets.FISH_AUDIO_API_KEY }}
       SHEET_ID: ${{ secrets.SHEET_ID }}
       GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
       GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
