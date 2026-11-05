@@ -15,8 +15,9 @@ Logic, per published post:
   3) Look at the FIRST content block only (must start with <figure ...>
      or a bare <img ...> as the very first thing in the post body).
   4) If that first block's <img src="..."> equals the featured image's
-     source_url (or the same file basename, to tolerate protocol/CDN
-     rewrites), strip that leading block from the content.
+     source_url, has the same basename, OR has identical image bytes
+     (SHA-256; catches external Pexels URLs re-uploaded as local news-*.jpg),
+     strip that leading block from the content.
   5) Otherwise leave the post untouched.
 
 This directly compares real URLs instead of guessing at literal HTML,
@@ -30,6 +31,7 @@ secrets). Defaults to DRY_RUN=true — must be explicitly set to
 DRY_RUN=false to actually PATCH posts.
 """
 
+import hashlib
 import os
 import re
 import time
@@ -89,7 +91,7 @@ def _basename(url: str) -> str:
     return os.path.basename(urlparse(url).path)
 
 
-def strip_leading_duplicate_block(content: str, hero_url: str) -> Optional[str]:
+def strip_leading_duplicate_block(content: str, hero_url: str, hero_sha256: str = "") -> Optional[str]:
     """If the content's first block is a <figure>...</figure> or a bare
     <img ...> that embeds hero_url (exact URL or same filename), return the
     content with that block removed. Otherwise return None (no match)."""
@@ -133,6 +135,21 @@ def fix_site(site: dict) -> dict:
         return stats
 
     media_cache: dict[int, str] = {}
+    image_hash_cache: dict[str, str] = {}
+
+    def image_sha256(image_url: str) -> str:
+        if image_url not in image_hash_cache:
+            try:
+                response = requests.get(image_url, timeout=25)
+                response.raise_for_status()
+                content_type = response.headers.get("Content-Type", "").lower()
+                image_hash_cache[image_url] = (
+                    hashlib.sha256(response.content).hexdigest()
+                    if content_type.startswith("image/") else ""
+                )
+            except Exception:
+                image_hash_cache[image_url] = ""
+        return image_hash_cache[image_url]
 
     def media_source_url(media_id: int) -> str:
         if media_id in media_cache:
@@ -197,7 +214,8 @@ def fix_site(site: dict) -> dict:
                 stats["skipped"] += 1
                 continue
 
-            new_content = strip_leading_duplicate_block(content, hero_url)
+            hero_sha256 = image_sha256(hero_url)
+            new_content = strip_leading_duplicate_block(content, hero_url, hero_sha256)
             if new_content is None:
                 stats["skipped"] += 1
                 continue
