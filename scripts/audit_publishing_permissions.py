@@ -19,6 +19,15 @@ WP_USER = os.getenv("WP_USER", "huh0303@gmail.com")
 def wp_check(site):
     secret = str(site.get("secret_name") or "").strip()
     password = os.getenv("WP_SECRET_" + secret, "").strip() if secret else ""
+    username = WP_USER
+    try:
+        aggregate = json.loads(os.getenv("WP_SITE_CREDENTIALS_JSON", "{}"))
+    except json.JSONDecodeError:
+        aggregate = {}
+    aggregate_item = aggregate.get(site.get("site_id")) or aggregate.get(secret) or aggregate.get(site.get("url")) or {}
+    if isinstance(aggregate_item, dict):
+        password = password or str(aggregate_item.get("app_password") or aggregate_item.get("password") or "").strip()
+        username = str(aggregate_item.get("username") or aggregate_item.get("user") or username).strip()
     if not secret:
         return {"status":"MISSING_SECRET_MAPPING","write_access":False,"needed":f"GitHub Secret name mapping missing for {site['site_id']}"}
     if not password:
@@ -27,7 +36,7 @@ def wp_check(site):
     try:
         r = requests.get(url + "/wp-json/wp/v2/users/me",
             params={"context":"edit","_fields":"id,name,slug,roles,capabilities"},
-            auth=(WP_USER,password),timeout=25)
+            auth=(username,password),timeout=25)
         if r.status_code in (401,403):
             return {"status":f"AUTH_OR_PERMISSION_{r.status_code}","write_access":False,
                     "needed":"Check Application Password, REST authentication and user role."}
