@@ -15,7 +15,7 @@ COUPANG_TRADEMARK_NOTICE = "Coupang’s trademarks are used under license from C
 LOGOS = {
     "trip_com": "https://commons.wikimedia.org/wiki/Special:FilePath/Trip.com_logo.svg",
     "olive_young_global": "https://dist.oliveyoung.com/fo/fe126e9b35/resources/images/common/logo.svg",
-    "coupang_partners": "https://news.coupang.com/wp-content/uploads/2023/01/coupang-bi-brand-logo-230109-01.jpg",
+    "coupang_partners": "https://influencers.coupang.com/logo-black.png",
 }
 POLICY_PATH = ROOT / "config/affiliate/london-shared-policy.json"
 
