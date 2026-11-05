@@ -103,7 +103,6 @@ jobs:
       - name: Install production runtime
         run: |
           if ! command -v ffmpeg >/dev/null 2>&1 || [ ! -f /usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc ]; then
-            sudo apt-get update -qq
             sudo apt-get install -y -qq ffmpeg fonts-noto-cjk
           fi
           python -m pip install --disable-pip-version-check requests pillow edge-tts google-api-python-client google-auth hangul-romanize pykakasi pypinyin
