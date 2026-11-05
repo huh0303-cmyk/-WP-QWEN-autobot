@@ -25,6 +25,10 @@ def env_for(code: str, name: str) -> str:
     # Language-specific credentials only. A generic OAuth fallback can silently
     # authenticate a different language channel, so it is intentionally forbidden.
     value = os.environ.get(f"YOUTUBE_OAUTH_{name}_{suffix}")
+    # Existing channel secrets store the shared OAuth client ID/secret once;
+    # refresh tokens remain strictly language-specific to prevent wrong-channel auth.
+    if not value and name in {"CLIENT_ID", "CLIENT_SECRET"}:
+        value = os.environ.get(f"YOUTUBE_OAUTH_{name}")
     if not value:
         raise RuntimeError(f"Missing YOUTUBE_OAUTH_{name}_{suffix}")
     return value
