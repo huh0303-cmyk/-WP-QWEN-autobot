@@ -106,35 +106,65 @@ def main():
             snippet = video.get("snippet", {})
             title_key = norm(snippet.get("title", ""))
             pair_key = semantic_pair_key(video, code, pairs)
-            keys = []
             if title_key:
-                keys.append(("title:" + title_key, "normalized_title"))
+                groups.setdefault("title:" + title_key, set()).add(video["id"])
             if pair_key:
-                keys.append((pair_key, "curriculum_pair"))
-            for key, reason in keys:
-                groups.setdefault(key, {"reason": reason, "videos": []})["videos"].append(video)
-        losers = 0
-        for key, group_data in groups.items():
-            group = group_data["videos"]
-            # A video may be in both a title group and a curriculum group; process each
-            # group independently but avoid scheduling the same duplicate twice.
-            if len(group) < 2:
+                groups.setdefault(pair_key, set()).add(video["id"])
+
+        # Merge title-duplicate and semantic-pair matches into connected
+        # components. A video is handled once even if it matches both keys.
+        by_id = {video["id"]: video for video in all_videos}
+        parent = {video_id: video_id for video_id in by_id}
+
+        def find(video_id):
+            while parent[video_id] != video_id:
+                parent[video_id] = parent[parent[video_id]]
+                video_id = parent[video_id]
+            return video_id
+
+        def union(left, right):
+            root_left, root_right = find(left), find(right)
+            if root_left != root_right:
+                parent[root_right] = root_left
+
+        reasons_by_component = {}
+        for key, members in groups.items():
+            if len(members) < 2:
                 continue
-            if any("viewCount" not in video.get("statistics", {}) for video in group):
+            members = sorted(members)
+            for video_id in members[1:]:
+                union(members[0], video_id)
+        components = {}
+        for key, members in groups.items():
+            if len(members) < 2:
+                continue
+            for video_id in members:
+                root = find(video_id)
+                components.setdefault(root, {"ids": set(), "keys": set()})
+                components[root]["ids"].add(video_id)
+                components[root]["keys"].add(key)
+
+        losers = 0
+        for component in components.values():
+            cluster = [by_id[video_id] for video_id in component["ids"]]
+            if len(cluster) < 2:
+                continue
+            if any("viewCount" not in video.get("statistics", {}) for video in cluster):
                 report["actions"].append({
-                    "language": code, "match_key": key, "match_reason": group_data["reason"],
+                    "language": code, "match_keys": sorted(component["keys"]),
                     "status": "REVIEW_VIEW_COUNT_UNAVAILABLE",
-                    "video_ids": [video["id"] for video in group],
+                    "video_ids": sorted(component["ids"]),
                 })
                 continue
-            group.sort(key=lambda video: (
+            cluster.sort(key=lambda video: (
                 int(video["statistics"]["viewCount"]),
                 video.get("snippet", {}).get("publishedAt", ""),
             ), reverse=True)
-            keep = group[0]
-            for video in group[1:]:
+            keep = cluster[0]
+            for video in cluster[1:]:
                 action = {
-                    "language": code, "match_key": key, "match_reason": group_data["reason"],
+                    "language": code,
+                    "match_keys": sorted(component["keys"]),
                     "title": video.get("snippet", {}).get("title"),
                     "keep_video_id": keep["id"],
                     "keep_views": int(keep["statistics"]["viewCount"]),
