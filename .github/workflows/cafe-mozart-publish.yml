@@ -1,0 +1,154 @@
+name: CAFE MOZART - Free-Only GitHub Publisher
+
+on:
+  # Three weekly candidate windows; deterministic weekly gate selects two or three.
+  schedule:
+    - cron: "31 2 * * 1"
+    - cron: "47 8 * * 3"
+    - cron: "19 14 * * 5"
+  workflow_dispatch:
+    inputs:
+      publish_now:
+        description: "Run one real Mozart publication now after all preflight checks"
+        type: boolean
+        required: true
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cafe-mozart-publisher
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: youtube-channels
+    timeout-minutes: 180
+    env:
+      PYTHONUNBUFFERED: "1"
+      CHANNEL: mbb
+      EXPECTED_YOUTUBE_CHANNEL_ID: UC7jOhyMa-FIrzZuea97z1Pw
+      YOUTUBE_COST_HOLD: ${{ vars.YOUTUBE_COST_HOLD }}
+      GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+      GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+      GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+      PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+      MUSIC_SOURCE_FOLDER_ID_MBB: ${{ secrets.MUSIC_SOURCE_FOLDER_ID_MBB }}
+      OUTPUT_FOLDER_ID_MBB: ${{ secrets.OUTPUT_FOLDER_ID_MBB }}
+      THUMBNAIL_FOLDER_ID_MBB: ${{ secrets.THUMBNAIL_FOLDER_ID_MBB }}
+      YOUTUBE_OAUTH_CLIENT_ID_MBB: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_MBB }}
+      YOUTUBE_OAUTH_CLIENT_SECRET_MBB: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_MBB }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_MBB: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_MBB }}
+      GITHUB_RUN_ID: ${{ github.run_id }}
+      GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
+      MANUAL_PUBLISH_NOW: ${{ inputs.publish_now }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure strict free-only Mozart policy
+        run: |
+          set -euo pipefail
+          {
+            echo "PLAYLIST_FREE_ONLY_CHANNEL=mbb"
+            echo "PLAYLIST_MUSIC_SOURCE=approved_bank"
+            echo "PLAYLIST_IMAGE_SOURCE=pexels_api"
+            echo "PLAYLIST_PAID_API_ENABLED=false"
+            echo "AUTO_TOPIC=false"
+            echo "GEMINI_API_KEY="
+            echo "OPENAI_API_KEY="
+            echo "LYRIA_API_KEY="
+          } >> "$GITHUB_ENV"
+          echo "Mozart is restricted to existing approved Drive audio and fresh free Pexels photography."
+
+      - name: Validate cost-hold exception and required assets/credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${YOUTUBE_COST_HOLD,,}" != "false" ]]; then
+            test "${PLAYLIST_FREE_ONLY_CHANNEL:-}" = "mbb"
+            test "${PLAYLIST_MUSIC_SOURCE:-}" = "approved_bank"
+            test "${PLAYLIST_IMAGE_SOURCE:-}" = "pexels_api"
+            test "${PLAYLIST_PAID_API_ENABLED:-true}" = "false"
+            test "${AUTO_TOPIC:-true}" = "false"
+            test -z "${GEMINI_API_KEY:-}"
+            test -z "${OPENAI_API_KEY:-}"
+            test -z "${LYRIA_API_KEY:-}"
+          fi
+          for key in GOOGLE_OAUTH_CLIENT_ID GOOGLE_OAUTH_CLIENT_SECRET GOOGLE_OAUTH_REFRESH_TOKEN \
+                     PEXELS_API_KEY MUSIC_SOURCE_FOLDER_ID_MBB OUTPUT_FOLDER_ID_MBB \
+                     THUMBNAIL_FOLDER_ID_MBB YOUTUBE_OAUTH_CLIENT_ID_MBB \
+                     YOUTUBE_OAUTH_CLIENT_SECRET_MBB YOUTUBE_OAUTH_REFRESH_TOKEN_MBB; do
+            if [[ -z "${!key:-}" ]]; then
+              echo "::error::Missing required free-only Mozart setting: $key"
+              exit 1
+            fi
+          done
+          echo "Free-only Mozart credentials and source folders are present; secret values are not printed."
+
+      - name: Select this week's 2–3 spaced releases
+        id: gate
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          MANUAL_PUBLISH_NOW: ${{ inputs.publish_now }}
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import datetime, hashlib, os
+          now = datetime.datetime.now(datetime.timezone.utc)
+          week = now.strftime("%G-W%V")
+          slots = ["mon", "wed", "fri"]
+          digest = hashlib.sha256(("cafe-mozart:" + week).encode()).digest()
+          target = 2 + digest[0] % 2
+          slots = sorted(slots, key=lambda slot: hashlib.sha256((week + slot).encode()).digest())
+          today = {0:"mon", 2:"wed", 4:"fri"}.get(now.weekday(), "")
+          manual = os.environ.get("EVENT_NAME") == "workflow_dispatch" and os.environ.get("MANUAL_PUBLISH_NOW", "").lower() == "true"
+          selected = manual or (today in slots[:target])
+          print("run_now=" + ("true" if selected else "false"))
+          print("week=" + week)
+          print("target=" + str(target))
+          print("slot=" + (today or "manual"))
+          PY
+
+      - name: Skip non-selected weekly candidate
+        if: steps.gate.outputs.run_now != 'true'
+        run: echo "Not a selected Mozart release slot this week. No video generated or uploaded."
+
+      - name: Install free runner tools
+        if: steps.gate.outputs.run_now == 'true'
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check --upgrade pip
+          python -m pip install --disable-pip-version-check requests Pillow google-api-python-client google-auth google-auth-httplib2 google-auth-oauthlib pydub mutagen numpy scipy moviepy
+
+      - name: Compile and regression-check Mozart publisher
+        if: steps.gate.outputs.run_now == 'true'
+        run: |
+          set -euo pipefail
+          python -m compileall -q automation_hub/youtube_github_runtime.py scripts/youtube_playlist_maker.py scripts/youtube_github_worker.py scripts/youtube_publish_approved.py
+          pytest -q tests/test_playlist_owner_policy.py
+
+      - name: Render and publish one Mozart release
+        if: steps.gate.outputs.run_now == 'true'
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          python scripts/youtube_github_worker.py --enqueue-channel mbb
+
+      - name: Save render, thumbnail and publication receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cafe-mozart-free-only-${{ github.run_id }}
+          path: |
+            artifacts/youtube_playlist_result.json
+            data/youtube_github_queue/logs/
+            playlist_output/final.mp4
+            playlist_output/thumbnail.*
+            playlist_output/*rights*
+            playlist_output/*source*
+          if-no-files-found: warn
+          retention-days: 30
