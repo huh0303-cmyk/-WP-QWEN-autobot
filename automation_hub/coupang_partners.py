@@ -216,6 +216,7 @@ def select_products(title, article_text, site_id="", limit=10):
     return fixed
 
 def render_header(site_id=""):
+    """Render three official company logos in one horizontal footer row."""
     header = load_header_buttons(site_id)
     if not header:
         raise RuntimeError(f"Affiliate header requires the three approved partner destinations for site={site_id}")
@@ -223,21 +224,31 @@ def render_header(site_id=""):
     coupang = button_map["coupang_partners"]
     olive = button_map["olive_young_global"]
     trip = button_map["trip_com"]
-    coupang_logo = html.escape(coupang.get("logo_url") or LOGOS["coupang_partners"], quote=True)
-    olive_logo = html.escape(olive.get("logo_url") or LOGOS["olive_young_global"], quote=True)
-    trip_logo = html.escape(trip.get("logo_url") or LOGOS["trip_com"], quote=True)
-    coupang_url = html.escape(coupang["affiliate_url"], quote=True)
-    olive_url = html.escape(olive["affiliate_url"], quote=True)
-    trip_url = html.escape(trip["affiliate_url"], quote=True)
-    olive_note = "Reward-code link; commission attribution not independently confirmed" if olive.get("verified") is not True else "Official partner link"
+    partners = [
+        ("coupang_partners", coupang, LOGOS["coupang_partners"], "Coupang company logo"),
+        ("olive_young_global", olive, LOGOS["olive_young_global"], "OLIVE YOUNG company logo"),
+        ("trip_com", trip, LOGOS["trip_com"], "Trip.com company logo"),
+    ]
+    cards = []
+    for provider, item, default_logo, alt in partners:
+        logo = html.escape(item.get("logo_url") or default_logo, quote=True)
+        url = html.escape(item["affiliate_url"], quote=True)
+        cards.append(
+            '<a class="london-partner-logo ' + provider + '" href="' + url
+            + '" target="_blank" rel="sponsored nofollow noopener" aria-label="' + html.escape(alt, quote=True) + '">'
+            + '<img src="' + logo + '" alt="' + html.escape(alt, quote=True)
+            + '" loading="lazy" decoding="async"></a>'
+        )
     return (HEADER_START
-        + '<div class="london-affiliate-partner-strip" aria-label="Official affiliate partner logos">'
-        + '<a class="london-coupang-brand" href="' + coupang_url + '" target="_blank" rel="sponsored nofollow noopener" aria-label="Coupang affiliate link"><img src="' + coupang_logo + '" alt="Coupang logo" loading="lazy" decoding="async"></a>'
-        + '<div class="london-third-party-partners">'
-        + '<a class="london-provider-button olive_young_global" href="' + olive_url + '" target="_blank" rel="sponsored nofollow noopener" title="' + html.escape(olive_note, quote=True) + '"><img src="' + olive_logo + '" alt="OLIVE YOUNG official company logo" loading="lazy" decoding="async"><span>OLIVE YOUNG</span><small>' + html.escape(olive_note) + '</small></a>'
-        + '<a class="london-provider-button trip_com" href="' + trip_url + '" target="_blank" rel="sponsored nofollow noopener"><img src="' + trip_logo + '" alt="Trip.com official company logo" loading="lazy" decoding="async"><span>Trip.com</span></a>'
-        + '</div></div>'
-        + '<style>.london-affiliate-partner-strip{margin:0 0 20px;padding:0}.london-coupang-brand{display:flex;min-height:82px;align-items:center;justify-content:center;padding:12px;border:1px solid #e5e7eb;border-top:4px solid #e87518;border-radius:10px;background:#fff;text-decoration:none!important}.london-coupang-brand img{display:block;width:150px;max-width:100%;height:auto;max-height:54px;object-fit:contain}.london-coupang-text-link{display:block;width:max-content;max-width:100%;margin:6px auto 12px;color:#17365d!important;font-size:12px;font-weight:700;text-decoration:underline}.london-third-party-partners{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.london-provider-button{box-sizing:border-box;display:flex;min-width:0;min-height:88px;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:10px 8px;border:1px solid #e5e7eb;border-top:4px solid var(--brand-color);border-radius:10px;background:#fff;text-decoration:none!important;text-align:center}.london-provider-button img{display:block;width:auto;max-width:100%;height:auto;max-height:58px;object-fit:contain}.london-provider-button span{font-size:9px;line-height:1.2;font-weight:700;color:#555}.london-provider-button small{font-size:8px;line-height:1.25;color:#9a5b16}.london-provider-button.olive_young_global{--brand-color:#168a43}.london-provider-button.trip_com{--brand-color:#1769d2}@media(max-width:520px){.london-third-party-partners{gap:6px}.london-provider-button{min-height:76px;padding:8px 4px}.london-provider-button img{max-height:48px}.london-provider-button span{font-size:8px}}</style>'
+        + '<div class="london-affiliate-partner-strip" aria-label="Three affiliate partner company logos">'
+        + ''.join(cards) + '</div>'
+        + '<style>.london-affiliate-partner-strip{box-sizing:border-box;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:center;gap:12px;width:100%;margin:0 0 18px;padding:12px;border:1px solid #e5e7eb;border-radius:12px;background:#fff}'
+        '.london-partner-logo{box-sizing:border-box;display:flex;min-width:0;min-height:78px;align-items:center;justify-content:center;padding:10px;border-radius:8px;background:#fff;text-decoration:none!important}'
+        '.london-partner-logo img{display:block;width:100%;max-width:210px;height:58px;object-fit:contain}'
+        '.london-partner-logo.coupang_partners{border-top:4px solid #e87518}'
+        '.london-partner-logo.olive_young_global{border-top:4px solid #168a43}'
+        '.london-partner-logo.trip_com{border-top:4px solid #1769d2}'
+        '@media(max-width:520px){.london-affiliate-partner-strip{gap:4px;padding:6px}.london-partner-logo{min-height:58px;padding:4px}.london-partner-logo img{height:38px}}</style>'
         + HEADER_END)
 
 def render_footer(title, article_text, site_id="", lang="en"):
