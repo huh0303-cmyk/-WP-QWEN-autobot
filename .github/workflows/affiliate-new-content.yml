@@ -41,7 +41,7 @@ jobs:
         env:
           AFFILIATE_AUTOMATION_END: '2026-11-12T23:59:59+09:00'
           WP_USER: ${{ secrets.WP_USER }}
-          AFFILIATE_WRITE_ENABLED: ${{ secrets.AFFILIATE_WRITE_ENABLED }}
+          AFFILIATE_WRITE_ENABLED: 'true'
           KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
           KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
           KOREAINVEST365COM: ${{ secrets.KOREAINVEST365COM }}
