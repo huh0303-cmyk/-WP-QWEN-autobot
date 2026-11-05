@@ -15,9 +15,9 @@ LEGACY_MARKERS = ((START, END), ("<!-- KHEALTH365-COUPANG-START -->", "<!-- KHEA
 DISCLOSURE = "This post contains Coupang Partners affiliate links. If you visit Coupang through one of these links and make a purchase within 24 hours, including a purchase of another eligible product, we may earn a commission at no additional cost to you. Attribution rules, cancellations and returns may affect commission eligibility. / 이 게시물에는 쿠팡 파트너스 제휴 링크가 포함되어 있습니다. 이 링크를 통해 쿠팡에 방문한 뒤 24시간 이내에 다른 상품을 구매하더라도 운영정책상 실적으로 인정되는 구매라면 수수료를 제공받을 수 있습니다. 구매 경로의 최종 기여, 주문 취소 및 반품 등에 따라 수수료가 인정되지 않을 수 있습니다."
 COUPANG_TRADEMARK_NOTICE = "Coupang’s trademarks are used under license from Coupang, LLC or its affiliates."
 LOGOS = {
-    "trip_com": "https://commons.wikimedia.org/wiki/Special:FilePath/Trip.com_logo.svg",
+    "trip_com": "https://dimg04.tripcdn.com/images/05E5012000rqtcwsyC749.png",
     "olive_young_global": "https://dist.oliveyoung.com/fo/fe126e9b35/resources/images/common/logo.svg",
-    "coupang_partners": "https://news.coupang.com/wp-content/uploads/2023/01/coupang-bi-brand-logo-230109-01.jpg",
+    "coupang_partners": "https://influencers.coupang.com/logo-black.png",
 }
 POLICY_PATH = ROOT / "config/affiliate/london-shared-policy.json"
 
@@ -264,7 +264,7 @@ def render_header(site_id=""):
         # prohibit displaying it together with third-party marks. Keep it in
         # its own standalone row; Olive Young and Trip.com occupy a separate row.
         if provider == "coupang_partners":
-            buttons.append(f'<div class="london-provider-button coupang_partners"><span class="london-coupang-logo-crop"><img src="{logo}" alt="Coupang official logo" loading="lazy"></span><span><a href="{url}" target="_blank" rel="sponsored nofollow noopener">Coupang Partners 바로가기</a></span></div>')
+            buttons.append(f'<div class="london-provider-button coupang_partners"><a class="london-coupang-logo-link" href="{url}" target="_blank" rel="sponsored nofollow noopener" aria-label="Coupang Partners affiliate link"><span class="london-coupang-logo-crop"><img src="{logo}" alt="Coupang official logo" loading="lazy"></span></a><span><a href="{url}" target="_blank" rel="sponsored nofollow noopener">Coupang Partners 바로가기</a></span></div>')
         else:
             buttons.append(f'<a class="london-provider-button {provider}" href="{url}" target="_blank" rel="sponsored nofollow noopener" aria-label="{label}"><img src="{logo}" alt="{label} official logo" loading="lazy"></a>')
     coupang = buttons[0]
@@ -283,6 +283,7 @@ def render_header(site_id=""):
         '.london-provider-button.coupang_partners .london-coupang-logo-crop{width:260px;height:66px;overflow:hidden;position:relative;display:block}'
         '.london-provider-button.coupang_partners span{font-size:12px;font-weight:700}'
         '.london-provider-button.coupang_partners a{color:#333;text-decoration:underline}'
+        '.london-provider-button.coupang_partners .london-coupang-logo-link{display:block;line-height:0;text-decoration:none}'
         '.london-other-official-partners{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;max-width:560px;margin:0 auto}'
         '.london-other-official-partners .london-provider-button{border:1px solid #e5e7eb;border-radius:10px;min-height:64px}'
         '.london-other-official-partners img{max-height:44px;max-width:220px}'
