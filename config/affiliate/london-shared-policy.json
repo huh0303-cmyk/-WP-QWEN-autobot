@@ -7,8 +7,8 @@
   ],
   "header_buttons": [
     "coupang_partners",
-    "trip_com",
-    "olive_young_global"
+    "olive_young_global",
+    "trip_com"
   ],
   "product_cards": {
     "count": 10,
@@ -35,7 +35,7 @@
     "Every destination has exactly ten Coupang Partners product cards: five health functional food/wellness products and five K-Beauty skincare products.",
     "All ten product cards use Coupang Partners account-generated tracking links and permitted product images. No Olive Young or Trip.com product cards.",
     "Each destination keeps its own catalog of ten unique products; the same set is reused until the weekly review replaces selected items.",
-    "Header buttons are separate from product cards and appear in this exact order: Coupang Partners, Trip.com, OLIVE YOUNG.",
+    "Header buttons are separate from product cards and appear in this exact order: Coupang Partners, OLIVE YOUNG, Trip.com.",
     "Each header button uses its own authorized affiliate tracking URL and approved brand asset.",
     "Do not invent links, images, prices, popularity, sales, reviews, or commission rates.",
     "Preserve article body, status, publication date, featured image and SEO metadata; update only the managed affiliate area.",
@@ -81,8 +81,8 @@
   "header_branding": {
     "order": [
       "coupang_partners",
-      "trip_com",
-      "olive_young_global"
+      "olive_young_global",
+      "trip_com"
     ],
     "logo_assets": "official_or_partner-authorized_brand_assets",
     "trip_com_and_olive_young": "Clickable tracked logo links to their approved landing pages",
