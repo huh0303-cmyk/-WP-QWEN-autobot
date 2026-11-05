@@ -6,9 +6,9 @@
   "only_update_existing_published_posts": true,
   "preserve_post_status_and_dates": true,
   "no_delete": true,
-  "note": "Owner-approved one-time live backfill. Preserve article content, status, dates, featured image and SEO metadata. Skip destinations that fail credential, catalog or platform verification; never claim skipped destinations are complete.",
-  "retry": 4,
-  "updated_at_utc": "2026-11-05T13:08:00Z",
+  "note": "Owner-approved retry: reprocess all enabled WordPress sites, including every prior post/site error. Keep posts already compliant unchanged; no deletions; report every site and per-post error. K-visa365 HTTP 403 must be diagnosed and recorded; do not bypass TLS or security controls.",
+  "retry": 5,
+  "updated_at_utc": "2026-11-06T01:12:00+09:00",
   "wp_username_confirmed": "huh0303@gmail.com",
   "soft_quota_rollout": "2026-11-05",
   "rollout_policy": "three official company logos in one horizontal row, followed immediately by ten Coupang product cards at the absolute article footer"
