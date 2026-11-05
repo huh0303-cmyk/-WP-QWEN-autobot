@@ -250,7 +250,7 @@ def render_footer(title, article_text, site_id="", lang="en"):
 def _remove_legacy_single_product_modules(content):
     """Remove only known standalone affiliate-recommendation divs; keep article images."""
     content = content or ""
-    tag_re = re.compile(r"</?div\\b[^>]*>", re.I | re.S)
+    tag_re = re.compile(r"</?div\b[^>]*>", re.I | re.S)
     offset = 0
     while True:
         start_tag = None
@@ -258,7 +258,7 @@ def _remove_legacy_single_product_modules(content):
             tag = match.group(0)
             if tag.startswith("</"):
                 continue
-            class_match = re.search(r"""\\bclass\\s*=\\s*["']([^"']*)["']""", tag, re.I)
+            class_match = re.search(r"""\bclass\\s*=\\s*["']([^"']*)["']""", tag, re.I)
             classes = set((class_match.group(1).split() if class_match else []))
             if "affiliate-recommendation" in classes:
                 start_tag = match
@@ -280,7 +280,7 @@ def _remove_legacy_single_product_modules(content):
         block = content[start_tag.start():end_pos]
         # Require both an actual tracked Coupang destination and an image before
         # treating this as the obsolete one-product affiliate module.
-        if "link.coupang.com/" in block and re.search(r"<img\\b", block, re.I):
+        if "link.coupang.com/" in block and re.search(r"<img\b", block, re.I):
             content = content[:start_tag.start()] + content[end_pos:]
             offset = start_tag.start()
         else:
