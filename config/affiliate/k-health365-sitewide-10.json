@@ -1,34 +1,12 @@
 [
   {
-    "id": "health-lactofit-gold-80",
-    "title": "락토핏 정품 골드 80포",
-    "url": "https://link.coupang.com/a/ih2ZTHJN24",
-    "image_url": "https://image5.coupangcdn.com/image/affiliate/banner/cca43bfaafc74c7cfbe0f222ddb13a67@2x.jpg",
+    "id": "health-cj-probiotic",
+    "title": "CJ 바이오코어 500억 고함량 특허유산균",
+    "url": "https://link.coupang.com/a/ih3Q2W2O04",
+    "image_url": "https://image13.coupangcdn.com/image/affiliate/banner/3b889a9edd0130193399558d82e71213@2x.jpg",
     "category": "health_functional_foods",
-    "display_title_en": "Lacto-Fit Gold Probiotic Powder, 80 Sticks",
-    "description_en": "A daily probiotic supplement in single-serve sticks. Review the strain information, ingredients, and suggested use on the label.",
-    "affiliate_confirmed": true,
-    "enabled": true
-  },
-  {
-    "id": "health-omega3-vitd",
-    "title": "순수식품 rTG 오메가3 비타민D",
-    "url": "https://link.coupang.com/a/ih3OY0Mk8a",
-    "image_url": "https://img4c.coupangcdn.com/image/affiliate/banner/ba4f6d538ce239e7666b0abba59a17b9@2x.jpg",
-    "category": "health_functional_foods",
-    "display_title_en": "RTG Omega-3 with Vitamin D",
-    "description_en": "An omega-3 supplement combined with vitamin D. Check the EPA/DHA amounts, ingredients, and suitability before use.",
-    "affiliate_confirmed": true,
-    "enabled": true
-  },
-  {
-    "id": "health-lutein-zeaxanthin",
-    "title": "뉴트리원 루테인 지아잔틴 164",
-    "url": "https://link.coupang.com/a/ih25YWz9lQ",
-    "image_url": "https://img1a.coupangcdn.com/image/affiliate/banner/8b632b89b0445bc5496b817fe50eadd4@2x.jpg",
-    "category": "health_functional_foods",
-    "display_title_en": "Lutein and Zeaxanthin 164",
-    "description_en": "A lutein and zeaxanthin supplement. Review ingredient amounts and directions.",
+    "display_title_en": "CJ BioCore 500 Billion Probiotics",
+    "description_en": "A high-count probiotic product. Review the strains, storage instructions, and recommended serving.",
     "affiliate_confirmed": true,
     "enabled": true
   },
@@ -44,13 +22,35 @@
     "enabled": true
   },
   {
-    "id": "health-cj-probiotic",
-    "title": "CJ 바이오코어 500억 고함량 특허유산균",
-    "url": "https://link.coupang.com/a/ih3Q2W2O04",
-    "image_url": "https://image13.coupangcdn.com/image/affiliate/banner/3b889a9edd0130193399558d82e71213@2x.jpg",
+    "id": "health-lactofit-gold-80",
+    "title": "락토핏 정품 골드 80포",
+    "url": "https://link.coupang.com/a/ih2ZTHJN24",
+    "image_url": "https://image5.coupangcdn.com/image/affiliate/banner/cca43bfaafc74c7cfbe0f222ddb13a67@2x.jpg",
     "category": "health_functional_foods",
-    "display_title_en": "CJ BioCore 500 Billion Probiotics",
-    "description_en": "A high-count probiotic product. Review the strains, storage instructions, and recommended serving.",
+    "display_title_en": "Lacto-Fit Gold Probiotic Powder, 80 Sticks",
+    "description_en": "A daily probiotic supplement in single-serve sticks. Review the strain information, ingredients, and suggested use on the label.",
+    "affiliate_confirmed": true,
+    "enabled": true
+  },
+  {
+    "id": "health-lutein-zeaxanthin",
+    "title": "뉴트리원 루테인 지아잔틴 164",
+    "url": "https://link.coupang.com/a/ih25YWz9lQ",
+    "image_url": "https://img1a.coupangcdn.com/image/affiliate/banner/8b632b89b0445bc5496b817fe50eadd4@2x.jpg",
+    "category": "health_functional_foods",
+    "display_title_en": "Lutein and Zeaxanthin 164",
+    "description_en": "A lutein and zeaxanthin supplement. Review ingredient amounts and directions.",
+    "affiliate_confirmed": true,
+    "enabled": true
+  },
+  {
+    "id": "health-omega3-vitd",
+    "title": "순수식품 rTG 오메가3 비타민D",
+    "url": "https://link.coupang.com/a/ih3OY0Mk8a",
+    "image_url": "https://img4c.coupangcdn.com/image/affiliate/banner/ba4f6d538ce239e7666b0abba59a17b9@2x.jpg",
+    "category": "health_functional_foods",
+    "display_title_en": "RTG Omega-3 with Vitamin D",
+    "description_en": "An omega-3 supplement combined with vitamin D. Check the EPA/DHA amounts, ingredients, and suitability before use.",
     "affiliate_confirmed": true,
     "enabled": true
   },
@@ -68,30 +68,17 @@
     "candidate_id": "oy01"
   },
   {
-    "id": "beauty-torriden-toner",
-    "title": "토리든 다이브인 저분자 히알루론산 토너, 300ml",
-    "url": "https://link.coupang.com/a/iiO3zaJdIW",
-    "image_url": "https://image2.coupangcdn.com/image/affiliate/banner/1e56c94b7b7566443e5360942b58664a@2x.jpg",
+    "id": "beauty-cosrx-essence",
+    "title": "코스알엑스 어드벤스드 스네일 래디언스 듀얼 에센스, 80ml",
+    "url": "https://link.coupang.com/a/iiO6gxBTK8",
+    "image_url": "https://image12.coupangcdn.com/image/affiliate/banner/72ad45e90fb6a4f7ce45830754b84e6c@2x.jpg",
     "category": "k_beauty_skincare",
-    "display_title_en": "Torriden Dive-In Hyaluronic Acid Toner",
-    "description_en": "A hydrating toner for a fresh, moisture-focused routine.",
+    "display_title_en": "COSRX Snail Radiance Dual Essence",
+    "description_en": "A dual-texture essence for a hydrated, radiant-looking complexion.",
     "affiliate_confirmed": true,
     "enabled": true,
     "source": "authenticated_coupang_partners_generated_blog_tag",
-    "candidate_id": "oy02"
-  },
-  {
-    "id": "beauty-roundlab-moisturizer",
-    "title": "라운드랩 자작나무 수분크림 기획세트, 120ml",
-    "url": "https://link.coupang.com/a/iiO4sWYZmC",
-    "image_url": "https://image4.coupangcdn.com/image/affiliate/banner/0a932a3704794bc394e604276b7314f0@2x.jpg",
-    "category": "k_beauty_skincare",
-    "display_title_en": "Round Lab Birch Juice Moisturizing Cream Set",
-    "description_en": "A daily moisturizing cream set for comfortable, hydrated skin.",
-    "affiliate_confirmed": true,
-    "enabled": true,
-    "source": "authenticated_coupang_partners_generated_blog_tag",
-    "candidate_id": "oy03"
+    "candidate_id": "oy05"
   },
   {
     "id": "beauty-joseon-sunscreen",
@@ -107,16 +94,29 @@
     "candidate_id": "oy04"
   },
   {
-    "id": "beauty-cosrx-essence",
-    "title": "코스알엑스 어드벤스드 스네일 래디언스 듀얼 에센스, 80ml",
-    "url": "https://link.coupang.com/a/iiO6gxBTK8",
-    "image_url": "https://image12.coupangcdn.com/image/affiliate/banner/72ad45e90fb6a4f7ce45830754b84e6c@2x.jpg",
+    "id": "beauty-roundlab-moisturizer",
+    "title": "라운드랩 자작나무 수분크림 기획세트, 120ml",
+    "url": "https://link.coupang.com/a/iiO4sWYZmC",
+    "image_url": "https://image4.coupangcdn.com/image/affiliate/banner/0a932a3704794bc394e604276b7314f0@2x.jpg",
     "category": "k_beauty_skincare",
-    "display_title_en": "COSRX Snail Radiance Dual Essence",
-    "description_en": "A dual-texture essence for a hydrated, radiant-looking complexion.",
+    "display_title_en": "Round Lab Birch Juice Moisturizing Cream Set",
+    "description_en": "A daily moisturizing cream set for comfortable, hydrated skin.",
     "affiliate_confirmed": true,
     "enabled": true,
     "source": "authenticated_coupang_partners_generated_blog_tag",
-    "candidate_id": "oy05"
+    "candidate_id": "oy03"
+  },
+  {
+    "id": "beauty-torriden-toner",
+    "title": "토리든 다이브인 저분자 히알루론산 토너, 300ml",
+    "url": "https://link.coupang.com/a/iiO3zaJdIW",
+    "image_url": "https://image2.coupangcdn.com/image/affiliate/banner/1e56c94b7b7566443e5360942b58664a@2x.jpg",
+    "category": "k_beauty_skincare",
+    "display_title_en": "Torriden Dive-In Hyaluronic Acid Toner",
+    "description_en": "A hydrating toner for a fresh, moisture-focused routine.",
+    "affiliate_confirmed": true,
+    "enabled": true,
+    "source": "authenticated_coupang_partners_generated_blog_tag",
+    "candidate_id": "oy02"
   }
 ]
