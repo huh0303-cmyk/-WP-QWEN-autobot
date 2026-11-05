@@ -76,31 +76,19 @@ def load_json(path: Path) -> dict:
 def select_pair(target_date: dt.date, pair_id: str | None) -> dict:
     catalog = load_json(PAIR_PATH)
     pairs = catalog["pairs"]
-    if pair_id:
-        for pair in pairs:
-            if pair["id"] == pair_id:
-                return pair
-        raise ValueError(f"Unknown pair id: {pair_id}")
-
-    # The previous category-first selector cycled through only THREE noun
-    # lessons while the catalog had 30 adjective lessons. This silently
-    # repeated noun content every six days (sun-moon, book-phone, water-coffee).
-    # Build one deterministic 33-lesson cycle from the entire catalog and
-    # spread the smaller category across the cycle. No pair repeats until
-    # every catalog entry has been used once.
-    adjectives = [row for row in pairs if row.get("category", "adjective") != "noun"]
-    nouns = [row for row in pairs if row.get("category", "adjective") == "noun"]
-    if not adjectives or not nouns:
-        raise RuntimeError("Vocabulary catalog must contain adjective and noun lessons")
-    ordered = list(adjectives)
-    # Insert nouns at evenly spaced positions rather than clustering them.
-    for index, noun in enumerate(nouns):
-        position = round((index + 1) * (len(adjectives) + 1) / (len(nouns) + 1))
-        ordered.insert(min(position, len(ordered)), noun)
-
-    anchor_date = dt.date(2026, 10, 5)
-    release_index = (target_date - anchor_date).days
-    return ordered[release_index % len(ordered)]
+    # Production must always pass a pair selected by a live full-history
+    # audit. A date-based fallback can silently recycle the catalog when the
+    # cycle wraps or when this builder is invoked outside the guarded workflow.
+    if not pair_id:
+        raise RuntimeError(
+            "A history-verified --pair-id is mandatory; date-based vocabulary cycling is disabled."
+        )
+    for pair in pairs:
+        if pair["id"] == pair_id:
+            if pair.get("category", "adjective") == "noun":
+                raise RuntimeError(f"Retired noun lesson cannot be generated: {pair_id}")
+            return pair
+    raise ValueError(f"Unknown or retired pair id: {pair_id}")
 
 
 def channel_map() -> dict[str, dict]:
