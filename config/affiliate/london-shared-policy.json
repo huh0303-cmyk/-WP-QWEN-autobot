@@ -1,6 +1,6 @@
 {
-  "version": 5,
-  "name": "London Project affiliate layout standard v5 - fixed 6-category randomized Coupang mix",
+  "version": 6,
+  "name": "London Project affiliate layout standard v6 - fixed reusable ten-product set",
   "platforms": [
     "wordpress",
     "blogger"
@@ -41,14 +41,14 @@
     "agoda"
   ],
   "selection_principles": [
-    "This v5 policy supersedes every older affiliate category-mix instruction in the repository.",
-    "Each article has exactly three branded header buttons in one horizontal row: Coupang Partners (orange), OLIVE YOUNG (green), Trip.com (blue), in that order.",
+    "This v6 policy supersedes older randomized category-mix rules. Each site reuses its own fixed ten-product set until an operator manually replaces the catalog.",
+    "Each article has exactly three branded header buttons in one horizontal row: Trip.com (blue), OLIVE YOUNG (green), Coupang Partners (orange), in that order.",
     "The header must use branded/logo-style tiles and each button must use a real verified tracking URL authorized for that destination.",
     "Do not render the old large navy generic buttons or raw Unicode-escaped Trip.com category link rows.",
     "All ten bottom product cards are Coupang Partners products only.",
-    "Every article must contain exactly: 2 beauty/cosmetics, 1 laptop, 1 tablet, 2 health supplements, 2 Korea travel packages, and 2 hotel products.",
-    "Build a site-specific pool of approximately 100 verified Coupang offers: 20 beauty, 10 laptops, 10 tablets, 20 health supplements, 20 Korea travel packages, 20 hotel products.",
-    "Randomly select products independently per article while preserving the exact category counts; avoid repeating the same ten-product set across articles.",
+    "Every article reuses the same ten verified Coupang products from that site’s fixed catalog until manual replacement; do not search or rotate products per article.",
+    "Keep one site-specific fixed catalog of exactly ten verified Coupang offers, each with one unique account-generated tracking URL and one unique official product image.",
+    "Reuse the exact same ten catalog entries in the same order on every article; change the set only through a deliberate manual catalog update.",
     "Use genuine account-generated Coupang tracking links and verified official product images. Never invent products, links, images, prices, sales, reviews or commission rates.",
     "Keep separate product pools per destination; never share WordPress and Blogger catalogs.",
     "Agoda remains disabled. Olive Young and Trip.com are header buttons only, not product-card providers.",
@@ -75,7 +75,7 @@
     "require_verified_site_header_links": true,
     "require_exactly_ten_coupang_cards": true,
     "agoda_enabled": false,
-    "require_trip_com_three_tracked_categories": true,
+    "require_trip_com_three_tracked_categories": false,
     "olive_young_reward_url_verification_pending": true,
     "require_exact_category_mix": true,
     "require_site_pool_target_100": true,
