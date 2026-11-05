@@ -3,6 +3,14 @@
   "scope": "fallback_for_registered_sites_without_site_specific_header_config",
   "buttons": [
     {
+      "provider": "coupang_partners",
+      "label": "Coupang Partners",
+      "affiliate_url": "https://link.coupang.com/a/ihRMHfQzKf",
+      "status": "account_link_on_file",
+      "link_type": "general_affiliate_destination",
+      "verified": true
+    },
+    {
       "provider": "trip_com",
       "label": "Trip.com",
       "affiliate_url": "https://www.trip.com/t/KwZ0AV4s0X2",
@@ -18,14 +26,6 @@
       "link_type": "reward_code_entry",
       "verified": false,
       "note": "User-supplied reward-code URL; commission attribution has not been independently confirmed."
-    },
-    {
-      "provider": "coupang_partners",
-      "label": "Coupang Partners",
-      "affiliate_url": "https://link.coupang.com/a/ihRMHfQzKf",
-      "status": "account_link_on_file",
-      "link_type": "general_affiliate_destination",
-      "verified": true
     }
   ]
 }
