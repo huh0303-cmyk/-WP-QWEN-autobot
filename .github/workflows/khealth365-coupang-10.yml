@@ -11,9 +11,9 @@ on:
           - preview
           - apply
       limit:
-        description: "Maximum posts to process (0 = all published posts)"
+        description: "Pilot safety limit. Keep 1 for the first article; use 0 only after explicit fleet/site approval."
         required: true
-        default: "0"
+        default: "1"
         type: string
 permissions:
   contents: read
