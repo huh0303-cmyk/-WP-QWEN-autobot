@@ -255,14 +255,90 @@ def fresh_image(topic, workdir, service=None):
             shutil.copyfile(source, output)
             return [str(output)]
         image_source = "gemini_app_export"
+
+    if image_source == "pexels_api":
+        service = service or base.get_drive_service()
+        if not base.PEXELS_API_KEY:
+            raise RuntimeError("WAITING_ASSETS: PEXELS_API_KEY is required for the free-only Globalmusic thumbnail path")
+        items = _bank_list(service, base.THUMBNAIL_FOLDER_ID, base.IMAGE_EXTS, "image/")
+        # A manually curated pexels_* image is consumed once, then renamed in Drive
+        # so later uploads cannot silently reuse the same thumbnail.
+        unused = [item for item in items if item.get("name", "").lower().startswith("pexels_")]
+        if unused:
+            chosen = random.choice(unused)
+            raw_path = Path(workdir) / Path(chosen["name"]).name
+            _bank_download(service, chosen["id"], str(raw_path))
+            service.files().update(
+                fileId=chosen["id"],
+                body={"name": "used_" + Path(chosen["name"]).name},
+                fields="id,name",
+            ).execute()
+        else:
+            used_ids = set()
+            for item in items:
+                match = re.match(r"used_pexels_(\d+)", item.get("name", "").lower())
+                if match:
+                    used_ids.add(int(match.group(1)))
+            queries = [
+                f"romantic couple cafe terrace {topic}",
+                "romantic couple seaside cafe",
+                "happy couple garden cafe coffee",
+            ]
+            candidates = []
+            for query in queries:
+                response = requests.get(
+                    "https://api.pexels.com/v1/search",
+                    headers={"Authorization": base.PEXELS_API_KEY},
+                    params={"query": query, "per_page": 80, "orientation": "landscape",
+                            "size": "large", "page": random.randint(1, 5)},
+                    timeout=30,
+                )
+                response.raise_for_status()
+                photos = response.json().get("photos", [])
+                candidates = [
+                    photo for photo in photos
+                    if photo.get("id") not in used_ids
+                    and "couple" in (photo.get("alt") or "").lower()
+                    and any(term in (photo.get("alt") or "").lower()
+                            for term in ("cafe", "coffee", "terrace", "sea", "garden", "beach"))
+                ]
+                if candidates:
+                    break
+            if not candidates:
+                raise RuntimeError("WAITING_ASSETS: Pexels returned no unused landscape couple/cafe photos")
+            chosen = random.choice(candidates)
+            photo_id = int(chosen["id"])
+            photo_url = chosen.get("src", {}).get("original") or chosen.get("src", {}).get("large2x")
+            if not photo_url:
+                raise RuntimeError("WAITING_ASSETS: selected Pexels photo has no downloadable source")
+            raw_path = Path(workdir) / f"pexels_{photo_id}.jpg"
+            response = requests.get(photo_url, timeout=90, stream=True)
+            response.raise_for_status()
+            with raw_path.open("wb") as output:
+                for chunk in response.iter_content(chunk_size=1024 * 1024):
+                    if chunk:
+                        output.write(chunk)
+            # Keep a private Drive receipt of every used photo ID; never reuse it.
+            base.upload_to_drive(service, str(raw_path), base.THUMBNAIL_FOLDER_ID,
+                                 f"used_pexels_{photo_id}.jpg")
+        try:
+            with Image.open(raw_path) as image:
+                image.verify()
+            with Image.open(raw_path) as image:
+                if image.width < 1280 or image.height < 720:
+                    raise RuntimeError("Pexels thumbnail source must be at least 1280x720")
+        except Exception as exc:
+            raise RuntimeError("WAITING_ASSETS: Pexels returned an invalid or undersized thumbnail") from exc
+        return [str(raw_path)]
+
     if image_source != "gemini_api":
-        service = base.get_drive_service()
+        service = service or base.get_drive_service()
         items = _bank_list(service, base.THUMBNAIL_FOLDER_ID, base.IMAGE_EXTS, "image/")
         items = [item for item in items if "gemini" in item['name'].lower()]
         if not items:
             raise RuntimeError("WAITING_ASSETS: save an approved Gemini thumbnail export named gemini_* in this channel thumbnail folder")
-        raw_path = Path(workdir) / ("gemini_app_export" + Path(random.choice(items)['name']).suffix)
         chosen = random.choice(items)
+        raw_path = Path(workdir) / ("gemini_app_export" + Path(chosen['name']).suffix)
         _bank_download(service, chosen['id'], str(raw_path))
         with Image.open(raw_path) as image:
             image.verify()
@@ -289,18 +365,42 @@ def fresh_image(topic, workdir, service=None):
 
 
 def benchmark_thumbnail(_channel, image_path, output_path, topic, **_kwargs):
-    """Owner's latest requirement: one very large, mobile-readable PLAYLIST label."""
+    """High-performing Globalmusic layout: close-up couple, text kept below faces."""
     image = base._resize_cover(Image.open(image_path).convert("RGB"), 1280, 720)
     overlay = Image.new("RGBA", image.size, (0, 0, 0, 0))
     draw = ImageDraw.Draw(overlay, "RGBA")
     font_path = base.ensure_font()
-    size=200
-    title_font=ImageFont.truetype(font_path,size)
-    while draw.textlength('PLAYLIST',font=title_font)>1088:
-        size-=2
-        title_font=ImageFont.truetype(font_path,size)
-    draw.text((644,216),'PLAYLIST',anchor='mm',font=title_font,fill=(0,0,0,160),stroke_width=4)
-    draw.text((640,210),'PLAYLIST',anchor='mm',font=title_font,fill='white',stroke_width=1,stroke_fill=(40,30,30,130))
+    if _channel == "globalmusic":
+        # A restrained bottom gradient keeps faces unobstructed and the title readable on mobile.
+        pixels = overlay.load()
+        for y in range(300, 720):
+            alpha = int(165 * ((y - 300) / 420) ** 1.35)
+            for x in range(1280):
+                pixels[x, y] = (7, 15, 24, alpha)
+        brand_font = ImageFont.truetype(font_path, 26)
+        title_size = 92
+        title_font = ImageFont.truetype(font_path, title_size)
+        while draw.textlength("LOVE SONGS", font=title_font) > 700 and title_size > 64:
+            title_size -= 2
+            title_font = ImageFont.truetype(font_path, title_size)
+        sub_font = ImageFont.truetype(font_path, 28)
+        draw.rounded_rectangle((56, 48, 300, 94), radius=18,
+                               fill=(10, 22, 34, 185), outline=(234, 197, 130, 220), width=2)
+        draw.text((75, 56), "CAFE ROMANTIC", font=brand_font, fill=(255, 255, 255, 245))
+        draw.text((58, 468), "LOVE SONGS", font=title_font, fill=(255, 255, 255, 255),
+                  stroke_width=3, stroke_fill=(0, 0, 0, 180))
+        draw.rounded_rectangle((60, 592, 400, 644), radius=18, fill=(216, 168, 91, 235))
+        draw.text((82, 602), "FRENCH  ×  JAPANESE", font=sub_font, fill=(19, 28, 39, 255))
+    else:
+        size = 200
+        title_font = ImageFont.truetype(font_path, size)
+        while draw.textlength("PLAYLIST", font=title_font) > 1088:
+            size -= 2
+            title_font = ImageFont.truetype(font_path, size)
+        draw.text((644, 216), "PLAYLIST", anchor="mm", font=title_font,
+                  fill=(0, 0, 0, 160), stroke_width=4)
+        draw.text((640, 210), "PLAYLIST", anchor="mm", font=title_font,
+                  fill="white", stroke_width=1, stroke_fill=(40, 30, 30, 130))
     composed = Image.alpha_composite(image.convert("RGBA"), overlay).convert("RGB")
     return base._save_thumbnail_capped(composed, output_path)
 
