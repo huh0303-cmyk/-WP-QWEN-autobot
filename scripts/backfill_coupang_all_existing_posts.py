@@ -76,7 +76,7 @@ def main():
     if args.mode == "apply" and args.confirm != "APPLY-ALL":
         raise SystemExit("Apply mode requires --confirm APPLY-ALL")
     try:
-        wp_credentials = json.loads(os.getenv("WP_SITE_CREDENTIALS_JSON","{}"))
+        wp_credentials = json.loads(os.getenv("WP_SITE_CREDENTIALS_JSON","").strip() or "{}")
     except json.JSONDecodeError as exc:
         raise SystemExit("WP_SITE_CREDENTIALS_JSON is not valid JSON") from exc
 
