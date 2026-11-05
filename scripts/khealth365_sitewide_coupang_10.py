@@ -46,6 +46,10 @@ def load_products():
     urls = [p["url"] for p in items]
     if len(set(urls)) != 10:
         die("중복 쿠팡 파트너스 URL이 있습니다.")
+    beauty_count = sum(1 for p in items if p.get("category") == "beauty")
+    health_count = sum(1 for p in items if p.get("category") == "health")
+    if beauty_count != 5 or health_count != 5:
+        die(f"상품 구성 오류: beauty={beauty_count}, health={health_count}; 각각 5개여야 합니다.")
     for p in items:
         if not re.fullmatch(r"https://link\.coupang\.com/a/[A-Za-z0-9]+", p["url"]):
             die("쿠팡 파트너스 단축 URL 형식 오류: " + p["id"])
@@ -59,6 +63,12 @@ def load_products():
         # are resolved once from the account's own affiliate destination.
         if "coupangcdn.com" not in urlparse(p["image_url"]).netloc.lower():
             die("공식 쿠팡 이미지 호스트가 아닙니다: " + p["id"])
+        image_check = requests.get(p["image_url"], headers=UA, timeout=25, stream=True)
+        image_type = image_check.headers.get("Content-Type", "").lower()
+        image_ok = image_check.ok and image_type.startswith("image/")
+        image_check.close()
+        if not image_ok:
+            die("상품 이미지 실제 응답 검증 실패: " + p["id"])
     image_urls = [p["image_url"] for p in items]
     if len(set(image_urls)) != 10:
         die("고정 상품 10개의 대표 이미지가 중복됩니다.")
