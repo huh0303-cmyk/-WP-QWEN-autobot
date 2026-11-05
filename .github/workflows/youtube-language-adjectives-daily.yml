@@ -69,8 +69,7 @@ jobs:
       - name: Check complete upload history and select an unused B1-B2 pair
         id: select
         env:
-          INPUT_LANGUAGES: ${{ needs.select.outputs.languages }}
-          SELECTED_PAIR_ID: ${{ needs.select.outputs.selected_pair_id }}
+          INPUT_LANGUAGES: ${{ inputs.languages }}
         run: |
           LANGUAGES="${INPUT_LANGUAGES:-all}"
           PAIR_LOG="$(python scripts/select_unique_survival_pair.py --languages "$LANGUAGES")"
@@ -122,7 +121,8 @@ jobs:
         env:
           INPUT_DATE: ${{ inputs.target_date }}
           INPUT_PUBLISH_AT: ${{ inputs.publish_at }}
-          INPUT_LANGUAGES: ${{ inputs.languages }}
+          INPUT_LANGUAGES: ${{ needs.select.outputs.languages }}
+          SELECTED_PAIR_ID: ${{ needs.select.outputs.selected_pair_id }}
         run: |
           if [ "${GITHUB_EVENT_NAME}" = "schedule" ]; then
             TARGET_DATE="$(TZ=Asia/Seoul date -d 'tomorrow' +%F)"
