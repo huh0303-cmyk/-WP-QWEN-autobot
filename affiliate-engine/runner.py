@@ -14,7 +14,8 @@ ENGINE=ROOT/"affiliate-engine"
 ROUTING=ENGINE/"config"/"affiliate-routing.json"
 POLICY=ROOT/"config"/"affiliate_distribution_policy.json"
 CATALOG_DIR=ENGINE/"data"/"catalogs"
-MARKER="<!-- london-affiliate-engine:v6 -->"
+MARKER="<!-- london-affiliate-engine:v7-footer-only -->"
+LEGACY_AFFILIATE_MARKERS=("<!-- LONDON-COUPANG-PARTNERS-START -->","<!-- LONDON-AFFILIATE-HEADER-START -->","<!-- KHEALTH365-COUPANG-START -->","london-coupang-wrap","london-affiliate-partner-strip")
 DISCLOSURE="<p><small>This post contains Coupang Partners affiliate links. If you visit Coupang through one of these links and make a purchase within 24 hours, including a purchase of another eligible product, we may earn a commission at no additional cost to you. Attribution rules, cancellations and returns may affect commission eligibility.</small><br/><small>이 게시물에는 쿠팡 파트너스 제휴 링크가 포함되어 있습니다. 이 링크를 통해 쿠팡에 방문한 뒤 24시간 이내에 다른 상품을 구매하더라도 운영정책상 실적으로 인정되는 구매라면 수수료를 제공받을 수 있습니다. 구매 경로의 최종 기여, 주문 취소 및 반품 등에 따라 수수료가 인정되지 않을 수 있습니다.</small></p>"
 
 def load_json(path:Path)->Any:
@@ -118,7 +119,7 @@ def wordpress(dest,since,block_for,write,scope,batch_size):
         for post in posts:
             content=post["content"]["rendered"]
             result={"platform":"wordpress","site":dest["site_key"],"post_id":post["id"],"url":post["link"],"action":"skipped"}
-            if MARKER in content: result["reason"]="already_has_v5_marker"
+            if any(marker in content for marker in (MARKER,*LEGACY_AFFILIATE_MARKERS)): result["reason"]="existing_managed_affiliate_footer_preserved"
             else:
                 try: block=block_for(post["title"]["rendered"],content,dest["site_key"])
                 except ValueError as exc: result.update(action="blocked",reason=str(exc))
