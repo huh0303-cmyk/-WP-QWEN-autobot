@@ -181,7 +181,7 @@ def select_products(title, article_text, site_id="", limit=10):
             if not isinstance(raw, dict) or raw.get("enabled") is not True:
                 continue
             category = str(raw.get("category", "")).lower()
-            if category not in {"beauty", "health"}:
+            if category not in {"beauty", "health", "k_beauty_skincare", "health_functional_foods"}:
                 continue
             item = _candidate(raw, category)
             if not item:
@@ -192,8 +192,8 @@ def select_products(title, article_text, site_id="", limit=10):
             seen_urls.add(item["url"])
             seen_images.add(image_key)
             fixed.append(item)
-        beauty_count = sum(1 for item in fixed if item["category"] == "beauty")
-        health_count = sum(1 for item in fixed if item["category"] == "health")
+        beauty_count = sum(1 for item in fixed if item["category"] in {"beauty", "k_beauty_skincare"})
+        health_count = sum(1 for item in fixed if item["category"] in {"health", "health_functional_foods"})
         if len(fixed) != 10 or beauty_count != 5 or health_count != 5:
             raise ValueError(
                 "K-Health365 catalog must contain exactly 10 unique verified products "
