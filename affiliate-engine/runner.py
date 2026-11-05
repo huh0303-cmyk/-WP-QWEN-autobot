@@ -96,6 +96,7 @@ def build_block(offers:list[dict[str,Any]],header_buttons:list[dict[str,Any]]|No
     header_buttons=[button_map[p] for p in expected]
     colors={"coupang_partners":"#e87518","olive_young_global":"#168a43","trip_com":"#1769d2"}
     labels={"coupang_partners":"Coupang Partners","olive_young_global":"OLIVE YOUNG","trip_com":"Trip.com"}
+    logo_fallback={"coupang_partners":"https://influencers.coupang.com/logo-black.png","olive_young_global":"https://dist.oliveyoung.com/fo/fe126e9b35/resources/images/common/logo.svg","trip_com":"https://commons.wikimedia.org/wiki/Special:FilePath/Trip.com_logo.svg"}
     buttons=[]
     for b in header_buttons:
         if not str(b.get("affiliate_url","")).startswith("https://"): raise ValueError(f"missing_header_button_url:{b.get('provider')}")
@@ -103,7 +104,8 @@ def build_block(offers:list[dict[str,Any]],header_buttons:list[dict[str,Any]]|No
             raise ValueError(f"unverified_header_button:{b.get('provider')}")
         provider=b["provider"]
         label=labels[provider]
-        logo=(f'<img class="london-affiliate-brand-logo" src="{html.escape(b["logo_url"],quote=True)}" alt="" loading="lazy"/>' if b.get("logo_url") else '')
+        logo_url=b.get("logo_url") or logo_fallback[provider]
+        logo=f'<img class="london-affiliate-brand-logo" src="{html.escape(logo_url,quote=True)}" alt="{label}" loading="lazy"/>'
         buttons.append(f'<a class="london-affiliate-provider-button {provider}" style="--brand-color:{colors[provider]}" href="{html.escape(b["affiliate_url"],quote=True)}" target="_blank" rel="sponsored nofollow noopener">{logo}<span>{label}</span></a>')
     cards=[]
     for o in offers:
