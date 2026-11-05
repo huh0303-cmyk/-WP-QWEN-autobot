@@ -85,7 +85,7 @@ def playlist_metadata(channel, topic, minutes):
     description = (
         f'{topic}. {angles[channel]}\n\n'
         f'Enjoy this approximately {round(minutes)}-minute playlist while sharing coffee, preparing dinner, reading, or unwinding at home. The carefully arranged music brings together the channel\'s signature sound and a relaxed flow for a warm, unhurried atmosphere. Let the music play in the background or listen closely to the details and changing moods.\n\n'
-        'Whether you are taking a quiet break, spending time with someone special, or setting a comfortable mood for your day, this session is designed to stay easy to enjoy from beginning to end. Keep the volume comfortable for your surroundings and return whenever you want to hear the atmosphere again.\n\n'
+        'Use this session as a gentle soundtrack for a break, a quiet conversation, or a slower part of your day. Keep the volume comfortable and return whenever the mood suits you.\n\n'
         'Which scene or feeling should inspire a future playlist? Tell us in the comments. Subscribe for more original listening sessions, fresh themes, and carefully selected music. Thank you for spending part of your day with us.'
     )
     validate_metadata(title, description)
