@@ -1,0 +1,42 @@
+name: CAFE_ROMANTIC - Verified thumbnail refresh
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/cafe-romantic-thumbnail-refresh.yml"
+      - "scripts/cafe_romantic_thumbnail_refresh.py"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cafe-romantic-thumbnail-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh-latest-public-thumbnail:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: youtube-channels
+    env:
+      PYTHONUTF8: "1"
+      GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+      GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+      GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+      THUMBNAIL_FOLDER_ID_GLOBALMUSIC: ${{ secrets.THUMBNAIL_FOLDER_ID_GLOBALMUSIC }}
+      YOUTUBE_OAUTH_CLIENT_ID_GLOBALMUSIC: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_GLOBALMUSIC }}
+      YOUTUBE_OAUTH_CLIENT_SECRET_GLOBALMUSIC: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_GLOBALMUSIC }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_GLOBALMUSIC: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_GLOBALMUSIC }}
+      THUMBNAIL_FILE_NAME: "cafe_romantic_thumbnail_2026-11-05.jpg"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install free YouTube and Drive runtime
+        run: python -m pip install --disable-pip-version-check google-api-python-client google-auth pillow
+      - name: Validate exact channel and refresh only its latest public video thumbnail
+        run: |
+          python -m py_compile scripts/cafe_romantic_thumbnail_refresh.py
+          python scripts/cafe_romantic_thumbnail_refresh.py
