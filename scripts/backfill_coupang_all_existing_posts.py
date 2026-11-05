@@ -102,9 +102,15 @@ def main():
         profile = PROFILE_BY_KEY.get(site_key,{})
         # Resolve K-Health365's four missing official product images once before
         # counting candidates. The helper persists the URLs in this run's workspace.
+        khealth_image_error = None
         if sid == "wp_khealth365":
             from scripts.khealth365_sitewide_coupang_10 import load_products as load_khealth_products
-            load_khealth_products()
+            try:
+                load_khealth_products()
+            except Exception as exc:
+                # A Coupang product page may deny automated image resolution (403).
+                # Never fail the whole fleet or substitute an unverified image.
+                khealth_image_error = type(exc).__name__ + ": " + str(exc)[:180]
         catalog_count = len(load_candidates(sid))
         entry = {"site_id":sid,"url":site.get("url"),"platform":platform,
                  "verified_products":catalog_count,"posts_seen":0,"updated":0,
@@ -112,6 +118,8 @@ def main():
         if catalog_count < 10:
             entry["needs_catalog"] = 1
             entry["errors"].append(f"site catalog has {catalog_count}/10 verified unique products; no cross-site borrowing")
+            if khealth_image_error:
+                entry["errors"].append("official image resolution blocked; no substitute used: " + khealth_image_error)
             report["totals"]["needs_catalog"] += 1
             report["sites"].append(entry)
             continue
