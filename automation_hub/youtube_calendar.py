@@ -53,6 +53,19 @@ def parse_calendar(values):
     return result
 
 
+ACTIVE_STATUSES = {"자료수집", "대본작성", "검수중"}
+
+
+def _recent_active_channels(rows, now):
+    """Only a genuinely recent claim blocks a channel; stale rows cannot freeze it forever."""
+    oldest = now - dt.timedelta(hours=12)
+    newest = now + dt.timedelta(hours=2)
+    return {
+        row["key"] for row in rows
+        if row["status"] in ACTIVE_STATUSES and oldest <= row["when"] <= newest
+    }
+
+
 def select_due(rows, now, enabled, limit=3):
     """Original CAL series wins over accidentally duplicated ROLL series.
 
@@ -63,7 +76,7 @@ def select_due(rows, now, enabled, limit=3):
     for r in rows:
         if r["id"].startswith("CAL-"):
             original_dates.add((r["key"], r["when"].date()))
-    blocked = {r["key"] for r in rows if r["status"] in {"자료수집", "대본작성", "검수중"}}
+    blocked = _recent_active_channels(rows, now)
     # A claimed/completed row must win even if a duplicate has an earlier clock time.
     occupied = {(r["key"], r["when"].date()) for r in rows
                 if r["status"] != READY or r["url"] or "[yt-calendar:" in r["notes"]}
