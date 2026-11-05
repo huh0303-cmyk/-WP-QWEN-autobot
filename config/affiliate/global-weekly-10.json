@@ -8,7 +8,7 @@
     "ends_at": "2026-11-12T00:00:00+09:00",
     "duration_hours": 168
   },
-  "status": "pilot_catalog_ready_not_fleet_deployed",
+  "status": "weekly_catalog_ready_khealth365_rollout_pending",
   "source_of_truth": true,
   "selection": {
     "provider": "coupang_partners",
@@ -52,12 +52,20 @@
     "shared_landing_page": "One weekly shelf page with 10 cards and all tracked URLs; all social profile links point to the same current weekly shelf"
   },
   "governance": {
-    "weekly_review": "Review clicks, orders, confirmed commissions, availability, link health and image health; retain performers and selectively replace only justified items",
-    "no_auto_rotation": true,
+    "weekly_review": "Every 168 hours, replace the complete set of ten Coupang products with the next verified weekly set. Keep the three partner company logos and their affiliate tracking destinations unchanged.",
+    "no_auto_rotation": false,
     "rollback": "Keep previous dated set immutable",
     "disclosure_required": true,
     "platform_rules_must_be_checked": true,
-    "live_fleet_rollout_requires_owner_approval": true
+    "live_fleet_rollout_requires_owner_approval": true,
+    "fixed_partner_logos": true,
+    "partner_logo_order": [
+      "Coupang Partners",
+      "OLIVE YOUNG",
+      "Trip.com"
+    ],
+    "partner_logo_tracking_links_required": true,
+    "partner_logos_change_weekly": false
   },
   "items": [
     {
