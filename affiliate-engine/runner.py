@@ -106,7 +106,7 @@ def build_block(offers:list[dict[str,Any]],header_buttons:list[dict[str,Any]]|No
         label=labels[provider]
         logo_url=b.get("logo_url") or logo_fallback[provider]
         logo=f'<img class="london-affiliate-brand-logo" src="{html.escape(logo_url,quote=True)}" alt="{label}" loading="lazy"/>'
-        buttons.append(f'<a class="london-affiliate-provider-button {provider}" style="--brand-color:{colors[provider]}" href="{html.escape(b["affiliate_url"],quote=True)}" target="_blank" rel="sponsored nofollow noopener">{logo}<span>{label}</span></a>')
+        buttons.append(f'<a class="london-affiliate-provider-button {provider}" style="--brand-color:{colors[provider]}" href="{html.escape(b["affiliate_url"],quote=True)}" target="_blank" rel="sponsored nofollow noopener" aria-label="{label} affiliate link">{logo}<span>{label}</span></a>')
     cards=[]
     for o in offers:
         title=html.escape(o["title"])
