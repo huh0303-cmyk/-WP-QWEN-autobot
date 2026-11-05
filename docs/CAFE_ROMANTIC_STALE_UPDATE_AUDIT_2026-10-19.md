@@ -28,3 +28,30 @@
 ## Status
 
 Cadence configuration and latest-video evidence fields corrected in GitHub. The latest known snapshot says 2026-10-06, not two months ago; the two-month display still needs post-deployment verification to identify the exact UI source/matching problem. No claim is made that the VPS runtime is healthy, a new video was rendered, or a new video was uploaded. No existing video was deleted or changed.
+
+
+## 2026-11-05 follow-up — four-week publication gap
+
+### Confirmed blockers in the current GitHub-only implementation
+
+1. **Automatic publication is deliberately disabled until two environment gates are explicitly released.** The hourly `.github/workflows/youtube-github-scheduler.yml` exits without dispatch unless `YOUTUBE_AUTO_PUBLISH_ENABLED=true` and `YOUTUBE_COST_HOLD=false` in the `youtube-channels` environment. `automation_hub/youtube_github_runtime.py` also treats a missing/blank `YOUTUBE_COST_HOLD` as active. The manual worker separately requires `confirm_publication=true` and still fails closed on cost hold. The migration record says no authorized end-to-end canary has passed.
+
+2. **The Globalmusic worker does not select the owner's reviewed local music source.** `scripts/youtube_github_worker.py::_playlist` does not set `PLAYLIST_MUSIC_SOURCE`; the maker defaults to `approved_bank`, and `scripts/youtube_playlist_maker.py::select_music` explicitly raises `WAITING_FRESH_COMPOSITIONS` for `globalmusic` and `kpop` unless `owner_local` is selected. The `owner_local` path requires a private `data/playlist-owner-music/approved.json` manifest plus staged audio under `data/playlist-owner-music/audio`. That directory and manifest are absent from the inspected local LondonProject checkout, so the GitHub runner cannot consume the classified PC music pool yet.
+
+3. **A local classification folder is not a production-ready audio catalog.** The owner's PC contains `OneDrive/Desktop/클로드/플리채널_음악분류/globalmusic` with 290 file entries. The folder's classification log reports duplicates/variants elsewhere in the library; no current SHA-256-reviewed, duration-checked, exact-language private manifest was found in the inspected LondonProject data path. Do not upload this folder wholesale: it contains unrelated files elsewhere in the source directory and the selector requires one-to-one French/Japanese track balance, unique audio hashes, approved rights, and a 50–70 minute mix.
+
+4. **The thumbnail source is not explicitly wired for this channel.** `fresh_image` defaults to `gemini_app_export`, which expects a `gemini_*` image in the channel's Drive thumbnail folder. The paid Gemini image API remains disabled. The repository contains a single Globalmusic source image, but using that same still image for every upload would violate the unique-thumbnail requirement. A fresh, original image and a phone-size review are still required for each upload.
+
+### Thumbnail benchmark checked
+
+A verified public reference is Cafe Music BGM channel's “Relaxing Jazz Music - Background Chill Out Music - Music For Relax,Study,Work” (video `neV3EPgvZ3g`), with 120,894,095 views in the current YouTube result: https://www.youtube.com/watch?v=neV3EPgvZ3g . Use the broad principles—an immersive, immediately legible café scene, a clear focal subject, restrained short typography, and strong contrast—without copying its artwork or layout. For CAFE_ROMANTIC, preserve the channel-specific rule of exactly one adult couple, large in frame, in a bright airy seaside/garden/lakeside café setting.
+
+### Required recovery gates — do not mark complete until all pass
+
+- Owner-approved GitHub environment release: `YOUTUBE_COST_HOLD=false`; enable automatic cadence only after the one-channel canary is verified.
+- Build a private SHA-256/duration/language-reviewed Globalmusic manifest from approved owner-paid Suno exports; stage only the selected audio in the GitHub-hosted worker's approved private asset store. Keep filenames, rights evidence, and audio files out of Git.
+- Wire the worker explicitly to the owner-reviewed source and a fresh no-cost thumbnail source; do not fall back to paid Gemini APIs or reuse one static image.
+- Verify exact authenticated channel ID `UCbJfEtsffpgI5MsKkB7BYvQ`, render the 50–70 minute mix, upload once, and record the returned video ID, public URL, exact channel ID, duration, thumbnail, and `privacyStatus=public`.
+- After the canary succeeds, activate the documented 2–3 day interval (approximately 2–3 uploads per week) and monitor actual public receipts, not workflow green checks.
+
+**Status on 2026-11-05: root causes identified; no production setting was bypassed, no existing video was changed, and no new video was uploaded. This channel is not yet recovered.**
