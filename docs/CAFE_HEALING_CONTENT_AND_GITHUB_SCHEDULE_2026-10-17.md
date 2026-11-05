@@ -6,9 +6,9 @@ Canonical channel ID: `UC7yEsLM-HoXudngrD-4FIqg` (handle `@cafe_healing1`).
 ## Owner requirements
 
 - Keep the channel focused on natural healing ambience; current rain and stream sounds are working and should remain core formats.
-- Expand the sound palette across releases: rain on leaves/window/roof; flowing creek/waterfall; soft wind through trees; birds; delicate temple/wind chimes; and a warm fireplace with clearly audible natural crackles.
-- Use one or two primary sound elements and a few restrained secondary elements per video, not every sound at equal volume. Avoid harsh loudness, artificial repetitive loops, sudden edits, music, and narration. For example: (A) forest stream + birds + breeze; (B) gentle rain + distant wind chime; (C) fireplace crackle + rain outside a cabin; (D) forest breeze + birds + subtle temple chime. Chimes should be occasional and soft, not continuous or piercing.
-- Publish 2–3 times weekly on randomized, well-spaced days/times using GitHub Actions as the scheduler/runner. VPS is not the production host.
+- Publish the five requested themes one at a time in a fixed rotation: fireplace/bulmeong → rain → forest wind → birdsong → quiet temple garden/bells, then repeat. Keep each upload focused on one primary sound theme.
+- Keep visuals deliberately simple: one main licensed moving scene (or at most two closely related shots), gently crossfaded and looped; do not build a busy montage. Sound is the main product. Use one primary sound plus at most one quiet supporting layer. Avoid harsh loudness, obvious loop seams, sudden edits, music, and narration. For example: (A) forest stream + birds + breeze; (B) gentle rain + distant wind chime; (C) fireplace crackle + rain outside a cabin; (D) forest breeze + birds + subtle temple chime. Chimes should be occasional and soft, not continuous or piercing.
+- Publish 2–3 times weekly on randomized, well-spaced days/times recorded in the Google Sheet calendar. GitHub Actions polls the calendar and publishes only due rows; the workflow must not invent or silently pull forward a future slot. VPS is not the production host.
 - Keep existing videos; no deletion. Verify exact OAuth channel ID immediately before upload and verify new video ID/channel ID/privacy/duration afterward.
 
 ## Existing pipeline observations
@@ -27,6 +27,32 @@ Use successful videos as pattern research, not copying:
 - `The Ambiance Felt From the Window on a Cold Rain Day | Warm, Relaxing Fireplace` — reported 1,000,000 views. Pattern: a single cozy visual story and a strong rain + fire sound pairing.
 
 Counts above are third-party/search observations and can change; recheck counts before using a result in future benchmark reports. Do not copy titles, thumbnails, footage, audio, or branding.
+
+## Updated five-theme production plan — 2026-11-06
+
+### Proven-demand benchmark checks
+These are reference patterns, not assets to copy:
+- Fireplace 4K, "Relaxing Fire Sounds" — approximately 20.5M YouTube views; one steady fireplace scene, real fire texture, no music.
+- Rainy Bedroom, "Soothing Rain Sounds in the Forest" — approximately 4.5M views; long uninterrupted rain ambience, clear sleep/focus use.
+- Naturescapes, "Woodland Stream & Birdsong" — approximately 1.1M views; one forest-water setting with birdsong.
+- The Guild of Ambience, "Study Sounds | Windy Weather White Noise" — reported above 600K views; a single wind-weather sound concept.
+- Temple ambience has not yet produced a sufficiently verified 500K+ sound-only benchmark in this research pass. Treat it as a carefully tested series entry, not a proven high-view format.
+
+### Theme order and visual source plan
+1. **Fireplace / 불멍** — Pexels clip 6755352 (one warm firewood close-up); soft crackle bed. Backup clip 946600.
+2. **Rain / 빗소리** — existing approved rain pool; rain on leaves/forest canopy; no rapid cuts.
+3. **Wind / 바람** — Pexels clip 3027193 (trees/leaves moving in wind); low, slowly changing wind bed.
+4. **Birds / 새소리** — Pexels clip 30535102 or 35475944; bundled CC0 forest-bird recording.
+5. **Temple / 절 풍경** — Pexels clip 36787646 (Buddhist temple in greenery); very soft, widely spaced original bell-like tones and low-level birds/breeze.
+
+All visual source pages are individually listed in the source code and must remain under the Pexels license. Do not download, sample, or reuse competitor YouTube media. The sound design must state clearly when a sound is synthesized; do not label synthesized audio as a field recording.
+
+### Rotation, runtime and timing
+- Rotate the five themes in the order above. Record a category only after the YouTube upload has passed verification; failed attempts do not consume a theme slot.
+- Randomize each long-form runtime between 74 and 175 minutes using the schedule ID as the reproducible seed.
+- Actual release times come from the pre-existing calendar's randomized 2–3 weekly rows. GitHub Actions checks four times per hour (UTC minutes 3, 19, 37, 53) and publishes only a due row. A push-triggered owner-requested first run may publish the next READY healing row immediately.
+- Cache the category and thumbnail history between GitHub runs so themes rotate and thumbnail frames are not immediately repeated.
+- Paid generation providers remain blank/disabled. The only bundled field recording used in the new theme plan is the existing CC0 bird ambience; the other generated sound beds are disclosed as original local sound design.
 
 ## Thumbnail design direction
 
@@ -58,4 +84,4 @@ Do not promise "no ads" unless the channel owner can guarantee that claim; do no
 
 ## Current status
 
-This file locks the requested channel policy and provides benchmark references. It does not claim that GitHub Actions has been deployed end-to-end or that a new video was uploaded. The current repository still needs the actual GitHub-native render/upload workflow, source asset availability check, and verified YouTube API receipt.
+The five-theme renderer, isolated free-only runtime gate, category-history cache and channel-specific GitHub Actions workflow have been committed. A workflow run and public YouTube upload receipt are still required before publication can be called successful. Existing videos are preserved.
