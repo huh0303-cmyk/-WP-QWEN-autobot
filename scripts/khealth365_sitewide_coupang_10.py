@@ -7,7 +7,7 @@ import requests
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
-from automation_hub.coupang_partners import apply_footer, select_products, START, END, HEADER_START, HEADER_END, LOGOS
+from automation_hub.coupang_partners import apply_footer, select_products, START, END, HEADER_START, HEADER_END, LOGOS, load_header_buttons
 
 SITE = "https://k-health365.com"
 DISCLOSURE = "이 게시물에는 쿠팡 파트너스 제휴 링크가 포함되어 있습니다. 이 링크를 통해 쿠팡에 방문한 뒤 24시간 이내에 다른 상품을 구매하더라도 운영정책상 실적으로 인정되는 구매라면 수수료를 제공받을 수 있습니다. 구매 경로의 최종 기여, 주문 취소 및 반품 등에 따라 수수료가 인정되지 않을 수 있습니다."
@@ -155,6 +155,12 @@ def main():
     # Resolve and persist any missing official product images once. Subsequent
     # runs reuse the same ten products and saved image URLs without reselection.
     load_products()
+    partner_header = load_header_buttons("wp_khealth365")
+    if not partner_header or len(partner_header.get("buttons", [])) != 3:
+        die("세 제휴사의 공식 로고 및 제휴 추적 URL 설정이 정확히 3개 필요합니다.")
+    partner_urls = {item["affiliate_url"] for item in partner_header["buttons"]}
+    if len(partner_urls) != 3:
+        die("세 제휴사의 추적 URL이 중복됩니다.")
     session = requests.Session()
     session.auth = (user, password)
     session.headers.update(UA)
@@ -207,9 +213,10 @@ def main():
                     params={"context":"edit","_fields":"id,link,content,status"}).json()
                 check = verify.get("content",{}).get("raw","")
                 logo_assets_present = all(asset in check for asset in LOGOS.values())
+                partner_urls_present = all(url in check for url in partner_urls)
                 card_count = check.count('class="london-coupang-card"')
-                if START not in check or END not in check or HEADER_START not in check or HEADER_END not in check or not logo_assets_present or card_count != 10 or len(expected) != 10 or not all(check.count(url) >= 2 for url in expected):
-                    report["errors"].append({"id":pid,"reason":"REST read-back verification failed: footer markers, three logos, or exactly ten cards missing","expected_products":len(expected),"actual_cards":card_count,"logo_assets_present":logo_assets_present})
+                if START not in check or END not in check or HEADER_START not in check or HEADER_END not in check or not logo_assets_present or not partner_urls_present or card_count != 10 or len(expected) != 10 or not all(check.count(url) >= 2 for url in expected):
+                    report["errors"].append({"id":pid,"reason":"REST read-back verification failed: footer markers, three logos, or exactly ten cards missing","expected_products":len(expected),"actual_cards":card_count,"logo_assets_present":logo_assets_present,"partner_urls_present":partner_urls_present})
                     continue
                 public = wp_request(session,"GET",SITE + "/wp-json/wp/v2/posts/" + str(pid),
                     params={"_fields":"id,link,content,status"}).json()
