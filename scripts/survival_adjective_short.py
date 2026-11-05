@@ -374,18 +374,22 @@ async def build_language(target_date: dt.date, pair: dict, code: str, channel: d
     duration = ffprobe_duration(output)
     if not 22 <= duration <= 48:
         raise RuntimeError(f"Unexpected randomized Short duration for {code}: {duration}")
-    if category == "noun":
-        glosses = meanings if code == "en" else pair["en"]
-        title = f"{words[0]} ({readings[0]}) • {words[1]} ({readings[1]}) | {glosses[0]} • {glosses[1]} #Shorts"
+    # Curriculum is now CEFR B1-B2. Include the level and lesson meaning in
+    # the title so the channel is positioned as structured intermediate learning,
+    # not isolated beginner word drills.
+    level = pair.get("level", "B1-B2")
+    if code == "en":
+        title = f"{level} Vocabulary: {words[0]} vs {words[1]} | Meaning & Pronunciation #Shorts"
     elif code in {"ko", "ja", "zh"}:
-        title = f"{words[0]} ({readings[0]}) vs {words[1]} ({readings[1]}) | {pair['en'][0]} vs {pair['en'][1]} #Shorts"
+        title = f"{level} 어휘: {words[0]} vs {words[1]} | {pair['en'][0]} vs {pair['en'][1]} #Shorts"
     else:
-        title = f"{words[0]} vs {words[1]} | Listen & Repeat 5x #Shorts"
+        title = f"Vocabulario {level}: {words[0]} vs {words[1]} | Meaning & Pronunciation #Shorts"
     manifest = {
         "date": target_date.isoformat(),
         "language_code": code,
         "language_label": profile.label,
         "pair_id": pair["id"],
+        "level": level,
         "category": category,
         "words": words,
         "pronunciations": readings,
@@ -407,10 +411,11 @@ async def build_language(target_date: dt.date, pair: dict, code: str, channel: d
         "content_key": f"{code}:{pair['id']}",
         "description": (
             f"{words[0]} ({readings[0]}) means {meanings[0]}; {words[1]} ({readings[1]}) means {meanings[1]}. "
-            f"Short {category} pronunciation practice: listen, pause, and repeat each word aloud. "
-            f"Lesson ID: {pair['id']} | Content key: {code}:{pair['id']}. #languagelearning #Shorts"
+            f"CEFR {level} vocabulary practice: learn the nuance, meaning, and pronunciation of both words. "
+            f"Listen, pause, and repeat each word aloud. Lesson ID: {pair['id']} | "
+            f"Content key: {code}:{pair['id']}. #languagelearning #B1B2 #Shorts"
         ),
-        "tags": ["language learning", "pronunciation", "listen and repeat", pair["id"], f"lesson-{pair['id']}", f"content-{code}-{pair['id']}", "Shorts"],
+        "tags": ["B1 B2 vocabulary", "intermediate language learning", "pronunciation", "listen and repeat", pair["id"], f"lesson-{pair['id']}", f"content-{code}-{pair['id']}", "Shorts"],
         "publication_status": "generated_not_uploaded",
     }
     manifest_path = destination / "manifest.json"
