@@ -1,5 +1,6 @@
 import datetime as dt
 import json
+import pytest
 from pathlib import Path
 
 from scripts.survival_adjective_short import LANGUAGES, PAIR_PATH, channel_map, pronunciation, select_pair
@@ -24,15 +25,12 @@ def test_catalog_has_a_full_month_of_localized_pairs():
         assert all(len(pair[code]) == 2 and all(pair[code]) for code in LANGUAGES)
 
 
-def test_first_day_is_the_requested_long_short_example():
-    pair = select_pair(dt.date(2026, 10, 1), "long-short")
-    assert pair["id"] == "long-short"
-    assert pair["ko"] == ["길다", "짧다"]
-    assert pair["en"] == ["long", "short"]
-    assert pronunciation(pair, "ko", "길다") == "gil-da"
-    assert pronunciation(pair, "ko", "짧다") == "jjal-tta"
-    assert pronunciation(pair, "ja", "長い") == "na-ga-i"
-    assert pronunciation(pair, "zh", "长") == "cháng"
+def test_current_intermediate_curriculum_pair_is_localized():
+    pair = select_pair(dt.date(2026, 11, 6), "reluctant-eager")
+    assert pair["id"] == "reluctant-eager"
+    assert pair["ko"] == ["꺼리는", "열망하는"]
+    assert pair["en"] == ["reluctant", "eager"]
+    assert pair["vi"] == ["miễn cưỡng", "háo hức"]
 
 
 def test_randomized_timing_never_intentionally_targets_29_seconds():
@@ -62,7 +60,7 @@ def test_builder_refuses_unsafe_date_based_pair_rotation():
 
 
 def test_builder_refuses_retired_noun_pairs_even_when_explicitly_requested():
-    with pytest.raises(RuntimeError, match="Retired noun lesson"):
+    with pytest.raises(ValueError, match="Unknown or retired pair id"):
         select_pair(dt.date(2026, 11, 6), "book-phone")
 
 def test_history_selector_catches_legacy_vietnamese_book_phone_metadata():
