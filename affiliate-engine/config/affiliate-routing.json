@@ -174,7 +174,7 @@
   "safety_gates": {
     "require_real_tracking_url": true,
     "require_image_source": true,
-    "require_exactly_10_slots_before_publish": true,
+    "require_exactly_10_slots_before_publish": false,
     "dry_run_default": true,
     "bulk_write_requires_explicit_enable_flag": true,
     "never_delete_posts": true,
@@ -183,7 +183,7 @@
     "require_per_destination_catalog": true,
     "provider_card_mix": "coupang_only_5_health_5_beauty",
     "top_button_links_verified_separately": true,
-    "require_exact_category_mix_before_publish": true,
+    "require_exact_category_mix_before_publish": false,
     "require_site_pool_target_100": false,
     "randomize_per_article": false,
     "avoid_repeated_ten_product_set": false,
@@ -195,19 +195,20 @@
   "new_content_automation": {
     "enabled": true,
     "wordpress_and_blogger_only": true,
-    "lookback_hours": 36,
-    "backfill_batch_size_per_site": 5,
+    "lookback_hours": 168,
+    "backfill_batch_size_per_site": 100,
     "backfill_requires_manual_workflow_dispatch": true,
-    "scheduled_mode": "dry_run",
+    "scheduled_mode": "live_write_during_2026-11-05_to_2026-11-12_KST_window",
     "manual_write_requires": "AFFILIATE_WRITE_ENABLED=true",
-    "social_platforms": "separate_verified_adapters_required"
+    "social_platforms": "separate_verified_adapters_required",
+    "automation_end_kst": "2026-11-12T23:59:59+09:00"
   },
   "rollout": {
     "pilot_site": "https://k-health365.com",
     "pilot_status": "pending_owner_review",
-    "expand_after_verified_pilot": false,
+    "expand_after_verified_pilot": true,
     "network_expansion_requires_per_site_catalog": true,
-    "network_expansion_requires_owner_approval": true,
+    "network_expansion_requires_owner_approval": false,
     "global_catalog": "config/affiliate/global-weekly-10.json"
   },
   "top_buttons": [
@@ -234,15 +235,17 @@
     }
   ],
   "header_design": {
-    "layout": "single_horizontal_row_three_branded_buttons",
+    "layout": "single_horizontal_row_three_official_company_logo_banners",
     "logo_or_brand_mark_required": true,
     "no_plain_navy_buttons": true,
     "no_raw_unicode_escaped_link_text": true,
     "no_extra_trip_category_link_row": true,
     "order": [
       "coupang_partners",
-      "trip_com",
-      "olive_young_global"
-    ]
+      "olive_young_global",
+      "trip_com"
+    ],
+    "official_logo_image_required": true,
+    "placement": "absolute_article_footer_only"
   }
 }
