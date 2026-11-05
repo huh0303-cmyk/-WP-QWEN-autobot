@@ -22,8 +22,8 @@ The user described the first category as health functional foods. The system may
 
 At the top of eligible blog articles, show three branded partner banners in this exact order:
 1. Coupang Partners
-2. Trip.com
-3. OLIVE YOUNG
+2. OLIVE YOUNG
+3. Trip.com
 
 Each banner must use its own authorized affiliate tracking URL and official/authorized brand asset. These are header links only and are not counted among the ten product cards. Do not add Trip.com category text links underneath unless separately approved.
 
