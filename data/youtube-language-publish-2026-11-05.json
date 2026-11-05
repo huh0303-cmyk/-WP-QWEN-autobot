@@ -1,0 +1,198 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-05",
+  "project": "London Project / Ten-language Intermediate Vocabulary",
+  "curriculum": {
+    "level": "CEFR B1-B2",
+    "catalog": "config/survival_adjective_pairs.json",
+    "catalog_version": 2,
+    "pair_count": 25,
+    "format": "one adjective contrast pair per Short; five listen-and-repeat rounds",
+    "tts": "Fish Audio S2.1 Pro Free"
+  },
+  "duplicate_cleanup": {
+    "workflow_run_id": "42048011059",
+    "videos_scanned": 1820,
+    "duplicates_set_private": 52,
+    "verification": "all 52 videos read back as privacyStatus=private",
+    "deletion_count": 0,
+    "by_language": {
+      "ko": {
+        "scanned": 1452,
+        "private": 0
+      },
+      "en": {
+        "scanned": 57,
+        "private": 7
+      },
+      "ja": {
+        "scanned": 147,
+        "private": 2
+      },
+      "zh": {
+        "scanned": 29,
+        "private": 12
+      },
+      "vi": {
+        "scanned": 25,
+        "private": 7
+      },
+      "es": {
+        "scanned": 24,
+        "private": 7
+      },
+      "fr": {
+        "scanned": 24,
+        "private": 5
+      },
+      "de": {
+        "scanned": 23,
+        "private": 7
+      },
+      "it": {
+        "scanned": 16,
+        "private": 1
+      },
+      "pt": {
+        "scanned": 23,
+        "private": 4
+      }
+    }
+  },
+  "publication_runs": {
+    "nine_languages": "42049463413",
+    "english": "42049526468"
+  },
+  "receipts": [
+    {
+      "language_code": "ko",
+      "channel_id": "UCdA24IuR-JE7qButWv5jLqA",
+      "video_id": "08EwAToQMN4",
+      "url": "https://www.youtube.com/shorts/08EwAToQMN4",
+      "pair_id": "reluctant-eager",
+      "words": [
+        "꺼리는",
+        "열망하는"
+      ],
+      "tts_engine": "Fish Audio S2.1 Pro Free",
+      "privacy_status": "public"
+    },
+    {
+      "language_code": "ja",
+      "channel_id": "UCOWoNH_d6p45ywQ6W0Z1Jng",
+      "video_id": "S97r_a48pQU",
+      "url": "https://www.youtube.com/shorts/S97r_a48pQU",
+      "pair_id": "reluctant-eager",
+      "words": [
+        "気が進まない",
+        "意欲的な"
+      ],
+      "tts_engine": "Fish Audio S2.1 Pro Free",
+      "privacy_status": "public"
+    },
+    {
+      "language_code": "zh",
+      "channel_id": "UCGTd7RhfaUaGGbVRsNPUN6Q",
+      "video_id": "vImlalEK7WQ",
+      "url": "https://www.youtube.com/shorts/vImlalEK7WQ",
+      "pair_id": "reluctant-eager",
+      "words": [
+        "不情愿的",
+        "热切的"
+      ],
+      "tts_engine": "Fish Audio S2.1 Pro Free",
+      "privacy_status": "public"
+    },
+    {
+      "language_code": "vi",
+      "channel_id": "UCRZ0uc_bxKDMwz3noBBi9KQ",
+      "video_id": "G2xT-bcFY2Y",
+      "url": "https://www.youtube.com/shorts/G2xT-bcFY2Y",
+      "pair_id": "reluctant-eager",
+      "words": [
+        "miễn cưỡng",
+        "háo hức"
+      ],
+      "tts_engine": "Fish Audio S2.1 Pro Free",
+      "privacy_status": "public"
+    },
+    {
+      "language_code": "es",
+      "channel_id": "UC9mvVEdL9Tllkit5v2Qv8UQ",
+      "video_id": "l8ra-WcjOlo",
+      "url": "https://www.youtube.com/shorts/l8ra-WcjOlo",
+      "pair_id": "reluctant-eager",
+      "words": [
+        "reacio",
+        "entusiasmado"
+      ],
+      "tts_engine": "Fish Audio S2.1 Pro Free",
+      "privacy_status": "public"
+    },
+    {
+      "language_code": "fr",
+      "channel_id": "UCmt8f9yUT6iTxBys8eH4-Cg",
+      "video_id": "h8gFr9Qii0c",
+      "url": "https://www.youtube.com/shorts/h8gFr9Qii0c",
+      "pair_id": "reluctant-eager",
+      "words": [
+        "réticent",
+        "enthousiaste"
+      ],
+      "tts_engine": "Fish Audio S2.1 Pro Free",
+      "privacy_status": "public"
+    },
+    {
+      "language_code": "de",
+      "channel_id": "UCKF98zgzm7YRWlyMaoJJKIQ",
+      "video_id": "sfO8R6JE8kE",
+      "url": "https://www.youtube.com/shorts/sfO8R6JE8kE",
+      "pair_id": "reluctant-eager",
+      "words": [
+        "widerwillig",
+        "eifrig"
+      ],
+      "tts_engine": "Fish Audio S2.1 Pro Free",
+      "privacy_status": "public"
+    },
+    {
+      "language_code": "it",
+      "channel_id": "UCK8B-BM09Cz-ockaQYLL5LA",
+      "video_id": "CwUyDmILsGM",
+      "url": "https://www.youtube.com/shorts/CwUyDmILsGM",
+      "pair_id": "reluctant-eager",
+      "words": [
+        "riluttante",
+        "entusiasta"
+      ],
+      "tts_engine": "Fish Audio S2.1 Pro Free",
+      "privacy_status": "public"
+    },
+    {
+      "language_code": "pt",
+      "channel_id": "UCKvKhETLGPaRV3qfWv2bM2g",
+      "video_id": "PZxLYjDrXxo",
+      "url": "https://www.youtube.com/shorts/PZxLYjDrXxo",
+      "pair_id": "reluctant-eager",
+      "words": [
+        "relutante",
+        "entusiasmado"
+      ],
+      "tts_engine": "Fish Audio S2.1 Pro Free",
+      "privacy_status": "public"
+    },
+    {
+      "language_code": "en",
+      "channel_id": "UCrjkKWMHzAAvpLIFgHnwcWg",
+      "video_id": "7v53fja7ogQ",
+      "url": "https://www.youtube.com/shorts/7v53fja7ogQ",
+      "pair_id": "scarce-abundant",
+      "words": [
+        "scarce",
+        "abundant"
+      ],
+      "tts_engine": "Fish Audio S2.1 Pro Free",
+      "privacy_status": "public"
+    }
+  ]
+}
