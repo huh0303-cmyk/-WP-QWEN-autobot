@@ -70,7 +70,9 @@ base.PEXELS_API_KEY = None
 base.PIXABAY_API_KEY = None
 base.GEMINI_API_KEY = None
 base.AI_IMAGE_COUNT = 1
-base.INTRO_CLIP_COUNT = 1
+# Narration-first: never prepend silent intro clips before Japanese health narration.
+base.INTRO_CLIP_COUNT = 0
+base.INTRO_CLIP_DURATION_SEC = 0.0
 base._fetch_from_pexels = _blocked_stock
 base._fetch_from_pixabay = _blocked_stock
 base._generate_ai_image = _approved_generate
