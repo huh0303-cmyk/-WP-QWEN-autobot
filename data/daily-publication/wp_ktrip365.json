@@ -1,1 +1,1 @@
-{"day": "2026-11-04", "status": "PUBLISHED", "public_url": "https://k-trip365.com/seoul-metropolitan-public-transit-routes-and-daily-cultural-sightseeing-itinerary/", "published_at": "2026-11-03T19:05:39Z"}
+{"day": "2026-11-05", "status": "CLAIMED", "attempts": 1, "claim": "daily-2026-11-05-wp_ktrip365-1fcb0bd1", "claimed_at": "2026-11-05T22:03:37.136939+09:00", "run_id": null, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
