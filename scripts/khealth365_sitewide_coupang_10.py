@@ -55,11 +55,14 @@ def load_products():
             p["image_url"] = image_from_affiliate(p["url"])
         if not p["image_url"].startswith("https://"):
             die("이미지 URL 검증 실패: " + p["id"])
-        check = requests.get(p["image_url"], headers=UA, timeout=25, stream=True)
-        ctype = check.headers.get("Content-Type", "").lower()
-        check.close()
-        if not check.ok or not ctype.startswith("image/"):
-            die("상품 이미지 응답 검증 실패: " + p["id"])
+        # Existing image URLs are treated as locked assets. Only missing images
+        # are resolved once from the account's own affiliate destination.
+        if "coupangcdn.com" not in urlparse(p["image_url"]).netloc.lower():
+            die("공식 쿠팡 이미지 호스트가 아닙니다: " + p["id"])
+    image_urls = [p["image_url"] for p in items]
+    if len(set(image_urls)) != 10:
+        die("고정 상품 10개의 대표 이미지가 중복됩니다.")
+    CATALOG.write_text(json.dumps(items, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
     return items
 
 def render_block(products):
@@ -110,6 +113,9 @@ def main():
     password = os.getenv("KHEALTH365_WP_APP_PASSWORD", "").strip()
     if not user or not password:
         die("GitHub Secrets KHEALTH365_WP_USER / KHEALTH365_WP_APP_PASSWORD 필요")
+    # Resolve and persist any missing official product images once. Subsequent
+    # runs reuse the same ten products and saved image URLs without reselection.
+    load_products()
     session = requests.Session()
     session.auth = (user, password)
     session.headers.update(UA)
