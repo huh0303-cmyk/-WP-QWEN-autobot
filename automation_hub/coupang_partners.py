@@ -247,7 +247,7 @@ def render_header(site_id=""):
         # Coupang's current brand guidelines prohibit using its logo as a hyperlink.
         # Keep the official logo visible and provide a separate tracked text link.
         if provider == "coupang_partners":
-            buttons.append(f'<div class="london-provider-button {provider}"><img src="{logo}" alt="Coupang" loading="lazy"><a href="{url}" target="_blank" rel="sponsored nofollow noopener">Visit Coupang</a></div>')
+            buttons.append(f'<span class="london-provider-button {provider}"><img src="{logo}" alt="Coupang" loading="lazy"><span class="london-coupang-link"><a href="{url}" target="_blank" rel="sponsored nofollow noopener">Visit Coupang</a></span></span>')
         else:
             buttons.append(f'<a class="london-provider-button {provider}" href="{url}" target="_blank" rel="sponsored nofollow noopener" aria-label="{label}"><img src="{logo}" alt="{label}" loading="lazy"></a>')
     return (HEADER_START
@@ -256,6 +256,7 @@ def render_header(site_id=""):
         '.london-provider-button{min-height:64px;display:flex;align-items:center;justify-content:center;gap:7px;padding:10px;border:1px solid #e5e7eb;border-radius:9px;background:#fff;text-decoration:none!important}'
         '.london-provider-button img{display:block;max-width:100%;width:auto;height:auto;max-height:34px;object-fit:contain}'
         '.london-provider-button.coupang_partners{flex-direction:column}.london-provider-button.coupang_partners img{max-width:125px;max-height:28px}'
+        '.london-provider-button.coupang_partners .london-coupang-link{display:block;font-size:11px;font-weight:700;color:#333;text-decoration:underline}'
         '.london-provider-button.coupang_partners a{font-size:11px;font-weight:700;color:#333;text-decoration:underline}'
         '@media(max-width:520px){.london-provider-buttons{gap:6px}.london-provider-button{min-height:56px;padding:7px}.london-provider-button img{max-height:27px}.london-provider-button.coupang_partners img{max-width:100px;max-height:23px}}</style>'
         + HEADER_END)
