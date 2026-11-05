@@ -1,16 +1,16 @@
 {
-  "checked_at_kst": "2026-11-03T12:27:00.628303+09:00",
+  "checked_at_kst": "2026-11-05T11:18:58.355119+09:00",
   "collection_status": "partial",
   "rows": [
     {
       "platform": "TikTok",
       "brand": "TOPIK",
-      "followers": 31000,
-      "formatted_followers": "31,000(증감 미확인)",
+      "followers": null,
+      "formatted_followers": "미집계(증감 미확인)",
       "delta": null,
       "delta_reason": "동일 마감 기준의 전일 스냅샷 미검증",
       "source": "공개 프로필 참고값; 공식 인사이트 아님",
-      "status": "조회 성공",
+      "status": "followerCount 파싱 실패(계정 없음/구조변경)",
       "period_views": "미집계(증감 미확인)"
     },
     {
@@ -71,8 +71,8 @@
     {
       "platform": "Instagram",
       "brand": "TOPIK",
-      "followers": 3476,
-      "formatted_followers": "3,476(증감 미확인)",
+      "followers": 3477,
+      "formatted_followers": "3,477(증감 미확인)",
       "delta": null,
       "delta_reason": "동일 마감 기준의 전일 스냅샷 미검증",
       "source": "공식 API",
