@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Issue a Blogger-only refresh token without replacing shared Drive OAuth.
+"""Issue a combined Drive + Blogger refresh token without adding GitHub secrets.
 
-This must be run interactively on the operator's local computer. The resulting
-file is stored below git-ignored ``.local/`` and token values are never printed.
+Accepts either a Google Desktop OAuth client JSON or a previous local OAuth
+token JSON containing client_id/client_secret. The resulting token stays in
+git-ignored .local/ and is scope-verified before it can replace a shared secret.
 """
 from __future__ import annotations
 
@@ -26,8 +27,19 @@ SCOPES = [
 def load_desktop_client(path: Path) -> dict:
     raw = json.loads(path.read_text(encoding="utf-8"))
     installed = raw.get("installed")
+    if not installed and raw.get("client_id") and raw.get("client_secret"):
+        # Reuse a previously authorized local client without reading its old
+        # refresh token. This is useful when the original Desktop client JSON
+        # was archived but its local OAuth credential file remains available.
+        installed = {
+            "client_id": raw["client_id"],
+            "client_secret": raw["client_secret"],
+            "auth_uri": raw.get("auth_uri", "https://accounts.google.com/o/oauth2/auth"),
+            "token_uri": raw.get("token_uri", "https://oauth2.googleapis.com/token"),
+            "redirect_uris": ["http://localhost"],
+        }
     if not installed or not installed.get("client_id") or not installed.get("client_secret"):
-        raise ValueError("'데스크톱 앱' 유형의 OAuth 클라이언트 JSON이 아닙니다.")
+        raise ValueError("OAuth client JSON or prior local OAuth credential file is required.")
     return installed
 
 
@@ -48,7 +60,7 @@ def main() -> int:
 
     from google_auth_oauthlib.flow import InstalledAppFlow
 
-    flow = InstalledAppFlow.from_client_secrets_file(str(source), SCOPES)
+    flow = InstalledAppFlow.from_client_config({"installed": installed}, SCOPES)
     credentials = flow.run_local_server(
         port=0,
         open_browser=True,
