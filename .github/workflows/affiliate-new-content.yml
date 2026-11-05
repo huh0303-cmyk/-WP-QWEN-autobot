@@ -16,7 +16,7 @@ on:
         type: choice
         options: [dry-run, write]
       scope:
-        description: New only or existing-post backfill (five posts per site per run)
+        description: New content or backfill; only verified footer blocks are appended
         required: true
         default: new
         type: choice
@@ -39,6 +39,7 @@ jobs:
       - run: pip install -r affiliate-engine/requirements.txt
       - name: Detect and process newly published content
         env:
+          AFFILIATE_AUTOMATION_END: '2026-11-12T23:59:59+09:00'
           WP_USER: ${{ secrets.WP_USER }}
           AFFILIATE_WRITE_ENABLED: ${{ secrets.AFFILIATE_WRITE_ENABLED }}
           KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
@@ -72,8 +73,16 @@ jobs:
           BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
           BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
         run: |
-          if [ "${{ inputs.mode || 'dry-run' }}" = "write" ]; then WRITE=--write; else WRITE=; fi
-          python affiliate-engine/runner.py --platform "${{ inputs.platform || 'all' }}" --scope "${{ inputs.scope || 'new' }}" --batch-size 5 $WRITE
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            if [ "$AFFILIATE_WRITE_ENABLED" = "true" ]; then WRITE=--write; else WRITE=; fi
+            PLATFORM=all
+            SCOPE=new
+          else
+            if [ "${{ inputs.mode || 'dry-run' }}" = "write" ]; then WRITE=--write; else WRITE=; fi
+            PLATFORM="${{ inputs.platform || 'all' }}"
+            SCOPE="${{ inputs.scope || 'new' }}"
+          fi
+          python affiliate-engine/runner.py --platform "$PLATFORM" --scope "$SCOPE" --since-hours 168 --batch-size 100 $WRITE
       - uses: actions/upload-artifact@v4
         if: always()
         with:
