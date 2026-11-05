@@ -89,3 +89,12 @@ A verified public reference is Cafe Music BGM channel's “Relaxing Jazz Music -
 - This is the canary run. Do not report a new video as published until the workflow records the exact channel ID, video ID, public URL, duration, thumbnail, and `privacyStatus=public`.
 - The global scheduler for all channels remains unchanged. A dedicated CAFE_ROMANTIC 2–3 day schedule should be activated only after this canary has a verified public receipt.
 - No other channel's cost-hold status or publishing schedule was changed.
+
+
+### 2026-11-06 calendar repair and active canary
+
+- Read-only calendar audit found 37 Globalmusic rows, but the newest existing row was dated 2026-10-23. There was no future `기획확정·자료준비` row, so `select_next_ready` correctly returned zero. The channel-control row also had a stale `next_run_at` of 2026-08-29 and `last_run_status=dispatched`.
+- Added one idempotent canary row only: `CAL-20261106-GLOBALMUSIC-01`, planned for 2026-11-06 20:17 KST, with a new French/Japanese topic. No historical calendar rows were deleted or overwritten.
+- The worker claimed this row and changed its status to `자료수집`. Read-only audit run `42055862714` confirmed the claim and worker run ID.
+- The first worker attempt `42052803008` stopped before build because no future calendar row existed; it did not publish a video.
+- The active canary run is `42054528245`. It passed the strict free-only cost-hold gate and is executing the selected channel. Do not mark publication complete until the worker returns a public YouTube URL and exact-channel receipt.
