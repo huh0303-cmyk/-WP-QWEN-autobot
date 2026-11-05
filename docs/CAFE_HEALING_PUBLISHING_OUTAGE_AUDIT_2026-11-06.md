@@ -28,5 +28,12 @@ A code review does not prove the GitHub Actions environment secrets exist or are
 4. The upload receipt reports the exact channel ID, video ID, PUBLIC privacy, duration, and watch URL.
 5. The GitHub Actions run completes successfully and the new video appears on @cafe_healing1.
 
+## Repair committed — 2026-11-06 KST
+- Added a narrowly scoped free-only CAFE HEALING exception to automation_hub/youtube_github_runtime.py. It requires the exact healing channel key, procedural free audio, direct Pexels footage, paid-provider keys absent, and the healing-only OAuth secret trio plus Sheets credentials.
+- Updated scripts/youtube_github_scheduler.py to identify the exact due channel key, optionally restrict to one channel, and enqueue only a due row with run_now=false. This prevents the scheduler's blank channel placeholder from defeating a channel-scoped free-only exception and prevents future rows from being pulled forward.
+- Added .github/workflows/cafe-healing-github-scheduler.yml. It polls hourly but dispatches only a due healing calendar row, installs FFmpeg/free runner libraries, disables paid generation providers, and stores sanitized receipts/logs as a workflow artifact.
+- Added/updated regression assertions in tests/test_github_only_routing.py.
+- Commits: 45334fa (strict healing-only exception), 66cda32 (exact channel due dispatch), 36b0024 (dedicated workflow), a72f75b (regression test), plus this audit record.
+ 
 ## Status
-Root-cause review completed from repository code and policy. No global cost gate was bypassed, no secrets were read, no video was uploaded, and no existing video was changed in this audit.
+Code changes are committed to main. The global YouTube cost-hold setting was not disabled, no secrets were read, and no existing video was changed. The workflow has not yet produced a verified run or a YouTube upload receipt in this task; therefore successful publication is not claimed. The next scheduled poll is at minute 17 UTC each hour and will publish only when a due healing calendar row exists and all credential/identity checks pass.
