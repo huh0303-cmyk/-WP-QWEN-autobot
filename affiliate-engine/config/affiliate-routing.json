@@ -128,7 +128,15 @@
     "require_unique_products_within_article": true,
     "fixed_ten_product_set_per_destination": false,
     "fixed_ten_product_set_per_week": true,
-    "shared_global_catalog_path": "config/affiliate/global-weekly-10.json"
+    "shared_global_catalog_path": "config/affiliate/global-weekly-10.json",
+    "footer_placement": "absolute_article_footer_only",
+    "official_logo_banner_order": [
+      "coupang_partners",
+      "olive_young_global",
+      "trip_com"
+    ],
+    "product_cards_position": "immediately_below_logo_banners",
+    "never_insert_at_top_or_inside_body": true
   },
   "publishing_policy": {
     "wordpress": {
@@ -211,16 +219,16 @@
       "tracking_url_required": true
     },
     {
-      "provider": "trip_com",
-      "label": "Trip.com",
-      "brand_color": "blue",
+      "provider": "olive_young_global",
+      "label": "OLIVE YOUNG",
+      "brand_color": "green",
       "required": true,
       "tracking_url_required": true
     },
     {
-      "provider": "olive_young_global",
-      "label": "OLIVE YOUNG",
-      "brand_color": "green",
+      "provider": "trip_com",
+      "label": "Trip.com",
+      "brand_color": "blue",
       "required": true,
       "tracking_url_required": true
     }
