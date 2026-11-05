@@ -49,20 +49,15 @@ def load_header_buttons(site_id=""):
         if not isinstance(data, dict):
             continue
         buttons = data.get("buttons", [])
-        required = ("coupang_partners", "olive_young_global", "trip_com")
-        if tuple(x.get("provider") for x in buttons) != required:
+        required = {"trip_com", "olive_young_global", "coupang_partners"}
+        if len(buttons) != 3 or {x.get("provider") for x in buttons} != required:
             continue
         if any(not str(x.get("affiliate_url", "")).startswith("https://") for x in buttons):
             continue
-        # Olive Young's account reward-code URL is retained as supplied, but its
-        # redirect/commission attribution is explicitly marked pending.
+        # Olive Young's supplied reward-code URL is accepted as a destination
+        # link while commission attribution remains explicitly pending.
         olive = next(x for x in buttons if x.get("provider") == "olive_young_global")
         if olive.get("status") != "redirect_test_failed_gate_url_null" and olive.get("verified") is not True:
-            continue
-        trip_categories = data.get("trip_com_categories", [])
-        if tuple(x.get("key") for x in trip_categories) != ("hotels", "flights", "tours_and_packages"):
-            continue
-        if any(x.get("verified") is not True or not str(x.get("affiliate_url", "")).startswith("https://") for x in trip_categories):
             continue
         return data
     return None
@@ -211,15 +206,13 @@ def render_footer(title, article_text, site_id="", lang="en"):
     if not header:
         raise RuntimeError(f"Affiliate header requires verified Coupang + Olive Young + Trip.com buttons and hotel/flight/tour tracking links for site={site_id}")
     provider_buttons = []
-    for button in header["buttons"]:
+    button_order = ("trip_com", "olive_young_global", "coupang_partners")
+    button_map = {item["provider"]: item for item in header["buttons"]}
+    for provider in button_order:
+        button = button_map[provider]
         url = html.escape(button["affiliate_url"], quote=True)
         label = html.escape(button["label"])
-        provider_buttons.append(f'<a class="london-provider-button" href="{url}" target="_blank" rel="sponsored nofollow noopener">{label}</a>')
-    trip_buttons = []
-    for item in header["trip_com_categories"]:
-        url = html.escape(item["affiliate_url"], quote=True)
-        label = html.escape(item["label"])
-        trip_buttons.append(f'<a class="london-trip-category-button" href="{url}" target="_blank" rel="sponsored nofollow noopener">Trip.com ? {label}</a>')
+        provider_buttons.append(f'<a class="london-provider-button {provider}" href="{url}" target="_blank" rel="sponsored nofollow noopener">{label}</a>')
     cards = []
     for p in products:
         url, image, name = (html.escape(p[k], quote=True) for k in ("url","image","title"))
@@ -228,16 +221,15 @@ def render_footer(title, article_text, site_id="", lang="en"):
             '<article class="london-coupang-card"><a class="london-coupang-image-link" href="' + url + '" target="_blank" rel="sponsored nofollow noopener">'
             '<img src="' + image + '" alt="' + name + '" loading="lazy" decoding="async" referrerpolicy="unsafe-url">'
             '</a><small class="london-coupang-category">' + category + '</small><strong>' + name + '</strong><a class="london-coupang-button" href="' + url
-            + '" target="_blank" rel="sponsored nofollow noopener">???? ????</a></article>'
+            + '" target="_blank" rel="sponsored nofollow noopener">쿠팡에서 상품 확인</a></article>'
         )
-    heading = "?? ?? ?? 10?" if lang == "ko" else "10 Coupang Picks"
+    heading = "함께 살펴볼 추천 상품 10선" if lang == "ko" else "10 Coupang Picks"
     return (START + '<section class="london-coupang-wrap" aria-label="Affiliate partners and Coupang products">'
         '<nav class="london-provider-buttons" aria-label="Affiliate partners">' + ''.join(provider_buttons) + '</nav>'
-        '<nav class="london-trip-category-buttons" aria-label="Trip.com travel categories">' + ''.join(trip_buttons) + '</nav>'
         '<style>.london-coupang-wrap{margin:30px 0;padding:18px;border:1px solid #e5e7eb;border-radius:12px}'
-        '.london-provider-buttons,.london-trip-category-buttons{display:flex;flex-wrap:wrap;gap:9px;margin:0 0 14px}'
-        '.london-provider-button{flex:1 1 28%;text-align:center;padding:12px 10px;border-radius:8px;background:#17365d;color:#fff!important;text-decoration:none;font-weight:700}'
-        '.london-trip-category-button{flex:1 1 28%;text-align:center;padding:9px 10px;border:1px solid #17365d;border-radius:7px;color:#17365d!important;text-decoration:none;font-size:13px;font-weight:600}'
+        '.london-provider-buttons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:0 0 18px}'
+        '.london-provider-button{display:block;text-align:center;padding:12px 8px;border-radius:8px;color:#fff!important;text-decoration:none;font-weight:700}'
+        '.london-provider-button.trip_com{background:#1769d2}.london-provider-button.olive_young_global{background:#168a43}.london-provider-button.coupang_partners{background:#e87518}'
         '.london-coupang-wrap h2{font-size:20px;margin:14px 0 10px}.london-coupang-disclosure{font-size:12px;color:#666;margin:0 0 14px}'
         '.london-coupang-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;align-items:stretch}'
         '.london-coupang-card{min-width:0;border:1px solid #e5e7eb;border-radius:10px;padding:10px;text-align:center;display:flex;flex-direction:column;background:#fff}'
@@ -292,8 +284,6 @@ def apply_footer(content, title, site_id="", lang="en"):
     content = _remove_legacy_single_product_modules(content or "")
     footer_source = content
     has_managed_block = any(old_start in content and old_end in content for old_start, old_end in LEGACY_MARKERS)
-    if not has_managed_block and ("link.coupang.com/" in content or "쿠팡 파트너스 활동의 일환" in content):
-        return content
     for old_start, old_end in LEGACY_MARKERS:
         a = footer_source.find(old_start)
         b = footer_source.find(old_end, a + len(old_start)) if a >= 0 else -1
@@ -312,7 +302,6 @@ def apply_footer(content, title, site_id="", lang="en"):
             if after.lstrip().startswith("</p>"):
                 after = after.lstrip()[4:]
             return before.rstrip() + "\n" + footer + "\n" + after.lstrip()
-    # Unknown legacy affiliate markup is preserved for explicit migration review.
-    if "link.coupang.com/" in content or "쿠팡 파트너스 활동의 일환" in content:
-        return content
+    # Preserve existing article and affiliate markup; append our managed,
+    # idempotent block rather than silently skipping the required ten cards.
     return content.rstrip() + ("\n" if content.strip() else "") + footer
