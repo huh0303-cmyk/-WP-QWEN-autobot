@@ -247,9 +247,49 @@ def render_footer(title, article_text, site_id="", lang="en"):
         '<h2>' + heading + '</h2><p class="london-coupang-disclosure">' + DISCLOSURE + '</p>'
         '<div class="london-coupang-grid">' + ''.join(cards) + '</div></section>' + END)
 
+def _remove_legacy_single_product_modules(content):
+    """Remove only known standalone affiliate-recommendation divs; keep article images."""
+    content = content or ""
+    tag_re = re.compile(r"</?div\\b[^>]*>", re.I | re.S)
+    offset = 0
+    while True:
+        start_tag = None
+        for match in tag_re.finditer(content, offset):
+            tag = match.group(0)
+            if tag.startswith("</"):
+                continue
+            class_match = re.search(r"""\\bclass\\s*=\\s*["']([^"']*)["']""", tag, re.I)
+            classes = set((class_match.group(1).split() if class_match else []))
+            if "affiliate-recommendation" in classes:
+                start_tag = match
+                break
+        if start_tag is None:
+            break
+        depth = 1
+        end_pos = None
+        for match in tag_re.finditer(content, start_tag.end()):
+            if match.group(0).startswith("</"):
+                depth -= 1
+                if depth == 0:
+                    end_pos = match.end()
+                    break
+            else:
+                depth += 1
+        if end_pos is None:
+            break
+        block = content[start_tag.start():end_pos]
+        # Require both an actual tracked Coupang destination and an image before
+        # treating this as the obsolete one-product affiliate module.
+        if "link.coupang.com/" in block and re.search(r"<img\\b", block, re.I):
+            content = content[:start_tag.start()] + content[end_pos:]
+            offset = start_tag.start()
+        else:
+            offset = end_pos
+    return content
+
 def apply_footer(content, title, site_id="", lang="en"):
     """Replace shared/K-Health legacy marker blocks or append once; never duplicate."""
-    content = content or ""
+    content = _remove_legacy_single_product_modules(content or "")
     footer_source = content
     for old_start, old_end in LEGACY_MARKERS:
         a = footer_source.find(old_start)
