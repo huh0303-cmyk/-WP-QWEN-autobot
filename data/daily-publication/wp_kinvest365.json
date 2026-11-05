@@ -1,1 +1,1 @@
-{"day": "2026-11-05", "status": "DISPATCHED", "attempts": 1, "claim": "daily-2026-11-05-wp_kinvest365-a74ca40a", "claimed_at": "2026-11-05T18:49:24.303751+09:00", "run_id": 42005594702, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-11-05", "status": "PUBLISHED", "public_url": "https://koreainvest365.com/south-korea-capital-market-governance-refines-valuation-standards-and-global-access-frameworks/", "published_at": "2026-11-05T09:55:29Z"}
