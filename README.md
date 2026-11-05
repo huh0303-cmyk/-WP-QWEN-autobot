@@ -71,23 +71,21 @@ python scripts/naver_blog_local_runner.py run --site-id naver_main --max-jobs 1
 - OpenAI 이미지 함수는 기존 환경변수 값과 관계없이 항상 차단
 - 현재 함께 만드는 유튜브 허브만 보유 원본·무료 공개자료를 사용할 수 있으며 AI 이미지 API는 금지
 
-## Blogger 최초 1회 준비
+## Blogger OAuth 최초 설정 및 갱신
 
-1. Google Cloud에서 Blogger API를 활성화합니다.
-2. 공용 Drive/Sheets refresh token을 덮어쓰지 말고, 데스크톱 OAuth JSON으로 Blogger 전용 토큰을 발급합니다.
+1. Google Cloud에서 Blogger API와 Google Drive API가 활성화되어 있는지 확인합니다.
+2. GitHub Secrets 한도 때문에 새 Secrets를 만들지 않습니다. 기존 Google Drive 권한을 보존하면서 Blogger 권한을 추가한 단일 OAuth 토큰을 발급합니다.
+3. 데스크톱 OAuth client JSON 또는 기존 로컬 OAuth 파일을 사용합니다.
 
    ```bash
    python scripts/setup_blogger_oauth_local.py /path/to/desktop-oauth-client.json
+   # 또는 기존 .local/blogger_oauth.json
    ```
 
-3. 생성된 `.local/blogger_oauth.json`의 값을 GitHub Secrets
-   `BLOGGER_GOOGLE_CLIENT_ID`, `BLOGGER_GOOGLE_CLIENT_SECRET`,
-   `BLOGGER_GOOGLE_REFRESH_TOKEN`에 각각 저장합니다. 토큰 값을 로그, 시트,
-   문서 또는 저장소에 붙여넣지 않습니다.
-4. `자동화_플랫폼계정`의 Blogger 행에서 `auth_profile=blogger`, blog ID,
-   `enabled=ON`을 확인합니다.
-5. 기존 ready 행 하나만 `publish_now=FALSE` 상태로 전송해 실제 Blogger
-   DRAFT ID와 편집 URL을 확인합니다. PUBLIC 전환은 별도 승인 없이는 금지합니다.
+4. 스크립트는 `drive`와 `blogger` scope를 실제 tokeninfo로 확인하고, Drive API·Control Room Sheets API·Blogger API 접근이 모두 성공해야 `.local/google_oauth_drive_blogger.json`을 생성합니다. 하나라도 실패하면 기존 GitHub Secrets를 변경하지 않습니다.
+5. 검증이 통과한 경우에만 기존 Secrets `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET`, `GOOGLE_OAUTH_REFRESH_TOKEN`의 값을 함께 갱신합니다. 새 Secret을 추가하지 않으며 토큰 값을 로그·시트·문서·저장소에 붙여넣지 않습니다.
+6. `verify-blogger-oauth.yml`을 실행해 등록된 Blogger 33개 ID 접근과 Blogger 쓰기 scope를 확인한 다음, 기존 발행 글 백필을 실행합니다.
+
 
 여러 Google 계정은 `auth_profile`을 예를 들어 `BRAND2`로 지정하고 `BRAND2_GOOGLE_CLIENT_ID`, `BRAND2_GOOGLE_CLIENT_SECRET`, `BRAND2_GOOGLE_REFRESH_TOKEN` 형태로 별도 secret을 연결할 수 있습니다. GitHub Actions에는 사용할 프로필 secret을 명시적으로 추가해야 합니다.
 
