@@ -94,6 +94,10 @@ def _playlist(env: dict[str, str], log_handle) -> str:
         shutil.rmtree(output)
     env.update(AUTO_TOPIC="false", TOPIC_KEYWORD=env["TOPIC"], LANGUAGE_KEYWORD=env.get("LANGUAGE", ""),
                PLAYLIST_VIDEO_GENERATION_ENABLED="true", ROOM_RESULT_SOURCE="artifacts/youtube_playlist_result.json")
+    if env["CHANNEL_KEY"] == "globalmusic":
+        # CAFE_ROMANTIC uses only owner-approved music and free Pexels photos.
+        # Never invoke paid Gemini image generation in this channel's playlist path.
+        env.update(PLAYLIST_IMAGE_SOURCE="pexels_api", PLAYLIST_PAID_API_ENABLED="false", GEMINI_API_KEY="")
     _run([sys.executable, "scripts/youtube_playlist_maker.py"], env, log_handle)
     meta = json.loads((output / "upload_meta.json").read_text(encoding="utf-8"))
     thumbnails = list(output.glob("thumbnail.*"))
