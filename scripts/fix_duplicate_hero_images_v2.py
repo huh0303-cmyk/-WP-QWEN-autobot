@@ -91,37 +91,44 @@ def _basename(url: str) -> str:
     return os.path.basename(urlparse(url).path)
 
 
-def strip_leading_duplicate_block(content: str, hero_url: str, hero_sha256: str = "") -> Optional[str]:
-    """If the content's first block is a <figure>...</figure> or a bare
-    <img ...> that embeds hero_url (exact URL or same filename), return the
-    content with that block removed. Otherwise return None (no match)."""
+def strip_leading_duplicate_block(content: str, hero_url: str, hero_sha256: str = "",
+                                  image_sha256_fn=None) -> Optional[str]:
+    """Remove only the first image block when it is the featured image.
+
+    Supports figure, paragraph-wrapped img, and bare img markup. Match by
+    exact URL, basename, or SHA-256 bytes (including rehosted Pexels files).
+    Never searches or removes images later in the article.
+    """
     stripped = content.lstrip()
-
-    if stripped.startswith("<figure"):
-        end = stripped.find("</figure>")
-        if end == -1:
-            return None
-        end += len("</figure>")
-        block = stripped[:end]
-        rest = stripped[end:]
-    elif stripped.startswith("<img"):
-        end = stripped.find(">")
-        if end == -1:
-            return None
-        end += 1
-        block = stripped[:end]
-        rest = stripped[end:]
-    else:
+    patterns = (
+        r"^(<figure\\b[^>]*>.*?</figure>\\s*)",
+        r"^(<p\\b[^>]*>\\s*<img\\b[^>]*>\\s*</p>\\s*)",
+        r"^(<img\\b[^>]*>\\s*)",
+    )
+    match = None
+    for pattern in patterns:
+        match = re.match(pattern, stripped, flags=re.IGNORECASE | re.DOTALL)
+        if match:
+            break
+    if not match:
         return None
 
-    m = re.search(r'src="([^"]+)"', block)
-    if not m:
+    block = match.group(1)
+    image = re.search(r"<img\\b[^>]*>", block, flags=re.IGNORECASE | re.DOTALL)
+    if not image:
         return None
-    img_src = m.group(1)
-
-    if img_src == hero_url or _basename(img_src) == _basename(hero_url):
-        return rest.lstrip("\n").lstrip()
-    return None
+    src = re.search(r"""\\bsrc\\s*=\\s*(['"])(.*?)\\1""", image.group(0),
+                    flags=re.IGNORECASE | re.DOTALL)
+    if not src:
+        return None
+    img_src = src.group(2)
+    same = img_src == hero_url or _basename(img_src) == _basename(hero_url)
+    if not same and hero_sha256 and image_sha256_fn:
+        candidate_sha = image_sha256_fn(img_src)
+        same = bool(candidate_sha and candidate_sha == hero_sha256)
+    if not same:
+        return None
+    return stripped[match.end():].lstrip("\\n").lstrip()
 
 
 def fix_site(site: dict) -> dict:
@@ -215,7 +222,7 @@ def fix_site(site: dict) -> dict:
                 continue
 
             hero_sha256 = image_sha256(hero_url)
-            new_content = strip_leading_duplicate_block(content, hero_url, hero_sha256)
+            new_content = strip_leading_duplicate_block(content, hero_url, hero_sha256, image_sha256)
             if new_content is None:
                 stats["skipped"] += 1
                 continue
