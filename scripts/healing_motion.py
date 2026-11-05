@@ -256,7 +256,7 @@ def render():
            "-b:v", "2200k", "-maxrate", "2600k", "-bufsize", "5200k",
            "-pix_fmt", "yuv420p", work / "scene.mp4")
 
-    audio_path = work / "ambience.mp3"
+    audio_path = work / ("ambience.mp3" if MODE == "birds" else "ambience.wav")
     if MODE == "birds":
         if not BIRD_ASSET.is_file():
             raise RuntimeError("The bundled CC0 forest-bird recording is missing")
@@ -293,7 +293,7 @@ def render():
            "-filter_complex", f"[1:a]loudnorm=I=-25:TP=-3:LRA=8,{tail}[a]",
            "-map", "0:v", "-map", "[a]", "-t", job.DURATION,
            "-c:v", "copy", "-c:a", "aac", "-b:a", "192k",
-           "-movflags", "+faststart", work / "healing-ambience.mp4")
+           "-movflags", "+faststart", work / "rain-75.mp4")
 
     seconds = float(subprocess.check_output([
         "ffprobe", "-v", "error", "-show_entries", "format=duration",
