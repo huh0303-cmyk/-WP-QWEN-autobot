@@ -13,7 +13,7 @@
       "subscriber_count_snapshot": 11,
       "video_count_snapshot": 38,
       "secret_profile": "GLOBALMUSIC",
-      "workflow": "youtube-github-worker.yml",
+      "workflow": "generate-youtube-playlist.yml",
       "enabled": true,
       "interval_days_min": 2,
       "interval_days_max": 3,
