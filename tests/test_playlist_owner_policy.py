@@ -23,3 +23,10 @@ def test_every_channel_has_complete_english_metadata():
 def test_metadata_rejects_short_description():
     with pytest.raises(ValueError):
         validate_metadata('Nice evening', 'Two lines are not enough.')
+
+def test_metadata_description_length_with_long_topics():
+    topic = "French and Japanese Love Songs for a Quiet Cafe Evening | Romantic Acoustic Playlist"
+    for channel in ['globalmusic', 'healing', 'kpop', 'mbb', 'starbucks']:
+        title, description, _, _ = playlist_metadata(channel, topic, 70)
+        validate_metadata(title, description)
+        assert 800 <= len(description) <= 1200
