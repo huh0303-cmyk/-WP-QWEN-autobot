@@ -1,102 +1,122 @@
 [
   {
-    "id": "lactofit-gold-80",
+    "id": "beauty-anua-toner",
+    "title": "아누아 어성초 77 히알루론산 수분 진정 토너, 150ml",
+    "url": "https://link.coupang.com/a/iiO2E6sxGu",
+    "image_url": "https://image11.coupangcdn.com/image/affiliate/banner/3e189473b60c5c95fd330b5678250529@2x.jpg",
+    "category": "beauty",
+    "display_title_en": "Anua Heartleaf 77 Soothing Toner",
+    "description_en": "A calming daily toner with heartleaf for a balanced skincare routine.",
+    "affiliate_confirmed": true,
+    "enabled": true,
+    "source": "authenticated_coupang_partners_generated_blog_tag",
+    "candidate_id": "oy01"
+  },
+  {
+    "id": "beauty-torriden-toner",
+    "title": "토리든 다이브인 저분자 히알루론산 토너, 300ml",
+    "url": "https://link.coupang.com/a/iiO3zaJdIW",
+    "image_url": "https://image2.coupangcdn.com/image/affiliate/banner/1e56c94b7b7566443e5360942b58664a@2x.jpg",
+    "category": "beauty",
+    "display_title_en": "Torriden Dive-In Hyaluronic Acid Toner",
+    "description_en": "A hydrating toner for a fresh, moisture-focused routine.",
+    "affiliate_confirmed": true,
+    "enabled": true,
+    "source": "authenticated_coupang_partners_generated_blog_tag",
+    "candidate_id": "oy02"
+  },
+  {
+    "id": "beauty-roundlab-moisturizer",
+    "title": "라운드랩 자작나무 수분크림 기획세트, 120ml",
+    "url": "https://link.coupang.com/a/iiO4sWYZmC",
+    "image_url": "https://image4.coupangcdn.com/image/affiliate/banner/0a932a3704794bc394e604276b7314f0@2x.jpg",
+    "category": "beauty",
+    "display_title_en": "Round Lab Birch Juice Moisturizing Cream Set",
+    "description_en": "A daily moisturizing cream set for comfortable, hydrated skin.",
+    "affiliate_confirmed": true,
+    "enabled": true,
+    "source": "authenticated_coupang_partners_generated_blog_tag",
+    "candidate_id": "oy03"
+  },
+  {
+    "id": "beauty-joseon-sunscreen",
+    "title": "조선미녀 맑은쌀 선크림 SPF50+, 50ml",
+    "url": "https://link.coupang.com/a/iiO5mGbPk4",
+    "image_url": "https://image15.coupangcdn.com/image/affiliate/banner/2d3eacaebca64758a0666bb66b6d00f1@2x.jpg",
+    "category": "beauty",
+    "display_title_en": "Beauty of Joseon Relief Sun SPF50+",
+    "description_en": "A lightweight daily sunscreen for broad-spectrum UV protection.",
+    "affiliate_confirmed": true,
+    "enabled": true,
+    "source": "authenticated_coupang_partners_generated_blog_tag",
+    "candidate_id": "oy04"
+  },
+  {
+    "id": "beauty-cosrx-essence",
+    "title": "코스알엑스 어드벤스드 스네일 래디언스 듀얼 에센스, 80ml",
+    "url": "https://link.coupang.com/a/iiO6gxBTK8",
+    "image_url": "https://image12.coupangcdn.com/image/affiliate/banner/72ad45e90fb6a4f7ce45830754b84e6c@2x.jpg",
+    "category": "beauty",
+    "display_title_en": "COSRX Snail Radiance Dual Essence",
+    "description_en": "A dual-texture essence for a hydrated, radiant-looking complexion.",
+    "affiliate_confirmed": true,
+    "enabled": true,
+    "source": "authenticated_coupang_partners_generated_blog_tag",
+    "candidate_id": "oy05"
+  },
+  {
+    "id": "health-lactofit-gold-80",
     "title": "락토핏 정품 골드 80포",
     "url": "https://link.coupang.com/a/ih2ZTHJN24",
     "image_url": "https://image5.coupangcdn.com/image/affiliate/banner/cca43bfaafc74c7cfbe0f222ddb13a67@2x.jpg",
-    "enabled": true,
-    "affiliate_confirmed": true,
+    "category": "health",
     "display_title_en": "Lacto-Fit Gold Probiotic Powder, 80 Sticks",
-    "description_en": "A daily probiotic supplement in single-serve sticks. Review the strain information, ingredients, and suggested use on the label."
+    "description_en": "A daily probiotic supplement in single-serve sticks. Review the strain information, ingredients, and suggested use on the label.",
+    "affiliate_confirmed": true,
+    "enabled": true
   },
   {
-    "id": "pure-omega3-vitd",
+    "id": "health-omega3-vitd",
     "title": "순수식품 rTG 오메가3 비타민D",
     "url": "https://link.coupang.com/a/ih3OY0Mk8a",
     "image_url": "https://img4c.coupangcdn.com/image/affiliate/banner/ba4f6d538ce239e7666b0abba59a17b9@2x.jpg",
-    "enabled": true,
-    "affiliate_confirmed": true,
+    "category": "health",
     "display_title_en": "RTG Omega-3 with Vitamin D",
-    "description_en": "An omega-3 supplement combined with vitamin D. Check the EPA/DHA amounts, ingredients, and suitability before use."
+    "description_en": "An omega-3 supplement combined with vitamin D. Check the EPA/DHA amounts, ingredients, and suitability before use.",
+    "affiliate_confirmed": true,
+    "enabled": true
   },
   {
-    "id": "nutrione-lutein-zeaxanthin",
+    "id": "health-lutein-zeaxanthin",
     "title": "뉴트리원 루테인 지아잔틴 164",
     "url": "https://link.coupang.com/a/ih25YWz9lQ",
     "image_url": "https://img1a.coupangcdn.com/image/affiliate/banner/8b632b89b0445bc5496b817fe50eadd4@2x.jpg",
-    "enabled": true,
-    "affiliate_confirmed": true,
+    "category": "health",
     "display_title_en": "Lutein and Zeaxanthin 164",
-    "description_en": "A lutein and zeaxanthin supplement formulated for eye-health nutrition. Review the ingredient amounts and directions."
+    "description_en": "A lutein and zeaxanthin supplement. Review ingredient amounts and directions.",
+    "affiliate_confirmed": true,
+    "enabled": true
   },
   {
-    "id": "hair-collagen-3270",
+    "id": "health-collagen-3270",
     "title": "모발 콜라겐 3270",
     "url": "https://link.coupang.com/a/ih3bfDbgPt",
     "image_url": "https://img4c.coupangcdn.com/image/affiliate/banner/c5a95ba6e0bac93f844593df5cfb92ab@2x.jpg",
-    "enabled": true,
-    "affiliate_confirmed": true,
+    "category": "health",
     "display_title_en": "Collagen 3270 Supplement",
-    "description_en": "A collagen supplement option for a beauty and wellness routine. Check the collagen source, serving size, and ingredients."
-  },
-  {
-    "id": "jongkundang-promega-omega3",
-    "title": "종근당건강 프로메가 오메가3 트리플",
-    "url": "https://link.coupang.com/a/ih3TfGGsBo",
-    "image_url": "https://img2a.coupangcdn.com/image/affiliate/banner/9dfe892d59e000abb9df751f5a43c5c6@2x.jpg",
-    "enabled": true,
+    "description_en": "A collagen supplement option. Check the collagen source, serving size, and ingredients.",
     "affiliate_confirmed": true,
-    "display_title_en": "Jongkundang Promega Triple Omega-3",
-    "description_en": "An omega-3 supplement option. Compare the EPA/DHA content and follow the product label."
+    "enabled": true
   },
   {
-    "id": "cj-biocore-probiotic-500b",
+    "id": "health-cj-probiotic",
     "title": "CJ 바이오코어 500억 고함량 특허유산균",
     "url": "https://link.coupang.com/a/ih3Q2W2O04",
     "image_url": "https://image13.coupangcdn.com/image/affiliate/banner/3b889a9edd0130193399558d82e71213@2x.jpg",
-    "enabled": true,
-    "affiliate_confirmed": true,
+    "category": "health",
     "display_title_en": "CJ BioCore 500 Billion Probiotics",
-    "description_en": "A high-count probiotic product. Review the strains, storage instructions, and recommended serving."
-  },
-  {
-    "id": "chondroitin-1200",
-    "title": "관절엔 콘드로이친 1200",
-    "url": "https://link.coupang.com/a/ihKqEBmP48",
-    "image_url": "",
-    "enabled": true,
+    "description_en": "A high-count probiotic product. Review the strains, storage instructions, and recommended serving.",
     "affiliate_confirmed": true,
-    "display_title_en": "Chondroitin 1200 Joint Supplement",
-    "description_en": "A joint-health supplement option containing chondroitin. Check the ingredient list and consult a qualified professional if needed."
-  },
-  {
-    "id": "calcium-magnesium-k2",
-    "title": "고려은단 뼈건강 칼마디 K2",
-    "url": "https://link.coupang.com/a/ihPTujzeyy",
-    "image_url": "",
-    "enabled": true,
-    "affiliate_confirmed": true,
-    "display_title_en": "Calcium, Magnesium, Vitamin D and K2",
-    "description_en": "A combined mineral and vitamin supplement. Review nutrient amounts and check whether it fits your existing intake."
-  },
-  {
-    "id": "koreaeundan-multivitamin",
-    "title": "고려은단 멀티비타민 올인원",
-    "url": "https://link.coupang.com/a/ihPGNw5JzU",
-    "image_url": "",
-    "enabled": true,
-    "affiliate_confirmed": true,
-    "display_title_en": "Korea Eundan All-in-One Multivitamin",
-    "description_en": "A multivitamin and mineral option for daily nutrition. Follow the label and avoid doubling up with similar supplements."
-  },
-  {
-    "id": "yuhan-msm",
-    "title": "유한양행 식물성 MSM",
-    "url": "https://link.coupang.com/a/ihWmcAFZSK",
-    "image_url": "",
-    "enabled": true,
-    "affiliate_confirmed": true,
-    "display_title_en": "Plant-Based MSM Supplement",
-    "description_en": "A plant-based MSM product for a wellness routine. Check the source, serving size, and product directions."
+    "enabled": true
   }
 ]
