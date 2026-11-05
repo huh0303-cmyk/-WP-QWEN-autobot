@@ -24,6 +24,17 @@ def main():
     token = _access_token(profile)
     if not token:
         raise SystemExit("Blogger OAuth 자격증명이 없습니다.")
+    # Print granted scope names only; never log access or refresh token values.
+    scope_resp = requests.get(
+        "https://oauth2.googleapis.com/tokeninfo",
+        params={"access_token": token}, timeout=20,
+    )
+    if scope_resp.status_code == 200:
+        granted_scopes = set(scope_resp.json().get("scope", "").split())
+        print("OAuth scope names: " + ", ".join(sorted(granted_scopes)))
+        print("Blogger write scope: " + ("YES" if "https://www.googleapis.com/auth/blogger" in granted_scopes else "NO"))
+    else:
+        print(f"OAuth scope introspection unavailable: HTTP {scope_resp.status_code}")
     response = requests.get(
         "https://www.googleapis.com/blogger/v3/users/self/blogs",
         headers={"Authorization": f"Bearer {token}"}, timeout=30,
