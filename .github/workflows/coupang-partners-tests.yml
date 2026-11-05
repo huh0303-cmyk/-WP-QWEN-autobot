@@ -4,6 +4,7 @@ on:
     paths:
       - "automation_hub/coupang_partners.py"
       - "automation_hub/blogger_adapter.py"
+      - "scripts/backfill_coupang_all_existing_posts.py"
       - "scripts/autopost_mega.py"
       - "scripts/london_four_agent_pipeline.py"
       - "scripts/publish_blogger_33_now.py"
