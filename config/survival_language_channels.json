@@ -1,8 +1,8 @@
 {
   "version": 1,
   "project": "london-project",
-  "program": "10-Language Survival 50",
-  "lessons_per_language": 50,
+  "program": "10-Language Intermediate Vocabulary",
+  "lessons_per_language": 25,
   "completed_through_lesson": 2,
   "next_lesson": 3,
   "interval_days_min": 1,
@@ -117,5 +117,10 @@
     "daily_pair_catalog": "config/survival_adjective_pairs.json",
     "generator": "scripts/survival_adjective_short.py",
     "voice_failover": "fail_closed_never_replace_with_another_language_voice"
-  }
+  },
+  "current_curriculum_level": "CEFR B1-B2",
+  "curriculum_version": 2,
+  "daily_format": "one reviewed B1-B2 adjective contrast pair per vertical Short; native-locale Fish Audio voice, Latin pronunciation guide where applicable, concise English meaning, five listen-and-repeat rounds; no generic praise outro; do not repeat any previously used pair on the same channel",
+  "daily_pair_catalog": "config/survival_adjective_pairs.json",
+  "quality_gate": "full uploads history duplicate-pair scan; exact channel ID verification; block generation if the selected pair is already present"
 }
