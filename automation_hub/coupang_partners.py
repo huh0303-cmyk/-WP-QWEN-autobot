@@ -15,9 +15,9 @@ LEGACY_MARKERS = ((START, END), ("<!-- KHEALTH365-COUPANG-START -->", "<!-- KHEA
 DISCLOSURE = "This post contains Coupang Partners affiliate links. If you visit Coupang through one of these links and make a purchase within 24 hours, including a purchase of another eligible product, we may earn a commission at no additional cost to you. Attribution rules, cancellations and returns may affect commission eligibility. / 이 게시물에는 쿠팡 파트너스 제휴 링크가 포함되어 있습니다. 이 링크를 통해 쿠팡에 방문한 뒤 24시간 이내에 다른 상품을 구매하더라도 운영정책상 실적으로 인정되는 구매라면 수수료를 제공받을 수 있습니다. 구매 경로의 최종 기여, 주문 취소 및 반품 등에 따라 수수료가 인정되지 않을 수 있습니다."
 COUPANG_TRADEMARK_NOTICE = "Coupang’s trademarks are used under license from Coupang, LLC or its affiliates."
 LOGOS = {
-    "trip_com": "https://dimg04.tripcdn.com/images/05E5012000rqtcwsyC749.png",
+    "trip_com": "https://commons.wikimedia.org/wiki/Special:FilePath/Trip.com_logo.svg",
     "olive_young_global": "https://dist.oliveyoung.com/fo/fe126e9b35/resources/images/common/logo.svg",
-    "coupang_partners": "https://influencers.coupang.com/logo-black.png",
+    "coupang_partners": "https://commons.wikimedia.org/wiki/Special:FilePath/Coupang_logo.svg",
 }
 POLICY_PATH = ROOT / "config/affiliate/london-shared-policy.json"
 
@@ -296,7 +296,12 @@ def render_header(site_id=""):
 
 def render_footer(title, article_text, site_id="", lang="en"):
     products = select_products(title, article_text, site_id)
-    # A site may legitimately have 0–9 verified offers. Publish what is available.
+    if len(products) != 10:
+        raise RuntimeError(f"K-Health365 footer must contain exactly 10 products; got {len(products)}")
+    beauty_count = sum(1 for p in products if _category(p) == "k_beauty_skincare")
+    health_count = sum(1 for p in products if _category(p) == "health_functional_foods")
+    if beauty_count != 5 or health_count != 5:
+        raise RuntimeError(f"K-Health365 footer requires 5 K-Beauty + 5 K-Health; got {beauty_count}+{health_count}")
     cards = []
     for p in products:
         url, image, name = (html.escape(p[k], quote=True) for k in ("url","image","title"))
@@ -332,6 +337,54 @@ def render_footer(title, article_text, site_id="", lang="en"):
         '<h2>' + heading + '</h2><p class="london-coupang-disclosure">' + DISCLOSURE + '</p>'
         '<div class="london-coupang-grid">' + ''.join(cards) + '</div>'
         '<p class="london-coupang-legal">' + COUPANG_TRADEMARK_NOTICE + '</p></section>' + END)
+
+def _remove_managed_affiliate_blocks(content):
+    """Remove legacy header/footer containers wherever they were previously inserted."""
+    tag_re = re.compile(r"</?(div|section|nav)\\b[^>]*>", re.I | re.S)
+    targets = {
+        "london-affiliate-partner-strip",
+        "london-coupang-wrap",
+        "khealth365-coupang-wrap",
+        "affiliate-recommendation",
+    }
+    offset = 0
+    while True:
+        opening = None
+        for match in tag_re.finditer(content, offset):
+            tag = match.group(0)
+            if tag.startswith("</"):
+                continue
+            cm = re.search(r"""\\bclass\\s*=\\s*["']([^"']*)["']""", tag, re.I)
+            classes = set(cm.group(1).split()) if cm else set()
+            if classes & targets:
+                opening = match
+                break
+        if opening is None:
+            break
+        tag_name = re.match(r"<(div|section|nav)", opening.group(0), re.I).group(1).lower()
+        depth = 1
+        end_pos = None
+        for match in tag_re.finditer(content, opening.end()):
+            token = match.group(0)
+            token_name = re.match(r"</?(div|section|nav)", token, re.I).group(1).lower()
+            if token_name != tag_name:
+                continue
+            if token.startswith("</"):
+                depth -= 1
+                if depth == 0:
+                    end_pos = match.end()
+                    break
+            else:
+                depth += 1
+        if end_pos is None:
+            break
+        content = content[:opening.start()] + content[end_pos:]
+        offset = opening.start()
+    # Drop the obsolete style block from the old partner strip; the new footer
+    # supplies a single, self-contained style block.
+    content = re.sub(r"<style[^>]*>[^<]*(?:london-affiliate-partner-strip|london-coupang-wrap)[\\s\\S]*?</style>", "", content, flags=re.I)
+    return content
+
 
 def _remove_legacy_single_product_modules(content):
     """Remove only known standalone affiliate-recommendation divs; keep article images."""
@@ -375,7 +428,8 @@ def _remove_legacy_single_product_modules(content):
 
 def apply_footer(content, title, site_id="", lang="en"):
     """Keep article body intact; place the three official partner logos immediately above the ten product cards at the footer."""
-    content = _remove_legacy_single_product_modules(content or "")
+    content = _remove_managed_affiliate_blocks(content or "")
+    content = _remove_legacy_single_product_modules(content)
     clean = content
     marker_pairs = ((HEADER_START, HEADER_END), (START, END), *LEGACY_MARKERS[1:])
     for old_start, old_end in marker_pairs:
