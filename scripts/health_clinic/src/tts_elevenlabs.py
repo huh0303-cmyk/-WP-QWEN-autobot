@@ -16,8 +16,11 @@ from config import LANGUAGES
 
 FISH_AUDIO_API_KEY = os.getenv("FISH_AUDIO_API_KEY", "").strip()
 
-CACHE_DIR = "/tmp/vita150_tts_cache_fish"
-os.makedirs(CACHE_DIR, exist_ok=True)
+CACHE_DIR = "/tmp/vita150_tts_cache"
+FISH_CACHE_DIR = os.path.join(CACHE_DIR, "fish_s2_1_pro_free_v2")
+EDGE_CACHE_DIR = os.path.join(CACHE_DIR, "edge_tts_v2")
+os.makedirs(FISH_CACHE_DIR, exist_ok=True)
+os.makedirs(EDGE_CACHE_DIR, exist_ok=True)
 
 SPEAKER_TAG_RE = re.compile(r"^\[(A|B)\]\s*(.*)$")
 SILENCE_BETWEEN_TURNS_MS = 350
@@ -56,12 +59,19 @@ def parse_dialogue(script_text: str):
 
 
 def _tts_single(text: str, voice_id: str, lang: str, speaker: str) -> str:
-    """Fish Audio S2.1 Pro Free first, then free native-language Edge TTS."""
-    text_hash = hashlib.sha256(("fish-audio-s2.1-pro-free|" + lang + "|" + speaker + "|" + text).encode("utf-8")).hexdigest()[:16]
-    out_path = os.path.join(CACHE_DIR, f"{text_hash}.mp3")
-    if os.path.exists(out_path):
-        return out_path
+    """Use Fish Audio for Japanese; keep provider caches strictly separated."""
+    normalized_lang = lang.split("-")[0].lower()
+    is_japanese = normalized_lang in ("ja", "jp")
 
+    fish_hash = hashlib.sha256(
+        ("fish-audio-s2.1-pro-free-v2|" + lang + "|" + speaker + "|" + text).encode("utf-8")
+    ).hexdigest()[:20]
+    fish_path = os.path.join(FISH_CACHE_DIR, f"{fish_hash}.mp3")
+    if os.path.exists(fish_path) and os.path.getsize(fish_path) > 1000:
+        print(f"[TTS_ENGINE] fish_audio_cache model=s2.1-pro-free lang={lang} speaker={speaker}")
+        return fish_path
+
+    fish_error = None
     if FISH_AUDIO_API_KEY:
         try:
             resp = requests.post(
@@ -71,22 +81,34 @@ def _tts_single(text: str, voice_id: str, lang: str, speaker: str) -> str:
                 json={"text": text, "format": "mp3"}, timeout=180,
             )
             if resp.ok and len(resp.content) > 1000 and not resp.content.lstrip().startswith(b"{"):
-                with open(out_path, "wb") as f:
+                with open(fish_path, "wb") as f:
                     f.write(resp.content)
                 print(f"[TTS_ENGINE] fish_audio model=s2.1-pro-free lang={lang} speaker={speaker} bytes={len(resp.content)}")
-                return out_path
-            print(f"[TTS] Fish Audio HTTP {resp.status_code}; falling back to free Edge TTS.")
+                return fish_path
+            fish_error = f"HTTP {resp.status_code}"
         except Exception as exc:
-            print(f"[TTS] Fish Audio failed ({type(exc).__name__}); falling back to free Edge TTS.")
+            fish_error = type(exc).__name__
     else:
-        print("[TTS] FISH_AUDIO_API_KEY unavailable; using free Edge TTS fallback.")
-    if lang.split("-")[0].lower() == "ja" or lang.lower() == "jp":
-        raise RuntimeError("Japanese Health Clinic requires Fish Audio s2.1-pro-free; key or Fish request is unavailable. Refusing silent provider fallback.")
+        fish_error = "FISH_AUDIO_API_KEY unavailable"
+
+    # Japanese narration must never silently change provider.
+    if is_japanese:
+        raise RuntimeError(
+            f"Japanese Health Clinic requires Fish Audio s2.1-pro-free; {fish_error}. "
+            "Generation stopped before using another TTS provider."
+        )
+
+    edge_hash = hashlib.sha256(
+        ("edge-tts-v2|" + lang + "|" + speaker + "|" + text).encode("utf-8")
+    ).hexdigest()[:20]
+    edge_path = os.path.join(EDGE_CACHE_DIR, f"{edge_hash}.mp3")
+    if os.path.exists(edge_path) and os.path.getsize(edge_path) > 1000:
+        print(f"[TTS_ENGINE] edge_tts_cache lang={lang} speaker={speaker}")
+        return edge_path
 
     voices = {
         "ko": ("ko-KR-SunHiNeural", "ko-KR-InJoonNeural"),
         "en": ("en-US-AriaNeural", "en-US-GuyNeural"),
-        "ja": ("ja-JP-NanamiNeural", "ja-JP-KeitaNeural"),
         "vi": ("vi-VN-HoaiMyNeural", "vi-VN-NamMinhNeural"),
         "zh": ("zh-CN-XiaoxiaoNeural", "zh-CN-YunxiNeural"),
         "es": ("es-ES-ElviraNeural", "es-ES-AlvaroNeural"),
@@ -95,17 +117,17 @@ def _tts_single(text: str, voice_id: str, lang: str, speaker: str) -> str:
         "it": ("it-IT-ElsaNeural", "it-IT-DiegoNeural"),
         "pt": ("pt-BR-FranciscaNeural", "pt-BR-AntonioNeural"),
     }
-    pair = voices.get(lang.split("-")[0].lower())
+    pair = voices.get(normalized_lang)
     if not pair:
         raise RuntimeError(f"No configured free Edge TTS voice for language={lang}.")
     voice = pair[0] if speaker == "A" else pair[1]
     import asyncio
     import edge_tts
-    asyncio.run(edge_tts.Communicate(text, voice).save(out_path))
-    if not os.path.exists(out_path) or os.path.getsize(out_path) <= 1000:
-        raise RuntimeError(f"Fish Audio and Edge TTS failed for {lang}/{speaker}.")
-    print(f"[TTS_ENGINE] edge_tts voice={voice} lang={lang} speaker={speaker} bytes={os.path.getsize(out_path)}")
-    return out_path
+    asyncio.run(edge_tts.Communicate(text, voice).save(edge_path))
+    if not os.path.exists(edge_path) or os.path.getsize(edge_path) <= 1000:
+        raise RuntimeError(f"Edge TTS failed for {lang}/{speaker}.")
+    print(f"[TTS_ENGINE] edge_tts voice={voice} lang={lang} speaker={speaker} bytes={os.path.getsize(edge_path)}")
+    return edge_path
 
 
 def synthesize_dialogue_with_timeline(script_text: str, lang: str):
