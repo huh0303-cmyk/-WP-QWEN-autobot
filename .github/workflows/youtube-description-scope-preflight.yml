@@ -68,7 +68,8 @@ jobs:
         env:
           PROFILE: ${{ matrix.profile }}
           EXPECTED_CHANNEL_ID: ${{ matrix.channel_id }}
-          CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
-          CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+          CLIENT_ID: ${{ secrets[format('YOUTUBE_OAUTH_CLIENT_ID_{0}', matrix.profile)] || secrets.YOUTUBE_OAUTH_CLIENT_ID || secrets.YOUTUBE_OAUTH_CLIENT_ID_NEW }}
+          CLIENT_SECRET: ${{ secrets[format('YOUTUBE_OAUTH_CLIENT_SECRET_{0}', matrix.profile)] || secrets.YOUTUBE_OAUTH_CLIENT_SECRET || secrets.YOUTUBE_OAUTH_CLIENT_SECRET_NEW }}
           REFRESH_TOKEN: ${{ secrets[matrix.refresh_secret] }}
         run: python scripts/youtube_description_scope_preflight.py
+
