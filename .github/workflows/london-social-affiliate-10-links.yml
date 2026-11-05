@@ -1,6 +1,14 @@
 name: London Project — Social & YouTube 10-Link Affiliate Workflow
 
 on:
+  push:
+    paths:
+      - "config/affiliate/global-weekly-10.json"
+      - "config/YOUTUBE_23_CHANNEL_MASTER_LOCK_2026-09-27.json"
+      - "config/youtube-auth-preflight-snapshot-2026-11-05.json"
+      - "config/sns_six_channel_policy.json"
+      - "scripts/build_social_affiliate_queue.py"
+      - ".github/workflows/london-social-affiliate-10-links.yml"
   workflow_dispatch:
     inputs:
       content_id:
