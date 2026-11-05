@@ -5,7 +5,7 @@
     "wordpress",
     "blogger"
   ],
-  "header_buttons": [
+  "footer_logo_banners": [
     "coupang_partners",
     "olive_young_global",
     "trip_com"
@@ -33,9 +33,9 @@
   ],
   "selection_principles": [
     "Every affiliate-eligible article ends with one footer module; never insert it at the top or between paragraphs.",
-    "The footer module starts with three official company logo banners in one horizontal row: Coupang Partners, OLIVE YOUNG, Trip.com.",
+    "At the absolute end of every blog post, place three official company logo banners in one horizontal row: Coupang Partners, OLIVE YOUNG, Trip.com.",
     "Each banner uses the destination's own approved affiliate tracking URL; the displayed image must be the official company logo asset.",
-    "Immediately below the three-logo row, show up to ten verified Coupang Partners product cards with product images and account-generated tracking links.",
+    "Immediately below the three-logo row, show the ten verified Coupang Partners product cards with product images and account-generated tracking links. The three-logo row and all ten cards form one footer block at the very bottom of the post.",
     "Use fewer than ten cards only when fewer verified destination-specific products are available; never fabricate links or images.",
     "Preserve article body, status, publication date, featured image and SEO metadata; update only the managed affiliate footer.",
     "Disclose affiliate relationships clearly and never promise commissions for every click or purchase."
@@ -50,13 +50,13 @@
     "show_affiliate_cta": true,
     "show_price_when_freshly_verified": true,
     "disclosure_required": true,
-    "header_layout": "single_horizontal_row_three_official_company_logo_images",
-    "header_order": [
+    "footer_logo_layout": "single_horizontal_row_three_official_company_logo_images",
+    "footer_logo_order": [
       "coupang_partners",
       "olive_young_global",
       "trip_com"
     ],
-    "product_cards_position": "immediately_below_header_logos",
+    "product_cards_position": "immediately_below_footer_logo_banners",
     "forbidden_positions": [
       "article_top",
       "inside_article_body",
@@ -80,7 +80,7 @@
     "randomize_per_article": false,
     "avoid_repeated_ten_product_set": false,
     "no_trip_category_text_link_row": true,
-    "header_brand_colors": {
+    "footer_logo_brand_colors": {
       "trip_com": "blue",
       "olive_young_global": "green",
       "coupang_partners": "orange"
@@ -92,7 +92,7 @@
     "require_three_logos_in_single_row": true,
     "product_cards_immediately_below_logos": true
   },
-  "header_branding": {
+  "footer_logo_branding": {
     "order": [
       "coupang_partners",
       "olive_young_global",
