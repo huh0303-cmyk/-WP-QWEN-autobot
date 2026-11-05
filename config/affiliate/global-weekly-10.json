@@ -1,0 +1,182 @@
+{
+  "schema_version": "1.0.0",
+  "policy": "London Project Global Weekly Affiliate Product Set",
+  "set_id": "global-week-2026-11-05",
+  "timezone": "Asia/Seoul",
+  "lock_window": {
+    "starts_at": "2026-11-05T00:00:00+09:00",
+    "ends_at": "2026-11-12T00:00:00+09:00",
+    "duration_hours": 168
+  },
+  "status": "pilot_catalog_ready_not_fleet_deployed",
+  "source_of_truth": true,
+  "selection": {
+    "provider": "coupang_partners",
+    "total": 10,
+    "category_counts": {
+      "k_beauty_skincare": 5,
+      "health_functional_foods": 5
+    },
+    "order": [
+      "k_beauty_skincare",
+      "health_functional_foods"
+    ],
+    "fixed_for_all_destinations": true,
+    "randomize": false,
+    "change_during_lock_window": false,
+    "exceptions": [
+      "tracked_link_broken",
+      "product_unavailable",
+      "image_broken_or_rights_issue",
+      "platform_or_policy_restriction"
+    ],
+    "exception_replacement_requires_authenticated_partner_link_and_image": true
+  },
+  "global_destinations": [
+    "wordpress",
+    "blogger_blogspot",
+    "youtube",
+    "instagram",
+    "threads",
+    "tiktok"
+  ],
+  "channel_rendering": {
+    "wordpress": "10 responsive product cards at article end; top affiliate banners remain a separate module",
+    "blogger_blogspot": "10 responsive product cards at article end; top banners only where template supports",
+    "youtube": "Use the same 10 tracked URLs in description grouped into two labeled sections; pin a compact index/comment where allowed; no claim of ten embedded cards",
+    "instagram": "Use approved link-in-bio landing page as the canonical 10-item shelf; captions/story links only where account features permit",
+    "threads": "Use canonical landing page link in profile or post when supported; concise post copy, no assumption of clickable multi-link cards",
+    "tiktok": "Use canonical landing page in bio; native product links only if account feature is enabled; do not put unsupported links in caption",
+    "shared_landing_page": "One weekly shelf page with 10 cards and all tracked URLs; all social profile links point to the same current weekly shelf"
+  },
+  "governance": {
+    "weekly_review": "Review clicks, orders, confirmed commissions, availability, link health and image health; retain performers and selectively replace only justified items",
+    "no_auto_rotation": true,
+    "rollback": "Keep previous dated set immutable",
+    "disclosure_required": true,
+    "platform_rules_must_be_checked": true,
+    "live_fleet_rollout_requires_owner_approval": true
+  },
+  "items": [
+    {
+      "id": "beauty-anua-toner",
+      "title": "아누아 어성초 77 히알루론산 수분 진정 토너, 150ml",
+      "url": "https://link.coupang.com/a/iiO2E6sxGu",
+      "image_url": "https://image11.coupangcdn.com/image/affiliate/banner/3e189473b60c5c95fd330b5678250529@2x.jpg",
+      "category": "k_beauty_skincare",
+      "display_title_en": "Anua Heartleaf 77 Soothing Toner",
+      "description_en": "A calming daily toner with heartleaf for a balanced skincare routine.",
+      "affiliate_confirmed": true,
+      "enabled": true,
+      "source": "authenticated_coupang_partners_generated_blog_tag",
+      "candidate_id": "oy01"
+    },
+    {
+      "id": "beauty-torriden-toner",
+      "title": "토리든 다이브인 저분자 히알루론산 토너, 300ml",
+      "url": "https://link.coupang.com/a/iiO3zaJdIW",
+      "image_url": "https://image2.coupangcdn.com/image/affiliate/banner/1e56c94b7b7566443e5360942b58664a@2x.jpg",
+      "category": "k_beauty_skincare",
+      "display_title_en": "Torriden Dive-In Hyaluronic Acid Toner",
+      "description_en": "A hydrating toner for a fresh, moisture-focused routine.",
+      "affiliate_confirmed": true,
+      "enabled": true,
+      "source": "authenticated_coupang_partners_generated_blog_tag",
+      "candidate_id": "oy02"
+    },
+    {
+      "id": "beauty-roundlab-moisturizer",
+      "title": "라운드랩 자작나무 수분크림 기획세트, 120ml",
+      "url": "https://link.coupang.com/a/iiO4sWYZmC",
+      "image_url": "https://image4.coupangcdn.com/image/affiliate/banner/0a932a3704794bc394e604276b7314f0@2x.jpg",
+      "category": "k_beauty_skincare",
+      "display_title_en": "Round Lab Birch Juice Moisturizing Cream Set",
+      "description_en": "A daily moisturizing cream set for comfortable, hydrated skin.",
+      "affiliate_confirmed": true,
+      "enabled": true,
+      "source": "authenticated_coupang_partners_generated_blog_tag",
+      "candidate_id": "oy03"
+    },
+    {
+      "id": "beauty-joseon-sunscreen",
+      "title": "조선미녀 맑은쌀 선크림 SPF50+, 50ml",
+      "url": "https://link.coupang.com/a/iiO5mGbPk4",
+      "image_url": "https://image15.coupangcdn.com/image/affiliate/banner/2d3eacaebca64758a0666bb66b6d00f1@2x.jpg",
+      "category": "k_beauty_skincare",
+      "display_title_en": "Beauty of Joseon Relief Sun SPF50+",
+      "description_en": "A lightweight daily sunscreen for broad-spectrum UV protection.",
+      "affiliate_confirmed": true,
+      "enabled": true,
+      "source": "authenticated_coupang_partners_generated_blog_tag",
+      "candidate_id": "oy04"
+    },
+    {
+      "id": "beauty-cosrx-essence",
+      "title": "코스알엑스 어드벤스드 스네일 래디언스 듀얼 에센스, 80ml",
+      "url": "https://link.coupang.com/a/iiO6gxBTK8",
+      "image_url": "https://image12.coupangcdn.com/image/affiliate/banner/72ad45e90fb6a4f7ce45830754b84e6c@2x.jpg",
+      "category": "k_beauty_skincare",
+      "display_title_en": "COSRX Snail Radiance Dual Essence",
+      "description_en": "A dual-texture essence for a hydrated, radiant-looking complexion.",
+      "affiliate_confirmed": true,
+      "enabled": true,
+      "source": "authenticated_coupang_partners_generated_blog_tag",
+      "candidate_id": "oy05"
+    },
+    {
+      "id": "health-lactofit-gold-80",
+      "title": "락토핏 정품 골드 80포",
+      "url": "https://link.coupang.com/a/ih2ZTHJN24",
+      "image_url": "https://image5.coupangcdn.com/image/affiliate/banner/cca43bfaafc74c7cfbe0f222ddb13a67@2x.jpg",
+      "category": "health_functional_foods",
+      "display_title_en": "Lacto-Fit Gold Probiotic Powder, 80 Sticks",
+      "description_en": "A daily probiotic supplement in single-serve sticks. Review the strain information, ingredients, and suggested use on the label.",
+      "affiliate_confirmed": true,
+      "enabled": true
+    },
+    {
+      "id": "health-omega3-vitd",
+      "title": "순수식품 rTG 오메가3 비타민D",
+      "url": "https://link.coupang.com/a/ih3OY0Mk8a",
+      "image_url": "https://img4c.coupangcdn.com/image/affiliate/banner/ba4f6d538ce239e7666b0abba59a17b9@2x.jpg",
+      "category": "health_functional_foods",
+      "display_title_en": "RTG Omega-3 with Vitamin D",
+      "description_en": "An omega-3 supplement combined with vitamin D. Check the EPA/DHA amounts, ingredients, and suitability before use.",
+      "affiliate_confirmed": true,
+      "enabled": true
+    },
+    {
+      "id": "health-lutein-zeaxanthin",
+      "title": "뉴트리원 루테인 지아잔틴 164",
+      "url": "https://link.coupang.com/a/ih25YWz9lQ",
+      "image_url": "https://img1a.coupangcdn.com/image/affiliate/banner/8b632b89b0445bc5496b817fe50eadd4@2x.jpg",
+      "category": "health_functional_foods",
+      "display_title_en": "Lutein and Zeaxanthin 164",
+      "description_en": "A lutein and zeaxanthin supplement. Review ingredient amounts and directions.",
+      "affiliate_confirmed": true,
+      "enabled": true
+    },
+    {
+      "id": "health-collagen-3270",
+      "title": "모발 콜라겐 3270",
+      "url": "https://link.coupang.com/a/ih3bfDbgPt",
+      "image_url": "https://img4c.coupangcdn.com/image/affiliate/banner/c5a95ba6e0bac93f844593df5cfb92ab@2x.jpg",
+      "category": "health_functional_foods",
+      "display_title_en": "Collagen 3270 Supplement",
+      "description_en": "A collagen supplement option. Check the collagen source, serving size, and ingredients.",
+      "affiliate_confirmed": true,
+      "enabled": true
+    },
+    {
+      "id": "health-cj-probiotic",
+      "title": "CJ 바이오코어 500억 고함량 특허유산균",
+      "url": "https://link.coupang.com/a/ih3Q2W2O04",
+      "image_url": "https://image13.coupangcdn.com/image/affiliate/banner/3b889a9edd0130193399558d82e71213@2x.jpg",
+      "category": "health_functional_foods",
+      "display_title_en": "CJ BioCore 500 Billion Probiotics",
+      "description_en": "A high-count probiotic product. Review the strains, storage instructions, and recommended serving.",
+      "affiliate_confirmed": true,
+      "enabled": true
+    }
+  ]
+}
