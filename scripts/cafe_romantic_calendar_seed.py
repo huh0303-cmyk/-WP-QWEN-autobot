@@ -12,18 +12,27 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from gsheets_direct import get_sheets_service
-from automation_hub.youtube_calendar import KST, read_calendar, select_next_ready
+from automation_hub.youtube_calendar import KST, read_calendar, select_next_ready, update_row
 
 SHEET_TAB = "14일_콘텐츠운영캘린더"
-SCHEDULE_ID = "CAL-20261106-GLOBALMUSIC-02"
-PLANNED_AT = "2026-11-06 20:30 KST"
-TOPIC = "A Quiet Paris Cafe at Sunset | French and Japanese Romantic Acoustic Songs"
+SCHEDULE_ID = "CAL-20261107-GLOBALMUSIC-03"
+PLANNED_AT = "2026-11-07 20:30 KST"
+TOPIC = "A Sunset Table for Two | French and Japanese Romantic Acoustic Love Songs"
 
 
 def main() -> int:
     spreadsheet_id = os.environ["SHEET_ID"]
     service = get_sheets_service()
     rows = read_calendar(service, spreadsheet_id)
+
+    # Release only the exact claim whose GitHub worker run is confirmed failed.
+    stale = next((row for row in rows if row["id"] == "CAL-20261106-GLOBALMUSIC-01"), None)
+    stale_worker = "[yt-worker:42054528245]"
+    if stale and stale["status"] in {"자료수집", "대본작성", "검수중"} and not stale["url"] and stale_worker in stale["notes"]:
+        reason = "GitHub worker 42054528245 failed before YouTube upload; no public video receipt. Claim released for recovery."
+        update_row(service, spreadsheet_id, stale, "실패", "", stale["notes"] + "\\n" + reason)
+        print("STALE_CAFE_ROMANTIC_CLAIM_RELEASED", stale["id"], "run=42054528245")
+        rows = read_calendar(service, spreadsheet_id)
 
     existing = next((row for row in rows if row["id"] == SCHEDULE_ID), None)
     if existing:
