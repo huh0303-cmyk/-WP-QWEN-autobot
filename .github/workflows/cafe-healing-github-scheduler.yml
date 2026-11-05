@@ -101,9 +101,20 @@ jobs:
           test -f assets/playlist-review/forest-birds-cc0.mp3
           echo "CAFE HEALING: free-only credentials and local CC0 asset presence verified."
 
+      - name: Compile-check the CAFE HEALING pipeline
+        run: python -m py_compile scripts/healing_motion.py scripts/healing_publish_direct.py scripts/healing_calendar_ensure.py scripts/healing_rain_review.py
+
       - name: Start the owner-requested first release immediately
         if: ${{ (github.event_name == 'push' && contains(github.event.head_commit.message, '[healing-start-now]')) || (github.event_name == 'workflow_dispatch' && inputs.publish_now == true) }}
-        run: python scripts/youtube_github_worker.py --enqueue-channel healing
+        env:
+          HEALING_START_RUN_ID: ${{ github.run_id }}
+          YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_HEALING }}
+          YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_HEALING }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_HEALING }}
+        run: python scripts/healing_publish_direct.py
+
+      - name: Ensure two or three randomized weekly calendar slots
+        run: python scripts/healing_calendar_ensure.py
 
       - name: Process only a due randomized calendar slot
         if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.publish_now != true) }}
