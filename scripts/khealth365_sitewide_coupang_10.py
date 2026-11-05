@@ -10,7 +10,7 @@ if str(ROOT) not in sys.path:
 from automation_hub.coupang_partners import apply_footer, select_products, START, END
 
 SITE = "https://k-health365.com"
-DISCLOSURE = "이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다."
+DISCLOSURE = "이 게시물에는 쿠팡 파트너스 제휴 링크가 포함되어 있습니다. 이 링크를 통해 쿠팡에 방문한 뒤 24시간 이내에 다른 상품을 구매하더라도 운영정책상 실적으로 인정되는 구매라면 수수료를 제공받을 수 있습니다. 구매 경로의 최종 기여, 주문 취소 및 반품 등에 따라 수수료가 인정되지 않을 수 있습니다."
 CATALOG = Path("config/affiliate/k-health365-sitewide-10.json")
 OUT = Path("output/khealth365-sitewide-10-report.json")
 UA = {"User-Agent": "Mozilla/5.0 (compatible; KHealth365AffiliateWorkflow/1.0)"}
