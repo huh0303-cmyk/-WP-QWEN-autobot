@@ -53,7 +53,7 @@ jobs:
           PLATFORM: ${{ inputs.platform || 'all' }}
           SITE_ID: ${{ inputs.site_id || '' }}
           LIMIT_PER_SITE: "0"
-          WP_USER: ${{ secrets.WP_USER }}
+          WP_USER: ${{ secrets.WP_USER || 'huh0303@gmail.com' }}
           WP_SITE_CREDENTIALS_JSON: ${{ secrets.WP_SITE_CREDENTIALS_JSON }}
           KOREA365ORG: ${{ secrets.KOREA365ORG }}
           KSTUDY365COM: ${{ secrets.KSTUDY365COM }}
