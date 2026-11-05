@@ -2,14 +2,14 @@
   "rollout": "affiliate-existing-published-posts",
   "authorized_by_user": true,
   "mode": "apply",
-  "scope": "all-active-registered-sites-with-10-verified-site-scoped-products",
+  "scope": "all_enabled_wordpress_and_blogger_blog_posts",
   "only_update_existing_published_posts": true,
   "preserve_post_status_and_dates": true,
   "no_delete": true,
-  "note": "One-time trigger. Sites without ten verified site-scoped products are skipped and reported; no cross-site catalog borrowing.",
+  "note": "Owner-approved one-time live backfill. Preserve article content, status, dates, featured image and SEO metadata. Skip destinations that fail credential, catalog or platform verification; never claim skipped destinations are complete.",
   "retry": 4,
-  "updated_at_utc": "2026-11-05T01:50:00Z",
+  "updated_at_utc": "2026-11-05T13:08:00Z",
   "wp_username_confirmed": "huh0303@gmail.com",
   "soft_quota_rollout": "2026-11-05",
-  "rollout_policy": "3 banners and disclosure on every published post; 0-10 verified site-scoped products"
+  "rollout_policy": "three official company logos in one horizontal row, followed immediately by ten Coupang product cards at the absolute article footer"
 }
