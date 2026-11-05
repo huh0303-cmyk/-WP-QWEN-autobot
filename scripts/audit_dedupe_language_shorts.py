@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Audit duplicate Shorts by normalized title and curriculum pair across all ten channels."""
-import argparse, datetime as dt, json, os, re, unicodedata
+import argparse, datetime as dt, json, os, re, time, unicodedata
 from pathlib import Path
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
@@ -179,10 +179,22 @@ def main():
                     ) if field in old_status}
                     status["privacyStatus"] = "private"
                     api.videos().update(part="status", body={"id": video["id"], "status": status}).execute()
-                    check = api.videos().list(part="snippet,status", id=video["id"]).execute().get("items", [])
-                    if (len(check) != 1 or check[0].get("snippet", {}).get("channelId") != channel_id
-                            or check[0].get("status", {}).get("privacyStatus") != "private"):
-                        raise RuntimeError(f"Privacy verification failed: {video['id']}")
+                    # YouTube's videos.list index can lag the successful update.
+                    # Retry read-only verification; never repeat the write request.
+                    verified = False
+                    last_check = None
+                    for attempt in range(8):
+                        check = api.videos().list(part="snippet,status", id=video["id"]).execute().get("items", [])
+                        last_check = check
+                        if (len(check) == 1
+                                and check[0].get("snippet", {}).get("channelId") == channel_id
+                                and check[0].get("status", {}).get("privacyStatus") == "private"):
+                            verified = True
+                            break
+                        if attempt < 7:
+                            time.sleep(2)
+                    if not verified:
+                        raise RuntimeError(f"Privacy verification failed after bounded read retries: {video['id']}; last={last_check}")
                     action["status"] = "VERIFIED_PRIVATE"
                 report["actions"].append(action)
                 losers += 1
