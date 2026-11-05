@@ -5,6 +5,12 @@ on:
     paths:
       - "scripts/youtube_english_metadata.py"
       - "scripts/playlist_language_policy.py"
+      - "scripts/youtube_playlist_maker.py"
+      - "automation_hub/youtube_github_runtime.py"
+      - ".github/workflows/cafe-mozart-publish.yml"
+      - "scripts/youtube_playlist_maker.py"
+      - "automation_hub/youtube_github_runtime.py"
+      - ".github/workflows/cafe-mozart-publish.yml"
       - "tests/test_playlist_owner_policy.py"
       - ".github/workflows/playlist-metadata-regression.yml"
   pull_request:
@@ -27,5 +33,7 @@ jobs:
           python-version: "3.11"
       - name: Install test runner
         run: python -m pip install --disable-pip-version-check pytest
+      - name: Compile playlist publisher and cost-hold guard
+        run: python -m compileall -q automation_hub/youtube_github_runtime.py scripts/youtube_playlist_maker.py scripts/youtube_github_worker.py scripts/youtube_publish_approved.py
       - name: Run playlist metadata regression tests
         run: pytest -q tests/test_playlist_owner_policy.py
