@@ -5,6 +5,8 @@ from pathlib import Path
 from urllib.parse import urlparse, urlunparse, unquote
 
 ROOT = Path(__file__).resolve().parents[1]
+HEADER_START = "<!-- LONDON-AFFILIATE-HEADER-START -->"
+HEADER_END = "<!-- LONDON-AFFILIATE-HEADER-END -->"
 START = "<!-- LONDON-COUPANG-PARTNERS-START -->"
 END = "<!-- LONDON-COUPANG-PARTNERS-END -->"
 LEGACY_MARKERS = ((START, END), ("<!-- KHEALTH365-COUPANG-START -->", "<!-- KHEALTH365-COUPANG-END -->"))
@@ -221,21 +223,31 @@ def select_products(title, article_text, site_id="", limit=10):
     chosen = chosen[:10] if len(chosen) >= 10 else []
     return chosen
 
+def render_header(site_id=""):
+    header = load_header_buttons(site_id)
+    if not header:
+        raise RuntimeError(f"Affiliate header requires Trip.com + Olive Young + Coupang tracking URLs for site={site_id}")
+    button_order = ("trip_com", "olive_young_global", "coupang_partners")
+    button_map = {item["provider"]: item for item in header["buttons"]}
+    buttons = []
+    for provider in button_order:
+        item = button_map[provider]
+        url = html.escape(item["affiliate_url"], quote=True)
+        label = html.escape(item["label"])
+        buttons.append(f'<a class="london-provider-button {provider}" href="{url}" target="_blank" rel="sponsored nofollow noopener">{label}</a>')
+    return (HEADER_START
+        + '<nav class="london-provider-buttons" aria-label="Affiliate partners">' + ''.join(buttons) + '</nav>'
+        + '<style>.london-provider-buttons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:0 0 22px}'
+        '.london-provider-button{display:block;text-align:center;padding:12px 8px;border-radius:8px;color:#fff!important;text-decoration:none!important;font-weight:700}'
+        '.london-provider-button.trip_com{background:#1769d2}.london-provider-button.olive_young_global{background:#168a43}.london-provider-button.coupang_partners{background:#e87518}'
+        '@media(max-width:520px){.london-provider-buttons{gap:6px}.london-provider-button{font-size:12px;padding:10px 4px}}</style>'
+        + HEADER_END)
+
+
 def render_footer(title, article_text, site_id="", lang="en"):
     products = select_products(title, article_text, site_id)
     if len(products) != 10:
         raise RuntimeError(f"Coupang footer requires exactly 10 unique verified products for site={site_id}; found {len(products)}")
-    header = load_header_buttons(site_id)
-    if not header:
-        raise RuntimeError(f"Affiliate header requires verified Coupang + Olive Young + Trip.com buttons and hotel/flight/tour tracking links for site={site_id}")
-    provider_buttons = []
-    button_order = ("trip_com", "olive_young_global", "coupang_partners")
-    button_map = {item["provider"]: item for item in header["buttons"]}
-    for provider in button_order:
-        button = button_map[provider]
-        url = html.escape(button["affiliate_url"], quote=True)
-        label = html.escape(button["label"])
-        provider_buttons.append(f'<a class="london-provider-button {provider}" href="{url}" target="_blank" rel="sponsored nofollow noopener">{label}</a>')
     cards = []
     for p in products:
         url, image, name = (html.escape(p[k], quote=True) for k in ("url","image","title"))
@@ -247,12 +259,8 @@ def render_footer(title, article_text, site_id="", lang="en"):
             + '" target="_blank" rel="sponsored nofollow noopener">쿠팡에서 상품 확인</a></article>'
         )
     heading = "함께 살펴볼 추천 상품 10선" if lang == "ko" else "10 Coupang Picks"
-    return (START + '<section class="london-coupang-wrap" aria-label="Affiliate partners and Coupang products">'
-        '<nav class="london-provider-buttons" aria-label="Affiliate partners">' + ''.join(provider_buttons) + '</nav>'
+    return (START + '<section class="london-coupang-wrap" aria-label="Coupang recommended products">'
         '<style>.london-coupang-wrap{margin:30px 0;padding:18px;border:1px solid #e5e7eb;border-radius:12px}'
-        '.london-provider-buttons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:0 0 18px}'
-        '.london-provider-button{display:block;text-align:center;padding:12px 8px;border-radius:8px;color:#fff!important;text-decoration:none;font-weight:700}'
-        '.london-provider-button.trip_com{background:#1769d2}.london-provider-button.olive_young_global{background:#168a43}.london-provider-button.coupang_partners{background:#e87518}'
         '.london-coupang-wrap h2{font-size:20px;margin:14px 0 10px}.london-coupang-disclosure{font-size:12px;color:#666;margin:0 0 14px}'
         '.london-coupang-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;align-items:stretch}'
         '.london-coupang-card{min-width:0;border:1px solid #e5e7eb;border-radius:10px;padding:10px;text-align:center;display:flex;flex-direction:column;background:#fff}'
@@ -303,28 +311,12 @@ def _remove_legacy_single_product_modules(content):
     return content
 
 def apply_footer(content, title, site_id="", lang="en"):
-    """Replace shared/K-Health legacy marker blocks or append once; never duplicate."""
+    """Place provider buttons at article top and the fixed ten-card block at article end."""
     content = _remove_legacy_single_product_modules(content or "")
-    footer_source = content
-    has_managed_block = any(old_start in content and old_end in content for old_start, old_end in LEGACY_MARKERS)
-    for old_start, old_end in LEGACY_MARKERS:
-        a = footer_source.find(old_start)
-        b = footer_source.find(old_end, a + len(old_start)) if a >= 0 else -1
-        if a >= 0 and b >= 0:
-            footer_source = footer_source[:a] + footer_source[b + len(old_end):]
-    footer = render_footer(title, footer_source, site_id, lang)
-    if not footer:
-        return content
-    for old_start, old_end in LEGACY_MARKERS:
-        a = content.find(old_start)
-        b = content.find(old_end, a + len(old_start)) if a >= 0 else -1
-        if a >= 0 and b >= 0:
-            before, after = content[:a], content[b + len(old_end):]
-            if before.rstrip().endswith("<p>"):
-                before = before.rstrip()[:-3]
-            if after.lstrip().startswith("</p>"):
-                after = after.lstrip()[4:]
-            return before.rstrip() + "\n" + footer + "\n" + after.lstrip()
-    # Preserve existing article and affiliate markup; append our managed,
-    # idempotent block rather than silently skipping the required ten cards.
-    return content.rstrip() + ("\n" if content.strip() else "") + footer
+    clean = content
+    marker_pairs = ((HEADER_START, HEADER_END), (START, END), *LEGACY_MARKERS[1:])
+    for old_start, old_end in marker_pairs:
+        clean = re.sub(re.escape(old_start) + r".*?" + re.escape(old_end), "", clean, flags=re.S)
+    header = render_header(site_id)
+    footer = render_footer(title, clean, site_id, lang)
+    return header + "\\n" + clean.lstrip() + ("\\n" if clean.strip() else "") + footer
