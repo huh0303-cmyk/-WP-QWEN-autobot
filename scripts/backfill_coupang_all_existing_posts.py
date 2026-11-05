@@ -22,7 +22,7 @@ DISCLOSURE = "이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이�
 
 def wp_auth(site, credentials):
     item = credentials.get(site["site_id"]) or credentials.get(site.get("secret_name","")) or {}
-    user = item.get("username") or item.get("user") or os.getenv("WP_USER","").strip() or "huh0300@gmail.com"
+    user = item.get("username") or item.get("user") or os.getenv("WP_USER","").strip() or "huh0303@gmail.com"
     password = item.get("app_password") or item.get("password") or os.getenv(site.get("secret_name",""),"").strip()
     return (user, password) if user and password else None
 
