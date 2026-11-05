@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Backfill exactly ten shared Coupang cards into every existing WP/Blogger post.
+Legacy provider buttons and old product shelves are replaced by the canonical English logo footer.
 
 Preview is read-only. Apply updates only the post body/content field and verifies
 that ten distinct affiliate destinations are visible after the update.
