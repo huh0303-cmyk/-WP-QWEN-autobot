@@ -40,7 +40,51 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  select:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment: youtube-channels
+    outputs:
+      selected_pair_id: ${{ steps.select.outputs.selected_pair_id }}
+      languages: ${{ steps.select.outputs.languages }}
+    env:
+      YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
+      YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_KO: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_KO }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_EN: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_EN }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_JA: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_JA }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_ZH: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_ZH }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_VI: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_VI }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_ES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_ES }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_FR: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_FR }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_DE: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_DE }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_IT: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_IT }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_PT: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_PT }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install --disable-pip-version-check google-api-python-client google-auth
+      - name: Check complete upload history and select an unused B1-B2 pair
+        id: select
+        env:
+          INPUT_LANGUAGES: ${{ needs.select.outputs.languages }}
+          SELECTED_PAIR_ID: ${{ needs.select.outputs.selected_pair_id }}
+        run: |
+          LANGUAGES="${INPUT_LANGUAGES:-all}"
+          PAIR_LOG="$(python scripts/select_unique_survival_pair.py --languages "$LANGUAGES")"
+          echo "$PAIR_LOG"
+          PAIR_ID="$(printf '%s\n' "$PAIR_LOG" | sed -n 's/^SELECTED_PAIR_ID=//p' | tail -n 1)"
+          if [ -z "$PAIR_ID" ]; then
+            echo "::error::No unused B1-B2 vocabulary pair was selected; refusing to generate repeated lessons."
+            exit 1
+          fi
+          echo "selected_pair_id=$PAIR_ID" >> "$GITHUB_OUTPUT"
+          echo "languages=$LANGUAGES" >> "$GITHUB_OUTPUT"
+
   build:
+    needs: select
     runs-on: ubuntu-latest
     timeout-minutes: 90
     environment: FISH_AUDIO_API_KEY
@@ -48,7 +92,7 @@ jobs:
       target_date: ${{ steps.build.outputs.target_date }}
       publish_at: ${{ steps.build.outputs.publish_at }}
       languages: ${{ steps.build.outputs.languages }}
-      selected_pair_id: ${{ steps.build.outputs.selected_pair_id }}
+      selected_pair_id: ${{ needs.select.outputs.selected_pair_id }}
     env:
       PYTHONUTF8: "1"
       FISH_AUDIO_API_KEY: ${{ secrets.FISH_AUDIO_API_KEY }}
@@ -88,18 +132,12 @@ jobs:
             PUBLISH_AT="${INPUT_PUBLISH_AT:-}"
           fi
           LANGUAGES="${INPUT_LANGUAGES:-all}"
-          ARGS=(--date "$TARGET_DATE" --languages "$LANGUAGES")
-          # No manual pair override: every release must pass the full-history
-          # ten-channel selector. If no unused lesson exists, fail closed.
-          PAIR_LOG="$(python scripts/select_unique_survival_pair.py --languages "$LANGUAGES")"
-          echo "$PAIR_LOG"
-          PAIR_ID="$(printf '%s\n' "$PAIR_LOG" | sed -n 's/^SELECTED_PAIR_ID=//p' | tail -n 1)"
+          PAIR_ID="${SELECTED_PAIR_ID}"
           if [ -z "$PAIR_ID" ]; then
-            echo "::error::No unused vocabulary pair was selected; refusing to generate repeated lessons."
+            echo "::error::The history selector did not provide an unused pair; refusing to generate repeated lessons."
             exit 1
           fi
-          ARGS+=(--pair-id "$PAIR_ID")
-          echo "selected_pair_id=$PAIR_ID" >> "$GITHUB_OUTPUT"
+          ARGS=(--date "$TARGET_DATE" --languages "$LANGUAGES" --pair-id "$PAIR_ID")
           python scripts/survival_adjective_short.py "${ARGS[@]}"
           echo "target_date=$TARGET_DATE" >> "$GITHUB_OUTPUT"
           echo "publish_at=$PUBLISH_AT" >> "$GITHUB_OUTPUT"
