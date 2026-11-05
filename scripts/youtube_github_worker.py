@@ -102,6 +102,7 @@ def _playlist(env: dict[str, str], log_handle) -> str:
             PLAYLIST_IMAGE_SOURCE="pexels_api",
             PLAYLIST_PAID_API_ENABLED="false",
             GEMINI_API_KEY="",
+            CAPTION_TEXT="French and Japanese love songs for a quiet cafe evening.",
         )
     _run([sys.executable, "scripts/youtube_playlist_maker.py"], env, log_handle)
     meta = json.loads((output / "upload_meta.json").read_text(encoding="utf-8"))
