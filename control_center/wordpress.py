@@ -76,13 +76,13 @@ def create_draft(site: WordPressSite, *, job_id: str, keyword: str, article: dic
                 raise RuntimeError(f"WordPress 이미지 업로드 실패 HTTP {media.status_code}: {media.text[:240]}")
             media_data = media.json()
         featured_media = int(media_data["id"])
-        source_url = media_data.get("source_url", "")
+        # Keep the image only as WordPress featured_media. The active theme
+        # renders that image on single-post pages; inserting the same file at
+        # the start of content_html creates a duplicate hero image.
         requests.post(
             f"{site.url}/wp-json/wp/v2/media/{featured_media}", auth=auth,
             json={"alt_text": image_alt}, timeout=30,
         )
-        if source_url:
-            content_html = f'<figure><img src="{source_url}" alt="{image_alt}"></figure>' + content_html
 
     payload: dict[str, Any] = {
         "title": article["title"],
