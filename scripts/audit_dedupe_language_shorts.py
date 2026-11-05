@@ -105,9 +105,17 @@ def main():
                 continue
             snippet = video.get("snippet", {})
             title_key = norm(snippet.get("title", ""))
+            description_key = norm(snippet.get("description", ""))
             pair_key = semantic_pair_key(video, code, pairs)
-            if title_key:
-                groups.setdefault("title:" + title_key, set()).add(video["id"])
+            # Repeated generic titles can represent different quiz questions.
+            # Treat a title as duplicate only when its normalized description
+            # also matches; a curriculum pair match remains an independent signal.
+            if title_key and description_key:
+                groups.setdefault(
+                    "content:" + title_key + "|" + description_key, set()
+                ).add(video["id"])
+            elif title_key:
+                groups.setdefault("title_only:" + title_key, set()).add(video["id"])
             if pair_key:
                 groups.setdefault(pair_key, set()).add(video["id"])
 
