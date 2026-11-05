@@ -176,17 +176,29 @@ def select_products(title, article_text, site_id="", limit=10):
         fixed = []
         seen_urls, seen_images = set(), set()
         for raw in fixed_rows:
-            item = _candidate(raw, "health")
-            if not item or raw.get("enabled") is not True:
+            if not isinstance(raw, dict) or raw.get("enabled") is not True:
+                continue
+            category = str(raw.get("category", "")).lower()
+            if category not in {"beauty", "health"}:
+                continue
+            item = _candidate(raw, category)
+            if not item:
                 continue
             image_key = _canonical_asset_url(item["image"])
-            if item["url"] in seen_urls or not image_key:
+            if item["url"] in seen_urls or not image_key or image_key in seen_images:
                 continue
             seen_urls.add(item["url"])
             seen_images.add(image_key)
             fixed.append(item)
-        if fixed:
-            return fixed[:min(limit, 10)]
+        beauty_count = sum(1 for item in fixed if item["category"] == "beauty")
+        health_count = sum(1 for item in fixed if item["category"] == "health")
+        if len(fixed) != 10 or beauty_count != 5 or health_count != 5:
+            raise ValueError(
+                "K-Health365 catalog must contain exactly 10 unique verified products "
+                f"(5 skincare + 5 health supplements); found {len(fixed)} total, "
+                f"{beauty_count} beauty, {health_count} health."
+            )
+        return fixed[:min(limit, 10)]
     pool = load_candidates(site_id)
     if not pool:
         return []
