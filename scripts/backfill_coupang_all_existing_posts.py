@@ -62,9 +62,8 @@ def clean_title(value):
     return html.unescape(re.sub(r"<[^>]+>", "", str(value or ""))).strip()
 
 def lang_for(site, content):
-    lang = str(site.get("language","en")).lower()
-    return "ko" if lang.startswith("ko") else "en"
-
+    # Affiliate product cards are English across the entire network.
+    return "en"
 def distinct_links(content):
     content = content or ""
     # Count product-card destinations only; the separate Coupang partner text link
