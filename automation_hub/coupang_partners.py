@@ -319,4 +319,4 @@ def apply_footer(content, title, site_id="", lang="en"):
         clean = re.sub(re.escape(old_start) + r".*?" + re.escape(old_end), "", clean, flags=re.S)
     header = render_header(site_id)
     footer = render_footer(title, clean, site_id, lang)
-    return header + "\\n" + clean.lstrip() + ("\\n" if clean.strip() else "") + footer
+    return header + "\n" + clean.lstrip() + ("\n" if clean.strip() else "") + footer
