@@ -292,16 +292,16 @@
     }
   ],
   "header_design": {
-    "layout": "single_horizontal_row_three_branded_buttons",
+    "layout": "single_horizontal_row_three_official_company_logo_banners",
     "order": [
       "coupang_partners",
-      "trip_com",
-      "olive_young_global"
+      "olive_young_global",
+      "trip_com"
     ],
     "labels": [
       "Coupang Partners",
-      "Trip.com",
-      "OLIVE YOUNG"
+      "OLIVE YOUNG",
+      "Trip.com"
     ],
     "brand_colors": {
       "coupang_partners": "coupang_orange",
@@ -312,13 +312,20 @@
     "no_plain_navy_text_button_replacement": true,
     "no_escaped_unicode_or_raw_backslash_u_labels": true,
     "no_extra_trip_category_text_link_row_below_buttons": true,
-    "each_button_uses_its_own_verified_site_authorized_tracking_url": true
+    "each_button_uses_its_own_verified_site_authorized_tracking_url": true,
+    "official_logo_image_required": true,
+    "logo_assets": {
+      "coupang_partners": "https://influencers.coupang.com/logo-black.png",
+      "olive_young_global": "https://dist.oliveyoung.com/fo/fe126e9b35/resources/images/common/logo.svg",
+      "trip_com": "https://commons.wikimedia.org/wiki/Special:FilePath/Trip.com_logo.svg"
+    },
+    "banner_click_targets": "each_logo_banner_uses_its_own_account_authorized_affiliate_tracking_url"
   },
   "rollout_gate": {
     "pilot_site": "https://k-health365.com",
-    "pilot_only": true,
-    "expand_to_all_control_korea365_org_destinations": false,
-    "requires_owner_approval_after_public_pilot_review": true
+    "pilot_only": false,
+    "expand_to_all_control_korea365_org_destinations": true,
+    "requires_owner_approval_after_public_pilot_review": false
   },
   "weekly_global_catalog": {
     "path": "config/affiliate/global-weekly-10.json",
@@ -329,5 +336,25 @@
     "separate_per_destination_catalogs": false,
     "randomize": false,
     "replace_only_for_verified_exceptions": true
+  },
+  "article_placement": {
+    "location": "absolute_article_footer_only",
+    "sequence": [
+      "three_official_company_logo_banners_in_one_horizontal_row",
+      "up_to_10_verified_coupang_product_cards"
+    ],
+    "forbidden": [
+      "article_top",
+      "inside_article_body",
+      "between_paragraphs"
+    ]
+  },
+  "automation_window": {
+    "timezone": "Asia/Seoul",
+    "start": "2026-11-05T00:00:00+09:00",
+    "end": "2026-11-12T23:59:59+09:00",
+    "schedule": "every_6_hours",
+    "new_posts": "append_same_footer_block_to_newly_published_posts",
+    "existing_posts": "backfill_all_published_posts_in_master_rollout_order"
   }
 }
