@@ -1,0 +1,59 @@
+name: Audit publishing permissions - all sites
+on:
+  push:
+    paths:
+      - "scripts/audit_publishing_permissions.py"
+      - ".github/workflows/audit-publishing-permissions.yml"
+      - "config/automation_hub_sites.json"
+      - "config/content_engine_profiles.json"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install --upgrade pip requests
+      - name: Read-only permission check (no posts created or changed)
+        env:
+          WP_SECRET_KOREA365ORG: ${{ secrets.KOREA365ORG }}
+          WP_SECRET_KSTUDY365COM: ${{ secrets.KSTUDY365COM }}
+          WP_SECRET_OLIVEYOUNGKOREACOM: ${{ secrets.OLIVEYOUNGKOREACOM }}
+          WP_SECRET_JOBKOREA365COM: ${{ secrets.JOBKOREA365COM }}
+          WP_SECRET_KVISA365COM: ${{ secrets.KVISA365COM }}
+          WP_SECRET_KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+          WP_SECRET_KSKIN365COM: ${{ secrets.KSKIN365COM }}
+          WP_SECRET_KTRIP365COM: ${{ secrets.KTRIP365COM }}
+          WP_SECRET_KFINANCE365COM: ${{ secrets.KFINANCE365COM }}
+          WP_SECRET_KOREAINSURANCE365COM: ${{ secrets.KOREAINSURANCE365COM }}
+          WP_SECRET_KOREATAXNLAWCOM: ${{ secrets.KOREATAXNLAWCOM }}
+          WP_SECRET_KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
+          WP_SECRET_STUDYINKOREA365COM: ${{ secrets.STUDYINKOREA365COM }}
+          WP_SECRET_JOBINKOREA365COM: ${{ secrets.JOBINKOREA365COM }}
+          WP_SECRET_KWORLD365COM: ${{ secrets.KWORLD365COM }}
+          WP_SECRET_KOREAWEDDING365COM: ${{ secrets.KOREAWEDDING365COM }}
+          WP_SECRET_JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
+          WP_SECRET_KOREAINVEST365COM: ${{ secrets.KOREAINVEST365COM }}
+          WP_SECRET_KREALESTATE365COM: ${{ secrets.KREALESTATE365COM }}
+          WP_SECRET_KOREACRYPTO365COM: ${{ secrets.KOREACRYPTO365COM }}
+          WP_SECRET_KTECH365COM: ${{ secrets.KTECH365COM }}
+          WP_SECRET_KIECAKOREAORG: ${{ secrets.KIECAKOREAORG }}
+          WP_SECRET_KSAKOREAORG: ${{ secrets.KSAKOREAORG }}
+          WP_SECRET_SISKOREACOM: ${{ secrets.SISKOREACOM }}
+          WP_SECRET_KIKOREACOM: ${{ secrets.KIKOREACOM }}
+          WP_SECRET_KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
+          BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
+          BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
+          BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
+        run: python scripts/audit_publishing_permissions.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: publishing-permission-audit
+          path: reports/publishing-permission-audit.json
+          if-no-files-found: warn
