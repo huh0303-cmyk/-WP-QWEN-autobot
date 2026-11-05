@@ -89,7 +89,12 @@ def upload_to_youtube(service, video_path, thumb_path, title, description, tags=
     from googleapiclient.http import MediaFileUpload
     from youtube_english_metadata import validate_metadata
     validate_metadata(title, description)
-    privacy_status = upload_privacy_status()
+    channel_key = os.environ.get("CHANNEL_KEY", "").strip().lower()
+    is_mozart = channel_key == "mbb"
+    if is_mozart and (not thumb_path or not os.path.isfile(thumb_path) or os.path.getsize(thumb_path) <= 0):
+        raise RuntimeError("CAFE_MOZART thumbnail preflight failed; refusing to upload without a real thumbnail")
+    # Keep Mozart private until its thumbnail is successfully applied.
+    privacy_status = "private" if is_mozart else upload_privacy_status()
     status = {"selfDeclaredMadeForKids": False, "privacyStatus": privacy_status}
     snippet = {"title": title, "description": description, "categoryId": "10"}
     if tags:
@@ -114,10 +119,18 @@ def upload_to_youtube(service, video_path, thumb_path, title, description, tags=
             time.sleep(min(2 ** retries, 8))
     video_id = response["id"]
     if thumb_path and os.path.exists(thumb_path) and os.path.getsize(thumb_path) > 0:
-        try:
+        if is_mozart:
             service.thumbnails().set(videoId=video_id, media_body=MediaFileUpload(thumb_path)).execute()
-        except Exception as e:
-            log(f"   ⚠️ 썸네일 설정 실패(무시): {e}")
+            service.videos().update(
+                part="status", body={"id": video_id, "status": {"privacyStatus": upload_privacy_status()}}
+            ).execute()
+        else:
+            try:
+                service.thumbnails().set(videoId=video_id, media_body=MediaFileUpload(thumb_path)).execute()
+            except Exception as e:
+                log(f"   ⚠️ 썸네일 설정 실패(무시): {e}")
+    elif is_mozart:
+        raise RuntimeError("CAFE_MOZART thumbnail missing after upload; video remains private")
     return video_id
 
 
