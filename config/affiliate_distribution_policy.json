@@ -115,8 +115,16 @@
     "link_rel": "sponsored nofollow noopener",
     "idempotent_marker": "london-affiliate-engine:v6",
     "header_buttons": true,
-    "header_button_layout": "three_brand_tiles_one_row",
-    "product_card_count": 10
+    "header_button_layout": "official_company_logos_inside_product_footer_immediately_before_ten_product_cards",
+    "product_card_count": 10,
+    "header_position": "immediately_before_product_cards_not_article_top",
+    "logo_assets": {
+      "coupang_partners": "https://influencers.coupang.com/logo-black.png",
+      "olive_young_global": "https://dist.oliveyoung.com/fo/fe126e9b35/resources/images/common/logo.svg",
+      "trip_com": "https://dimg04.tripcdn.com/images/05E5012000rqtcwsyC749.png"
+    },
+    "coupang_logo_linked": false,
+    "coupang_logo_separate_from_third_party_logos": true
   },
   "platform_scope": {
     "wordpress": {
@@ -208,7 +216,8 @@
     "must_validate_unique_randomized_set_per_post": false,
     "never_publish_with_pool_below_required_category_counts": true,
     "weekly_catalog_is_single_source": true,
-    "do_not_change_locked_set_without_exception": true
+    "do_not_change_locked_set_without_exception": true,
+    "partner_logos_not_inserted_at_article_top": true
   },
   "rollout_order": [
     "One global weekly catalog: exactly 10 Coupang Partners products shared by all registered channels for 168 hours",
