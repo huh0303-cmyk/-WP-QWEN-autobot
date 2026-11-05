@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - ".github/workflows/cafe-healing-github-scheduler.yml"
+      - "scripts/healing_motion.py"
   schedule:
     - cron: "3,19,37,53 * * * *"
   workflow_dispatch:
@@ -105,7 +106,7 @@ jobs:
         run: python -m py_compile scripts/healing_motion.py scripts/healing_publish_direct.py scripts/healing_calendar_ensure.py scripts/healing_rain_review.py
 
       - name: Start the owner-requested first release immediately
-        if: ${{ (github.event_name == 'push' && contains(github.event.head_commit.message, '[healing-start-now]')) || (github.event_name == 'workflow_dispatch' && inputs.publish_now == true) }}
+        if: ${{ (github.event_name == 'push' && (contains(github.event.head_commit.message, '[healing-start-now]') || contains(github.event.head_commit.message, 'Trigger CAFE HEALING first publish after output path fix'))) || (github.event_name == 'workflow_dispatch' && inputs.publish_now == true) }}
         env:
           HEALING_START_RUN_ID: ${{ github.run_id }}
           YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_HEALING }}
