@@ -97,7 +97,12 @@ def _playlist(env: dict[str, str], log_handle) -> str:
     if env["CHANNEL_KEY"] == "globalmusic":
         # CAFE_ROMANTIC uses only owner-approved music and free Pexels photos.
         # Never invoke paid Gemini image generation in this channel's playlist path.
-        env.update(PLAYLIST_IMAGE_SOURCE="pexels_api", PLAYLIST_PAID_API_ENABLED="false", GEMINI_API_KEY="")
+        env.update(
+            PLAYLIST_MUSIC_SOURCE="owner_drive",
+            PLAYLIST_IMAGE_SOURCE="pexels_api",
+            PLAYLIST_PAID_API_ENABLED="false",
+            GEMINI_API_KEY="",
+        )
     _run([sys.executable, "scripts/youtube_playlist_maker.py"], env, log_handle)
     meta = json.loads((output / "upload_meta.json").read_text(encoding="utf-8"))
     thumbnails = list(output.glob("thumbnail.*"))
