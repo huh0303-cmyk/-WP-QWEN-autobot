@@ -60,7 +60,7 @@
     "preserve_publication_date": true,
     "preserve_featured_image": true,
     "preserve_seo_metadata": true,
-    "idempotent_marker": "LONDON-COUPANG-PARTNERS-START/END",
+    "idempotent_marker": "LONDON-COUPANG-PARTNERS-START/END-v6",
     "require_verified_site_header_links": true,
     "require_exactly_ten_coupang_cards": true,
     "agoda_enabled": false,
