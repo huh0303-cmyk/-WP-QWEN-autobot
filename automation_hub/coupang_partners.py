@@ -141,9 +141,9 @@ def _score(item, text):
 
 def _category(item):
     raw = str(item.get("category", "")).lower()
-    if raw in {"kbeauty", "beauty", "toner", "serum", "mask", "cleanser", "moisturizer", "sunscreen", "k_beauty_skincare"}:
+    if raw in {"kbeauty", "beauty", "beauty_cosmetics", "toner", "serum", "mask", "cleanser", "moisturizer", "sunscreen", "k_beauty_skincare"}:
         return "k_beauty_skincare"
-    if raw in {"health", "k_health", "supplement", "vitamin", "health_functional_foods"}:
+    if raw in {"health", "k_health", "supplement", "supplements", "vitamin", "health_supplements", "health_functional_foods"}:
         return "health_functional_foods"
     s = item["search_text"]
     if any(term in s for term in CATEGORY_TERMS["k_beauty_olive_young"]):
