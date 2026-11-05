@@ -29,7 +29,7 @@ class AffiliatePolicyTests(unittest.TestCase):
   self.assertEqual({x["url"] for x in a},{x["url"] for x in b})
  def test_short_category_pool_is_blocked(self):
   routing,offers=self.fixture(); offers=[x for x in offers if not (x["category"]=="health_functional_foods" and x["title"].endswith("4"))]
-  with self.assertRaisesRegex(ValueError,"affiliate_policy_category_mix_invalid|affiliate_catalog_requires_five"):
+  with self.assertRaisesRegex(ValueError,"insufficient_unique_offers|missing_verified_offer"):
    runner.select_offers("Travel guide","travel",routing,"test_site",offers)
  def test_wrong_provider_is_rejected(self):
   routing,offers=self.fixture(); offers[0]["provider"]="wrong"
