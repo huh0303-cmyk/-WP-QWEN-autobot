@@ -1,0 +1,45 @@
+﻿name: Verify Korean and Japanese YouTube upload credentials
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  korean:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: youtube-channels
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: Verify exact TOPIK channel and upload scope
+        env:
+          PROFILE: ko
+          EXPECTED_CHANNEL_ID: UCdA24IuR-JE7qButWv5jLqA
+          CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+          REFRESH_TOKEN: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_KO }}
+        run: python scripts/youtube_auth_preflight.py
+  japanese:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: youtube-channels
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: Verify exact Japanese Survival channel and upload scope
+        env:
+          PROFILE: ja
+          EXPECTED_CHANNEL_ID: UCOWoNH_d6p45ywQ6W0Z1Jng
+          CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+          REFRESH_TOKEN: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_JA }}
+        run: python scripts/youtube_auth_preflight.py
