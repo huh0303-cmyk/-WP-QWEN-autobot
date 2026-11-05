@@ -19,8 +19,8 @@ Owner approved a CAFE_MOZART-only recovery using no paid APIs, existing approved
 
 ## Validation
 - Python compile checks passed in GitHub Actions run `42062316775` for the publisher/runtime files.
-- The dedicated MBB free-mode tests and the full playlist owner-policy tests passed in run `42062301592`.
-- The latest validation run after adding the upload-idempotency guard is tracked as `42062530199`; its final conclusion should be checked before the next release.
+- The dedicated MBB free-mode tests and the full playlist owner-policy tests passed in runs `42062301592`, `42062530199`, and `42062547010`.
+- The compile check, cost-hold guard tests, and playlist owner-policy tests all completed successfully after the thumbnail-publication fail-safe and upload-idempotency guard were added.
 - The separate daily publisher is committed on the default branch. It is scheduled for a daily 02:31 UTC candidate check; the in-workflow weekly gate permits only the selected two or three weekdays.
 
 ## Explicit limitations / remaining verification
