@@ -1,0 +1,48 @@
+name: CAFE_ROMANTIC - Free-only asset preflight
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/cafe-romantic-preflight.yml"
+      - "scripts/cafe_romantic_preflight.py"
+      - "scripts/playlist_owner_library.py"
+      - "scripts/youtube_playlist_maker.py"
+      - "scripts/youtube_github_worker.py"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cafe-romantic-free-only-preflight
+  cancel-in-progress: false
+
+jobs:
+  verify-owner-music-and-thumbnail-pools:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: youtube-channels
+    env:
+      PYTHONUTF8: "1"
+      GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+      GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+      GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+      MUSIC_SOURCE_FOLDER_ID_GLOBALMUSIC: ${{ secrets.MUSIC_SOURCE_FOLDER_ID_GLOBALMUSIC }}
+      THUMBNAIL_FOLDER_ID_GLOBALMUSIC: ${{ secrets.THUMBNAIL_FOLDER_ID_GLOBALMUSIC }}
+      PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install free Drive and audio validation runtime
+        run: |
+          if ! command -v ffprobe >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq ffmpeg
+          fi
+          python -m pip install --disable-pip-version-check google-api-python-client google-auth pillow
+      - name: Verify approved tracks, exact hashes, 50–70 minute balanced mix, and fresh Pexels image
+        run: |
+          python -m py_compile scripts/cafe_romantic_preflight.py scripts/playlist_owner_library.py
+          python scripts/cafe_romantic_preflight.py
