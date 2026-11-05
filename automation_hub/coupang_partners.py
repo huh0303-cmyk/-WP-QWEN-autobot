@@ -10,7 +10,13 @@ HEADER_END = "<!-- LONDON-AFFILIATE-HEADER-END -->"
 START = "<!-- LONDON-COUPANG-PARTNERS-START -->"
 END = "<!-- LONDON-COUPANG-PARTNERS-END -->"
 LEGACY_MARKERS = ((START, END), ("<!-- KHEALTH365-COUPANG-START -->", "<!-- KHEALTH365-COUPANG-END -->"))
-DISCLOSURE = "이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다."
+DISCLOSURE = "This post contains Coupang Partners affiliate links. If you purchase through these links, we may earn a commission at no additional cost to you."
+COUPANG_TRADEMARK_NOTICE = "Coupang’s trademarks are used under license from Coupang, LLC or its affiliates."
+LOGOS = {
+    "trip_com": "https://commons.wikimedia.org/wiki/Special:FilePath/Trip.com_logo.svg",
+    "olive_young_global": "https://dist.oliveyoung.com/fo/fe126e9b35/resources/images/common/logo.svg",
+    "coupang_partners": "https://news.coupang.com/wp-content/uploads/2023/01/coupang-bi-brand-logo-230109-01.jpg",
+}
 POLICY_PATH = ROOT / "config/affiliate/london-shared-policy.json"
 
 CATEGORY_TERMS = {
@@ -46,6 +52,7 @@ def load_header_buttons(site_id=""):
         ROOT / f"data/affiliate/{key}-header-buttons.json",
         ROOT / f"config/affiliate/header-buttons/{key}.json",
     ]
+    candidates.append(ROOT / "config/affiliate/default-header-buttons.json")
     for path in candidates:
         data = _load_json(path)
         if not isinstance(data, dict):
@@ -85,7 +92,9 @@ def _candidate(raw, source):
     price_raw = raw.get("price_krw") or raw.get("price") or raw.get("displayed_price") or ""
     digits = re.sub(r"[^0-9]", "", str(price_raw))
     price = int(digits) if digits else None
-    return {"url": url, "title": title.strip(), "image": image, "official_tag": official_tag, "source": source, "price_krw": price,
+    return {"url": url, "title": title.strip(), "display_title_en": str(raw.get("display_title_en") or raw.get("title_en") or "").strip(),
+            "description_en": str(raw.get("description_en") or "").strip(),
+            "image": image, "official_tag": official_tag, "source": source, "price_krw": price,
             "category": str(raw.get("category", "")).lower(),
             "search_text": " ".join([title, str(raw.get("query","")), str(raw.get("category","")), str(raw.get("relevance","")), str(raw.get("description_en",""))]).lower()}
 
@@ -234,14 +243,23 @@ def render_header(site_id=""):
         item = button_map[provider]
         url = html.escape(item["affiliate_url"], quote=True)
         label = html.escape(item["label"])
-        buttons.append(f'<a class="london-provider-button {provider}" href="{url}" target="_blank" rel="sponsored nofollow noopener">{label}</a>')
+        logo = html.escape(LOGOS[provider], quote=True)
+        # Coupang's current brand guidelines prohibit using its logo as a hyperlink.
+        # Keep the official logo visible and provide a separate tracked text link.
+        if provider == "coupang_partners":
+            buttons.append(f'<div class="london-provider-button {provider}"><img src="{logo}" alt="Coupang" loading="lazy"><a href="{url}" target="_blank" rel="sponsored nofollow noopener">Visit Coupang</a></div>')
+        else:
+            buttons.append(f'<a class="london-provider-button {provider}" href="{url}" target="_blank" rel="sponsored nofollow noopener" aria-label="{label}"><img src="{logo}" alt="{label}" loading="lazy"></a>')
     return (HEADER_START
         + '<nav class="london-provider-buttons" aria-label="Affiliate partners">' + ''.join(buttons) + '</nav>'
-        + '<style>.london-provider-buttons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:0 0 22px}'
-        '.london-provider-button{display:block;text-align:center;padding:12px 8px;border-radius:8px;color:#fff!important;text-decoration:none!important;font-weight:700}'
-        '.london-provider-button.trip_com{background:#1769d2}.london-provider-button.olive_young_global{background:#168a43}.london-provider-button.coupang_partners{background:#e87518}'
-        '@media(max-width:520px){.london-provider-buttons{gap:6px}.london-provider-button{font-size:12px;padding:10px 4px}}</style>'
+        + '<style>.london-provider-buttons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0 0 22px;align-items:stretch}'
+        '.london-provider-button{min-height:64px;display:flex;align-items:center;justify-content:center;gap:7px;padding:10px;border:1px solid #e5e7eb;border-radius:9px;background:#fff;text-decoration:none!important}'
+        '.london-provider-button img{display:block;max-width:100%;width:auto;height:auto;max-height:34px;object-fit:contain}'
+        '.london-provider-button.coupang_partners{flex-direction:column}.london-provider-button.coupang_partners img{max-width:125px;max-height:28px}'
+        '.london-provider-button.coupang_partners a{font-size:11px;font-weight:700;color:#333;text-decoration:underline}'
+        '@media(max-width:520px){.london-provider-buttons{gap:6px}.london-provider-button{min-height:56px;padding:7px}.london-provider-button img{max-height:27px}.london-provider-button.coupang_partners img{max-width:100px;max-height:23px}}</style>'
         + HEADER_END)
+
 
 
 def render_footer(title, article_text, site_id="", lang="en"):
