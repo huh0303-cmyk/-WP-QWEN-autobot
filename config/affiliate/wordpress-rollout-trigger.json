@@ -1,5 +1,5 @@
 {
-  "requested_at": "2026-11-05T14:05:00+09:00",
+  "requested_at": "2026-11-05T12:25:00+09:00",
   "scope": "all_enabled_wordpress_sites",
   "mode": "apply",
   "authorized_by": "user",
@@ -17,5 +17,18 @@
     "placement": "article_footer"
   },
   "preserve_existing_content": true,
-  "verify_after_update": true
+  "verify_after_update": true,
+  "run_mode": "continue_on_item_and_site_error",
+  "processing_order": "reverse_of_master_policy",
+  "report_required": true,
+  "report_metrics": [
+    "sites_attempted",
+    "sites_skipped_by_policy",
+    "sites_held_for_missing_catalog",
+    "posts_seen",
+    "posts_updated",
+    "posts_already_compliant",
+    "post_errors",
+    "site_errors"
+  ]
 }
