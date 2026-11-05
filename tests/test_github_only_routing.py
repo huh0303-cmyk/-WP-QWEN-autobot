@@ -60,7 +60,9 @@ def test_cafe_healing_has_a_channel_scoped_free_only_scheduler():
     assert "HEALING_VARIANT: sequential" in workflow
     assert "YOUTUBE_OAUTH_REFRESH_TOKEN_HEALING" in workflow
     assert "scripts/youtube_github_scheduler.py --channel healing" in workflow
-    assert "scripts/youtube_github_worker.py --enqueue-channel healing" in workflow
+    assert "scripts/healing_publish_direct.py" in workflow
+    assert "scripts/healing_calendar_ensure.py" in workflow
+    assert "python -m py_compile scripts/healing_motion.py" in workflow
     assert "actions/cache/restore@v4" in workflow
     assert "actions/cache/save@v4" in workflow
     assert 'if channel == "healing"' in runtime
@@ -83,3 +85,18 @@ def test_cafe_healing_rotates_five_sound_themes_with_one_visual_source():
     assert "FISH_AUDIO_API_KEY" in runtime
     assert "PEXELS_API_KEY" in runtime
     assert "free_natural_ambience" in runtime
+
+
+
+def test_healing_direct_launch_is_cost_gated_and_audited():
+    direct = (ROOT / "scripts/healing_publish_direct.py").read_text(encoding="utf-8")
+    calendar = (ROOT / "scripts/healing_calendar_ensure.py").read_text(encoding="utf-8")
+    assert 'check_cost_hold("healing")' in direct
+    assert 'check_cost_hold("healing")' in calendar
+    assert "EXPECTED_CHANNEL_ID = \"UC7yEsLM-HoXudngrD-4FIqg\"" in direct
+    assert "EXPECTED_CHANNEL_ID = \"UC7yEsLM-HoXudngrD-4FIqg\"" in calendar
+    assert "verified_channel_id" in direct
+    assert "privacy_status" in direct
+    assert "values().append" in direct
+    assert "target_count = rng.randint(2, 3)" in calendar
+    assert "insertDataOption=\"INSERT_ROWS\"" in calendar
