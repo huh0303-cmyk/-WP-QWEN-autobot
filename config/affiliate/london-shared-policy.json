@@ -1,6 +1,6 @@
 {
-  "version": 6,
-  "name": "London Project affiliate layout standard v6 - fixed reusable ten-product set",
+  "version": 7,
+  "name": "London Project affiliate layout standard v7 - official partner logos and English product cards",
   "platforms": [
     "wordpress",
     "blogger"
@@ -19,7 +19,9 @@
     "randomize_per_article": false,
     "avoid_repeating_same_ten_item_set": false,
     "fixed_product_set_per_site": true,
-    "reuse_same_ten_until_manual_replacement": true
+    "reuse_same_ten_until_manual_replacement": true,
+    "english_description_required": true,
+    "bottom_coupang_logo": true
   },
   "trip_com_categories": [],
   "disabled_providers": [
@@ -35,7 +37,10 @@
     "Use only the account's supplied affiliate URLs. Do not invent tracking links, image URLs, prices, sales, reviews, or commission rates.",
     "Keep separate product catalogs and header links per destination; never share product pools across unrelated sites.",
     "Preserve article body, status, publication date, featured image and SEO metadata; replace only the designated affiliate block.",
-    "Display the Coupang Partners commission disclosure with the product cards."
+    "Display the Coupang Partners commission disclosure with the product cards.",
+    "Each of the ten Coupang product cards must include an English-language product explanation.",
+    "Display the Coupang logo below the ten-card grid and include the affiliate commission disclosure and required Coupang trademark notice.",
+    "Do not make the Coupang logo itself a hyperlink; use a separate tracked text link in accordance with Coupang's current media asset guidelines."
   ],
   "display": {
     "position": "end_of_article",
@@ -71,5 +76,21 @@
       "coupang_partners": "orange"
     },
     "fixed_product_set_per_site": true
+  },
+  "header_branding": {
+    "order": [
+      "trip_com",
+      "olive_young_global",
+      "coupang_partners"
+    ],
+    "logo_assets": "official_or_brand-published logo assets",
+    "trip_com_and_olive_young": "Clickable tracked logo links to their landing pages",
+    "coupang": "Display official logo without hyperlink in accordance with current Coupang brand guidelines; use a separate tracked text link",
+    "responsive": true
+  },
+  "disclosure": {
+    "language": "English",
+    "text": "This post contains Coupang Partners affiliate links. If you purchase through these links, we may earn a commission at no additional cost to you.",
+    "trademark_notice": "Coupang’s trademarks are used under license from Coupang, LLC or its affiliates."
   }
 }
