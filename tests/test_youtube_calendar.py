@@ -200,3 +200,20 @@ def test_release_policy_is_public_and_requires_identity_verification():
     assert policy["upload_privacy_status"] == "public"
     assert policy["public_allowed"] is True
     assert policy["require_authenticated_channel_id_match"] is True
+
+
+
+def test_stale_active_claim_does_not_block_new_healing_calendar_slot():
+    stale = row("CAL-STALE", "Healing", "2026-08-01 08:00 KST", status="자료수집")
+    ready = row("CAL-NEW", "Healing", "2026-08-31 12:00 KST")
+    selected, _ = select_due(parsed(stale, ready), NOW, {"healing"})
+    assert [item["id"] for item in selected] == ["CAL-NEW"]
+
+
+def test_recent_active_claim_still_blocks_duplicate_channel_work():
+    active = row("CAL-ACTIVE", "Healing", "2026-08-31 11:30 KST", status="자료수집")
+    ready = row("CAL-NEW", "Healing", "2026-08-31 12:00 KST")
+    selected, _ = select_due(parsed(active, ready), NOW, {"healing"})
+    assert not selected
+    next_ready, _ = select_next_ready(parsed(active, ready), NOW, {"healing"})
+    assert not next_ready
