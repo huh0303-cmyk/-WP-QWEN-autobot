@@ -2,6 +2,7 @@
 """Verify Blogger OAuth against every enabled destination in the 33-site registry."""
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import sys
@@ -26,6 +27,8 @@ def main():
         raise SystemExit("Blogger OAuth 자격증명이 없습니다.")
     expected_client_id = os.environ.get("EXPECTED_GOOGLE_OAUTH_CLIENT_ID", "").strip()
     active_client_id = os.environ.get("BLOGGER_GOOGLE_CLIENT_ID", "").strip()
+    if active_client_id:
+        print("Active OAuth client ID SHA256: " + hashlib.sha256(active_client_id.encode("utf-8")).hexdigest())
     if expected_client_id:
         matches = active_client_id == expected_client_id
         print("OAuth client matches downloaded desktop client: " + ("YES" if matches else "NO"))
