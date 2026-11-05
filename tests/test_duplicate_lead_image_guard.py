@@ -18,6 +18,19 @@ class DuplicateLeadImageTests(unittest.TestCase):
         html = '<figure><img src="hero.jpg" alt="My Article"></figure><p>Text</p>'
         self.assertEqual(strip_title_duplicate_lead_image(html, "My Article"), "<p>Text</p>")
 
+    def test_koreawedding_guard_removes_different_lead_photo_before_text(self):
+        from editorial_image_guard import strip_leading_inline_image_block
+        html = '<figure><img src="different-protest-photo.jpg" alt="Immigration demonstration"></figure><p>Opening paragraph</p><p><img src="later.jpg" alt="Details"></p>'
+        self.assertEqual(
+            strip_leading_inline_image_block(html),
+            '<p>Opening paragraph</p><p><img src="later.jpg" alt="Details"></p>',
+        )
+
+    def test_koreawedding_guard_preserves_images_after_opening_text(self):
+        from editorial_image_guard import strip_leading_inline_image_block
+        html = '<p>Opening paragraph</p><figure><img src="later.jpg" alt="Details"></figure>'
+        self.assertEqual(strip_leading_inline_image_block(html), html)
+
     def test_preserves_unrelated_lead_image(self):
         html = '<p><img src="wedding.jpg" alt="Wedding ceremony"/></p><p>Text</p>'
         self.assertEqual(strip_title_duplicate_lead_image(html, "Immigration policy"), html)
