@@ -5,6 +5,7 @@ Prefer existing approved music and Gemini app exports; API generation is explici
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import random
@@ -427,6 +428,71 @@ def build_fresh_healing(_service, _theme, output_path):
 
 def select_music(service, folder_id, exts, mime_prefix):
     source = os.environ.get("PLAYLIST_MUSIC_SOURCE", "approved_bank")
+    if source == "owner_drive" and base.CHANNEL_KEY == "globalmusic":
+        from playlist_owner_library import select_owner_tracks
+        service = service or base.get_drive_service()
+        manifest_rows = service.files().list(
+            q=f"'{folder_id}' in parents and name = 'approved.json' and trashed = false",
+            fields="files(id,name,mimeType,size)", pageSize=10,
+        ).execute().get("files", [])
+        if len(manifest_rows) != 1:
+            raise RuntimeError(
+                f"WAITING_OWNER_LIBRARY: expected one private approved.json in Globalmusic Drive folder; found {len(manifest_rows)}"
+            )
+        work_root = Path(base.WORKDIR)
+        audio_root = work_root / "owner_drive_audio"
+        if audio_root.exists():
+            shutil.rmtree(audio_root)
+        audio_root.mkdir(parents=True, exist_ok=True)
+        manifest_path = work_root / "owner_drive_approved.json"
+        _bank_download(service, manifest_rows[0]["id"], str(manifest_path))
+        manifest_data = json.loads(manifest_path.read_text(encoding="utf-8"))
+        if manifest_data.get("version") != 1 or not isinstance(manifest_data.get("tracks"), list):
+            raise RuntimeError("WAITING_OWNER_LIBRARY: unsupported Drive owner manifest")
+        audio_items = _bank_list(service, folder_id, exts, mime_prefix)
+        by_name = {}
+        for item in audio_items:
+            by_name.setdefault(item.get("name", ""), []).append(item)
+        staged = 0
+        for entry in manifest_data["tracks"]:
+            if (entry.get("channel") != "globalmusic" or entry.get("approved") is not True
+                    or entry.get("genre") != "romantic_acoustic"
+                    or entry.get("rights") != "owner_paid_suno"):
+                continue
+            name = entry.get("file", "")
+            if not isinstance(name, str) or Path(name).name != name:
+                raise RuntimeError("WAITING_OWNER_LIBRARY: unsafe audio filename in private Drive manifest")
+            candidates = by_name.get(name, [])
+            matched = False
+            for candidate in candidates:
+                destination = audio_root / name
+                _bank_download(service, candidate["id"], str(destination))
+                digest = hashlib.sha256(destination.read_bytes()).hexdigest()
+                if digest == str(entry.get("sha256", "")).lower():
+                    matched = True
+                    staged += 1
+                    break
+                destination.unlink(missing_ok=True)
+            if not matched:
+                raise RuntimeError(f"WAITING_OWNER_LIBRARY: Drive audio missing or SHA-256 mismatch: {name}")
+        if staged < 20:
+            raise RuntimeError(f"WAITING_OWNER_LIBRARY: only {staged} reviewed audio tracks staged; expected at least 20")
+        chosen = select_owner_tracks(base.CHANNEL_KEY, audio_root, manifest_path, base.get_duration)
+        result = []
+        for row in chosen:
+            file_id = f"owner-local:{row['sha256']}"
+            _generated_paths[file_id] = row["path"]
+            result.append({"id": file_id, "name": row["name"], "duration": row["duration"]})
+        Path(base.WORKDIR, "owner_audio_selection.json").write_text(
+            json.dumps([{key: row[key] for key in ("name", "sha256", "duration",
+                      "language", "genre", "rights")} for row in chosen],
+                      ensure_ascii=False, indent=2), encoding="utf-8")
+        print(
+            f"OWNER_DRIVE_LIBRARY_READY staged={staged} selected={len(chosen)} "
+            f"minutes={sum(row['duration'] for row in chosen)/60:.1f}",
+            flush=True,
+        )
+        return result
     if source == "owner_local" and base.CHANNEL_KEY in {"globalmusic", "kpop", "starbucks"}:
         from playlist_owner_library import select_owner_tracks
         root = Path(os.environ.get("PLAYLIST_OWNER_AUDIO_ROOT",
