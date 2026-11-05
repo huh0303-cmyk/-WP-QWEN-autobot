@@ -15,6 +15,9 @@ sys.path.insert(0, str(ROOT))
 from automation_hub.coupang_partners import apply_footer, load_candidates, select_products, HEADER_START, HEADER_END, START, END
 
 REGISTRY = json.loads((ROOT / "config/automation_hub_sites.json").read_text(encoding="utf-8"))
+MASTER_POLICY = json.loads((ROOT / "config/affiliate/portfolio-master-policy-2026-11-05.json").read_text(encoding="utf-8"))
+WP_AFFILIATE_POLICY = {str(x["domain"]).lower(): x for x in MASTER_POLICY.get("wordpress", [])}
+WP_ROLLOUT_ORDER = [str(x["domain"]).lower() for x in reversed(MASTER_POLICY.get("wordpress", []))]
 PROFILES = json.loads((ROOT / "config/content_engine_profiles.json").read_text(encoding="utf-8"))
 PROFILE_BY_KEY = {p["site_key"]: p for p in PROFILES.get("profiles", [])}
 REPORT = ROOT / "reports/coupang-existing-posts-backfill.json"
@@ -93,12 +96,17 @@ def main():
     report = {"mode":args.mode,"platform":args.platform,"started_at":time.strftime("%Y-%m-%dT%H:%M:%SZ",time.gmtime()),
               "sites":[],"totals":{"posts_seen":0,"updated":0,"already_ten":0,"needs_catalog":0,"skipped_legacy":0,"errors":0}}
     session = requests.Session()
-    for site in REGISTRY.get("sites",[]):
+    site_rows = [x for x in REGISTRY.get("sites",[]) if x.get("platform") == "wordpress"]
+    order_index = {domain: i for i, domain in enumerate(WP_ROLLOUT_ORDER)}
+    site_rows.sort(key=lambda x: order_index.get(urlparse(x.get("url", "")).netloc.lower().removeprefix("www."), 10**6))
+    for site in site_rows if args.platform == "wordpress" else REGISTRY.get("sites",[]):
         sid, platform = site.get("site_id",""), site.get("platform","")
         if not site.get("enabled", True): continue
         if args.site_id and sid != args.site_id: continue
         if args.platform != "all" and platform != args.platform: continue
         site_key = sid.split("_",1)[-1]
+        site_domain = urlparse(site.get("url", "")).netloc.lower().removeprefix("www.")
+        policy = WP_AFFILIATE_POLICY.get(site_domain) if platform == "wordpress" else None
         profile = PROFILE_BY_KEY.get(site_key,{})
         # Resolve K-Health365's four missing official product images once before
         # counting candidates. The helper persists the URLs in this run's workspace.
@@ -111,6 +119,9 @@ def main():
                 # A Coupang product page may deny automated image resolution (403).
                 # Never fail the whole fleet or substitute an unverified image.
                 khealth_image_error = type(exc).__name__ + ": " + str(exc)[:180]
+        if platform == "wordpress" and (not policy or policy.get("provider") != "coupang"):
+            report["sites"].append({"site_id":sid,"url":site.get("url"),"platform":platform,"status":"held_by_master_policy","provider":(policy or {}).get("provider","unlisted"),"reason":"This Coupang-only workflow does not process no-affiliate, excluded, Trip.com, or Olive Young destinations."})
+            continue
         catalog_count = len(load_candidates(sid))
         entry = {"site_id":sid,"url":site.get("url"),"platform":platform,
                  "verified_products":catalog_count,"posts_seen":0,"updated":0,
