@@ -104,18 +104,21 @@ def main():
             if video.get("status", {}).get("privacyStatus") == "private":
                 continue
             snippet = video.get("snippet", {})
-            title_key = norm(snippet.get("title", ""))
-            description_key = norm(snippet.get("description", ""))
+            title_text = snippet.get("title", "")
+            title_key = norm(title_text)
+            description = snippet.get("description", "")
+            # Only vocabulary-pair title patterns (e.g. "high vs low" or
+            # "book • phone") are eligible for title-based cleanup. Generic
+            # quiz/engagement titles can be reused for different questions.
+            pair_title = bool(re.search(r"\\bvs\\b|[•]", title_text, flags=re.IGNORECASE))
+            first_description_line = re.split(r"[\\r\\n]", description, maxsplit=1)[0]
+            first_sentence = re.split(r"(?<=[.!?])\\s+", first_description_line, maxsplit=1)[0]
+            description_key = norm(first_sentence)
             pair_key = semantic_pair_key(video, code, pairs)
-            # Repeated generic titles can represent different quiz questions.
-            # Treat a title as duplicate only when its normalized description
-            # also matches; a curriculum pair match remains an independent signal.
-            if title_key and description_key:
+            if pair_title and title_key and description_key:
                 groups.setdefault(
-                    "content:" + title_key + "|" + description_key, set()
+                    "pair_content:" + title_key + "|" + description_key, set()
                 ).add(video["id"])
-            elif title_key:
-                groups.setdefault("title_only:" + title_key, set()).add(video["id"])
             if pair_key:
                 groups.setdefault(pair_key, set()).add(video["id"])
 
