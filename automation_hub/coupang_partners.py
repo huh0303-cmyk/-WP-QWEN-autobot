@@ -291,6 +291,9 @@ def apply_footer(content, title, site_id="", lang="en"):
     """Replace shared/K-Health legacy marker blocks or append once; never duplicate."""
     content = _remove_legacy_single_product_modules(content or "")
     footer_source = content
+    has_managed_block = any(old_start in content and old_end in content for old_start, old_end in LEGACY_MARKERS)
+    if not has_managed_block and ("link.coupang.com/" in content or "쿠팡 파트너스 활동의 일환" in content):
+        return content
     for old_start, old_end in LEGACY_MARKERS:
         a = footer_source.find(old_start)
         b = footer_source.find(old_end, a + len(old_start)) if a >= 0 else -1
