@@ -33,7 +33,7 @@ def test_scheduler_is_disabled_without_explicit_owner_flags():
     assert "YOUTUBE_AUTO_PUBLISH_ENABLED" in workflow
     assert "YOUTUBE_COST_HOLD" in workflow
     assert "has_due_calendar_row" in script
-    assert "check_cost_hold()" in script
+    assert "check_cost_hold(channel_key)" in script
     assert "process_one()" in script
     assert "systemctl" not in workflow
     assert "appleboy/ssh-action" not in workflow
@@ -47,3 +47,21 @@ def test_pipeline_workflow_is_manual_and_cost_hold_gated():
     assert "LONDON_PIPELINE_COST_HOLD" in workflow
     assert "systemctl" not in workflow
     assert "appleboy/ssh-action" not in workflow
+
+
+
+def test_cafe_healing_has_a_channel_scoped_free_only_scheduler():
+    workflow = (ROOT / ".github/workflows/cafe-healing-github-scheduler.yml").read_text(encoding="utf-8")
+    runtime = (ROOT / "automation_hub/youtube_github_runtime.py").read_text(encoding="utf-8")
+    scheduler = (ROOT / "scripts/youtube_github_scheduler.py").read_text(encoding="utf-8")
+    assert 'cron: "17 * * * *"' in workflow
+    assert "PLAYLIST_FREE_ONLY_CHANNEL: healing" in workflow
+    assert 'PLAYLIST_PAID_API_ENABLED: "false"' in workflow
+    assert "HEALING_VARIANT: random" in workflow
+    assert "YOUTUBE_OAUTH_REFRESH_TOKEN_HEALING" in workflow
+    assert "scripts/youtube_github_scheduler.py --channel healing" in workflow
+    assert 'if channel_key == "healing"' in runtime
+    assert "YOUTUBE_OAUTH_REFRESH_TOKEN_HEALING" in runtime
+    assert 'parser.add_argument("--channel"' in scheduler
+    assert "check_cost_hold(channel_key)" in scheduler
+    assert "run_now=False" in scheduler
