@@ -52,4 +52,5 @@ def test_unknown_legacy_affiliate_markup_is_preserved(monkeypatch):
     monkeypatch.setattr(cp, "load_candidates", lambda site_id="": fake_pool(10))
     monkeypatch.setattr(cp, "load_header_buttons", lambda site_id="": None)
     original = '<p><a href="https://link.coupang.com/a/example">old</a></p>'
-    assert cp.apply_footer(original, "Article", "testsite") == original
+    with pytest.raises(RuntimeError, match="Affiliate header requires"):
+        cp.apply_footer(original, "Article", "testsite")
