@@ -5,6 +5,11 @@ from __future__ import annotations
 import datetime as dt
 import os
 import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / "scripts"))
 
 from gsheets_direct import get_sheets_service
 from automation_hub.youtube_calendar import KST, read_calendar, select_next_ready
