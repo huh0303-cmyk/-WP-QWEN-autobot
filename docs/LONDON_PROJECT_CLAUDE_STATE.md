@@ -1,5 +1,14 @@
 # 런던프로젝트클로드 — 상태 원장 (State Ledger)
 
+## 2026-11-06 — HISTORY_TV_TODAY 발행 중단 조사 및 일부 복구
+
+- 대상: `HISTORY_TV_TODAY` / `@HISTORY_TV_TODAY` / `UCVBvZwodUF4s57KeNicxQ3w`, scheduler key `history`.
+- 확인된 자동발행 차단: `.github/workflows/youtube-github-scheduler.yml`은 `YOUTUBE_AUTO_PUBLISH_ENABLED=true`와 `YOUTUBE_COST_HOLD=false`가 모두 아니면 checkout/worker 실행 전에 안전 종료한다. worker도 cost hold를 별도로 강제한다. 현재 GitHub Environment 변수의 실값은 이 조사에서 읽지 못했으므로 어느 변수가 실제로 활성화되어 있는지는 단정하지 않는다.
+- 확인된 코드 결함 및 수정: 시간별 scheduler workflow에 `FISH_AUDIO_API_KEY` 환경변수 전달이 빠져 있었다. `scripts/youtube_github_worker.py::_knowledge`는 이 키가 비어 있으면 지식채널 작업을 명시적으로 중단한다. scheduler workflow에 `secrets.FISH_AUDIO_API_KEY` 매핑 추가, commit `71ddd8a85b8a9e1b20bd02c07471ab32c6204f97`.
+- 잔여 핵심 차단: `docs/TODAY_IN_HISTORY_PIPELINE.md` 기준으로 History 전용 2개 사건/날짜 고정/장면 매칭/권리 검수 계약은 offline validator 수준이며 active worker의 legacy `archive_footage_longform.py` 경로에 완전 통합되지 않았다. 과거 기록의 OAuth HTTP 403도 있어 정확한 UC ID 쓰기 인증은 canary 전 재검증 필요.
+- 별도 조사 보고서: `docs/HISTORY_TV_TODAY_OUTAGE_REPAIR_2026-11-06.md`.
+- 안전 조치: 기존 cost hold/auto-publish gate 유지. 비밀값 변경, workflow dispatch, 영상 생성·업로드, 기존 영상 공개상태 변경은 하지 않았다. 따라서 **부분 수정 완료 / 실발행 복구 미검증(HOLD)** 이 정확한 상태다. 소유자 승인된 비용 검토 및 채널 인증 확인 뒤 History 단독 canary와 영수증 검증 필요.
+
 ## 2026-11-05 — Affiliate Standard v6.0 LOCKED
 
 - Owner-approved fixed rule: exactly 10 Coupang Partners product cards per eligible content item: 5 health functional food / wellness products + 5 K-Beauty skincare products.
