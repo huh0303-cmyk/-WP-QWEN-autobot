@@ -59,9 +59,7 @@ def select_offers(title:str,content:str,routing:dict[str,Any],site_key:str,offer
         expected[slot["category"]]=expected.get(slot["category"],0)+1
     if expected!={"health_functional_foods":5,"k_beauty_skincare":5}:
         raise ValueError(f"affiliate_policy_category_mix_invalid:{expected}")
-    pool_target=routing["selection_policy"].get("pool_category_counts",{})
     chosen=[]
-    seed=f"{site_key}:{title}:{normalized(content[:1200])}"
     for slot in required:
         provider=slot["provider"]
         category=slot["category"]
@@ -69,7 +67,6 @@ def select_offers(title:str,content:str,routing:dict[str,Any],site_key:str,offer
         candidates=[o for o in candidates if o.get("affiliate_link_verified") is True and o.get("image_rights_verified") is True and all(urlparse(str(o.get(k,""))).scheme=="https" and urlparse(str(o.get(k,""))).netloc for k in ("url","image_url"))]
         # The destination catalog contains the ten fixed items: five per category.
         if not candidates: raise ValueError(f"missing_verified_offer:{slot['slot']}:{provider}:{category}")
-        candidates.sort(key=lambda o:hashlib.sha256(f"{seed}:{slot['slot']}:{o['url']}".encode()).hexdigest())
         used={x["url"] for x in chosen}
         selected=next((o for o in candidates if o["url"] not in used),None)
         if selected is None: raise ValueError(f"insufficient_unique_offers:{category}")
@@ -77,8 +74,8 @@ def select_offers(title:str,content:str,routing:dict[str,Any],site_key:str,offer
     if len(chosen)!=10: raise ValueError(f"expected_10_offers_got_{len(chosen)}")
     if len({o["url"] for o in chosen})!=10: raise ValueError("duplicate_tracking_url_in_selected_offers")
     counts={}
-    for o in chosen: counts[o["category"]]=counts.get(o["category"],0)+1
-    counts={category_key(k):v for k,v in counts.items()}
+    for o in chosen:
+        cat=category_key(o.get("category")); counts[cat]=counts.get(cat,0)+1
     if counts!=expected: raise ValueError(f"category_mix_mismatch_expected_{expected}_got_{counts}")
     if any(o.get("provider")!="coupang_partners" for o in chosen): raise ValueError("provider_mix_mismatch_expected_coupang_only_10")
     return chosen
