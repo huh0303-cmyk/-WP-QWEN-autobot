@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 
 from scripts.survival_adjective_short import LANGUAGES, PAIR_PATH, channel_map, pronunciation, select_pair
+from scripts.select_unique_survival_pair import norm, pair_is_used
 
 
 def test_all_ten_languages_have_exact_unique_channels_and_native_locale_voices():
@@ -63,3 +64,25 @@ def test_builder_refuses_unsafe_date_based_pair_rotation():
 def test_builder_refuses_retired_noun_pairs_even_when_explicitly_requested():
     with pytest.raises(RuntimeError, match="Retired noun lesson"):
         select_pair(dt.date(2026, 11, 6), "book-phone")
+
+def test_history_selector_catches_legacy_vietnamese_book_phone_metadata():
+    pair = {
+        "id": "book-phone",
+        "vi": ["sách", "điện thoại"],
+    }
+    legacy_video_metadata = norm(
+        "sách (sách) • điện thoại (điện thoại) | book • phone #Shorts "
+        "sách means book; điện thoại means phone"
+    )
+    assert pair_is_used(pair, "vi", [legacy_video_metadata])
+
+
+def test_history_selector_does_not_combine_words_from_different_videos():
+    pair = {"id": "book-phone", "vi": ["sách", "điện thoại"]}
+    history = [norm("sách means book"), norm("điện thoại means phone")]
+    assert not pair_is_used(pair, "vi", history)
+
+
+def test_history_selector_matches_stable_pair_id_in_metadata():
+    pair = {"id": "reluctant-eager", "vi": ["miễn cưỡng", "háo hức"]}
+    assert pair_is_used(pair, "vi", [norm("Lesson ID: reluctant-eager")])
