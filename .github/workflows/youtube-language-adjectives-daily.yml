@@ -13,10 +13,6 @@ on:
         description: Optional ISO-8601 future release time; uploads privately and schedules publication
         required: false
         type: string
-      pair_id:
-        description: Optional vocabulary pair override
-        required: false
-        type: string
       languages:
         description: all ten channels or comma-separated language codes
         required: true
@@ -76,13 +72,12 @@ jobs:
             exit 1
           fi
           echo "Fish Audio key is available to the build job."
-      - name: Resolve KST date and render native-locale vocabulary Shorts
+      - name: Resolve KST date and select only an unused vocabulary pair
         id: build
         shell: bash
         env:
           INPUT_DATE: ${{ inputs.target_date }}
           INPUT_PUBLISH_AT: ${{ inputs.publish_at }}
-          INPUT_PAIR: ${{ inputs.pair_id }}
           INPUT_LANGUAGES: ${{ inputs.languages }}
         run: |
           if [ "${GITHUB_EVENT_NAME}" = "schedule" ]; then
@@ -94,17 +89,14 @@ jobs:
           fi
           LANGUAGES="${INPUT_LANGUAGES:-all}"
           ARGS=(--date "$TARGET_DATE" --languages "$LANGUAGES")
-          if [ -n "${INPUT_PAIR:-}" ]; then
-            PAIR_ID="$INPUT_PAIR"
-            echo "Using explicitly requested pair override: $PAIR_ID"
-          else
-            PAIR_LOG="$(python scripts/select_unique_survival_pair.py --languages "$LANGUAGES")"
-            echo "$PAIR_LOG"
-            PAIR_ID="$(printf '%s\n' "$PAIR_LOG" | sed -n 's/^SELECTED_PAIR_ID=//p' | tail -n 1)"
-            if [ -z "$PAIR_ID" ]; then
-              echo "::error::No unused vocabulary pair was selected; refusing to generate repeated lessons."
-              exit 1
-            fi
+          # No manual pair override: every release must pass the full-history
+          # ten-channel selector. If no unused lesson exists, fail closed.
+          PAIR_LOG="$(python scripts/select_unique_survival_pair.py --languages "$LANGUAGES")"
+          echo "$PAIR_LOG"
+          PAIR_ID="$(printf '%s\n' "$PAIR_LOG" | sed -n 's/^SELECTED_PAIR_ID=//p' | tail -n 1)"
+          if [ -z "$PAIR_ID" ]; then
+            echo "::error::No unused vocabulary pair was selected; refusing to generate repeated lessons."
+            exit 1
           fi
           ARGS+=(--pair-id "$PAIR_ID")
           echo "selected_pair_id=$PAIR_ID" >> "$GITHUB_OUTPUT"
