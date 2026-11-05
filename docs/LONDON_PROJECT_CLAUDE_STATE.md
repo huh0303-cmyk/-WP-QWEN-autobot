@@ -1,4 +1,17 @@
 # 런던프로젝트클로드 — 상태 원장 (State Ledger)
+
+## 2026-11-05 — Affiliate Standard v6.0 LOCKED
+
+- Owner-approved fixed rule: exactly 10 Coupang Partners product cards per eligible content item: 5 health functional food / wellness products + 5 K-Beauty skincare products.
+- Product cards are Coupang-only. OLIVE YOUNG and Trip.com are never product-card providers.
+- Header banners are separate and ordered: Coupang Partners → Trip.com → OLIVE YOUNG.
+- Product-card disclosure states the 24-hour eligible-purchase attribution window, including another eligible item, with attribution/cancellation/return caveats.
+- Weekly review keeps proven performers and replaces only selected unavailable, broken, or underperforming items.
+- K-Health365 is the only pilot. No fleet-wide change to WordPress, Blogspot, YouTube, TikTok, Instagram, Facebook, Threads, or other registered destinations until the owner explicitly approves after public pilot review.
+- Canonical authority: `docs/AFFILIATE_STANDARD_LOCK_V6_2026-11-05.md`, `config/affiliate_distribution_policy.json`, `affiliate-engine/config/affiliate-routing.json`, `config/affiliate/london-shared-policy.json`.
+- Former v4/v5 mixed category, randomized allocation, and old header-order instructions are superseded. Historical notes below remain for audit only and must not be used as current instructions.
+- GitHub code/config updated; no new live article or channel placement is claimed as completed by this policy change.
+
 ## 2026-11-03 ? Affiliate standard v4.0
 
 - Current article layout: three header buttons only ? Coupang Partners, Olive Young Global, Trip.com.
