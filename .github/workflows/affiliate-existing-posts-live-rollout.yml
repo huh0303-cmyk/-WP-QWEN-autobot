@@ -1,0 +1,98 @@
+name: Affiliate live rollout — existing published posts
+
+on:
+  push:
+    paths:
+      - "config/affiliate/initial-rollout-trigger.json"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Preview or apply the live updates
+        required: true
+        type: choice
+        options: [preview, apply]
+        default: preview
+      confirm_apply:
+        description: Type APPLY-ALL to authorize updates
+        required: false
+        type: string
+        default: ""
+      platform:
+        description: Which platform to process
+        required: true
+        type: choice
+        options: [all, wordpress, blogger]
+        default: all
+      site_id:
+        description: Optional exact site_id
+        required: false
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: affiliate-existing-posts-live-rollout
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    if: ${{ github.event_name == 'push' || inputs.mode == 'preview' || inputs.confirm_apply == 'APPLY-ALL' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install --upgrade pip requests
+      - name: Update existing published posts with verified affiliate blocks
+        env:
+          MODE: ${{ github.event_name == 'push' && 'apply' || inputs.mode || 'preview' }}
+          PLATFORM: ${{ inputs.platform || 'all' }}
+          SITE_ID: ${{ inputs.site_id || '' }}
+          LIMIT_PER_SITE: "0"
+          WP_USER: ${{ secrets.WP_USER }}
+          WP_SITE_CREDENTIALS_JSON: ${{ secrets.WP_SITE_CREDENTIALS_JSON }}
+          KOREA365ORG: ${{ secrets.KOREA365ORG }}
+          KSTUDY365COM: ${{ secrets.KSTUDY365COM }}
+          OLIVEYOUNGKOREACOM: ${{ secrets.OLIVEYOUNGKOREACOM }}
+          JOBKOREA365COM: ${{ secrets.JOBKOREA365COM }}
+          KVISA365COM: ${{ secrets.KVISA365COM }}
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+          KSKIN365COM: ${{ secrets.KSKIN365COM }}
+          KTRIP365COM: ${{ secrets.KTRIP365COM }}
+          KFINANCE365COM: ${{ secrets.KFINANCE365COM }}
+          KOREAINSURANCE365COM: ${{ secrets.KOREAINSURANCE365COM }}
+          KOREATAXNLAWCOM: ${{ secrets.KOREATAXNLAWCOM }}
+          KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
+          STUDYINKOREA365COM: ${{ secrets.STUDYINKOREA365COM }}
+          JOBINKOREA365COM: ${{ secrets.JOBINKOREA365COM }}
+          KWORLD365COM: ${{ secrets.KWORLD365COM }}
+          KOREAWEDDING365COM: ${{ secrets.KOREAWEDDING365COM }}
+          JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
+          KOREAINVEST365COM: ${{ secrets.KOREAINVEST365COM }}
+          KREALESTATE365COM: ${{ secrets.KREALESTATE365COM }}
+          KOREACRYPTO365COM: ${{ secrets.KOREACRYPTO365COM }}
+          KTECH365COM: ${{ secrets.KTECH365COM }}
+          KIECAKOREAORG: ${{ secrets.KIECAKOREAORG }}
+          KSAKOREAORG: ${{ secrets.KSAKOREAORG }}
+          SISKOREACOM: ${{ secrets.SISKOREACOM }}
+          KIKOREACOM: ${{ secrets.KIKOREACOM }}
+          KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
+          BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
+          BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
+          BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
+        run: |
+          ARGS=(--mode "$MODE" --platform "$PLATFORM" --limit-per-site "${LIMIT_PER_SITE:-0}")
+          if [ -n "$SITE_ID" ]; then ARGS+=(--site-id "$SITE_ID"); fi
+          if [ "$MODE" = "apply" ]; then ARGS+=(--confirm APPLY-ALL); fi
+          python scripts/backfill_coupang_all_existing_posts.py "${ARGS[@]}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: affiliate-existing-posts-live-rollout-report
+          path: reports/coupang-existing-posts-backfill.json
+          if-no-files-found: warn
+          retention-days: 14
