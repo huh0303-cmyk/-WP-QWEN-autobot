@@ -3105,16 +3105,16 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
     if selected_photo and selected_photo["image_url"] not in checked_images:
         site.pop("_newsroom_real_photo", None)
     images = [image for image in checked_images if not selected_photo or image != selected_photo["image_url"]]
-    hero=build_img_html(images[:1],keyword,alt_text=title)
-    mid =build_img_html(images[1:2],keyword,alt_text=keyword) if len(images)>1 else ""
-    end =build_img_html(images[2:3],keyword,alt_text=f"{keyword} {theme}") if len(images)>2 else ""
+    # WordPress themes render featured_media on single-post pages. Do not
+    # also prepend that same first image to the body: it creates a duplicate
+    # hero (the uploaded media URL may differ from the original Pexels URL).
+    hero = ""
+    mid = build_img_html(images[1:2], keyword, alt_text=keyword) if len(images) > 1 else ""
+    end = build_img_html(images[2:3], keyword, alt_text=f"{keyword} {theme}") if len(images) > 2 else ""
     is_newsroom = site.get("mode") in ("news", "news_en")
     if is_newsroom:
-        from newsroom_real_photos import figure
-        ai_caption = "AI 생성 설명 이미지 · 실제 현장 사진 아님" if site.get("lang") == "ko" else "AI-generated illustration; not a photograph of the event"
-        photo = site.get("_newsroom_real_photo")
-        hero = figure(photo, site.get("lang", "en")) if photo else build_img_html(images[:1], keyword, alt_text=ai_caption)
-        mid = build_img_html(images[:1], keyword, alt_text=ai_caption) if photo else ""
+        # Newsroom lead photo is the featured image only; never repeat it inline.
+        mid = ""
         end = ""
     faq_html="" if is_newsroom else build_faq_html(faq)
 
