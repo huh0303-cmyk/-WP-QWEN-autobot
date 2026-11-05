@@ -23,12 +23,22 @@
   },
   "article_rules": {
     "default_card_count": 10,
-    "placement": "article_footer",
+    "placement": "absolute_article_footer_only",
     "required_disclosure": true,
     "no_medical_investment_or_legal_outcome_claims": true,
     "separate_information_content_from_product_promotion": true,
-    "provider_logo_strip": "only_if_provider_brand_guidelines_allow",
-    "use_official_current_brand_assets": true
+    "provider_logo_strip": "official_company_logo_images_only",
+    "use_official_current_brand_assets": true,
+    "banner_order": [
+      "coupang_partners",
+      "olive_young_global",
+      "trip_com"
+    ],
+    "banner_layout": "single_horizontal_row_three_official_logos",
+    "banner_links": "each_official_logo_banner_is_clickable_and_uses_its_own_account_authorized_tracking_url",
+    "product_cards_position": "immediately_below_three_company_banners",
+    "never_place_affiliate_block_at_article_top_or_inside_article_body": true,
+    "soft_product_count": "use_up_to_10_verified_coupang_products_when_catalog_has_fewer; never fabricate"
   },
   "wordpress": [
     {
@@ -729,11 +739,21 @@
     ]
   },
   "execution_status": {
-    "policy_saved": false,
+    "policy_saved": true,
     "wordpress_live_backfill": "not_started_by_this_policy",
     "blogger_live_backfill": "not_started",
     "youtube_backfill": "not_started",
     "social_publish": "not_started",
-    "note": "This file is the authoritative routing plan. Do not claim a platform update until its own provider credentials, tracked URLs, media permissions, and post-level verification pass."
+    "note": "This file is the authoritative routing plan. Do not claim a platform update until its own provider credentials, tracked URLs, media permissions, and post-level verification pass.",
+    "new_content_automation": "scheduled_every_6_hours_through_2026-11-12_KST; live_write_requires_AFFILIATE_WRITE_ENABLED_secret_true",
+    "placement_lock": "footer_only_three_official_company_logo_banners_then_up_to_10_coupang_products"
+  },
+  "automation_window": {
+    "timezone": "Asia/Seoul",
+    "start": "2026-11-05T00:00:00+09:00",
+    "end": "2026-11-12T23:59:59+09:00",
+    "schedule": "every_6_hours",
+    "scope": "newly_published_wordpress_and_blogger_posts",
+    "requires_write_secret": "AFFILIATE_WRITE_ENABLED=true"
   }
 }
