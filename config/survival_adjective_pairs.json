@@ -1,1593 +1,1133 @@
 {
-  "version": 1,
-  "format": "one_antonym_pair_per_daily_short",
+  "version": 2,
+  "format": "B1_B2_adjective_contrast_one_pair_per_short",
+  "level": "CEFR B1-B2",
   "repeat_each_word_minimum": 5,
   "review_cycle_days": 30,
   "pairs": [
     {
-      "id": "long-short",
+      "id": "reluctant-eager",
       "category": "adjective",
+      "level": "B1-B2",
       "en": [
-        "long",
-        "short"
+        "reluctant",
+        "eager"
       ],
       "ko": [
-        "길다",
-        "짧다"
+        "꺼리는",
+        "열망하는"
       ],
       "ja": [
-        "長い",
-        "短い"
+        "気が進まない",
+        "意欲的な"
       ],
       "zh": [
-        "长",
-        "短"
+        "不情愿的",
+        "热切的"
       ],
       "vi": [
-        "dài",
-        "ngắn"
+        "miễn cưỡng",
+        "háo hức"
       ],
       "es": [
-        "largo",
-        "corto"
+        "reacio",
+        "entusiasmado"
       ],
       "fr": [
-        "long",
-        "court"
+        "réticent",
+        "enthousiaste"
       ],
       "de": [
-        "lang",
-        "kurz"
+        "widerwillig",
+        "eifrig"
       ],
       "it": [
-        "lungo",
-        "corto"
+        "riluttante",
+        "entusiasta"
       ],
       "pt": [
-        "longo",
-        "curto"
-      ],
-      "pronunciations": {
-        "ko": [
-          "gil-da",
-          "jjal-tta"
-        ],
-        "ja": [
-          "na-ga-i",
-          "mi-ji-ka-i"
-        ],
-        "zh": [
-          "cháng",
-          "duǎn"
-        ]
-      }
+        "relutante",
+        "entusiasmado"
+      ]
     },
     {
-      "id": "heavy-light",
+      "id": "scarce-abundant",
       "category": "adjective",
+      "level": "B1-B2",
       "en": [
-        "heavy",
-        "light"
+        "scarce",
+        "abundant"
       ],
       "ko": [
-        "무겁다",
-        "가볍다"
+        "희소한",
+        "풍부한"
       ],
       "ja": [
-        "重い",
-        "軽い"
+        "乏しい",
+        "豊富な"
       ],
       "zh": [
-        "重",
-        "轻"
+        "稀缺的",
+        "丰富的"
       ],
       "vi": [
-        "nặng",
-        "nhẹ"
+        "khan hiếm",
+        "dồi dào"
       ],
       "es": [
-        "pesado",
-        "ligero"
+        "escaso",
+        "abundante"
       ],
       "fr": [
-        "lourd",
-        "léger"
+        "rare",
+        "abondant"
       ],
       "de": [
-        "schwer",
-        "leicht"
+        "knapp",
+        "reichlich"
       ],
       "it": [
-        "pesante",
-        "leggero"
+        "scarso",
+        "abbondante"
       ],
       "pt": [
-        "pesado",
-        "leve"
+        "escasso",
+        "abundante"
       ]
     },
     {
-      "id": "fast-slow",
+      "id": "accurate-inaccurate",
       "category": "adjective",
+      "level": "B1-B2",
       "en": [
-        "fast",
-        "slow"
+        "accurate",
+        "inaccurate"
       ],
       "ko": [
-        "빠르다",
-        "느리다"
+        "정확한",
+        "부정확한"
       ],
       "ja": [
-        "速い",
-        "遅い"
+        "正確な",
+        "不正確な"
       ],
       "zh": [
-        "快",
-        "慢"
+        "准确的",
+        "不准确的"
       ],
       "vi": [
-        "nhanh",
-        "chậm"
+        "chính xác",
+        "không chính xác"
       ],
       "es": [
-        "rápido",
-        "lento"
+        "preciso",
+        "impreciso"
       ],
       "fr": [
-        "rapide",
-        "lent"
+        "précis",
+        "imprécis"
       ],
       "de": [
-        "schnell",
-        "langsam"
+        "genau",
+        "ungenau"
       ],
       "it": [
-        "veloce",
-        "lento"
+        "accurato",
+        "inesatto"
       ],
       "pt": [
-        "rápido",
-        "lento"
+        "preciso",
+        "impreciso"
       ]
     },
     {
-      "id": "sun-moon",
-      "category": "noun",
-      "en": [
-        "sun",
-        "moon"
-      ],
-      "ko": [
-        "해",
-        "달"
-      ],
-      "ja": [
-        "太陽",
-        "月"
-      ],
-      "zh": [
-        "太阳",
-        "月亮"
-      ],
-      "vi": [
-        "mặt trời",
-        "mặt trăng"
-      ],
-      "es": [
-        "sol",
-        "luna"
-      ],
-      "fr": [
-        "soleil",
-        "lune"
-      ],
-      "de": [
-        "Sonne",
-        "Mond"
-      ],
-      "it": [
-        "sole",
-        "luna"
-      ],
-      "pt": [
-        "sol",
-        "lua"
-      ],
-      "pronunciations": {
-        "ko": [
-          "hae",
-          "dal"
-        ],
-        "ja": [
-          "tai-yō",
-          "tsuki"
-        ],
-        "zh": [
-          "tài-yáng",
-          "yuè-liang"
-        ],
-        "es": [
-          "sohl",
-          "LOO-nah"
-        ],
-        "fr": [
-          "soh-LAY",
-          "loon"
-        ],
-        "de": [
-          "ZON-uh",
-          "mohnt"
-        ],
-        "it": [
-          "SOH-leh",
-          "LOO-nah"
-        ],
-        "pt": [
-          "sohl",
-          "LOO-ah"
-        ]
-      }
-    },
-    {
-      "id": "book-phone",
-      "category": "noun",
-      "en": [
-        "book",
-        "phone"
-      ],
-      "ko": [
-        "책",
-        "전화"
-      ],
-      "ja": [
-        "本",
-        "電話"
-      ],
-      "zh": [
-        "书",
-        "电话"
-      ],
-      "vi": [
-        "sách",
-        "điện thoại"
-      ],
-      "es": [
-        "libro",
-        "teléfono"
-      ],
-      "fr": [
-        "livre",
-        "téléphone"
-      ],
-      "de": [
-        "Buch",
-        "Telefon"
-      ],
-      "it": [
-        "libro",
-        "telefono"
-      ],
-      "pt": [
-        "livro",
-        "telefone"
-      ],
-      "pronunciations": {
-        "ko": [
-          "chaek",
-          "jeon-hwa"
-        ],
-        "ja": [
-          "hon",
-          "den-wa"
-        ],
-        "zh": [
-          "shū",
-          "diàn-huà"
-        ],
-        "es": [
-          "LEE-broh",
-          "teh-LEH-foh-noh"
-        ],
-        "fr": [
-          "leevr",
-          "tay-lay-FOHN"
-        ],
-        "de": [
-          "bookh",
-          "teh-leh-FOHN"
-        ],
-        "it": [
-          "LEE-broh",
-          "teh-LEH-foh-noh"
-        ],
-        "pt": [
-          "LEE-vroo",
-          "teh-leh-FOH-nee"
-        ]
-      }
-    },
-    {
-      "id": "water-coffee",
-      "category": "noun",
-      "en": [
-        "water",
-        "coffee"
-      ],
-      "ko": [
-        "물",
-        "커피"
-      ],
-      "ja": [
-        "水",
-        "コーヒー"
-      ],
-      "zh": [
-        "水",
-        "咖啡"
-      ],
-      "vi": [
-        "nước",
-        "cà phê"
-      ],
-      "es": [
-        "agua",
-        "café"
-      ],
-      "fr": [
-        "eau",
-        "café"
-      ],
-      "de": [
-        "Wasser",
-        "Kaffee"
-      ],
-      "it": [
-        "acqua",
-        "caffè"
-      ],
-      "pt": [
-        "água",
-        "café"
-      ],
-      "pronunciations": {
-        "ko": [
-          "mul",
-          "keo-pi"
-        ],
-        "ja": [
-          "mi-zu",
-          "kō-hī"
-        ],
-        "zh": [
-          "shuǐ",
-          "kā-fēi"
-        ],
-        "es": [
-          "AH-gwah",
-          "kah-FEH"
-        ],
-        "fr": [
-          "oh",
-          "kah-FEH"
-        ],
-        "de": [
-          "VAH-suh",
-          "kah-FAY"
-        ],
-        "it": [
-          "AHK-kwah",
-          "kahf-FEH"
-        ],
-        "pt": [
-          "AH-gwah",
-          "kah-FEH"
-        ]
-      }
-    },
-    {
-      "id": "big-small",
+      "id": "efficient-inefficient",
       "category": "adjective",
+      "level": "B1-B2",
       "en": [
-        "big",
-        "small"
+        "efficient",
+        "inefficient"
       ],
       "ko": [
-        "크다",
-        "작다"
+        "효율적인",
+        "비효율적인"
       ],
       "ja": [
-        "大きい",
-        "小さい"
+        "効率的な",
+        "非効率的な"
       ],
       "zh": [
-        "大",
-        "小"
+        "高效的",
+        "低效的"
       ],
       "vi": [
-        "to",
-        "nhỏ"
+        "hiệu quả",
+        "kém hiệu quả"
       ],
       "es": [
-        "grande",
-        "pequeño"
+        "eficiente",
+        "ineficiente"
       ],
       "fr": [
-        "grand",
-        "petit"
+        "efficace",
+        "inefficace"
       ],
       "de": [
-        "groß",
-        "klein"
+        "effizient",
+        "ineffizient"
       ],
       "it": [
-        "grande",
-        "piccolo"
+        "efficiente",
+        "inefficiente"
       ],
       "pt": [
-        "grande",
-        "pequeno"
+        "eficiente",
+        "ineficiente"
       ]
     },
     {
-      "id": "hot-cold",
+      "id": "flexible-rigid",
+      "category": "adjective",
+      "level": "B1-B2",
       "en": [
-        "hot",
-        "cold"
+        "flexible",
+        "rigid"
       ],
       "ko": [
-        "뜨겁다",
-        "차갑다"
+        "유연한",
+        "경직된"
       ],
       "ja": [
-        "熱い",
-        "冷たい"
+        "柔軟な",
+        "硬直した"
       ],
       "zh": [
-        "热",
-        "冷"
+        "灵活的",
+        "僵化的"
       ],
       "vi": [
-        "nóng",
-        "lạnh"
+        "linh hoạt",
+        "cứng nhắc"
       ],
       "es": [
-        "caliente",
-        "frío"
+        "flexible",
+        "rígido"
       ],
       "fr": [
-        "chaud",
-        "froid"
+        "souple",
+        "rigide"
       ],
       "de": [
-        "heiß",
-        "kalt"
+        "flexibel",
+        "starr"
       ],
       "it": [
-        "caldo",
-        "freddo"
+        "flessibile",
+        "rigido"
       ],
       "pt": [
-        "quente",
-        "frio"
+        "flexível",
+        "rígido"
       ]
     },
     {
-      "id": "easy-difficult",
+      "id": "temporary-permanent",
+      "category": "adjective",
+      "level": "B1-B2",
       "en": [
-        "easy",
-        "difficult"
+        "temporary",
+        "permanent"
       ],
       "ko": [
-        "쉽다",
-        "어렵다"
+        "일시적인",
+        "영구적인"
       ],
       "ja": [
-        "易しい",
-        "難しい"
+        "一時的な",
+        "永久的な"
       ],
       "zh": [
-        "容易",
-        "困难"
+        "暂时的",
+        "永久的"
       ],
       "vi": [
-        "dễ",
-        "khó"
+        "tạm thời",
+        "vĩnh viễn"
       ],
       "es": [
-        "fácil",
-        "difícil"
+        "temporal",
+        "permanente"
       ],
       "fr": [
-        "facile",
-        "difficile"
+        "temporaire",
+        "permanent"
       ],
       "de": [
-        "einfach",
-        "schwierig"
+        "vorübergehend",
+        "dauerhaft"
       ],
       "it": [
-        "facile",
-        "difficile"
+        "temporaneo",
+        "permanente"
       ],
       "pt": [
-        "fácil",
-        "difícil"
+        "temporário",
+        "permanente"
       ]
     },
     {
-      "id": "new-old",
+      "id": "cautious-reckless",
+      "category": "adjective",
+      "level": "B1-B2",
       "en": [
-        "new",
-        "old"
+        "cautious",
+        "reckless"
       ],
       "ko": [
-        "새롭다",
-        "오래되다"
+        "신중한",
+        "무모한"
       ],
       "ja": [
-        "新しい",
-        "古い"
+        "用心深い",
+        "無謀な"
       ],
       "zh": [
-        "新",
-        "旧"
+        "谨慎的",
+        "鲁莽的"
       ],
       "vi": [
-        "mới",
-        "cũ"
+        "thận trọng",
+        "liều lĩnh"
       ],
       "es": [
-        "nuevo",
-        "viejo"
+        "prudente",
+        "imprudente"
       ],
       "fr": [
-        "nouveau",
-        "vieux"
+        "prudent",
+        "téméraire"
       ],
       "de": [
-        "neu",
-        "alt"
+        "vorsichtig",
+        "rücksichtslos"
       ],
       "it": [
-        "nuovo",
-        "vecchio"
+        "cauto",
+        "sconsiderato"
       ],
       "pt": [
-        "novo",
-        "velho"
+        "cauteloso",
+        "imprudente"
       ]
     },
     {
-      "id": "high-low",
+      "id": "confident-insecure",
+      "category": "adjective",
+      "level": "B1-B2",
       "en": [
-        "high",
-        "low"
+        "confident",
+        "insecure"
       ],
       "ko": [
-        "높다",
-        "낮다"
+        "자신감 있는",
+        "불안한"
       ],
       "ja": [
-        "高い",
-        "低い"
+        "自信のある",
+        "自信のない"
       ],
       "zh": [
-        "高",
-        "低"
+        "自信的",
+        "缺乏安全感的"
       ],
       "vi": [
-        "cao",
-        "thấp"
-      ],
-      "es": [
-        "alto",
-        "bajo"
-      ],
-      "fr": [
-        "haut",
-        "bas"
-      ],
-      "de": [
-        "hoch",
-        "niedrig"
-      ],
-      "it": [
-        "alto",
-        "basso"
-      ],
-      "pt": [
-        "alto",
-        "baixo"
-      ]
-    },
-    {
-      "id": "strong-weak",
-      "en": [
-        "strong",
-        "weak"
-      ],
-      "ko": [
-        "강하다",
-        "약하다"
-      ],
-      "ja": [
-        "強い",
-        "弱い"
-      ],
-      "zh": [
-        "强",
-        "弱"
-      ],
-      "vi": [
-        "mạnh",
-        "yếu"
-      ],
-      "es": [
-        "fuerte",
-        "débil"
-      ],
-      "fr": [
-        "fort",
-        "faible"
-      ],
-      "de": [
-        "stark",
-        "schwach"
-      ],
-      "it": [
-        "forte",
-        "debole"
-      ],
-      "pt": [
-        "forte",
-        "fraco"
-      ]
-    },
-    {
-      "id": "clean-dirty",
-      "en": [
-        "clean",
-        "dirty"
-      ],
-      "ko": [
-        "깨끗하다",
-        "더럽다"
-      ],
-      "ja": [
-        "きれい",
-        "汚い"
-      ],
-      "zh": [
-        "干净",
-        "脏"
-      ],
-      "vi": [
-        "sạch",
-        "bẩn"
-      ],
-      "es": [
-        "limpio",
-        "sucio"
-      ],
-      "fr": [
-        "propre",
-        "sale"
-      ],
-      "de": [
-        "sauber",
-        "schmutzig"
-      ],
-      "it": [
-        "pulito",
-        "sporco"
-      ],
-      "pt": [
-        "limpo",
-        "sujo"
-      ]
-    },
-    {
-      "id": "bright-dark",
-      "en": [
-        "bright",
-        "dark"
-      ],
-      "ko": [
-        "밝다",
-        "어둡다"
-      ],
-      "ja": [
-        "明るい",
-        "暗い"
-      ],
-      "zh": [
-        "明亮",
-        "黑暗"
-      ],
-      "vi": [
-        "sáng",
-        "tối"
-      ],
-      "es": [
-        "brillante",
-        "oscuro"
-      ],
-      "fr": [
-        "lumineux",
-        "sombre"
-      ],
-      "de": [
-        "hell",
-        "dunkel"
-      ],
-      "it": [
-        "luminoso",
-        "scuro"
-      ],
-      "pt": [
-        "claro",
-        "escuro"
-      ]
-    },
-    {
-      "id": "hard-soft",
-      "en": [
-        "hard",
-        "soft"
-      ],
-      "ko": [
-        "단단하다",
-        "부드럽다"
-      ],
-      "ja": [
-        "硬い",
-        "柔らかい"
-      ],
-      "zh": [
-        "硬",
-        "软"
-      ],
-      "vi": [
-        "cứng",
-        "mềm"
-      ],
-      "es": [
-        "duro",
-        "suave"
-      ],
-      "fr": [
-        "dur",
-        "doux"
-      ],
-      "de": [
-        "hart",
-        "weich"
-      ],
-      "it": [
-        "duro",
-        "morbido"
-      ],
-      "pt": [
-        "duro",
-        "macio"
-      ]
-    },
-    {
-      "id": "wide-narrow",
-      "en": [
-        "wide",
-        "narrow"
-      ],
-      "ko": [
-        "넓다",
-        "좁다"
-      ],
-      "ja": [
-        "広い",
-        "狭い"
-      ],
-      "zh": [
-        "宽",
-        "窄"
-      ],
-      "vi": [
-        "rộng",
-        "hẹp"
-      ],
-      "es": [
-        "ancho",
-        "estrecho"
-      ],
-      "fr": [
-        "large",
-        "étroit"
-      ],
-      "de": [
-        "breit",
-        "schmal"
-      ],
-      "it": [
-        "largo",
-        "stretto"
-      ],
-      "pt": [
-        "largo",
-        "estreito"
-      ]
-    },
-    {
-      "id": "thick-thin",
-      "en": [
-        "thick",
-        "thin"
-      ],
-      "ko": [
-        "두껍다",
-        "얇다"
-      ],
-      "ja": [
-        "厚い",
-        "薄い"
-      ],
-      "zh": [
-        "厚",
-        "薄"
-      ],
-      "vi": [
-        "dày",
-        "mỏng"
-      ],
-      "es": [
-        "grueso",
-        "delgado"
-      ],
-      "fr": [
-        "épais",
-        "mince"
-      ],
-      "de": [
-        "dick",
-        "dünn"
-      ],
-      "it": [
-        "spesso",
-        "sottile"
-      ],
-      "pt": [
-        "grosso",
-        "fino"
-      ]
-    },
-    {
-      "id": "early-late",
-      "en": [
-        "early",
-        "late"
-      ],
-      "ko": [
-        "이르다",
-        "늦다"
-      ],
-      "ja": [
-        "早い",
-        "遅い"
-      ],
-      "zh": [
-        "早",
-        "晚"
-      ],
-      "vi": [
-        "sớm",
-        "muộn"
-      ],
-      "es": [
-        "temprano",
-        "tarde"
-      ],
-      "fr": [
-        "tôt",
-        "tard"
-      ],
-      "de": [
-        "früh",
-        "spät"
-      ],
-      "it": [
-        "presto",
-        "tardi"
-      ],
-      "pt": [
-        "cedo",
-        "tarde"
-      ]
-    },
-    {
-      "id": "full-empty",
-      "en": [
-        "full",
-        "empty"
-      ],
-      "ko": [
-        "가득하다",
-        "비어 있다"
-      ],
-      "ja": [
-        "いっぱい",
-        "空っぽ"
-      ],
-      "zh": [
-        "满",
-        "空"
-      ],
-      "vi": [
-        "đầy",
-        "rỗng"
-      ],
-      "es": [
-        "lleno",
-        "vacío"
-      ],
-      "fr": [
-        "plein",
-        "vide"
-      ],
-      "de": [
-        "voll",
-        "leer"
-      ],
-      "it": [
-        "pieno",
-        "vuoto"
-      ],
-      "pt": [
-        "cheio",
-        "vazio"
-      ]
-    },
-    {
-      "id": "happy-sad",
-      "en": [
-        "happy",
-        "sad"
-      ],
-      "ko": [
-        "행복하다",
-        "슬프다"
-      ],
-      "ja": [
-        "うれしい",
-        "悲しい"
-      ],
-      "zh": [
-        "高兴",
-        "难过"
-      ],
-      "vi": [
-        "vui",
-        "buồn"
-      ],
-      "es": [
-        "feliz",
-        "triste"
-      ],
-      "fr": [
-        "heureux",
-        "triste"
-      ],
-      "de": [
-        "glücklich",
-        "traurig"
-      ],
-      "it": [
-        "felice",
-        "triste"
-      ],
-      "pt": [
-        "feliz",
-        "triste"
-      ]
-    },
-    {
-      "id": "safe-dangerous",
-      "en": [
-        "safe",
-        "dangerous"
-      ],
-      "ko": [
-        "안전하다",
-        "위험하다"
-      ],
-      "ja": [
-        "安全",
-        "危険"
-      ],
-      "zh": [
-        "安全",
-        "危险"
-      ],
-      "vi": [
-        "an toàn",
-        "nguy hiểm"
+        "tự tin",
+        "thiếu tự tin"
       ],
       "es": [
         "seguro",
-        "peligroso"
+        "inseguro"
       ],
       "fr": [
-        "sûr",
-        "dangereux"
+        "confiant",
+        "peu sûr de soi"
       ],
       "de": [
-        "sicher",
-        "gefährlich"
+        "selbstbewusst",
+        "unsicher"
       ],
       "it": [
         "sicuro",
-        "pericoloso"
+        "insicuro"
       ],
       "pt": [
-        "seguro",
-        "perigoso"
+        "confiante",
+        "inseguro"
       ]
     },
     {
-      "id": "expensive-cheap",
-      "en": [
-        "expensive",
-        "cheap"
-      ],
-      "ko": [
-        "비싸다",
-        "싸다"
-      ],
-      "ja": [
-        "高い",
-        "安い"
-      ],
-      "zh": [
-        "贵",
-        "便宜"
-      ],
-      "vi": [
-        "đắt",
-        "rẻ"
-      ],
-      "es": [
-        "caro",
-        "barato"
-      ],
-      "fr": [
-        "cher",
-        "bon marché"
-      ],
-      "de": [
-        "teuer",
-        "billig"
-      ],
-      "it": [
-        "costoso",
-        "economico"
-      ],
-      "pt": [
-        "caro",
-        "barato"
-      ]
-    },
-    {
-      "id": "near-far",
-      "en": [
-        "near",
-        "far"
-      ],
-      "ko": [
-        "가깝다",
-        "멀다"
-      ],
-      "ja": [
-        "近い",
-        "遠い"
-      ],
-      "zh": [
-        "近",
-        "远"
-      ],
-      "vi": [
-        "gần",
-        "xa"
-      ],
-      "es": [
-        "cerca",
-        "lejos"
-      ],
-      "fr": [
-        "proche",
-        "loin"
-      ],
-      "de": [
-        "nah",
-        "weit"
-      ],
-      "it": [
-        "vicino",
-        "lontano"
-      ],
-      "pt": [
-        "perto",
-        "longe"
-      ]
-    },
-    {
-      "id": "young-old",
-      "en": [
-        "young",
-        "old"
-      ],
-      "ko": [
-        "젊다",
-        "나이가 많다"
-      ],
-      "ja": [
-        "若い",
-        "年を取った"
-      ],
-      "zh": [
-        "年轻",
-        "年老"
-      ],
-      "vi": [
-        "trẻ",
-        "già"
-      ],
-      "es": [
-        "joven",
-        "anciano"
-      ],
-      "fr": [
-        "jeune",
-        "âgé"
-      ],
-      "de": [
-        "jung",
-        "alt"
-      ],
-      "it": [
-        "giovane",
-        "anziano"
-      ],
-      "pt": [
-        "jovem",
-        "idoso"
-      ]
-    },
-    {
-      "id": "wet-dry",
-      "en": [
-        "wet",
-        "dry"
-      ],
-      "ko": [
-        "젖다",
-        "마르다"
-      ],
-      "ja": [
-        "濡れている",
-        "乾いている"
-      ],
-      "zh": [
-        "湿",
-        "干"
-      ],
-      "vi": [
-        "ướt",
-        "khô"
-      ],
-      "es": [
-        "mojado",
-        "seco"
-      ],
-      "fr": [
-        "mouillé",
-        "sec"
-      ],
-      "de": [
-        "nass",
-        "trocken"
-      ],
-      "it": [
-        "bagnato",
-        "asciutto"
-      ],
-      "pt": [
-        "molhado",
-        "seco"
-      ]
-    },
-    {
-      "id": "quiet-noisy",
-      "en": [
-        "quiet",
-        "noisy"
-      ],
-      "ko": [
-        "조용하다",
-        "시끄럽다"
-      ],
-      "ja": [
-        "静か",
-        "うるさい"
-      ],
-      "zh": [
-        "安静",
-        "吵闹"
-      ],
-      "vi": [
-        "yên tĩnh",
-        "ồn ào"
-      ],
-      "es": [
-        "silencioso",
-        "ruidoso"
-      ],
-      "fr": [
-        "silencieux",
-        "bruyant"
-      ],
-      "de": [
-        "leise",
-        "laut"
-      ],
-      "it": [
-        "silenzioso",
-        "rumoroso"
-      ],
-      "pt": [
-        "silencioso",
-        "barulhento"
-      ]
-    },
-    {
-      "id": "kind-unkind",
-      "en": [
-        "kind",
-        "unkind"
-      ],
-      "ko": [
-        "친절하다",
-        "불친절하다"
-      ],
-      "ja": [
-        "親切",
-        "不親切"
-      ],
-      "zh": [
-        "友善",
-        "不友善"
-      ],
-      "vi": [
-        "tử tế",
-        "không tử tế"
-      ],
-      "es": [
-        "amable",
-        "antipático"
-      ],
-      "fr": [
-        "gentil",
-        "méchant"
-      ],
-      "de": [
-        "freundlich",
-        "unfreundlich"
-      ],
-      "it": [
-        "gentile",
-        "scortese"
-      ],
-      "pt": [
-        "gentil",
-        "indelicado"
-      ]
-    },
-    {
-      "id": "beautiful-ugly",
-      "en": [
-        "beautiful",
-        "ugly"
-      ],
-      "ko": [
-        "아름답다",
-        "못생기다"
-      ],
-      "ja": [
-        "美しい",
-        "醜い"
-      ],
-      "zh": [
-        "漂亮",
-        "难看"
-      ],
-      "vi": [
-        "đẹp",
-        "xấu"
-      ],
-      "es": [
-        "hermoso",
-        "feo"
-      ],
-      "fr": [
-        "beau",
-        "laid"
-      ],
-      "de": [
-        "schön",
-        "hässlich"
-      ],
-      "it": [
-        "bello",
-        "brutto"
-      ],
-      "pt": [
-        "bonito",
-        "feio"
-      ]
-    },
-    {
-      "id": "sweet-bitter",
-      "en": [
-        "sweet",
-        "bitter"
-      ],
-      "ko": [
-        "달다",
-        "쓰다"
-      ],
-      "ja": [
-        "甘い",
-        "苦い"
-      ],
-      "zh": [
-        "甜",
-        "苦"
-      ],
-      "vi": [
-        "ngọt",
-        "đắng"
-      ],
-      "es": [
-        "dulce",
-        "amargo"
-      ],
-      "fr": [
-        "sucré",
-        "amer"
-      ],
-      "de": [
-        "süß",
-        "bitter"
-      ],
-      "it": [
-        "dolce",
-        "amaro"
-      ],
-      "pt": [
-        "doce",
-        "amargo"
-      ]
-    },
-    {
-      "id": "open-closed",
-      "en": [
-        "open",
-        "closed"
-      ],
-      "ko": [
-        "열려 있다",
-        "닫혀 있다"
-      ],
-      "ja": [
-        "開いている",
-        "閉まっている"
-      ],
-      "zh": [
-        "开着",
-        "关着"
-      ],
-      "vi": [
-        "mở",
-        "đóng"
-      ],
-      "es": [
-        "abierto",
-        "cerrado"
-      ],
-      "fr": [
-        "ouvert",
-        "fermé"
-      ],
-      "de": [
-        "offen",
-        "geschlossen"
-      ],
-      "it": [
-        "aperto",
-        "chiuso"
-      ],
-      "pt": [
-        "aberto",
-        "fechado"
-      ]
-    },
-    {
-      "id": "busy-free",
-      "en": [
-        "busy",
-        "free"
-      ],
-      "ko": [
-        "바쁘다",
-        "한가하다"
-      ],
-      "ja": [
-        "忙しい",
-        "暇"
-      ],
-      "zh": [
-        "忙",
-        "有空"
-      ],
-      "vi": [
-        "bận",
-        "rảnh"
-      ],
-      "es": [
-        "ocupado",
-        "libre"
-      ],
-      "fr": [
-        "occupé",
-        "libre"
-      ],
-      "de": [
-        "beschäftigt",
-        "frei"
-      ],
-      "it": [
-        "occupato",
-        "libero"
-      ],
-      "pt": [
-        "ocupado",
-        "livre"
-      ]
-    },
-    {
-      "id": "same-different",
-      "en": [
-        "same",
-        "different"
-      ],
-      "ko": [
-        "같다",
-        "다르다"
-      ],
-      "ja": [
-        "同じ",
-        "違う"
-      ],
-      "zh": [
-        "相同",
-        "不同"
-      ],
-      "vi": [
-        "giống nhau",
-        "khác nhau"
-      ],
-      "es": [
-        "igual",
-        "diferente"
-      ],
-      "fr": [
-        "identique",
-        "différent"
-      ],
-      "de": [
-        "gleich",
-        "verschieden"
-      ],
-      "it": [
-        "uguale",
-        "diverso"
-      ],
-      "pt": [
-        "igual",
-        "diferente"
-      ]
-    },
-    {
-      "id": "right-wrong",
-      "en": [
-        "right",
-        "wrong"
-      ],
-      "ko": [
-        "맞다",
-        "틀리다"
-      ],
-      "ja": [
-        "正しい",
-        "間違っている"
-      ],
-      "zh": [
-        "正确",
-        "错误"
-      ],
-      "vi": [
-        "đúng",
-        "sai"
-      ],
-      "es": [
-        "correcto",
-        "incorrecto"
-      ],
-      "fr": [
-        "correct",
-        "incorrect"
-      ],
-      "de": [
-        "richtig",
-        "falsch"
-      ],
-      "it": [
-        "giusto",
-        "sbagliato"
-      ],
-      "pt": [
-        "certo",
-        "errado"
-      ]
-    },
-    {
-      "id": "smooth-rough",
+      "id": "ordinary-exceptional",
       "category": "adjective",
+      "level": "B1-B2",
       "en": [
-        "smooth",
-        "rough"
+        "ordinary",
+        "exceptional"
       ],
       "ko": [
-        "매끄럽다",
-        "거칠다"
+        "평범한",
+        "탁월한"
       ],
       "ja": [
-        "滑らか",
-        "ざらざらした"
+        "普通の",
+        "並外れた"
       ],
       "zh": [
-        "光滑",
-        "粗糙"
+        "普通的",
+        "卓越的"
       ],
       "vi": [
-        "mịn",
-        "thô ráp"
+        "bình thường",
+        "phi thường"
       ],
       "es": [
-        "liso",
-        "áspero"
+        "普通",
+        "excepcional"
       ],
       "fr": [
-        "lisse",
-        "rugueux"
+        "ordinaire",
+        "exceptionnel"
       ],
       "de": [
-        "glatt",
-        "rau"
+        "gewöhnlich",
+        "außergewöhnlich"
       ],
       "it": [
-        "liscio",
-        "ruvido"
+        "ordinario",
+        "eccezionale"
       ],
       "pt": [
-        "liso",
-        "áspero"
+        "comum",
+        "excepcional"
+      ]
+    },
+    {
+      "id": "relevant-irrelevant",
+      "category": "adjective",
+      "level": "B1-B2",
+      "en": [
+        "relevant",
+        "irrelevant"
+      ],
+      "ko": [
+        "관련 있는",
+        "관련 없는"
+      ],
+      "ja": [
+        "関連性のある",
+        "無関係な"
+      ],
+      "zh": [
+        "相关的",
+        "无关的"
+      ],
+      "vi": [
+        "liên quan",
+        "không liên quan"
+      ],
+      "es": [
+        "relevante",
+        "irrelevante"
+      ],
+      "fr": [
+        "pertinent",
+        "hors sujet"
+      ],
+      "de": [
+        "relevant",
+        "irrelevant"
+      ],
+      "it": [
+        "pertinente",
+        "irrilevante"
+      ],
+      "pt": [
+        "relevante",
+        "irrelevante"
+      ]
+    },
+    {
+      "id": "obvious-subtle",
+      "category": "adjective",
+      "level": "B1-B2",
+      "en": [
+        "obvious",
+        "subtle"
+      ],
+      "ko": [
+        "명백한",
+        "미묘한"
+      ],
+      "ja": [
+        "明白な",
+        "微妙な"
+      ],
+      "zh": [
+        "明显的",
+        "微妙的"
+      ],
+      "vi": [
+        "rõ ràng",
+        "tinh tế"
+      ],
+      "es": [
+        "evidente",
+        "sutil"
+      ],
+      "fr": [
+        "évident",
+        "subtil"
+      ],
+      "de": [
+        "offensichtlich",
+        "subtil"
+      ],
+      "it": [
+        "ovvio",
+        "sottile"
+      ],
+      "pt": [
+        "óbvio",
+        "sutil"
+      ]
+    },
+    {
+      "id": "sophisticated-basic",
+      "category": "adjective",
+      "level": "B1-B2",
+      "en": [
+        "sophisticated",
+        "basic"
+      ],
+      "ko": [
+        "정교한",
+        "기본적인"
+      ],
+      "ja": [
+        "洗練された",
+        "基本的な"
+      ],
+      "zh": [
+        "复杂精致的",
+        "基础的"
+      ],
+      "vi": [
+        "tinh vi",
+        "cơ bản"
+      ],
+      "es": [
+        "sofisticado",
+        "básico"
+      ],
+      "fr": [
+        "sophistiqué",
+        "élémentaire"
+      ],
+      "de": [
+        "anspruchsvoll",
+        "grundlegend"
+      ],
+      "it": [
+        "sofisticato",
+        "di base"
+      ],
+      "pt": [
+        "sofisticado",
+        "básico"
+      ]
+    },
+    {
+      "id": "independent-dependent",
+      "category": "adjective",
+      "level": "B1-B2",
+      "en": [
+        "independent",
+        "dependent"
+      ],
+      "ko": [
+        "독립적인",
+        "의존적인"
+      ],
+      "ja": [
+        "独立した",
+        "依存した"
+      ],
+      "zh": [
+        "独立的",
+        "依赖的"
+      ],
+      "vi": [
+        "độc lập",
+        "phụ thuộc"
+      ],
+      "es": [
+        "independiente",
+        "dependiente"
+      ],
+      "fr": [
+        "indépendant",
+        "dépendant"
+      ],
+      "de": [
+        "unabhängig",
+        "abhängig"
+      ],
+      "it": [
+        "indipendente",
+        "dipendente"
+      ],
+      "pt": [
+        "independente",
+        "dependente"
+      ]
+    },
+    {
+      "id": "consistent-inconsistent",
+      "category": "adjective",
+      "level": "B1-B2",
+      "en": [
+        "consistent",
+        "inconsistent"
+      ],
+      "ko": [
+        "일관된",
+        "일관성 없는"
+      ],
+      "ja": [
+        "一貫した",
+        "一貫性のない"
+      ],
+      "zh": [
+        "一致的",
+        "不一致的"
+      ],
+      "vi": [
+        "nhất quán",
+        "không nhất quán"
+      ],
+      "es": [
+        "coherente",
+        "incoherente"
+      ],
+      "fr": [
+        "cohérent",
+        "incohérent"
+      ],
+      "de": [
+        "konsequent",
+        "inkonsequent"
+      ],
+      "it": [
+        "coerente",
+        "incoerente"
+      ],
+      "pt": [
+        "consistente",
+        "inconsistente"
+      ]
+    },
+    {
+      "id": "reliable-unreliable",
+      "category": "adjective",
+      "level": "B1-B2",
+      "en": [
+        "reliable",
+        "unreliable"
+      ],
+      "ko": [
+        "신뢰할 수 있는",
+        "신뢰할 수 없는"
+      ],
+      "ja": [
+        "信頼できる",
+        "信頼できない"
+      ],
+      "zh": [
+        "可靠的",
+        "不可靠的"
+      ],
+      "vi": [
+        "đáng tin cậy",
+        "không đáng tin cậy"
+      ],
+      "es": [
+        "fiable",
+        "poco fiable"
+      ],
+      "fr": [
+        "fiable",
+        "peu fiable"
+      ],
+      "de": [
+        "zuverlässig",
+        "unzuverlässig"
+      ],
+      "it": [
+        "affidabile",
+        "inaffidabile"
+      ],
+      "pt": [
+        "confiável",
+        "não confiável"
+      ]
+    },
+    {
+      "id": "optimistic-pessimistic",
+      "category": "adjective",
+      "level": "B1-B2",
+      "en": [
+        "optimistic",
+        "pessimistic"
+      ],
+      "ko": [
+        "낙관적인",
+        "비관적인"
+      ],
+      "ja": [
+        "楽観的な",
+        "悲観的な"
+      ],
+      "zh": [
+        "乐观的",
+        "悲观的"
+      ],
+      "vi": [
+        "lạc quan",
+        "bi quan"
+      ],
+      "es": [
+        "optimista",
+        "pesimista"
+      ],
+      "fr": [
+        "optimiste",
+        "pessimiste"
+      ],
+      "de": [
+        "optimistisch",
+        "pessimistisch"
+      ],
+      "it": [
+        "ottimista",
+        "pessimista"
+      ],
+      "pt": [
+        "otimista",
+        "pessimista"
+      ]
+    },
+    {
+      "id": "essential-optional",
+      "category": "adjective",
+      "level": "B1-B2",
+      "en": [
+        "essential",
+        "optional"
+      ],
+      "ko": [
+        "필수적인",
+        "선택적인"
+      ],
+      "ja": [
+        "不可欠な",
+        "任意の"
+      ],
+      "zh": [
+        "必要的",
+        "可选的"
+      ],
+      "vi": [
+        "thiết yếu",
+        "không bắt buộc"
+      ],
+      "es": [
+        "esencial",
+        "opcional"
+      ],
+      "fr": [
+        "essentiel",
+        "facultatif"
+      ],
+      "de": [
+        "wesentlich",
+        "optional"
+      ],
+      "it": [
+        "essenziale",
+        "facoltativo"
+      ],
+      "pt": [
+        "essencial",
+        "opcional"
+      ]
+    },
+    {
+      "id": "frequent-rare",
+      "category": "adjective",
+      "level": "B1-B2",
+      "en": [
+        "frequent",
+        "rare"
+      ],
+      "ko": [
+        "빈번한",
+        "드문"
+      ],
+      "ja": [
+        "頻繁な",
+        "まれな"
+      ],
+      "zh": [
+        "频繁的",
+        "罕见的"
+      ],
+      "vi": [
+        "thường xuyên",
+        "hiếm"
+      ],
+      "es": [
+        "frecuente",
+        "raro"
+      ],
+      "fr": [
+        "fréquent",
+        "rare"
+      ],
+      "de": [
+        "häufig",
+        "selten"
+      ],
+      "it": [
+        "frequente",
+        "raro"
+      ],
+      "pt": [
+        "frequente",
+        "raro"
+      ]
+    },
+    {
+      "id": "aware-unaware",
+      "category": "adjective",
+      "level": "B1-B2",
+      "en": [
+        "aware",
+        "unaware"
+      ],
+      "ko": [
+        "인지하는",
+        "인지하지 못하는"
+      ],
+      "ja": [
+        "気づいている",
+        "気づいていない"
+      ],
+      "zh": [
+        "意识到的",
+        "未意识到的"
+      ],
+      "vi": [
+        "nhận thức được",
+        "không nhận thức được"
+      ],
+      "es": [
+        "consciente",
+        "inconsciente"
+      ],
+      "fr": [
+        "conscient",
+        "inconscient"
+      ],
+      "de": [
+        "bewusst",
+        "unbewusst"
+      ],
+      "it": [
+        "consapevole",
+        "inconsapevole"
+      ],
+      "pt": [
+        "ciente",
+        "inconsciente"
+      ]
+    },
+    {
+      "id": "convincing-unconvincing",
+      "category": "adjective",
+      "level": "B1-B2",
+      "en": [
+        "convincing",
+        "unconvincing"
+      ],
+      "ko": [
+        "설득력 있는",
+        "설득력 없는"
+      ],
+      "ja": [
+        "説得力のある",
+        "説得力のない"
+      ],
+      "zh": [
+        "有说服力的",
+        "没有说服力的"
+      ],
+      "vi": [
+        "thuyết phục",
+        "không thuyết phục"
+      ],
+      "es": [
+        "convincente",
+        "poco convincente"
+      ],
+      "fr": [
+        "convaincant",
+        "peu convaincant"
+      ],
+      "de": [
+        "überzeugend",
+        "nicht überzeugend"
+      ],
+      "it": [
+        "convincente",
+        "poco convincente"
+      ],
+      "pt": [
+        "convincente",
+        "pouco convincente"
+      ]
+    },
+    {
+      "id": "beneficial-harmful",
+      "category": "adjective",
+      "level": "B1-B2",
+      "en": [
+        "beneficial",
+        "harmful"
+      ],
+      "ko": [
+        "유익한",
+        "해로운"
+      ],
+      "ja": [
+        "有益な",
+        "有害な"
+      ],
+      "zh": [
+        "有益的",
+        "有害的"
+      ],
+      "vi": [
+        "có lợi",
+        "có hại"
+      ],
+      "es": [
+        "beneficioso",
+        "perjudicial"
+      ],
+      "fr": [
+        "bénéfique",
+        "nuisible"
+      ],
+      "de": [
+        "vorteilhaft",
+        "schädlich"
+      ],
+      "it": [
+        "benefico",
+        "dannoso"
+      ],
+      "pt": [
+        "benéfico",
+        "prejudicial"
+      ]
+    },
+    {
+      "id": "practical-impractical",
+      "category": "adjective",
+      "level": "B1-B2",
+      "en": [
+        "practical",
+        "impractical"
+      ],
+      "ko": [
+        "실용적인",
+        "비실용적인"
+      ],
+      "ja": [
+        "実用的な",
+        "非実用的な"
+      ],
+      "zh": [
+        "实用的",
+        "不切实际的"
+      ],
+      "vi": [
+        "thiết thực",
+        "không thiết thực"
+      ],
+      "es": [
+        "práctico",
+        "poco práctico"
+      ],
+      "fr": [
+        "pratique",
+        "peu pratique"
+      ],
+      "de": [
+        "praktisch",
+        "unpraktisch"
+      ],
+      "it": [
+        "pratico",
+        "poco pratico"
+      ],
+      "pt": [
+        "prático",
+        "impraticável"
+      ]
+    },
+    {
+      "id": "ambitious-unambitious",
+      "category": "adjective",
+      "level": "B1-B2",
+      "en": [
+        "ambitious",
+        "unambitious"
+      ],
+      "ko": [
+        "야심 찬",
+        "야심 없는"
+      ],
+      "ja": [
+        "野心的な",
+        "野心のない"
+      ],
+      "zh": [
+        "有抱负的",
+        "没有抱负的"
+      ],
+      "vi": [
+        "tham vọng",
+        "không có tham vọng"
+      ],
+      "es": [
+        "ambicioso",
+        "sin ambición"
+      ],
+      "fr": [
+        "ambitieux",
+        "sans ambition"
+      ],
+      "de": [
+        "ehrgeizig",
+        "anspruchslos"
+      ],
+      "it": [
+        "ambizioso",
+        "senza ambizione"
+      ],
+      "pt": [
+        "ambicioso",
+        "sem ambição"
+      ]
+    },
+    {
+      "id": "sensitive-insensitive",
+      "category": "adjective",
+      "level": "B1-B2",
+      "en": [
+        "sensitive",
+        "insensitive"
+      ],
+      "ko": [
+        "민감한",
+        "둔감한"
+      ],
+      "ja": [
+        "敏感な",
+        "鈍感な"
+      ],
+      "zh": [
+        "敏感的",
+        "不敏感的"
+      ],
+      "vi": [
+        "nhạy cảm",
+        "vô cảm"
+      ],
+      "es": [
+        "sensible",
+        "insensible"
+      ],
+      "fr": [
+        "sensible",
+        "insensible"
+      ],
+      "de": [
+        "empfindlich",
+        "unsensibel"
+      ],
+      "it": [
+        "sensibile",
+        "insensibile"
+      ],
+      "pt": [
+        "sensível",
+        "insensível"
+      ]
+    },
+    {
+      "id": "widespread-limited",
+      "category": "adjective",
+      "level": "B1-B2",
+      "en": [
+        "widespread",
+        "limited"
+      ],
+      "ko": [
+        "널리 퍼진",
+        "제한된"
+      ],
+      "ja": [
+        "広く普及した",
+        "限定された"
+      ],
+      "zh": [
+        "广泛的",
+        "有限的"
+      ],
+      "vi": [
+        "phổ biến rộng rãi",
+        "hạn chế"
+      ],
+      "es": [
+        "generalizado",
+        "limitado"
+      ],
+      "fr": [
+        "répandu",
+        "limité"
+      ],
+      "de": [
+        "weit verbreitet",
+        "begrenzt"
+      ],
+      "it": [
+        "diffuso",
+        "limitato"
+      ],
+      "pt": [
+        "generalizado",
+        "limitado"
       ]
     }
   ]
