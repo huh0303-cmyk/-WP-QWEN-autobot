@@ -1,0 +1,38 @@
+name: K-Health365 repair duplicate Omega-3 affiliate module
+
+on:
+  workflow_dispatch:
+    inputs:
+      post_id:
+        description: WordPress post ID to repair
+        required: true
+        default: "7314"
+
+permissions:
+  contents: read
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install requests
+      - name: Remove legacy single-product module and rebuild one unified footer
+        env:
+          KHEALTH365_WP_USER: huh0303@gmail.com
+          KHEALTH365_WP_APP_PASSWORD: ${{ secrets.KHEALTH365COM }}
+          POST_ID: ${{ inputs.post_id }}
+        run: |
+          python scripts/khealth365_sitewide_coupang_10.py --mode apply --post-id "$POST_ID"
+      - name: Upload repair report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: khealth365-affiliate-deduplication-report
+          path: output/khealth365-sitewide-10-report.json
+          if-no-files-found: warn
