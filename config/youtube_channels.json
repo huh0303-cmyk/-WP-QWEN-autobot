@@ -11,9 +11,9 @@
       "handle": "cafe_romantic",
       "created_at": "2025-06-20",
       "subscriber_count_snapshot": 11,
-      "video_count_snapshot": 32,
+      "video_count_snapshot": 38,
       "secret_profile": "GLOBALMUSIC",
-      "workflow": "generate-youtube-playlist.yml",
+      "workflow": "youtube-github-worker.yml",
       "enabled": true,
       "interval_days_min": 2,
       "interval_days_max": 3,
@@ -22,7 +22,8 @@
       "allowed_hour_end": 23,
       "topic_mode": "auto",
       "language": "mixed",
-      "tone": "sweet acoustic multilingual vocal love songs"
+      "tone": "sweet acoustic multilingual vocal love songs",
+      "last_verified_at": "2026-11-05"
     },
     {
       "channel_key": "healing",
