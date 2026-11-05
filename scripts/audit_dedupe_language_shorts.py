@@ -1,71 +1,173 @@
 #!/usr/bin/env python3
-"""Find normalized-title duplicates in all ten language channels.
-Normalization uses Unicode word boundaries and Unicode word characters.
-Keep highest views; ties keep newest. Missing view counts are report-only.
-"""
+"""Audit duplicate Shorts by normalized title and curriculum pair across all ten channels."""
 import argparse, datetime as dt, json, os, re, unicodedata
 from pathlib import Path
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
-ROOT=Path(__file__).resolve().parents[1]
-REG=ROOT/"config/survival_language_channels.json"
-OUT=ROOT/"artifacts/youtube/language-duplicate-audit"
-def env(code,name):
- s=f"LANGUAGE_{code.upper()}"
- v=os.environ.get(f"YOUTUBE_OAUTH_{name}_{s}") or os.environ.get(f"YOUTUBE_OAUTH_{name}")
- if not v: raise RuntimeError(f"Missing YOUTUBE_OAUTH_{name}_{s}")
- return v
+
+ROOT = Path(__file__).resolve().parents[1]
+REG = ROOT / "config/survival_language_channels.json"
+CATALOG = ROOT / "config/survival_adjective_pairs.json"
+OUT = ROOT / "artifacts/youtube/language-duplicate-audit"
+
+
+def env(code, name):
+    suffix = f"LANGUAGE_{code.upper()}"
+    value = os.environ.get(f"YOUTUBE_OAUTH_{name}_{suffix}") or os.environ.get(f"YOUTUBE_OAUTH_{name}")
+    if not value:
+        raise RuntimeError(f"Missing YOUTUBE_OAUTH_{name}_{suffix}")
+    return value
+
+
 def svc(code):
- c=Credentials(token=None,refresh_token=env(code,"REFRESH_TOKEN"),token_uri="https://oauth2.googleapis.com/token",client_id=env(code,"CLIENT_ID"),client_secret=env(code,"CLIENT_SECRET"),scopes=None)
- return build("youtube","v3",credentials=c,cache_discovery=False)
-def norm(s):
- s=unicodedata.normalize("NFKC",s).casefold()
- s=re.sub(r"#shorts?\b","",s)
- return re.sub(r"[^\w]+","",s,flags=re.UNICODE)
-def videos(api,cid,limit):
- rows=api.channels().list(part="contentDetails",id=cid).execute().get("items",[])
- if len(rows)!=1: raise RuntimeError(f"Cannot resolve uploads playlist {cid}")
- pl=rows[0]["contentDetails"]["relatedPlaylists"]["uploads"]; ids=[]; token=None
- while len(ids)<limit:
-  page=api.playlistItems().list(part="contentDetails",playlistId=pl,maxResults=min(50,limit-len(ids)),pageToken=token).execute()
-  ids += [x["contentDetails"]["videoId"] for x in page.get("items",[])]
-  token=page.get("nextPageToken")
-  if not token: break
- out=[]
- for i in range(0,len(ids),50): out += api.videos().list(part="snippet,statistics,status",id=",".join(ids[i:i+50])).execute().get("items",[])
- return out
+    credentials = Credentials(
+        token=None, refresh_token=env(code, "REFRESH_TOKEN"),
+        token_uri="https://oauth2.googleapis.com/token",
+        client_id=env(code, "CLIENT_ID"), client_secret=env(code, "CLIENT_SECRET"),
+        scopes=None,
+    )
+    return build("youtube", "v3", credentials=credentials, cache_discovery=False)
+
+
+def norm(value):
+    value = unicodedata.normalize("NFKC", str(value or "")).casefold()
+    value = re.sub(r"#shorts?\b", "", value)
+    return re.sub(r"[^\w]+", "", value, flags=re.UNICODE)
+
+
+def videos(api, channel_id, limit=None):
+    rows = api.channels().list(part="contentDetails", id=channel_id).execute().get("items", [])
+    if len(rows) != 1:
+        raise RuntimeError(f"Cannot resolve uploads playlist {channel_id}")
+    playlist = rows[0]["contentDetails"]["relatedPlaylists"]["uploads"]
+    ids, token = [], None
+    while limit is None or len(ids) < limit:
+        page_size = 50 if limit is None else min(50, limit - len(ids))
+        page = api.playlistItems().list(
+            part="contentDetails", playlistId=playlist, maxResults=page_size, pageToken=token
+        ).execute()
+        ids.extend(item["contentDetails"]["videoId"] for item in page.get("items", []))
+        token = page.get("nextPageToken")
+        if not token:
+            break
+    result = []
+    for offset in range(0, len(ids), 50):
+        result.extend(api.videos().list(
+            part="snippet,statistics,status", id=",".join(ids[offset:offset + 50])
+        ).execute().get("items", []))
+    return result
+
+
+def semantic_pair_key(video, code, pairs):
+    snippet = video.get("snippet", {})
+    metadata = norm(" ".join([
+        snippet.get("title", ""), snippet.get("description", ""),
+        " ".join(snippet.get("tags", [])),
+    ]))
+    for pair in pairs:
+        words = [norm(word) for word in pair.get(code, []) if norm(word)]
+        pair_id = norm(pair.get("id", ""))
+        if pair_id and pair_id in metadata:
+            return f"pair:{pair['id']}"
+        if len(words) >= 2 and all(word in metadata for word in words):
+            return f"pair:{pair['id']}"
+    return ""
+
+
 def main():
- p=argparse.ArgumentParser(); p.add_argument("--apply",action="store_true"); p.add_argument("--limit",type=int,default=500); a=p.parse_args()
- registry=json.loads(REG.read_text(encoding="utf-8")); OUT.mkdir(parents=True,exist_ok=True)
- report={"mode":"apply" if a.apply else "report_only","created_at":dt.datetime.now(dt.timezone.utc).isoformat(),"channels":[],"actions":[]}
- for row in registry["languages"]:
-  code,cid=row["language_code"],row["channel_id"]; api=svc(code)
-  mine=api.channels().list(part="id",mine=True).execute().get("items",[])
-  if len(mine)!=1 or mine[0]["id"]!=cid:
-   report["channels"].append({"language":code,"status":"BLOCKED_CHANNEL_IDENTITY_MISMATCH"}); continue
-  allv=videos(api,cid,a.limit); groups={}
-  for v in allv:
-   if v.get("status",{}).get("privacyStatus")=="private": continue
-   key=norm(v.get("snippet",{}).get("title",""))
-   if key: groups.setdefault(key,[]).append(v)
-  losers=0
-  for group in groups.values():
-   if len(group)<2: continue
-   if any("viewCount" not in v.get("statistics",{}) for v in group):
-    report["actions"].append({"language":code,"status":"REVIEW_VIEW_COUNT_UNAVAILABLE","video_ids":[v["id"] for v in group]}); continue
-   group.sort(key=lambda v:(int(v["statistics"]["viewCount"]),v.get("snippet",{}).get("publishedAt","")),reverse=True)
-   keep=group[0]
-   for v in group[1:]:
-    action={"language":code,"title":v["snippet"].get("title"),"keep_video_id":keep["id"],"keep_views":int(keep["statistics"]["viewCount"]),"duplicate_video_id":v["id"],"duplicate_views":int(v["statistics"]["viewCount"]),"status":"WOULD_SET_PRIVATE"}
-    if a.apply:
-     old=v.get("status",{}); st={k:old[k] for k in ("license","embeddable","publicStatsViewable","selfDeclaredMadeForKids") if k in old}; st["privacyStatus"]="private"
-     api.videos().update(part="status",body={"id":v["id"],"status":st}).execute()
-     chk=api.videos().list(part="snippet,status",id=v["id"]).execute().get("items",[])
-     if len(chk)!=1 or chk[0].get("snippet",{}).get("channelId")!=cid or chk[0].get("status",{}).get("privacyStatus")!="private": raise RuntimeError(f"Privacy verification failed: {v['id']}")
-     action["status"]="VERIFIED_PRIVATE"
-    report["actions"].append(action); losers+=1
-  report["channels"].append({"language":code,"videos_scanned":len(allv),"duplicate_losers":losers,"status":"SCANNED"})
- path=OUT/f"duplicate_audit_{dt.datetime.now(dt.timezone.utc).strftime('%Y%m%dT%H%M%SZ')}.json"
- path.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
- print(json.dumps({"mode":report["mode"],"channels":report["channels"],"actions":report["actions"],"report_path":str(path)},ensure_ascii=False,indent=2))
-if __name__=="__main__": main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--apply", action="store_true")
+    parser.add_argument("--limit", type=int, default=0,
+                        help="Maximum uploads per channel; 0 scans the complete uploads playlist")
+    args = parser.parse_args()
+    limit = args.limit or None
+    registry = json.loads(REG.read_text(encoding="utf-8"))
+    pairs = [pair for pair in json.loads(CATALOG.read_text(encoding="utf-8"))["pairs"]
+             if pair.get("category", "adjective") != "noun"]
+    OUT.mkdir(parents=True, exist_ok=True)
+    report = {
+        "mode": "apply" if args.apply else "report_only",
+        "scan_scope": "full_uploads_playlist" if limit is None else f"latest_{limit}",
+        "created_at": dt.datetime.now(dt.timezone.utc).isoformat(),
+        "channels": [], "actions": [],
+    }
+    for row in registry["languages"]:
+        code, channel_id = row["language_code"], row["channel_id"]
+        api = svc(code)
+        mine = api.channels().list(part="id", mine=True).execute().get("items", [])
+        if len(mine) != 1 or mine[0].get("id") != channel_id:
+            report["channels"].append({"language": code, "status": "BLOCKED_CHANNEL_IDENTITY_MISMATCH"})
+            continue
+        all_videos = videos(api, channel_id, limit)
+        groups = {}
+        for video in all_videos:
+            if video.get("status", {}).get("privacyStatus") == "private":
+                continue
+            snippet = video.get("snippet", {})
+            title_key = norm(snippet.get("title", ""))
+            pair_key = semantic_pair_key(video, code, pairs)
+            keys = []
+            if title_key:
+                keys.append(("title:" + title_key, "normalized_title"))
+            if pair_key:
+                keys.append((pair_key, "curriculum_pair"))
+            for key, reason in keys:
+                groups.setdefault(key, {"reason": reason, "videos": []})["videos"].append(video)
+        losers = 0
+        for key, group_data in groups.items():
+            group = group_data["videos"]
+            # A video may be in both a title group and a curriculum group; process each
+            # group independently but avoid scheduling the same duplicate twice.
+            if len(group) < 2:
+                continue
+            if any("viewCount" not in video.get("statistics", {}) for video in group):
+                report["actions"].append({
+                    "language": code, "match_key": key, "match_reason": group_data["reason"],
+                    "status": "REVIEW_VIEW_COUNT_UNAVAILABLE",
+                    "video_ids": [video["id"] for video in group],
+                })
+                continue
+            group.sort(key=lambda video: (
+                int(video["statistics"]["viewCount"]),
+                video.get("snippet", {}).get("publishedAt", ""),
+            ), reverse=True)
+            keep = group[0]
+            for video in group[1:]:
+                action = {
+                    "language": code, "match_key": key, "match_reason": group_data["reason"],
+                    "title": video.get("snippet", {}).get("title"),
+                    "keep_video_id": keep["id"],
+                    "keep_views": int(keep["statistics"]["viewCount"]),
+                    "duplicate_video_id": video["id"],
+                    "duplicate_views": int(video["statistics"]["viewCount"]),
+                    "status": "WOULD_SET_PRIVATE",
+                }
+                if args.apply:
+                    old_status = video.get("status", {})
+                    status = {field: old_status[field] for field in (
+                        "license", "embeddable", "publicStatsViewable", "selfDeclaredMadeForKids"
+                    ) if field in old_status}
+                    status["privacyStatus"] = "private"
+                    api.videos().update(part="status", body={"id": video["id"], "status": status}).execute()
+                    check = api.videos().list(part="snippet,status", id=video["id"]).execute().get("items", [])
+                    if (len(check) != 1 or check[0].get("snippet", {}).get("channelId") != channel_id
+                            or check[0].get("status", {}).get("privacyStatus") != "private"):
+                        raise RuntimeError(f"Privacy verification failed: {video['id']}")
+                    action["status"] = "VERIFIED_PRIVATE"
+                report["actions"].append(action)
+                losers += 1
+        report["channels"].append({
+            "language": code, "videos_scanned": len(all_videos),
+            "duplicate_matches": losers, "status": "SCANNED",
+        })
+    path = OUT / f"duplicate_audit_{dt.datetime.now(dt.timezone.utc).strftime('%Y%m%dT%H%M%SZ')}.json"
+    path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    print(json.dumps({
+        "mode": report["mode"], "scan_scope": report["scan_scope"],
+        "channels": report["channels"], "actions": report["actions"],
+        "report_path": str(path),
+    }, ensure_ascii=False, indent=2))
+
+
+if __name__ == "__main__":
+    main()
