@@ -8,14 +8,15 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
 import requests
+from automation_hub.coupang_partners import render_footer, START as SHARED_START, HEADER_START as SHARED_HEADER_START
 
 ROOT=Path(__file__).resolve().parents[1]
 ENGINE=ROOT/"affiliate-engine"
 ROUTING=ENGINE/"config"/"affiliate-routing.json"
 POLICY=ROOT/"config"/"affiliate_distribution_policy.json"
 CATALOG_DIR=ENGINE/"data"/"catalogs"
-MARKER="<!-- london-affiliate-engine:v7-footer-only -->"
-LEGACY_AFFILIATE_MARKERS=("<!-- LONDON-COUPANG-PARTNERS-START -->","<!-- LONDON-AFFILIATE-HEADER-START -->","<!-- KHEALTH365-COUPANG-START -->","london-coupang-wrap","london-affiliate-partner-strip")
+MARKER=SHARED_START
+LEGACY_AFFILIATE_MARKERS=("<!-- london-affiliate-engine:v7-footer-only -->",SHARED_HEADER_START,"<!-- LONDON-AFFILIATE-HEADER-START -->","<!-- KHEALTH365-COUPANG-START -->","london-coupang-wrap","london-affiliate-partner-strip")
 DISCLOSURE="<p><small>This post contains Coupang Partners affiliate links. If you visit Coupang through one of these links and make a purchase within 24 hours, including a purchase of another eligible product, we may earn a commission at no additional cost to you. Attribution rules, cancellations and returns may affect commission eligibility.</small><br/><small>이 게시물에는 쿠팡 파트너스 제휴 링크가 포함되어 있습니다. 이 링크를 통해 쿠팡에 방문한 뒤 24시간 이내에 다른 상품을 구매하더라도 운영정책상 실적으로 인정되는 구매라면 수수료를 제공받을 수 있습니다. 구매 경로의 최종 기여, 주문 취소 및 반품 등에 따라 수수료가 인정되지 않을 수 있습니다.</small></p>"
 
 def load_json(path:Path)->Any:
@@ -191,9 +192,9 @@ def main():
     if args.write and not write: raise SystemExit("write blocked: set AFFILIATE_WRITE_ENABLED=true as a GitHub secret")
     since=recent_since(args.since_hours)
     def block_for(title,content,site_key):
-        catalog=load_site_catalog(site_key)
-        offers=select_offers(title,content,routing,site_key,catalog.get("offers",[]))
-        return build_block(offers,catalog.get("header_buttons",[]),catalog.get("trip_com_categories",[]))
+        # Reuse the canonical weekly catalog and shared footer renderer.
+        # Product-card labels, descriptions and CTAs are always English.
+        return render_footer(title,content,site_key,"en")
     results=[]
     if args.platform in {"wordpress","all"}:
         for dest in load_destinations("wordpress"):
