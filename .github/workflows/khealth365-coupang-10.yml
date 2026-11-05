@@ -1,0 +1,48 @@
+name: K-Health365 - Coupang 5 skincare + 5 health
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "preview audits every published post; apply replaces the managed footer"
+        required: true
+        default: "preview"
+        type: choice
+        options:
+          - preview
+          - apply
+      limit:
+        description: "Maximum posts to process (0 = all published posts)"
+        required: true
+        default: "0"
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: khealth365-coupang-10-products
+  cancel-in-progress: false
+jobs:
+  khealth365-coupang:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: pip install requests
+      - name: Validate 5 skincare + 5 health products and process posts
+        env:
+          KHEALTH365_WP_USER: ${{ secrets.KHEALTH365_WP_USER }}
+          KHEALTH365_WP_APP_PASSWORD: ${{ secrets.KHEALTH365_WP_APP_PASSWORD }}
+          MODE: ${{ inputs.mode }}
+        run: |
+          python -m py_compile automation_hub/coupang_partners.py scripts/khealth365_sitewide_coupang_10.py
+          python scripts/khealth365_sitewide_coupang_10.py --mode "${MODE}" --limit "${{ inputs.limit }}"
+      - name: Upload audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: khealth365-coupang-10-${{ github.run_id }}
+          path: output/khealth365-sitewide-10-report.json
+          if-no-files-found: warn
