@@ -380,10 +380,24 @@ async def build_language(target_date: dt.date, pair: dict, code: str, channel: d
     level = pair.get("level", "B1-B2")
     if code == "en":
         title = f"{level} Vocabulary: {words[0]} vs {words[1]} | Meaning & Pronunciation #Shorts"
-    elif code in {"ko", "ja", "zh"}:
-        title = f"{level} 어휘: {words[0]} vs {words[1]} | {pair['en'][0]} vs {pair['en'][1]} #Shorts"
+    elif code == "ko":
+        title = f"{level} 중급 어휘: {words[0]} vs {words[1]} | {pair['en'][0]} vs {pair['en'][1]} #Shorts"
+    elif code == "ja":
+        title = f"{level} 中級語彙: {words[0]} vs {words[1]} | 意味・発音 #Shorts"
+    elif code == "zh":
+        title = f"{level} 中级词汇: {words[0]} vs {words[1]} | 词义与发音 #Shorts"
+    elif code == "vi":
+        title = f"Từ vựng {level}: {words[0]} vs {words[1]} | Nghĩa & phát âm #Shorts"
+    elif code == "es":
+        title = f"Vocabulario {level}: {words[0]} vs {words[1]} | Significado y pronunciación #Shorts"
+    elif code == "fr":
+        title = f"Vocabulaire {level}: {words[0]} vs {words[1]} | Sens et prononciation #Shorts"
+    elif code == "de":
+        title = f"{level}-Wortschatz: {words[0]} vs {words[1]} | Bedeutung & Aussprache #Shorts"
+    elif code == "it":
+        title = f"Vocabolario {level}: {words[0]} vs {words[1]} | Significato e pronuncia #Shorts"
     else:
-        title = f"Vocabulario {level}: {words[0]} vs {words[1]} | Meaning & Pronunciation #Shorts"
+        title = f"Vocabulário {level}: {words[0]} vs {words[1]} | Significado e pronúncia #Shorts"
     manifest = {
         "date": target_date.isoformat(),
         "language_code": code,
