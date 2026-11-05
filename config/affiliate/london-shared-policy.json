@@ -1,6 +1,6 @@
 {
-  "version": 8,
-  "name": "London Project affiliate layout standard v8 - Coupang 5 health + 5 K-Beauty, three header partners",
+  "version": 9,
+  "name": "London Project affiliate footer standard v9 - three official company logos then Coupang cards",
   "platforms": [
     "wordpress",
     "blogger"
@@ -32,19 +32,16 @@
     "agoda"
   ],
   "selection_principles": [
-    "Every destination has exactly ten Coupang Partners product cards: five health functional food/wellness products and five K-Beauty skincare products.",
-    "All ten product cards use Coupang Partners account-generated tracking links and permitted product images. No Olive Young or Trip.com product cards.",
-    "Each destination keeps its own catalog of ten unique products; the same set is reused until the weekly review replaces selected items.",
-    "Header buttons are separate from product cards and appear in this exact order: Coupang Partners, OLIVE YOUNG, Trip.com.",
-    "Each header button uses its own authorized affiliate tracking URL and approved brand asset.",
-    "Do not invent links, images, prices, popularity, sales, reviews, or commission rates.",
-    "Preserve article body, status, publication date, featured image and SEO metadata; update only the managed affiliate area.",
-    "Display the Coupang logo with the product cards only using the official permitted asset; do not distort or recolor it and do not make it a hyperlink.",
-    "Disclose that purchases made within 24 hours after a visitor enters Coupang through the affiliate link, including purchases of other eligible products, may generate commission; attribution rules, cancellations and returns can affect eligibility.",
-    "Never claim every click or purchase guarantees commission."
+    "Every affiliate-eligible article ends with one footer module; never insert it at the top or between paragraphs.",
+    "The footer module starts with three official company logo banners in one horizontal row: Coupang Partners, OLIVE YOUNG, Trip.com.",
+    "Each banner uses the destination's own approved affiliate tracking URL; the displayed image must be the official company logo asset.",
+    "Immediately below the three-logo row, show up to ten verified Coupang Partners product cards with product images and account-generated tracking links.",
+    "Use fewer than ten cards only when fewer verified destination-specific products are available; never fabricate links or images.",
+    "Preserve article body, status, publication date, featured image and SEO metadata; update only the managed affiliate footer.",
+    "Disclose affiliate relationships clearly and never promise commissions for every click or purchase."
   ],
   "display": {
-    "position": "end_of_article",
+    "position": "absolute_end_of_article",
     "layout": "responsive_product_cards",
     "desktop_columns": 4,
     "mobile_columns": 2,
@@ -52,7 +49,19 @@
     "show_product_title": true,
     "show_affiliate_cta": true,
     "show_price_when_freshly_verified": true,
-    "disclosure_required": true
+    "disclosure_required": true,
+    "header_layout": "single_horizontal_row_three_official_company_logo_images",
+    "header_order": [
+      "coupang_partners",
+      "olive_young_global",
+      "trip_com"
+    ],
+    "product_cards_position": "immediately_below_header_logos",
+    "forbidden_positions": [
+      "article_top",
+      "inside_article_body",
+      "between_paragraphs"
+    ]
   },
   "guardrails": {
     "preserve_article_body": true,
@@ -62,7 +71,7 @@
     "preserve_seo_metadata": true,
     "idempotent_marker": "LONDON-COUPANG-PARTNERS-START/END-v6",
     "require_verified_site_header_links": true,
-    "require_exactly_ten_coupang_cards": true,
+    "require_exactly_ten_coupang_cards": false,
     "agoda_enabled": false,
     "require_trip_com_three_tracked_categories": false,
     "olive_young_reward_url_verification_pending": true,
@@ -76,7 +85,12 @@
       "olive_young_global": "green",
       "coupang_partners": "orange"
     },
-    "fixed_product_set_per_site": true
+    "fixed_product_set_per_site": true,
+    "require_official_company_logo_images": true,
+    "require_footer_only": true,
+    "never_insert_at_article_top_or_inside_body": true,
+    "require_three_logos_in_single_row": true,
+    "product_cards_immediately_below_logos": true
   },
   "header_branding": {
     "order": [
@@ -84,10 +98,15 @@
       "olive_young_global",
       "trip_com"
     ],
-    "logo_assets": "official_or_partner-authorized_brand_assets",
+    "logo_assets": {
+      "coupang_partners": "https://influencers.coupang.com/logo-black.png",
+      "olive_young_global": "https://dist.oliveyoung.com/fo/fe126e9b35/resources/images/common/logo.svg",
+      "trip_com": "https://commons.wikimedia.org/wiki/Special:FilePath/Trip.com_logo.svg"
+    },
     "trip_com_and_olive_young": "Clickable tracked logo links to their approved landing pages",
     "coupang": "Official Coupang Partners logo; use separate tracked text link if required by brand terms",
-    "responsive": true
+    "responsive": true,
+    "logo_assets_rule": "Use image files of the official company marks, not text-only substitutes, emoji, or recreated wordmarks."
   },
   "disclosure": {
     "language": "English",
