@@ -24,6 +24,13 @@ def main():
     token = _access_token(profile)
     if not token:
         raise SystemExit("Blogger OAuth 자격증명이 없습니다.")
+    expected_client_id = os.environ.get("EXPECTED_GOOGLE_OAUTH_CLIENT_ID", "").strip()
+    active_client_id = os.environ.get("BLOGGER_GOOGLE_CLIENT_ID", "").strip()
+    if expected_client_id:
+        matches = active_client_id == expected_client_id
+        print("OAuth client matches downloaded desktop client: " + ("YES" if matches else "NO"))
+        if not matches:
+            raise SystemExit("OAuth client ID mismatch; do not replace GOOGLE_OAUTH_REFRESH_TOKEN.")
     # Print granted scope names only; never log access or refresh token values.
     scope_resp = requests.get(
         "https://oauth2.googleapis.com/tokeninfo",
