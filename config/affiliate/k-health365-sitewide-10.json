@@ -1,5 +1,60 @@
 [
   {
+    "id": "health-lactofit-gold-80",
+    "title": "락토핏 정품 골드 80포",
+    "url": "https://link.coupang.com/a/ih2ZTHJN24",
+    "image_url": "https://image5.coupangcdn.com/image/affiliate/banner/cca43bfaafc74c7cfbe0f222ddb13a67@2x.jpg",
+    "category": "health_functional_foods",
+    "display_title_en": "Lacto-Fit Gold Probiotic Powder, 80 Sticks",
+    "description_en": "A daily probiotic supplement in single-serve sticks. Review the strain information, ingredients, and suggested use on the label.",
+    "affiliate_confirmed": true,
+    "enabled": true
+  },
+  {
+    "id": "health-omega3-vitd",
+    "title": "순수식품 rTG 오메가3 비타민D",
+    "url": "https://link.coupang.com/a/ih3OY0Mk8a",
+    "image_url": "https://img4c.coupangcdn.com/image/affiliate/banner/ba4f6d538ce239e7666b0abba59a17b9@2x.jpg",
+    "category": "health_functional_foods",
+    "display_title_en": "RTG Omega-3 with Vitamin D",
+    "description_en": "An omega-3 supplement combined with vitamin D. Check the EPA/DHA amounts, ingredients, and suitability before use.",
+    "affiliate_confirmed": true,
+    "enabled": true
+  },
+  {
+    "id": "health-lutein-zeaxanthin",
+    "title": "뉴트리원 루테인 지아잔틴 164",
+    "url": "https://link.coupang.com/a/ih25YWz9lQ",
+    "image_url": "https://img1a.coupangcdn.com/image/affiliate/banner/8b632b89b0445bc5496b817fe50eadd4@2x.jpg",
+    "category": "health_functional_foods",
+    "display_title_en": "Lutein and Zeaxanthin 164",
+    "description_en": "A lutein and zeaxanthin supplement. Review ingredient amounts and directions.",
+    "affiliate_confirmed": true,
+    "enabled": true
+  },
+  {
+    "id": "health-collagen-3270",
+    "title": "모발 콜라겐 3270",
+    "url": "https://link.coupang.com/a/ih3bfDbgPt",
+    "image_url": "https://img4c.coupangcdn.com/image/affiliate/banner/c5a95ba6e0bac93f844593df5cfb92ab@2x.jpg",
+    "category": "health_functional_foods",
+    "display_title_en": "Collagen 3270 Supplement",
+    "description_en": "A collagen supplement option. Check the collagen source, serving size, and ingredients.",
+    "affiliate_confirmed": true,
+    "enabled": true
+  },
+  {
+    "id": "health-cj-probiotic",
+    "title": "CJ 바이오코어 500억 고함량 특허유산균",
+    "url": "https://link.coupang.com/a/ih3Q2W2O04",
+    "image_url": "https://image13.coupangcdn.com/image/affiliate/banner/3b889a9edd0130193399558d82e71213@2x.jpg",
+    "category": "health_functional_foods",
+    "display_title_en": "CJ BioCore 500 Billion Probiotics",
+    "description_en": "A high-count probiotic product. Review the strains, storage instructions, and recommended serving.",
+    "affiliate_confirmed": true,
+    "enabled": true
+  },
+  {
     "id": "beauty-anua-toner",
     "title": "아누아 어성초 77 히알루론산 수분 진정 토너, 150ml",
     "url": "https://link.coupang.com/a/iiO2E6sxGu",
@@ -63,60 +118,5 @@
     "enabled": true,
     "source": "authenticated_coupang_partners_generated_blog_tag",
     "candidate_id": "oy05"
-  },
-  {
-    "id": "health-lactofit-gold-80",
-    "title": "락토핏 정품 골드 80포",
-    "url": "https://link.coupang.com/a/ih2ZTHJN24",
-    "image_url": "https://image5.coupangcdn.com/image/affiliate/banner/cca43bfaafc74c7cfbe0f222ddb13a67@2x.jpg",
-    "category": "health_functional_foods",
-    "display_title_en": "Lacto-Fit Gold Probiotic Powder, 80 Sticks",
-    "description_en": "A daily probiotic supplement in single-serve sticks. Review the strain information, ingredients, and suggested use on the label.",
-    "affiliate_confirmed": true,
-    "enabled": true
-  },
-  {
-    "id": "health-omega3-vitd",
-    "title": "순수식품 rTG 오메가3 비타민D",
-    "url": "https://link.coupang.com/a/ih3OY0Mk8a",
-    "image_url": "https://img4c.coupangcdn.com/image/affiliate/banner/ba4f6d538ce239e7666b0abba59a17b9@2x.jpg",
-    "category": "health_functional_foods",
-    "display_title_en": "RTG Omega-3 with Vitamin D",
-    "description_en": "An omega-3 supplement combined with vitamin D. Check the EPA/DHA amounts, ingredients, and suitability before use.",
-    "affiliate_confirmed": true,
-    "enabled": true
-  },
-  {
-    "id": "health-lutein-zeaxanthin",
-    "title": "뉴트리원 루테인 지아잔틴 164",
-    "url": "https://link.coupang.com/a/ih25YWz9lQ",
-    "image_url": "https://img1a.coupangcdn.com/image/affiliate/banner/8b632b89b0445bc5496b817fe50eadd4@2x.jpg",
-    "category": "health_functional_foods",
-    "display_title_en": "Lutein and Zeaxanthin 164",
-    "description_en": "A lutein and zeaxanthin supplement. Review ingredient amounts and directions.",
-    "affiliate_confirmed": true,
-    "enabled": true
-  },
-  {
-    "id": "health-collagen-3270",
-    "title": "모발 콜라겐 3270",
-    "url": "https://link.coupang.com/a/ih3bfDbgPt",
-    "image_url": "https://img4c.coupangcdn.com/image/affiliate/banner/c5a95ba6e0bac93f844593df5cfb92ab@2x.jpg",
-    "category": "health_functional_foods",
-    "display_title_en": "Collagen 3270 Supplement",
-    "description_en": "A collagen supplement option. Check the collagen source, serving size, and ingredients.",
-    "affiliate_confirmed": true,
-    "enabled": true
-  },
-  {
-    "id": "health-cj-probiotic",
-    "title": "CJ 바이오코어 500억 고함량 특허유산균",
-    "url": "https://link.coupang.com/a/ih3Q2W2O04",
-    "image_url": "https://image13.coupangcdn.com/image/affiliate/banner/3b889a9edd0130193399558d82e71213@2x.jpg",
-    "category": "health_functional_foods",
-    "display_title_en": "CJ BioCore 500 Billion Probiotics",
-    "description_en": "A high-count probiotic product. Review the strains, storage instructions, and recommended serving.",
-    "affiliate_confirmed": true,
-    "enabled": true
   }
 ]
