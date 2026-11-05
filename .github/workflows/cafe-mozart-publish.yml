@@ -1,11 +1,9 @@
 name: CAFE MOZART - Free-Only GitHub Publisher
 
 on:
-  # Three weekly candidate windows; deterministic weekly gate selects two or three.
+  # One daily candidate window; deterministic gate allows only 2–3 releases per week.
   schedule:
-    - cron: "31 2 * * 1"
-    - cron: "47 8 * * 3"
-    - cron: "19 14 * * 5"
+    - cron: "31 2 * * *"
   workflow_dispatch:
     inputs:
       publish_now:
