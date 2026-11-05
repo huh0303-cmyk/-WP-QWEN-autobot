@@ -115,6 +115,17 @@ jobs:
             CH="$INPUT_CHANNEL"
           fi
           echo "channel=$CH" >> "$GITHUB_OUTPUT"
+      - name: Require Fish Audio secret for Japanese before script generation
+        if: ${{ steps.pick.outputs.channel == 'health_japan' }}
+        env:
+          FISH_AUDIO_API_KEY: ${{ secrets.FISH_AUDIO_API_KEY }}
+        run: |
+          set -eu
+          if [ -z "${FISH_AUDIO_API_KEY:-}" ]; then
+            echo "::error title=Missing Fish Audio secret::Japanese generation is blocked; no Edge TTS fallback is allowed."
+            exit 1
+          fi
+          echo "Japanese Fish Audio credential is present; value is not printed."
       - name: Write script, narrate, render, verify channel, upload
         run: python -u scripts/channel_long_video.py ${{ steps.pick.outputs.args }}
       - name: Keep manifest, subtitles and receipt (video only for build-only runs)
