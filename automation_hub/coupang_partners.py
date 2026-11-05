@@ -264,7 +264,7 @@ def render_header(site_id=""):
         # prohibit displaying it together with third-party marks. Keep it in
         # its own standalone row; Olive Young and Trip.com occupy a separate row.
         if provider == "coupang_partners":
-            buttons.append(f'<div class="london-provider-button coupang_partners"><a class="london-coupang-logo-link" href="{url}" target="_blank" rel="sponsored nofollow noopener" aria-label="Coupang Partners affiliate link"><span class="london-coupang-logo-crop"><img src="{logo}" alt="Coupang official logo" loading="lazy"></span></a><span><a href="{url}" target="_blank" rel="sponsored nofollow noopener">Coupang Partners 바로가기</a></span></div>')
+            buttons.append(f'<div class="london-provider-button coupang_partners"><img src="{logo}" alt="Coupang official logo" loading="lazy"><span><a href="{url}" target="_blank" rel="sponsored nofollow noopener">Coupang Partners 제휴 링크</a></span></div>')
         else:
             buttons.append(f'<a class="london-provider-button {provider}" href="{url}" target="_blank" rel="sponsored nofollow noopener" aria-label="{label}"><img src="{logo}" alt="{label} official logo" loading="lazy"></a>')
     coupang = buttons[0]
@@ -279,17 +279,17 @@ def render_header(site_id=""):
         '.london-provider-button{min-height:70px;display:flex;align-items:center;justify-content:center;gap:9px;padding:10px 16px;background:#fff;text-decoration:none!important}'
         '.london-provider-button img{display:block;max-width:100%;width:auto;height:auto;max-height:44px;object-fit:contain}'
         '.london-provider-button.coupang_partners{flex-direction:column;border:0;min-height:88px}'
-        '.london-provider-button.coupang_partners img{width:520px;max-width:none;height:auto;max-height:none;display:block;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}'
-        '.london-provider-button.coupang_partners .london-coupang-logo-crop{width:260px;height:66px;overflow:hidden;position:relative;display:block}'
+        '.london-provider-button.coupang_partners img{width:240px;max-width:100%;height:auto;max-height:none;display:block;position:static;transform:none}'
+        
         '.london-provider-button.coupang_partners span{font-size:12px;font-weight:700}'
         '.london-provider-button.coupang_partners a{color:#333;text-decoration:underline}'
-        '.london-provider-button.coupang_partners .london-coupang-logo-link{display:block;line-height:0;text-decoration:none}'
+        
         '.london-other-official-partners{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;max-width:560px;margin:0 auto}'
         '.london-other-official-partners .london-provider-button{border:1px solid #e5e7eb;border-radius:10px;min-height:64px}'
         '.london-other-official-partners img{max-height:44px;max-width:220px}'
         '.london-other-official-partners .trip_com img{max-width:220px;max-height:44px}'
         '.london-other-official-partners .olive_young_global img{max-width:220px;max-height:44px}'
-        '@media(max-width:520px){.london-coupang-official-standalone{margin-bottom:14px;min-height:82px}.london-provider-button.coupang_partners .london-coupang-logo-crop{width:230px;height:58px}.london-provider-button.coupang_partners img{width:460px}.london-other-official-partners{gap:8px}.london-other-official-partners .london-provider-button{min-height:62px;padding:6px}.london-other-official-partners img{max-width:150px;max-height:34px}}</style>'
+        '@media(max-width:520px){.london-coupang-official-standalone{margin-bottom:14px;min-height:82px}.london-provider-button.coupang_partners img{width:210px}.london-other-official-partners{gap:8px}.london-other-official-partners .london-provider-button{min-height:62px;padding:6px}.london-other-official-partners img{max-width:150px;max-height:34px}}</style>'
         + HEADER_END)
 
 
@@ -340,7 +340,7 @@ def render_footer(title, article_text, site_id="", lang="en"):
 
 def _remove_managed_affiliate_blocks(content):
     """Remove legacy header/footer containers wherever they were previously inserted."""
-    tag_re = re.compile(r"</?(div|section|nav)\\b[^>]*>", re.I | re.S)
+    tag_re = re.compile(r"</?(div|section|nav)\b[^>]*>", re.I | re.S)
     targets = {
         "london-affiliate-partner-strip",
         "london-coupang-wrap",
@@ -354,7 +354,7 @@ def _remove_managed_affiliate_blocks(content):
             tag = match.group(0)
             if tag.startswith("</"):
                 continue
-            cm = re.search(r"""\\bclass\\s*=\\s*["']([^"']*)["']""", tag, re.I)
+            cm = re.search(r"""\bclass\s*=\s*["']([^"']*)["']""", tag, re.I)
             classes = set(cm.group(1).split()) if cm else set()
             if classes & targets:
                 opening = match
@@ -382,7 +382,7 @@ def _remove_managed_affiliate_blocks(content):
         offset = opening.start()
     # Drop the obsolete style block from the old partner strip; the new footer
     # supplies a single, self-contained style block.
-    content = re.sub(r"<style[^>]*>[^<]*(?:london-affiliate-partner-strip|london-coupang-wrap)[\\s\\S]*?</style>", "", content, flags=re.I)
+    content = re.sub(r"<style[^>]*>[^<]*(?:london-affiliate-partner-strip|london-coupang-wrap)[\s\\S]*?</style>", "", content, flags=re.I)
     return content
 
 
