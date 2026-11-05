@@ -84,9 +84,9 @@ def playlist_metadata(channel, topic, minutes):
     title = _unique_title(channel, topic)
     description = (
         f'{topic}. {angles[channel]}\n\n'
-        f'This listening session lasts about {round(minutes)} minutes, so you can settle in and enjoy the music without needing to choose another playlist every few minutes. The songs are arranged for an easy flow, whether you are spending time with someone you love or simply want a warmer atmosphere around you.\n\n'
-        'Try it during a coffee date at home, a relaxed dinner, a late drive, or a quiet evening when a little tenderness feels just right. Keep the volume comfortable for your surroundings, and use headphones or speakers according to the moment. You do not have to listen from beginning to end; return whenever you want to bring back the same feeling.\n\n'
-        'Which mood should the next playlist capture: a shy first crush, a long-lasting love, a rainy window, or a sunset walk? Share your favorite moment in the comments. Subscribe for more carefully shaped music sessions, with a different setting and feeling each time.'
+        f'Enjoy this approximately {round(minutes)}-minute playlist while sharing coffee, preparing dinner, reading, or unwinding at home. The carefully arranged music brings together the channel\'s signature sound and a relaxed flow for a warm, unhurried atmosphere. Let the music play in the background or listen closely to the details and changing moods.\n\n'
+        'Whether you are taking a quiet break, spending time with someone special, or setting a comfortable mood for your day, this session is designed to stay easy to enjoy from beginning to end. Keep the volume comfortable for your surroundings and return whenever you want to hear the atmosphere again.\n\n'
+        'Which scene or feeling should inspire a future playlist? Tell us in the comments. Subscribe for more original listening sessions, fresh themes, and carefully selected music. Thank you for spending part of your day with us.'
     )
     validate_metadata(title, description)
     return title, description, [labels[channel], topic], False
