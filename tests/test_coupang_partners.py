@@ -28,6 +28,18 @@ def test_fewer_than_ten_products_blocks_footer(monkeypatch):
 
 def test_footer_replaces_own_marker_without_duplication(monkeypatch):
     monkeypatch.setattr(cp, "load_candidates", lambda site_id="": fake_pool(10))
+    monkeypatch.setattr(cp, "load_header_buttons", lambda site_id="": {
+        "buttons": [
+            {"provider": "coupang_partners", "affiliate_url": "https://example.com/coupang", "label": "Coupang"},
+            {"provider": "olive_young_global", "affiliate_url": "https://example.com/olive", "label": "Olive Young"},
+            {"provider": "trip_com", "affiliate_url": "https://example.com/trip", "label": "Trip.com"},
+        ],
+        "trip_com_categories": [
+            {"key": "hotels", "affiliate_url": "https://example.com/hotels", "label": "Hotels", "verified": True},
+            {"key": "flights", "affiliate_url": "https://example.com/flights", "label": "Flights", "verified": True},
+            {"key": "tours_and_packages", "affiliate_url": "https://example.com/tours", "label": "Tours", "verified": True},
+        ],
+    })
     original = "<p>Article</p>" + cp.START + "old" + cp.END
     updated = cp.apply_footer(original, "Vitamin D", "testsite", "ko")
     assert updated.count(cp.START) == 1
