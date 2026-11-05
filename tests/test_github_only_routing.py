@@ -81,6 +81,7 @@ def test_cafe_healing_rotates_five_sound_themes_with_one_visual_source():
     assert 'CATEGORY_ORDER = ("fire", "rain", "wind", "birds", "temple")' in motion
     assert "one main licensed nature scene" in motion
     assert "one main source clip is looped" in motion
+    assert 'work / "rain-75.mp4"' in motion
     assert "record_category(MODE" in motion
     assert "FISH_AUDIO_API_KEY" in runtime
     assert "PEXELS_API_KEY" in runtime
