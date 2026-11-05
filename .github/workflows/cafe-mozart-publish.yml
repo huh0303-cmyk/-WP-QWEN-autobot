@@ -126,7 +126,7 @@ jobs:
         run: |
           set -euo pipefail
           python -m compileall -q automation_hub/youtube_github_runtime.py scripts/youtube_playlist_maker.py scripts/youtube_github_worker.py scripts/youtube_publish_approved.py
-          pytest -q tests/test_playlist_owner_policy.py
+          pytest -q tests/test_playlist_owner_policy.py tests/test_cafe_mozart_free_publish.py
 
       - name: Render and publish one Mozart release
         if: steps.gate.outputs.run_now == 'true'
