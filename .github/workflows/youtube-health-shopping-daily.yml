@@ -1,7 +1,7 @@
 name: Daily long videos - Health Clinic USA / Japan + Seoul_Jisoo1 shopping
 
 # One narrated 3-5 minute video per channel per KST day. Scheduled uploads are PRIVATE only per owner instruction (2026-10-24).
-# Narration uses free Fish Audio S2.1 Pro Free when available, then free Edge TTS -> Pexels/Pixabay -> ffmpeg -> YouTube API. No paid TTS fallback.
+# TTS policy: Japanese Health Clinic MUST use Fish Audio S2.1 Pro Free (fail closed; never Edge fallback); non-Japanese channels may use free Edge TTS fallback -> Pexels/Pixabay -> ffmpeg -> YouTube API. No paid TTS fallback.
 # Upload happens only after the authenticated channel ID equals the locked UC ID; the job fails
 # visibly (and publishes nothing) while a channel's OAuth token is not yet re-authorised.
 on:
