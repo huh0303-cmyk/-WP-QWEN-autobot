@@ -1,0 +1,35 @@
+name: "Repair KoreaWedding365 duplicate lead image"
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_live_repair:
+        description: "Set true to back up and remove the title-matching first inline image from the specified post"
+        required: true
+        default: "false"
+
+permissions:
+  contents: read
+
+jobs:
+  repair:
+    if: inputs.confirm_live_repair == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: Backup, repair, and verify the exact post
+        env:
+          KOREAWEDDING365COM: ${{ secrets.KOREAWEDDING365COM }}
+        run: python scripts/fix_koreawedding_duplicate_hero.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: koreawedding365-duplicate-hero-backup-${{ github.run_id }}
+          path: artifacts/koreawedding-duplicate-hero/
+          if-no-files-found: warn
+          retention-days: 30
