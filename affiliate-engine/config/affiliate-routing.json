@@ -1,6 +1,6 @@
 {
   "engine": "London Project Affiliate Engine",
-  "version": "6.0.0",
+  "version": "7.0.0",
   "mode": "safe",
   "default_locale": "ko-KR",
   "required_slots": [
@@ -126,7 +126,9 @@
     "randomize_per_article": false,
     "avoid_repeated_ten_product_set": false,
     "require_unique_products_within_article": true,
-    "fixed_ten_product_set_per_destination": true
+    "fixed_ten_product_set_per_destination": false,
+    "fixed_ten_product_set_per_week": true,
+    "shared_global_catalog_path": "config/affiliate/global-weekly-10.json"
   },
   "publishing_policy": {
     "wordpress": {
@@ -176,7 +178,11 @@
     "require_exact_category_mix_before_publish": true,
     "require_site_pool_target_100": false,
     "randomize_per_article": false,
-    "avoid_repeated_ten_product_set": false
+    "avoid_repeated_ten_product_set": false,
+    "require_global_weekly_catalog": true,
+    "weekly_lock_hours": 168,
+    "shared_catalog_path": "config/affiliate/global-weekly-10.json",
+    "social_platforms_use_same_product_ids": true
   },
   "new_content_automation": {
     "enabled": true,
@@ -193,7 +199,8 @@
     "pilot_status": "pending_owner_review",
     "expand_after_verified_pilot": false,
     "network_expansion_requires_per_site_catalog": true,
-    "network_expansion_requires_owner_approval": true
+    "network_expansion_requires_owner_approval": true,
+    "global_catalog": "config/affiliate/global-weekly-10.json"
   },
   "top_buttons": [
     {
