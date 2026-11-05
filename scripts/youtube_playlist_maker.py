@@ -265,7 +265,7 @@ def fresh_image(topic, workdir, service=None):
         # A manually curated pexels_* image is consumed once, then renamed in Drive
         # so later uploads cannot silently reuse the same thumbnail.
         unused = [item for item in items if item.get("name", "").lower().startswith("pexels_")]
-        if unused:
+        if unused and base.CHANNEL_KEY != "mbb":
             chosen = random.choice(unused)
             raw_path = Path(workdir) / Path(chosen["name"]).name
             _bank_download(service, chosen["id"], str(raw_path))
