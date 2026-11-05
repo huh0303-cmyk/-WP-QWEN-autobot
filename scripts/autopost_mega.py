@@ -3138,8 +3138,13 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
 
     related_html = "" if is_newsroom else build_related_links_html(url, pw, site.get("lang","ko"), exclude_title=title)
     final += related_html
-    # Mandatory shared Coupang footer for every WordPress article, including newsroom sites.
+    # Mandatory affiliate header + fixed ten-product footer. K-Health365 resolves
+    # missing official product images once and persists them before the first publish;
+    # later articles reuse the same locked catalog without searching or rotating.
     from automation_hub.coupang_partners import apply_footer
+    if url.rstrip("/").lower() == "https://k-health365.com":
+        from scripts.khealth365_sitewide_coupang_10 import load_products as load_khealth_fixed_products
+        load_khealth_fixed_products()
     final = apply_footer(final, title, site.get("site_id", url), site.get("lang", "ko"))
 
 
