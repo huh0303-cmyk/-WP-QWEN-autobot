@@ -1,0 +1,74 @@
+﻿name: Verify YouTube video-description update scopes (read-only)
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    environment: youtube-channels
+    strategy:
+      fail-fast: false
+      max-parallel: 5
+      matrix:
+        include:
+          - profile: GLOBALMUSIC
+            channel_id: UCbJfEtsffpgI5MsKkB7BYvQ
+            refresh_secret: YOUTUBE_OAUTH_REFRESH_TOKEN_GLOBALMUSIC
+          - profile: HEALING
+            channel_id: UC7yEsLM-HoXudngrD-4FIqg
+            refresh_secret: YOUTUBE_OAUTH_REFRESH_TOKEN_HEALING
+          - profile: STARBUCKS
+            channel_id: UC_e-sbLkVgwJNYEeobolNog
+            refresh_secret: YOUTUBE_OAUTH_REFRESH_TOKEN_STARBUCKS
+          - profile: MBB
+            channel_id: UC7jOhyMa-FIrzZuea97z1Pw
+            refresh_secret: YOUTUBE_OAUTH_REFRESH_TOKEN_MBB
+          - profile: KPOP
+            channel_id: UCKZsfAWyCmY0jckf4IWZrqw
+            refresh_secret: YOUTUBE_OAUTH_REFRESH_TOKEN_KPOP
+          - profile: NASA_SPACE_TIMES
+            channel_id: UCtNLZO07Oh3UnXPI2CjOgNg
+            refresh_secret: YOUTUBE_OAUTH_REFRESH_TOKEN_NASA_SPACE_TIMES
+          - profile: HISTORY_TODAY_TIMES
+            channel_id: UCVBvZwodUF4s57KeNicxQ3w
+            refresh_secret: YOUTUBE_OAUTH_REFRESH_TOKEN_HISTORY_TODAY_TIMES
+          - profile: INVENTION_TIMES
+            channel_id: UCgNj-yS93A_fOHXXvG49fww
+            refresh_secret: YOUTUBE_OAUTH_REFRESH_TOKEN_INVENTION_TIMES
+          - profile: SILENT_ERA_TIMES
+            channel_id: UCLvy6kSpC8-7o3hnSrfQ47g
+            refresh_secret: YOUTUBE_OAUTH_REFRESH_TOKEN_SILENT_ERA_TIMES
+          - profile: RETRO_REELS_TIMES
+            channel_id: UCwh49EokdWFJqYFE_zA6XDQ
+            refresh_secret: YOUTUBE_OAUTH_REFRESH_TOKEN_RETRO_REELS_TIMES
+          - profile: health_japan
+            channel_id: UCC_PcHMv-Uxpr00Pjw_J2Wg
+            refresh_secret: HEALTH_CLINIC_YOUTUBE_REFRESH_TOKEN_JP
+          - profile: health_usa
+            channel_id: UC91BpNSb4nUwD6jrpthK7FQ
+            refresh_secret: HEALTH_CLINIC_YOUTUBE_REFRESH_TOKEN_EN
+          - profile: ko
+            channel_id: UCdA24IuR-JE7qButWv5jLqA
+            refresh_secret: YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_KO
+          - profile: ja
+            channel_id: UCOWoNH_d6p45ywQ6W0Z1Jng
+            refresh_secret: YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_JA
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: Verify exact channel and metadata-update OAuth scope
+        env:
+          PROFILE: ${{ matrix.profile }}
+          EXPECTED_CHANNEL_ID: ${{ matrix.channel_id }}
+          CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+          REFRESH_TOKEN: ${{ secrets[matrix.refresh_secret] }}
+        run: python scripts/youtube_description_scope_preflight.py
