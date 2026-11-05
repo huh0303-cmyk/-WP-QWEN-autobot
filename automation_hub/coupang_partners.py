@@ -213,6 +213,8 @@ def select_products(title, article_text, site_id="", limit=10):
         fixed.append(item)
     if len(fixed) != 10 or counts != {"health_functional_foods": 5, "k_beauty_skincare": 5}:
         raise ValueError(f"Global weekly catalog must contain 10 unique verified Coupang offers (5 health + 5 beauty); found {len(fixed)} and {counts}.")
+    # The owner-approved weekly display order is K-Beauty first, then K-Health.
+    fixed.sort(key=lambda item: 0 if item.get("category") == "k_beauty_skincare" else 1)
     return fixed
 
 def render_header(site_id=""):
