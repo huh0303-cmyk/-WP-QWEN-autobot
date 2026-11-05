@@ -64,7 +64,15 @@ def blogger_token():
         if r.status_code>=400:
             return None, {"status":f"OAUTH_REFRESH_{r.status_code}","write_access":False,
                           "needed":"Refresh token/client credentials invalid, revoked, or expired."}
-        return r.json().get("access_token"), {"status":"TOKEN_OK"}
+        access_token=r.json().get("access_token")
+        info=requests.get("https://oauth2.googleapis.com/tokeninfo",
+            params={"access_token":access_token},timeout=20)
+        info.raise_for_status()
+        scopes=set(str(info.json().get("scope","")).split())
+        write_scope="https://www.googleapis.com/auth/blogger" in scopes
+        return access_token, {"status":"TOKEN_OK" if write_scope else "TOKEN_READ_ONLY_OR_SCOPE_MISSING",
+                              "blogger_write_scope":write_scope,
+                              "needed":None if write_scope else "Re-authorize OAuth and grant https://www.googleapis.com/auth/blogger (not blogger.readonly)."}
     except requests.RequestException as exc:
         return None, {"status":"OAUTH_NETWORK_ERROR","write_access":False,"needed":type(exc).__name__}
 
@@ -104,6 +112,8 @@ def main():
     wp_sites=[s for s in REGISTRY.get("sites",[]) if s.get("platform")=="wordpress" and s.get("enabled",True)]
     blogger_sites=[s for s in REGISTRY.get("sites",[]) if s.get("platform")=="blogger" and s.get("enabled",True)]
     token, oauth=blogger_token()
+    if token and not oauth.get("blogger_write_scope"):
+        token=None
     for site in wp_sites:
         result=wp_check(site)
         rows.append({"platform":"WordPress","site_id":site["site_id"],"url":site["url"],**result})
