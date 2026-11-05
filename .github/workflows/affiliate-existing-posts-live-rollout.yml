@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - "config/affiliate/initial-rollout-trigger.json"
+      - "config/affiliate/wordpress-rollout-trigger.json"
   workflow_dispatch:
     inputs:
       mode:
@@ -50,7 +51,7 @@ jobs:
       - name: Update existing published posts with verified affiliate blocks
         env:
           MODE: ${{ github.event_name == 'push' && 'apply' || inputs.mode || 'preview' }}
-          PLATFORM: ${{ inputs.platform || 'all' }}
+          PLATFORM: ${{ github.event_name == 'push' && 'wordpress' || inputs.platform || 'all' }}
           SITE_ID: ${{ inputs.site_id || '' }}
           LIMIT_PER_SITE: "0"
           WP_USER: ${{ secrets.WP_USER || 'huh0303@gmail.com' }}
