@@ -68,7 +68,8 @@ class MasterPolicyRegressionTests(unittest.TestCase):
             "BLOGGER_GOOGLE_REFRESH_TOKEN",
         ):
             self.assertIn(name, workflow)
-        self.assertIn('SCOPES = ["https://www.googleapis.com/auth/blogger"]', setup)
+        self.assertIn('"https://www.googleapis.com/auth/drive"', setup)
+        self.assertIn('"https://www.googleapis.com/auth/blogger"', setup)
         self.assertNotIn("print(credentials.refresh_token)", setup)
 
     def test_newsroom_trim_cannot_cross_minimum(self):
