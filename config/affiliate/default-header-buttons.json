@@ -8,7 +8,8 @@
       "affiliate_url": "https://link.coupang.com/a/ihRMHfQzKf",
       "status": "account_link_on_file",
       "link_type": "general_affiliate_destination",
-      "verified": true
+      "verified": true,
+      "logo_url": "https://influencers.coupang.com/logo-black.png"
     },
     {
       "provider": "olive_young_global",
@@ -17,7 +18,8 @@
       "status": "redirect_test_failed_gate_url_null",
       "link_type": "reward_code_entry",
       "verified": false,
-      "note": "User-supplied reward-code URL; commission attribution has not been independently confirmed."
+      "note": "User-supplied reward-code URL; commission attribution has not been independently confirmed.",
+      "logo_url": "https://dist.oliveyoung.com/fo/fe126e9b35/resources/images/common/logo.svg"
     },
     {
       "provider": "trip_com",
@@ -25,7 +27,8 @@
       "affiliate_url": "https://www.trip.com/t/KwZ0AV4s0X2",
       "status": "redirect_validated",
       "link_type": "homepage",
-      "verified": true
+      "verified": true,
+      "logo_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Trip.com_logo.svg"
     }
   ]
 }
