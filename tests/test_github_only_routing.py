@@ -32,7 +32,7 @@ def test_scheduler_is_disabled_without_explicit_owner_flags():
     assert 'cron: "17 * * * *"' in workflow
     assert "YOUTUBE_AUTO_PUBLISH_ENABLED" in workflow
     assert "YOUTUBE_COST_HOLD" in workflow
-    assert "has_due_calendar_row" in script
+    assert "find_due_channel" in script
     assert "check_cost_hold(channel_key)" in script
     assert "process_one()" in script
     assert "systemctl" not in workflow
