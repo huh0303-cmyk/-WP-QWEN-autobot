@@ -46,8 +46,8 @@ def load_products():
     urls = [p["url"] for p in items]
     if len(set(urls)) != 10:
         die("중복 쿠팡 파트너스 URL이 있습니다.")
-    beauty_count = sum(1 for p in items if p.get("category") == "beauty")
-    health_count = sum(1 for p in items if p.get("category") == "health")
+    beauty_count = sum(1 for p in items if p.get("category") == "k_beauty_skincare")
+    health_count = sum(1 for p in items if p.get("category") == "health_functional_foods")
     if beauty_count != 5 or health_count != 5:
         die(f"상품 구성 오류: beauty={beauty_count}, health={health_count}; 각각 5개여야 합니다.")
     for p in items:
