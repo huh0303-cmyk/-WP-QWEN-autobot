@@ -13,7 +13,7 @@ LEGACY_MARKERS = ((START, END), ("<!-- KHEALTH365-COUPANG-START -->", "<!-- KHEA
 DISCLOSURE = "This post contains Coupang Partners affiliate links. If you visit Coupang through one of these links and make a purchase within 24 hours, including a purchase of another eligible product, we may earn a commission at no additional cost to you. Attribution rules, cancellations and returns may affect commission eligibility. / 이 게시물에는 쿠팡 파트너스 제휴 링크가 포함되어 있습니다. 이 링크를 통해 쿠팡에 방문한 뒤 24시간 이내에 다른 상품을 구매하더라도 운영정책상 실적으로 인정되는 구매라면 수수료를 제공받을 수 있습니다. 구매 경로의 최종 기여, 주문 취소 및 반품 등에 따라 수수료가 인정되지 않을 수 있습니다."
 COUPANG_TRADEMARK_NOTICE = "Coupang’s trademarks are used under license from Coupang, LLC or its affiliates."
 LOGOS = {
-    "trip_com": "https://commons.wikimedia.org/wiki/Special:FilePath/Trip.com_logo.svg",
+    "trip_com": "https://dimg04.tripcdn.com/images/05E5012000rqtcwsyC749.png",
     "olive_young_global": "https://dist.oliveyoung.com/fo/fe126e9b35/resources/images/common/logo.svg",
     "coupang_partners": "https://influencers.coupang.com/logo-black.png",
 }
@@ -248,21 +248,32 @@ def render_header(site_id=""):
         url = html.escape(item["affiliate_url"], quote=True)
         label = html.escape(item["label"])
         logo = html.escape(LOGOS[provider], quote=True)
-        # Coupang's current brand guidelines prohibit using its logo as a hyperlink.
-        # Keep the official logo visible and provide a separate tracked text link.
+        # Coupang's official media guidelines prohibit linking its logo and
+        # prohibit displaying it together with third-party marks. Keep it in
+        # its own standalone row; Olive Young and Trip.com occupy a separate row.
         if provider == "coupang_partners":
-            buttons.append(f'<span class="london-provider-button {provider}"><img src="{logo}" alt="Coupang" loading="lazy"><span class="london-coupang-link"><a href="{url}" target="_blank" rel="sponsored nofollow noopener">Visit Coupang</a></span></span>')
+            buttons.append(f'<div class="london-provider-button coupang_partners"><img src="{logo}" alt="Coupang official logo" loading="lazy"><span><a href="{url}" target="_blank" rel="sponsored nofollow noopener">Coupang Partners 바로가기</a></span></div>')
         else:
-            buttons.append(f'<a class="london-provider-button {provider}" href="{url}" target="_blank" rel="sponsored nofollow noopener" aria-label="{label}"><img src="{logo}" alt="{label}" loading="lazy"></a>')
+            buttons.append(f'<a class="london-provider-button {provider}" href="{url}" target="_blank" rel="sponsored nofollow noopener" aria-label="{label}"><img src="{logo}" alt="{label} official logo" loading="lazy"></a>')
+    coupang = buttons[0]
+    other_partners = ''.join(buttons[1:])
     return (HEADER_START
-        + '<nav class="london-provider-buttons" aria-label="Affiliate partners">' + ''.join(buttons) + '</nav>'
-        + '<style>.london-provider-buttons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0 0 22px;align-items:stretch}'
-        '.london-provider-button{min-height:64px;display:flex;align-items:center;justify-content:center;gap:7px;padding:10px;border:1px solid #e5e7eb;border-radius:9px;background:#fff;text-decoration:none!important}'
-        '.london-provider-button img{display:block;max-width:100%;width:auto;height:auto;max-height:34px;object-fit:contain}'
-        '.london-provider-button.coupang_partners{flex-direction:column}.london-provider-button.coupang_partners img{max-width:125px;max-height:28px}'
-        '.london-provider-button.coupang_partners .london-coupang-link{display:block;font-size:11px;font-weight:700;color:#333;text-decoration:underline}'
-        '.london-provider-button.coupang_partners a{font-size:11px;font-weight:700;color:#333;text-decoration:underline}'
-        '@media(max-width:520px){.london-provider-buttons{gap:6px}.london-provider-button{min-height:56px;padding:7px}.london-provider-button img{max-height:27px}.london-provider-button.coupang_partners img{max-width:100px;max-height:23px}}</style>'
+        + '<div class="london-affiliate-partner-strip" aria-label="Affiliate partner links">'
+        + '<div class="london-coupang-official-standalone">' + coupang + '</div>'
+        + '<nav class="london-other-official-partners" aria-label="Other affiliate partners">' + other_partners + '</nav>'
+        + '</div>'
+        + '<style>.london-affiliate-partner-strip{margin:0 0 18px;padding:12px 0 16px;border-bottom:1px solid #e5e7eb}'
+        '.london-coupang-official-standalone{display:flex;justify-content:center;align-items:center;margin:0 auto 18px;padding:12px;max-width:360px}'
+        '.london-provider-button{min-height:54px;display:flex;align-items:center;justify-content:center;gap:9px;padding:8px 12px;background:#fff;text-decoration:none!important}'
+        '.london-provider-button img{display:block;max-width:100%;width:auto;height:auto;max-height:36px;object-fit:contain}'
+        '.london-provider-button.coupang_partners{flex-direction:column;border:0}'
+        '.london-provider-button.coupang_partners img{max-width:190px;max-height:42px}'
+        '.london-provider-button.coupang_partners span{font-size:12px;font-weight:700}'
+        '.london-provider-button.coupang_partners a{color:#333;text-decoration:underline}'
+        '.london-other-official-partners{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;max-width:560px;margin:0 auto}'
+        '.london-other-official-partners .london-provider-button{border:1px solid #e5e7eb;border-radius:10px;min-height:64px}'
+        '.london-other-official-partners img{max-height:34px;max-width:180px}'
+        '@media(max-width:520px){.london-coupang-official-standalone{margin-bottom:12px}.london-provider-button.coupang_partners img{max-width:160px}.london-other-official-partners{gap:8px}.london-other-official-partners .london-provider-button{min-height:54px;padding:6px}.london-other-official-partners img{max-width:140px;max-height:28px}}</style>'
         + HEADER_END)
 
 
@@ -291,8 +302,10 @@ def render_footer(title, article_text, site_id="", lang="en"):
             + '" target="_blank" rel="sponsored nofollow noopener">Shop on Coupang</a></article>'
         )
     heading = f"{len(products)} Recommended Products" if products else "Affiliate Disclosure"
+    partner_strip = render_header(site_id)
     return (START + '<section class="london-coupang-wrap" aria-label="Coupang recommended products">'
-        '<style>.london-coupang-wrap{margin:30px 0;padding:18px;border:1px solid #e5e7eb;border-radius:12px}'
+        + partner_strip
+        + '<style>.london-coupang-wrap{margin:30px 0;padding:18px;border:1px solid #e5e7eb;border-radius:12px}'
         '.london-coupang-wrap h2{font-size:20px;margin:14px 0 10px}.london-coupang-disclosure{font-size:12px;color:#666;margin:0 0 14px}'
         '.london-coupang-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;align-items:stretch}'
         '.london-coupang-card{min-width:0;border:1px solid #e5e7eb;border-radius:10px;padding:10px;text-align:center;display:flex;flex-direction:column;background:#fff}'
@@ -346,12 +359,11 @@ def _remove_legacy_single_product_modules(content):
     return content
 
 def apply_footer(content, title, site_id="", lang="en"):
-    """Place provider buttons at article top and the fixed ten-card block at article end."""
+    """Keep article body intact; place the three official partner logos immediately above the ten product cards at the footer."""
     content = _remove_legacy_single_product_modules(content or "")
     clean = content
     marker_pairs = ((HEADER_START, HEADER_END), (START, END), *LEGACY_MARKERS[1:])
     for old_start, old_end in marker_pairs:
         clean = re.sub(re.escape(old_start) + r".*?" + re.escape(old_end), "", clean, flags=re.S)
-    header = render_header(site_id)
     footer = render_footer(title, clean, site_id, lang)
-    return header + "\n" + clean.lstrip() + ("\n" if clean.strip() else "") + footer
+    return clean.rstrip() + ("\n" if clean.strip() else "") + footer
