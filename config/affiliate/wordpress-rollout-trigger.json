@@ -1,0 +1,21 @@
+{
+  "requested_at": "2026-11-05T14:05:00+09:00",
+  "scope": "all_enabled_wordpress_sites",
+  "mode": "apply",
+  "authorized_by": "user",
+  "requirements": {
+    "partner_logos": [
+      "Coupang Partners",
+      "OLIVE YOUNG",
+      "Trip.com"
+    ],
+    "product_cards": 10,
+    "product_mix": {
+      "health_functional_foods": 5,
+      "k_beauty_skincare": 5
+    },
+    "placement": "article_footer"
+  },
+  "preserve_existing_content": true,
+  "verify_after_update": true
+}
