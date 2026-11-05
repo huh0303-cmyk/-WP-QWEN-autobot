@@ -57,11 +57,29 @@ def test_cafe_healing_has_a_channel_scoped_free_only_scheduler():
     assert 'cron: "17 * * * *"' in workflow
     assert "PLAYLIST_FREE_ONLY_CHANNEL: healing" in workflow
     assert 'PLAYLIST_PAID_API_ENABLED: "false"' in workflow
-    assert "HEALING_VARIANT: random" in workflow
+    assert "HEALING_VARIANT: sequential" in workflow
     assert "YOUTUBE_OAUTH_REFRESH_TOKEN_HEALING" in workflow
     assert "scripts/youtube_github_scheduler.py --channel healing" in workflow
-    assert 'if channel_key == "healing"' in runtime
+    assert "scripts/youtube_github_worker.py --enqueue-channel healing" in workflow
+    assert "actions/cache/restore@v4" in workflow
+    assert "actions/cache/save@v4" in workflow
+    assert 'if channel == "healing"' in runtime
     assert "YOUTUBE_OAUTH_REFRESH_TOKEN_HEALING" in runtime
     assert 'parser.add_argument("--channel"' in scheduler
     assert "check_cost_hold(channel_key)" in scheduler
     assert "run_now=False" in scheduler
+
+
+
+def test_cafe_healing_rotates_five_sound_themes_with_one_visual_source():
+    motion = (ROOT / "scripts/healing_motion.py").read_text(encoding="utf-8")
+    runtime = (ROOT / "automation_hub/youtube_github_runtime.py").read_text(encoding="utf-8")
+    for theme in ('"fire"', '"rain"', '"wind"', '"birds"', '"temple"'):
+        assert theme in motion
+    assert 'CATEGORY_ORDER = ("fire", "rain", "wind", "birds", "temple")' in motion
+    assert "one main licensed nature scene" in motion
+    assert "one main source clip is looped" in motion
+    assert "record_category(MODE" in motion
+    assert "FISH_AUDIO_API_KEY" in runtime
+    assert "PEXELS_API_KEY" in runtime
+    assert "free_natural_ambience" in runtime
