@@ -63,8 +63,8 @@ def free_only_channel_allowed(channel_key: str) -> bool:
             "YOUTUBE_OAUTH_REFRESH_TOKEN_GLOBALMUSIC",
         )
     else:
-        # Mozart: existing approved Drive recordings + free Pexels photography only.
-        if os.environ.get("PLAYLIST_MUSIC_SOURCE", "") != "approved_bank":
+        # Mozart: fetch verified public-domain classical recordings directly; no MBB music Drive folder.
+        if os.environ.get("PLAYLIST_MUSIC_SOURCE", "") != "owner_local":
             return False
         if os.environ.get("PLAYLIST_IMAGE_SOURCE", "") != "pexels_api":
             return False
@@ -72,7 +72,7 @@ def free_only_channel_allowed(channel_key: str) -> bool:
             return False
         required_free = (
             "GOOGLE_OAUTH_CLIENT_ID", "GOOGLE_OAUTH_CLIENT_SECRET", "GOOGLE_OAUTH_REFRESH_TOKEN",
-            "MUSIC_SOURCE_FOLDER_ID_MBB", "THUMBNAIL_FOLDER_ID_MBB", "PEXELS_API_KEY",
+            "THUMBNAIL_FOLDER_ID_MBB", "PEXELS_API_KEY",
             "YOUTUBE_OAUTH_CLIENT_ID_MBB", "YOUTUBE_OAUTH_CLIENT_SECRET_MBB",
             "YOUTUBE_OAUTH_REFRESH_TOKEN_MBB",
         )
