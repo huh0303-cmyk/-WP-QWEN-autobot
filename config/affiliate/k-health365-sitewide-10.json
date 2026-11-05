@@ -5,7 +5,9 @@
     "url": "https://link.coupang.com/a/ih2ZTHJN24",
     "image_url": "https://image5.coupangcdn.com/image/affiliate/banner/cca43bfaafc74c7cfbe0f222ddb13a67@2x.jpg",
     "enabled": true,
-    "affiliate_confirmed": true
+    "affiliate_confirmed": true,
+    "display_title_en": "Lacto-Fit Gold Probiotic Powder, 80 Sticks",
+    "description_en": "A daily probiotic supplement in single-serve sticks. Review the strain information, ingredients, and suggested use on the label."
   },
   {
     "id": "pure-omega3-vitd",
@@ -13,7 +15,9 @@
     "url": "https://link.coupang.com/a/ih3OY0Mk8a",
     "image_url": "https://img4c.coupangcdn.com/image/affiliate/banner/ba4f6d538ce239e7666b0abba59a17b9@2x.jpg",
     "enabled": true,
-    "affiliate_confirmed": true
+    "affiliate_confirmed": true,
+    "display_title_en": "RTG Omega-3 with Vitamin D",
+    "description_en": "An omega-3 supplement combined with vitamin D. Check the EPA/DHA amounts, ingredients, and suitability before use."
   },
   {
     "id": "nutrione-lutein-zeaxanthin",
@@ -21,7 +25,9 @@
     "url": "https://link.coupang.com/a/ih25YWz9lQ",
     "image_url": "https://img1a.coupangcdn.com/image/affiliate/banner/8b632b89b0445bc5496b817fe50eadd4@2x.jpg",
     "enabled": true,
-    "affiliate_confirmed": true
+    "affiliate_confirmed": true,
+    "display_title_en": "Lutein and Zeaxanthin 164",
+    "description_en": "A lutein and zeaxanthin supplement formulated for eye-health nutrition. Review the ingredient amounts and directions."
   },
   {
     "id": "hair-collagen-3270",
@@ -29,7 +35,9 @@
     "url": "https://link.coupang.com/a/ih3bfDbgPt",
     "image_url": "https://img4c.coupangcdn.com/image/affiliate/banner/c5a95ba6e0bac93f844593df5cfb92ab@2x.jpg",
     "enabled": true,
-    "affiliate_confirmed": true
+    "affiliate_confirmed": true,
+    "display_title_en": "Collagen 3270 Supplement",
+    "description_en": "A collagen supplement option for a beauty and wellness routine. Check the collagen source, serving size, and ingredients."
   },
   {
     "id": "jongkundang-promega-omega3",
@@ -37,7 +45,9 @@
     "url": "https://link.coupang.com/a/ih3TfGGsBo",
     "image_url": "https://img2a.coupangcdn.com/image/affiliate/banner/9dfe892d59e000abb9df751f5a43c5c6@2x.jpg",
     "enabled": true,
-    "affiliate_confirmed": true
+    "affiliate_confirmed": true,
+    "display_title_en": "Jongkundang Promega Triple Omega-3",
+    "description_en": "An omega-3 supplement option. Compare the EPA/DHA content and follow the product label."
   },
   {
     "id": "cj-biocore-probiotic-500b",
@@ -45,7 +55,9 @@
     "url": "https://link.coupang.com/a/ih3Q2W2O04",
     "image_url": "https://image13.coupangcdn.com/image/affiliate/banner/3b889a9edd0130193399558d82e71213@2x.jpg",
     "enabled": true,
-    "affiliate_confirmed": true
+    "affiliate_confirmed": true,
+    "display_title_en": "CJ BioCore 500 Billion Probiotics",
+    "description_en": "A high-count probiotic product. Review the strains, storage instructions, and recommended serving."
   },
   {
     "id": "chondroitin-1200",
@@ -53,7 +65,9 @@
     "url": "https://link.coupang.com/a/ihKqEBmP48",
     "image_url": "",
     "enabled": true,
-    "affiliate_confirmed": true
+    "affiliate_confirmed": true,
+    "display_title_en": "Chondroitin 1200 Joint Supplement",
+    "description_en": "A joint-health supplement option containing chondroitin. Check the ingredient list and consult a qualified professional if needed."
   },
   {
     "id": "calcium-magnesium-k2",
@@ -61,7 +75,9 @@
     "url": "https://link.coupang.com/a/ihPTujzeyy",
     "image_url": "",
     "enabled": true,
-    "affiliate_confirmed": true
+    "affiliate_confirmed": true,
+    "display_title_en": "Calcium, Magnesium, Vitamin D and K2",
+    "description_en": "A combined mineral and vitamin supplement. Review nutrient amounts and check whether it fits your existing intake."
   },
   {
     "id": "koreaeundan-multivitamin",
@@ -69,7 +85,9 @@
     "url": "https://link.coupang.com/a/ihPGNw5JzU",
     "image_url": "",
     "enabled": true,
-    "affiliate_confirmed": true
+    "affiliate_confirmed": true,
+    "display_title_en": "Korea Eundan All-in-One Multivitamin",
+    "description_en": "A multivitamin and mineral option for daily nutrition. Follow the label and avoid doubling up with similar supplements."
   },
   {
     "id": "yuhan-msm",
@@ -77,6 +95,8 @@
     "url": "https://link.coupang.com/a/ihWmcAFZSK",
     "image_url": "",
     "enabled": true,
-    "affiliate_confirmed": true
+    "affiliate_confirmed": true,
+    "display_title_en": "Plant-Based MSM Supplement",
+    "description_en": "A plant-based MSM product for a wellness routine. Check the source, serving size, and product directions."
   }
 ]
