@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Choose the next vocabulary pair not already used by any requested language channel."""
+"""Choose a reviewed, unused adjective pair across the requested language channels."""
 from __future__ import annotations
 
 import argparse
@@ -79,6 +79,13 @@ def main() -> int:
         raise RuntimeError(f"Unknown/unregistered languages: {invalid}")
 
     catalog = json.loads(PAIR_PATH.read_text(encoding="utf-8"))["pairs"]
+    # Low-value standalone beginner noun pairs (sun/moon, book/phone,
+    # water/coffee) are retired from the daily Shorts curriculum. The format
+    # is now adjective contrasts only; do not silently cycle the noun subset.
+    catalog = [pair for pair in catalog if pair.get("category", "adjective") != "noun"]
+    if not catalog:
+        raise RuntimeError("No reviewed adjective lessons remain in the vocabulary catalog.")
+
     used_metadata = {}
     for code in codes:
         svc = service_for(code)
@@ -106,7 +113,7 @@ def main() -> int:
                     stream.write(f"pair_id={pair['id']}\n")
             return 0
 
-    raise RuntimeError("No unused vocabulary pair remains across the requested channels; expand the reviewed catalog instead of repeating content.")
+    raise RuntimeError("No unused reviewed adjective pair remains across the requested channels; expand the reviewed catalog instead of repeating content.")
 
 
 if __name__ == "__main__":
