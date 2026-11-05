@@ -11,9 +11,14 @@ on:
           - preview
           - apply
       limit:
-        description: "Pilot safety limit. Keep 1 for the first article; use 0 only after explicit fleet/site approval."
+        description: "Keep 1 for this single-post pilot."
         required: true
         default: "1"
+        type: string
+      post_id:
+        description: "Exact K-Health365 post ID for the one-article pilot."
+        required: true
+        default: "6987"
         type: string
 permissions:
   contents: read
@@ -38,7 +43,7 @@ jobs:
           MODE: ${{ inputs.mode }}
         run: |
           python -m py_compile automation_hub/coupang_partners.py scripts/khealth365_sitewide_coupang_10.py
-          python scripts/khealth365_sitewide_coupang_10.py --mode "${MODE}" --limit "${{ inputs.limit }}"
+          python scripts/khealth365_sitewide_coupang_10.py --mode "${MODE}" --limit "${{ inputs.limit }}" --post-id "${{ inputs.post_id }}"
       - name: Upload audit report
         if: always()
         uses: actions/upload-artifact@v4
