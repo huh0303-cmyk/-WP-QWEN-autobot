@@ -10,10 +10,17 @@ import argparse
 import json
 from pathlib import Path
 
+import requests
+
 
 ROOT = Path(__file__).resolve().parents[1]
-OUTPUT = ROOT / ".local" / "blogger_oauth.json"
-SCOPES = ["https://www.googleapis.com/auth/blogger"]
+OUTPUT = ROOT / ".local" / "google_oauth_drive_blogger.json"
+# Preserve the existing Drive permission while adding Blogger management.
+# This allows one existing GitHub refresh-token secret to serve both APIs.
+SCOPES = [
+    "https://www.googleapis.com/auth/drive",
+    "https://www.googleapis.com/auth/blogger",
+]
 
 
 def load_desktop_client(path: Path) -> dict:
@@ -55,6 +62,34 @@ def main() -> int:
             "취소한 뒤 prompt=consent로 다시 승인하세요."
         )
 
+    # Verify the actual granted scopes before replacing the shared GitHub token.
+    token_response = requests.post(
+        "https://oauth2.googleapis.com/token",
+        data={
+            "client_id": installed["client_id"],
+            "client_secret": installed["client_secret"],
+            "refresh_token": credentials.refresh_token,
+            "grant_type": "refresh_token",
+        },
+        timeout=30,
+    )
+    if token_response.status_code >= 400:
+        raise SystemExit(f"새 refresh token 검증 실패: HTTP {token_response.status_code}")
+    access_token = token_response.json()["access_token"]
+    scope_response = requests.get(
+        "https://oauth2.googleapis.com/tokeninfo",
+        params={"access_token": access_token},
+        timeout=20,
+    )
+    if scope_response.status_code != 200:
+        raise SystemExit(f"실제 OAuth scope 확인 실패: HTTP {scope_response.status_code}")
+    granted_scopes = set(scope_response.json().get("scope", "").split())
+    required_scopes = set(SCOPES)
+    if not required_scopes.issubset(granted_scopes):
+        missing = sorted(required_scopes - granted_scopes)
+        raise SystemExit("필수 scope 누락; 기존 GitHub token은 변경하지 마세요: " + ", ".join(missing))
+    print("검증된 OAuth scope: " + ", ".join(sorted(granted_scopes)))
+
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT.write_text(
         json.dumps(
@@ -71,7 +106,8 @@ def main() -> int:
     )
     print(f"발급 완료: {OUTPUT}")
     print("토큰 값은 출력하지 않았습니다. 이 파일은 .gitignore의 .local/ 아래에 있습니다.")
-    print("GitHub Secrets에는 BLOGGER_GOOGLE_CLIENT_ID, BLOGGER_GOOGLE_CLIENT_SECRET, BLOGGER_GOOGLE_REFRESH_TOKEN으로 등록하세요.")
+    print("Drive scope 보존과 Blogger scope 추가가 확인됐습니다.")
+    print("새 GitHub Secret을 만들지 말고 기존 GOOGLE_OAUTH_REFRESH_TOKEN만 교체하세요.")
     return 0
 
 
