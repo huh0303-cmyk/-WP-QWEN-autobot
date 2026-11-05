@@ -1,6 +1,13 @@
 name: Affiliate Engine — new WordPress and Blogger content
 
 on:
+  push:
+    paths:
+      - "affiliate-engine/runner.py"
+      - "affiliate-engine/config/affiliate-routing.json"
+      - "config/affiliate/default-header-buttons.json"
+      - "config/affiliate/portfolio-master-policy-2026-11-05.json"
+      - ".github/workflows/affiliate-new-content.yml"
   workflow_dispatch:
     inputs:
       platform:
@@ -73,7 +80,7 @@ jobs:
           BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
           BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
         run: |
-          if [ "${{ github.event_name }}" = "schedule" ]; then
+          if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
             if [ "$AFFILIATE_WRITE_ENABLED" = "true" ]; then WRITE=--write; else WRITE=; fi
             PLATFORM=all
             SCOPE=new
