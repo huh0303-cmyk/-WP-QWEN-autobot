@@ -98,3 +98,10 @@ A verified public reference is Cafe Music BGM channel's “Relaxing Jazz Music -
 - The worker claimed this row and changed its status to `자료수집`. Read-only audit run `42055862714` confirmed the claim and worker run ID.
 - The first worker attempt `42052803008` stopped before build because no future calendar row existed; it did not publish a video.
 - The active canary run is `42054528245`. It passed the strict free-only cost-hold gate and is executing the selected channel. Do not mark publication complete until the worker returns a public YouTube URL and exact-channel receipt.
+
+## 2026-11-06 — description-length failure fixed in GitHub
+
+- Inspected failed worker run `42054528245` and its uploaded artifact log. The approved owner-Drive audio pool staged 25 tracks, selected a balanced 22-track mix, rendered a 70-minute video, and uploaded the MP4 and thumbnail to Drive. The worker then stopped before YouTube upload because `youtube_english_metadata.py` generated a 1,325-character description while `validate_metadata` requires 800–1,200 characters.
+- Updated the shared playlist description template to a concise, channel-aware structure designed to remain within the validator's 800–1,200 character window. Added regression coverage for all five playlist channels using the production-length Cafe Romantic topic.
+- This corrects the confirmed metadata blocker without changing the global cost hold, enabling other channels, bypassing the owner-approved free-only exception, or uploading duplicate content.
+- The failed run did not publish to YouTube. A fresh canary must still verify the exact channel ID, returned video ID, public watch URL, duration, thumbnail and `privacyStatus=public` before the channel is considered recovered. The existing Drive-rendered MP4 should be reused only if its exact artifact and metadata are revalidated; otherwise create one new idempotently tracked attempt.
