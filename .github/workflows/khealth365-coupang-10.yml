@@ -33,8 +33,8 @@ jobs:
         run: pip install requests
       - name: Validate 5 skincare + 5 health products and process posts
         env:
-          KHEALTH365_WP_USER: ${{ secrets.KHEALTH365_WP_USER }}
-          KHEALTH365_WP_APP_PASSWORD: ${{ secrets.KHEALTH365_WP_APP_PASSWORD }}
+          WP_USER: ${{ secrets.WP_USER }}
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
           MODE: ${{ inputs.mode }}
         run: |
           python -m py_compile automation_hub/coupang_partners.py scripts/khealth365_sitewide_coupang_10.py
