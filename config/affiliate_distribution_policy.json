@@ -1,6 +1,6 @@
 {
-  "policy_version": "5.0.0",
-  "effective_date": "2026-11-03",
+  "policy_version": "6.0.0",
+  "effective_date": "2026-11-05",
   "timezone": "Asia/Seoul",
   "per_article_total": 10,
   "provider_allocation": {
@@ -10,61 +10,61 @@
     {
       "slot": "coupang_01",
       "provider": "coupang_partners",
-      "category": "beauty_cosmetics",
+      "category": "health_functional_foods",
       "position": 1
     },
     {
       "slot": "coupang_02",
       "provider": "coupang_partners",
-      "category": "beauty_cosmetics",
+      "category": "health_functional_foods",
       "position": 2
     },
     {
       "slot": "coupang_03",
       "provider": "coupang_partners",
-      "category": "laptop",
+      "category": "health_functional_foods",
       "position": 3
     },
     {
       "slot": "coupang_04",
       "provider": "coupang_partners",
-      "category": "tablet",
+      "category": "health_functional_foods",
       "position": 4
     },
     {
       "slot": "coupang_05",
       "provider": "coupang_partners",
-      "category": "health_supplements",
+      "category": "health_functional_foods",
       "position": 5
     },
     {
       "slot": "coupang_06",
       "provider": "coupang_partners",
-      "category": "health_supplements",
+      "category": "k_beauty_skincare",
       "position": 6
     },
     {
       "slot": "coupang_07",
       "provider": "coupang_partners",
-      "category": "korea_travel_packages",
+      "category": "k_beauty_skincare",
       "position": 7
     },
     {
       "slot": "coupang_08",
       "provider": "coupang_partners",
-      "category": "korea_travel_packages",
+      "category": "k_beauty_skincare",
       "position": 8
     },
     {
       "slot": "coupang_09",
       "provider": "coupang_partners",
-      "category": "hotel_products",
+      "category": "k_beauty_skincare",
       "position": 9
     },
     {
       "slot": "coupang_10",
       "provider": "coupang_partners",
-      "category": "hotel_products",
+      "category": "k_beauty_skincare",
       "position": 10
     }
   ],
@@ -89,25 +89,17 @@
     "commission_rate_source": "provider_dashboard_or_current_partner_terms",
     "missing_or_irrelevant_offer_action": "hold_and_report_no_publish",
     "top_button_links_separate_from_product_cards": true,
-    "target_verified_pool_per_site": 100,
+    "target_verified_pool_per_site": 10,
     "pool_category_counts": {
-      "beauty_cosmetics": 20,
-      "laptop": 10,
-      "tablet": 10,
-      "health_supplements": 20,
-      "korea_travel_packages": 20,
-      "hotel_products": 20
+      "health_functional_foods": 5,
+      "k_beauty_skincare": 5
     },
     "per_article_category_counts": {
-      "beauty_cosmetics": 2,
-      "laptop": 1,
-      "tablet": 1,
-      "health_supplements": 2,
-      "korea_travel_packages": 2,
-      "hotel_products": 2
+      "health_functional_foods": 5,
+      "k_beauty_skincare": 5
     },
-    "randomize_products_per_article": true,
-    "avoid_same_ten_product_set_on_different_articles": true,
+    "randomize_products_per_article": false,
+    "avoid_same_ten_product_set_on_different_articles": false,
     "require_unique_products_within_article": true
   },
   "rendering": {
@@ -210,18 +202,19 @@
     "social_live_publish_enabled": false,
     "domain_based_exclusions": false,
     "control_room_registry_is_authoritative": true,
-    "provider_card_mix": "coupang_only_10_fixed_category_mix",
+    "provider_card_mix": "coupang_only_5_health_5_beauty",
     "top_buttons_separate_from_cards": true,
     "agoda_enabled": false,
     "must_validate_exact_category_mix_before_publish": true,
-    "must_validate_unique_randomized_set_per_post": true,
+    "must_validate_unique_randomized_set_per_post": false,
     "never_publish_with_pool_below_required_category_counts": true
   },
   "rollout_order": [
-    "Authoritative v5 standard: three branded header buttons + ten Coupang-only cards with exact six-category mix",
-    "Build and verify a 100-product Coupang pool for each destination",
-    "Randomly allocate 2 beauty, 1 laptop, 1 tablet, 2 health supplements, 2 Korea travel packages, 2 hotel products to every article",
-    "Backfill and validate each destination independently; apply same rule to every new article"
+    "Canonical v6: three header affiliate buttons in order Coupang Partners, Trip.com, OLIVE YOUNG",
+    "Every article/video/social placement uses ten Coupang Partners products only: five health functional food/wellness products and five K-Beauty skincare products",
+    "Each destination has its own ten-product Coupang tracking catalog and official permitted product images",
+    "Weekly review: replace only selected products when needed; never invent tracking URLs or images",
+    "Pilot K-Health365 only; fleet rollout remains disabled until owner approves after reviewing the pilot"
   ],
   "scope_exclusions": [
     "naver",
@@ -271,44 +264,50 @@
       "tracking_url_required": true
     },
     {
-      "provider": "olive_young_global",
-      "label": "Olive Young",
-      "position": 2,
-      "tracking_url_required": true
-    },
-    {
       "provider": "trip_com",
       "label": "Trip.com",
-      "position": 3,
+      "position": 2,
       "tracking_url_required": true,
       "subcategories": [
         "hotels",
         "flights",
         "tours_and_packages"
       ]
+    },
+    {
+      "provider": "olive_young_global",
+      "label": "OLIVE YOUNG",
+      "position": 3,
+      "tracking_url_required": true
     }
   ],
   "header_design": {
     "layout": "single_horizontal_row_three_branded_buttons",
     "order": [
       "coupang_partners",
-      "olive_young_global",
-      "trip_com"
+      "trip_com",
+      "olive_young_global"
     ],
     "labels": [
       "Coupang Partners",
-      "OLIVE YOUNG",
-      "Trip.com"
+      "Trip.com",
+      "OLIVE YOUNG"
     ],
     "brand_colors": {
       "coupang_partners": "coupang_orange",
-      "olive_young_global": "olive_young_green",
-      "trip_com": "trip_blue"
+      "trip_com": "trip_blue",
+      "olive_young_global": "olive_young_green"
     },
     "logo_or_brand_mark_required": true,
     "no_plain_navy_text_button_replacement": true,
     "no_escaped_unicode_or_raw_backslash_u_labels": true,
     "no_extra_trip_category_text_link_row_below_buttons": true,
     "each_button_uses_its_own_verified_site_authorized_tracking_url": true
+  },
+  "rollout_gate": {
+    "pilot_site": "https://k-health365.com",
+    "pilot_only": true,
+    "expand_to_all_control_korea365_org_destinations": false,
+    "requires_owner_approval_after_public_pilot_review": true
   }
 }
