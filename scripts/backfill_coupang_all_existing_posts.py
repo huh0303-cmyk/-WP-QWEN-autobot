@@ -66,7 +66,12 @@ def lang_for(site, content):
     return "ko" if lang.startswith("ko") else "en"
 
 def distinct_links(content):
-    return set(re.findall(r"""href=["'](https://link\.coupang\.com/[^"']+)""", content or ""))
+    content = content or ""
+    # Count product-card destinations only; the separate Coupang partner text link
+    # above the cards is a header destination, not one of the ten product slots.
+    match = re.search(r'<div class="london-coupang-grid"[^>]*>([\s\S]*?)</div>', content, re.I)
+    scope = match.group(1) if match else content
+    return set(re.findall(r"""href=["'](https://link\.coupang\.com/[^"']+)""", scope, re.I))
 
 def main():
     ap = argparse.ArgumentParser()
@@ -93,6 +98,9 @@ def main():
             tr.raise_for_status()
             blogger_token = tr.json()["access_token"]
 
+    dashboard = json.loads((ROOT / "docs/dashboard.json").read_text(encoding="utf-8-sig"))
+    dashboard_wp_hosts = {urlparse(str(r.get("url", ""))).netloc.lower() for r in dashboard.get("rows", []) if r.get("platform") in {"wordpress", "newsroom"} and r.get("url")}
+
     report = {"mode":args.mode,"platform":args.platform,"started_at":time.strftime("%Y-%m-%dT%H:%M:%SZ",time.gmtime()),
               "sites":[],"totals":{"posts_seen":0,"updated":0,"already_ten":0,"needs_catalog":0,"skipped_legacy":0,"errors":0}}
     session = requests.Session()
@@ -104,6 +112,10 @@ def main():
         if not site.get("enabled", True): continue
         if args.site_id and sid != args.site_id: continue
         if args.platform != "all" and platform != args.platform: continue
+        if platform == "wordpress" and not args.site_id:
+            host = urlparse(str(site.get("url", ""))).netloc.lower()
+            if host not in dashboard_wp_hosts:
+                continue
         site_key = sid.split("_",1)[-1]
         site_domain = urlparse(site.get("url", "")).netloc.lower().removeprefix("www.")
         policy = WP_AFFILIATE_POLICY.get(site_domain) if platform == "wordpress" else None
@@ -122,7 +134,7 @@ def main():
         if platform == "wordpress" and (not policy or policy.get("provider") in {"none", "excluded"}):
             report["sites"].append({"site_id":sid,"url":site.get("url"),"platform":platform,"status":"held_by_master_policy","provider":(policy or {}).get("provider","unlisted"),"reason":"Master policy excludes commercial product blocks for this destination."})
             continue
-        catalog_count = len(load_candidates(sid))
+        catalog_count = len(select_products("Global weekly set", "", sid))
         entry = {"site_id":sid,"url":site.get("url"),"platform":platform,
                  "verified_products":catalog_count,"posts_seen":0,"updated":0,
                  "already_ten":0,"needs_catalog":0,"skipped_legacy":0,"errors":[]}

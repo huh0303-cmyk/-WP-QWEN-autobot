@@ -55,22 +55,24 @@ def load_header_buttons(site_id=""):
     candidates = [
         ROOT / f"data/affiliate/{key}-header-buttons.json",
         ROOT / f"config/affiliate/header-buttons/{key}.json",
+        ROOT / "config/affiliate/default-header-buttons.json",
     ]
-    candidates.append(ROOT / "config/affiliate/default-header-buttons.json")
     for path in candidates:
         data = _load_json(path)
         if not isinstance(data, dict):
             continue
         buttons = data.get("buttons", [])
-        required = {"trip_com", "olive_young_global", "coupang_partners"}
-        if len(buttons) != 3 or {x.get("provider") for x in buttons} != required:
+        required = ("coupang_partners", "olive_young_global", "trip_com")
+        if tuple(x.get("provider") for x in buttons) != required:
             continue
         if any(not str(x.get("affiliate_url", "")).startswith("https://") for x in buttons):
             continue
-        # Olive Young's supplied reward-code URL is accepted as a destination
-        # link while commission attribution remains explicitly pending.
+        coupang = next(x for x in buttons if x.get("provider") == "coupang_partners")
         olive = next(x for x in buttons if x.get("provider") == "olive_young_global")
-        if olive.get("status") != "redirect_test_failed_gate_url_null" and olive.get("verified") is not True:
+        trip = next(x for x in buttons if x.get("provider") == "trip_com")
+        if coupang.get("verified") is not True or trip.get("verified") is not True:
+            continue
+        if olive.get("verified") is not True and olive.get("status") != "redirect_test_failed_gate_url_null":
             continue
         return data
     return None
@@ -168,123 +170,75 @@ def _canonical_asset_url(value):
         return ""
 
 def select_products(title, article_text, site_id="", limit=10):
-    # Soft quota: use up to ten verified, site-scoped offers; never fabricate products.
-    key = _resolve_site_key(site_id)
-    if limit <= 0:
+    """Use the same verified ten-product global weekly set on every destination."""
+    if limit < 10:
         return []
-    # K-Health365 uses a fixed ten-product catalog. Reuse the same verified
-    # offers in catalog order for every article until an operator replaces it.
-    if key == "khealth365":
-        fixed_path = ROOT / "config/affiliate/global-weekly-10.json"
-        weekly_data = _load_json(fixed_path)
-        if not isinstance(weekly_data, dict):
-            raise RuntimeError("Weekly Coupang catalog is missing or invalid.")
-        window = weekly_data.get("lock_window", {})
-        try:
-            now = datetime.now(ZoneInfo("Asia/Seoul"))
-            starts_at = datetime.fromisoformat(window["starts_at"])
-            ends_at = datetime.fromisoformat(window["ends_at"])
-        except (KeyError, TypeError, ValueError) as exc:
-            raise RuntimeError("Weekly Coupang catalog must define valid KST starts_at and ends_at.") from exc
-        if not (starts_at <= now < ends_at):
-            raise RuntimeError(f"Weekly Coupang set is outside its 168-hour lock window ({starts_at.isoformat()} to {ends_at.isoformat()}); update the ten products and dates before publishing.")
-        fixed_rows = weekly_data.get("items", [])
-        fixed = []
-        seen_urls, seen_images = set(), set()
-        for raw in fixed_rows:
-            if not isinstance(raw, dict) or raw.get("enabled") is not True:
-                continue
-            category = str(raw.get("category", "")).lower()
-            if category not in {"beauty", "health", "k_beauty_skincare", "health_functional_foods"}:
-                continue
-            item = _candidate(raw, category)
-            if not item:
-                continue
-            image_key = _canonical_asset_url(item["image"])
-            if item["url"] in seen_urls or not image_key or image_key in seen_images:
-                continue
-            seen_urls.add(item["url"])
-            seen_images.add(image_key)
-            fixed.append(item)
-        beauty_count = sum(1 for item in fixed if item["category"] in {"beauty", "k_beauty_skincare"})
-        health_count = sum(1 for item in fixed if item["category"] in {"health", "health_functional_foods"})
-        if len(fixed) != 10 or beauty_count != 5 or health_count != 5:
-            raise ValueError(
-                "K-Health365 catalog must contain exactly 10 unique verified products "
-                f"(5 skincare + 5 health supplements); found {len(fixed)} total, "
-                f"{beauty_count} beauty, {health_count} health."
-            )
-        return fixed[:min(limit, 10)]
-    pool = load_candidates(site_id)
-    if not pool:
-        return []
-    clean_text = article_text or ""
-    for old_start, old_end in LEGACY_MARKERS:
-        clean_text = re.sub(re.escape(old_start) + r".*?" + re.escape(old_end), " ", clean_text, flags=re.S)
-    # Never add a product already linked in the article's own content (including
-    # a standalone topic recommendation outside the managed footer).
-    existing_urls = set(re.findall(r"""https://link\.coupang\.com/a/[A-Za-z0-9]+""", clean_text, re.I))
-    existing_images = {
-        _canonical_asset_url(src)
-        for src in re.findall(r"""<img\b[^>]*\bsrc\s*=\s*["']([^"']+)["']""", clean_text, re.I)
-    }
-    unique_pool, seen_urls, seen_images = [], set(), set()
-    for item in pool:
-        image_key = _canonical_asset_url(item.get("image"))
-        if item["url"] in existing_urls or (image_key and image_key in existing_images):
+    weekly_data = _load_json(ROOT / "config/affiliate/global-weekly-10.json")
+    if not isinstance(weekly_data, dict) or weekly_data.get("source_of_truth") is not True:
+        raise RuntimeError("Global weekly Coupang catalog is missing or is not the source of truth.")
+    window = weekly_data.get("lock_window", {})
+    try:
+        now = datetime.now(ZoneInfo("Asia/Seoul"))
+        starts_at = datetime.fromisoformat(window["starts_at"])
+        ends_at = datetime.fromisoformat(window["ends_at"])
+    except (KeyError, TypeError, ValueError) as exc:
+        raise RuntimeError("Global weekly catalog must define valid KST starts_at and ends_at.") from exc
+    if not (starts_at <= now < ends_at):
+        raise RuntimeError(f"Global weekly set is outside its 168-hour lock window ({starts_at.isoformat()} to {ends_at.isoformat()}); update the weekly set before publishing.")
+    if weekly_data.get("status") != "weekly_catalog_ready_global_rollout_approved":
+        raise RuntimeError("Global weekly catalog has not passed the owner-approved fleet rollout gate.")
+    fixed = []
+    seen_urls, seen_images = set(), set()
+    counts = {"health_functional_foods": 0, "k_beauty_skincare": 0}
+    for raw in weekly_data.get("items", []):
+        if not isinstance(raw, dict) or raw.get("enabled") is not True or raw.get("affiliate_confirmed") is not True:
             continue
-        if item["url"] in seen_urls or not image_key:
+        category = str(raw.get("category", "")).lower()
+        if category not in counts:
             continue
+        item = _candidate(raw, "global_weekly")
+        if not item:
+            continue
+        image_key = item["image"].strip()
+        if item["url"] in seen_urls or image_key in seen_images:
+            continue
+        if "/image/affiliate/banner/" not in urlparse(image_key).path:
+            continue
+        item["display_title_en"] = raw.get("display_title_en", "")
+        item["description_en"] = raw.get("description_en", "")
+        item["category"] = category
         seen_urls.add(item["url"])
         seen_images.add(image_key)
-        unique_pool.append(item)
-    pool = unique_pool
-    if not pool: return []
-    ranked = sorted(pool, key=lambda p: (_category(p) != "health_functional_foods", p["title"].lower()))
-    # Coverage-first fleet rollout: use all verified destination-scoped offers up to ten.
-    # A site with fewer than five items in either category is not blocked.
-    chosen = [p for p in ranked if _category(p) in {"health_functional_foods", "k_beauty_skincare"}]
-    if not chosen:
-        chosen = ranked
-    return chosen[:min(limit, 10)]
+        counts[category] += 1
+        fixed.append(item)
+    if len(fixed) != 10 or counts != {"health_functional_foods": 5, "k_beauty_skincare": 5}:
+        raise ValueError(f"Global weekly catalog must contain 10 unique verified Coupang offers (5 health + 5 beauty); found {len(fixed)} and {counts}.")
+    return fixed
 
 def render_header(site_id=""):
     header = load_header_buttons(site_id)
     if not header:
-        raise RuntimeError(f"Affiliate header requires Trip.com + Olive Young + Coupang tracking URLs for site={site_id}")
-    button_order = ("coupang_partners", "olive_young_global", "trip_com")
-    button_map = {item["provider"]: item for item in header["buttons"]}
-    buttons = []
-    labels = {
-        "coupang_partners": "Coupang Partners",
-        "olive_young_global": "OLIVE YOUNG",
-        "trip_com": "Trip.com",
-    }
-    for provider in button_order:
-        item = button_map[provider]
-        url = html.escape(item["affiliate_url"], quote=True)
-        label = html.escape(labels[provider])
-        logo = html.escape(LOGOS[provider], quote=True)
-        # Three official logos are displayed side-by-side in the required order.
-        # Each complete banner is independently linked to its own affiliate URL.
-        buttons.append(
-            f'<a class="london-provider-button {provider}" href="{url}" '
-            f'target="_blank" rel="sponsored nofollow noopener" aria-label="{label} affiliate link">'
-            f'<img src="{logo}" alt="{label} official company logo" loading="lazy" decoding="async">'
-            f'<span>{label}</span></a>'
-        )
+        raise RuntimeError(f"Affiliate header requires the three approved partner destinations for site={site_id}")
+    button_map = {item.get("provider"): item for item in header.get("buttons", [])}
+    coupang = button_map["coupang_partners"]
+    olive = button_map["olive_young_global"]
+    trip = button_map["trip_com"]
+    coupang_logo = html.escape(coupang.get("logo_url") or LOGOS["coupang_partners"], quote=True)
+    olive_logo = html.escape(olive.get("logo_url") or LOGOS["olive_young_global"], quote=True)
+    trip_logo = html.escape(trip.get("logo_url") or LOGOS["trip_com"], quote=True)
+    coupang_url = html.escape(coupang["affiliate_url"], quote=True)
+    olive_url = html.escape(olive["affiliate_url"], quote=True)
+    trip_url = html.escape(trip["affiliate_url"], quote=True)
+    olive_note = "Reward-code link; commission attribution not independently confirmed" if olive.get("verified") is not True else "Official partner link"
     return (HEADER_START
-        + '<div class="london-affiliate-partner-strip" aria-label="Official affiliate partner banners">'
-        + ''.join(buttons)
-        + '</div>'
-        + '<style>.london-affiliate-partner-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0 0 20px;padding:0}'
-        '.london-provider-button{box-sizing:border-box;display:flex;min-width:0;min-height:96px;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:12px 8px;border:1px solid #e5e7eb;border-top:4px solid var(--brand-color);border-radius:10px;background:#fff;text-decoration:none!important;text-align:center}'
-        '.london-provider-button img{display:block;width:auto;max-width:100%;height:auto;max-height:72px;object-fit:contain}'
-        '.london-provider-button span{font-size:8px;line-height:1.2;font-weight:500;color:#777}'
-        '.london-provider-button.coupang_partners{--brand-color:#e87518}'
-        '.london-provider-button.olive_young_global{--brand-color:#168a43}'
-        '.london-provider-button.trip_com{--brand-color:#1769d2}'
-        '@media(max-width:520px){.london-affiliate-partner-strip{gap:6px}.london-provider-button{min-height:82px;padding:8px 4px}.london-provider-button img{max-height:56px}.london-provider-button span{font-size:7px}}</style>'
+        + '<div class="london-affiliate-partner-strip" aria-label="Official affiliate partner logos">'
+        + '<div class="london-coupang-brand"><img src="' + coupang_logo + '" alt="Coupang Partners official company logo" loading="lazy" decoding="async"><span>Coupang Partners</span></div>'
+        + '<a class="london-coupang-text-link" href="' + coupang_url + '" target="_blank" rel="sponsored nofollow noopener">Coupang Partners tracked destination</a>'
+        + '<div class="london-third-party-partners">'
+        + '<a class="london-provider-button olive_young_global" href="' + olive_url + '" target="_blank" rel="sponsored nofollow noopener" title="' + html.escape(olive_note, quote=True) + '"><img src="' + olive_logo + '" alt="OLIVE YOUNG official company logo" loading="lazy" decoding="async"><span>OLIVE YOUNG</span><small>' + html.escape(olive_note) + '</small></a>'
+        + '<a class="london-provider-button trip_com" href="' + trip_url + '" target="_blank" rel="sponsored nofollow noopener"><img src="' + trip_logo + '" alt="Trip.com official company logo" loading="lazy" decoding="async"><span>Trip.com</span></a>'
+        + '</div></div>'
+        + '<style>.london-affiliate-partner-strip{margin:0 0 20px;padding:0}.london-coupang-brand{display:flex;min-height:82px;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:12px;border:1px solid #e5e7eb;border-top:4px solid #e87518;border-radius:10px;background:#fff}.london-coupang-brand img{display:block;width:auto;max-width:100%;max-height:62px;object-fit:contain}.london-coupang-brand span{font-size:8px;color:#777}.london-coupang-text-link{display:block;width:max-content;max-width:100%;margin:6px auto 12px;color:#17365d!important;font-size:12px;font-weight:700;text-decoration:underline}.london-third-party-partners{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.london-provider-button{box-sizing:border-box;display:flex;min-width:0;min-height:88px;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:10px 8px;border:1px solid #e5e7eb;border-top:4px solid var(--brand-color);border-radius:10px;background:#fff;text-decoration:none!important;text-align:center}.london-provider-button img{display:block;width:auto;max-width:100%;height:auto;max-height:58px;object-fit:contain}.london-provider-button span{font-size:9px;line-height:1.2;font-weight:700;color:#555}.london-provider-button small{font-size:8px;line-height:1.25;color:#9a5b16}.london-provider-button.olive_young_global{--brand-color:#168a43}.london-provider-button.trip_com{--brand-color:#1769d2}@media(max-width:520px){.london-third-party-partners{gap:6px}.london-provider-button{min-height:76px;padding:8px 4px}.london-provider-button img{max-height:48px}.london-provider-button span{font-size:8px}}</style>'
         + HEADER_END)
 
 def render_footer(title, article_text, site_id="", lang="en"):
@@ -296,8 +250,8 @@ def render_footer(title, article_text, site_id="", lang="en"):
     for p in products:
         url, image, name = (html.escape(p[k], quote=True) for k in ("url","image","title"))
         category = html.escape(p.get("category", "").replace("_", " ").title())
-        title_en = html.escape(p.get("display_title_en") or p["title"])
-        description = p.get("description_en") or {
+        title_en = html.escape(p["title"] if lang == "ko" else (p.get("display_title_en") or p["title"]))
+        description = ("성분과 함량, 원료 및 섭취 방법을 상품 페이지에서 확인하세요." if lang == "ko" and _category(p) == "health_functional_foods" else "피부 타입과 전성분, 사용 방법을 상품 페이지에서 확인하세요." if lang == "ko" else p.get("description_en")) or {
             "korea_digital_esim_sim": "Stay connected in Korea with convenient mobile data and SIM or eSIM access.",
             "korea_travel_power": "A practical travel accessory designed to make charging devices easier on the go.",
             "k_beauty_olive_young": "A Korean beauty pick for everyday skincare and personal care routines.",
@@ -312,7 +266,7 @@ def render_footer(title, article_text, site_id="", lang="en"):
             '<p class="london-coupang-description">' + description + '</p><a class="london-coupang-button" href="' + url
             + '" target="_blank" rel="sponsored nofollow noopener">Shop on Coupang</a></article>'
         )
-    heading = f"{len(products)} Recommended Products" if products else "Affiliate Disclosure"
+    heading = ("함께 살펴볼 추천 상품 10선" if lang == "ko" else f"{len(products)} Recommended Products") if products else "Affiliate Disclosure"
     partner_strip = render_header(site_id)
     return (START + '<section class="london-coupang-wrap" aria-label="Coupang recommended products">'
         + partner_strip

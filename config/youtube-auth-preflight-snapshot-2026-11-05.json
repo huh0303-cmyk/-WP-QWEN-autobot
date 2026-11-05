@@ -1,0 +1,36 @@
+{
+  "verified_on": "2026-11-05",
+  "verification_type": "read-only OAuth refresh + exact channels.list(mine=true) identity + upload-scope preflight",
+  "verified_channels": {
+    "globalmusic": "UCbJfEtsffpgI5MsKkB7BYvQ",
+    "healing": "UC7yEsLM-HoXudngrD-4FIqg",
+    "starbucks": "UC_e-sbLkVgwJNYEeobolNog",
+    "mbb": "UC7jOhyMa-FIrzZuea97z1Pw",
+    "kpop": "UCKZsfAWyCmY0jckf4IWZrqw",
+    "nasa": "UCtNLZO07Oh3UnXPI2CjOgNg",
+    "history": "UCVBvZwodUF4s57KeNicxQ3w",
+    "invention": "UCgNj-yS93A_fOHXXvG49fww",
+    "silent_era": "UCLvy6kSpC8-7o3hnSrfQ47g",
+    "retro_reels": "UCwh49EokdWFJqYFE_zA6XDQ",
+    "health_japan": "UCC_PcHMv-Uxpr00Pjw_J2Wg",
+    "health_usa": "UC91BpNSb4nUwD6jrpthK7FQ",
+    "ko": "UCdA24IuR-JE7qButWv5jLqA",
+    "ja": "UCOWoNH_d6p45ywQ6W0Z1Jng"
+  },
+  "source_runs": {
+    "playlist_knowledge": "41982080749",
+    "health_channels": "41982297888",
+    "language_ko_ja": "41984609966"
+  },
+  "unverified_channels": [
+    "en",
+    "zh",
+    "vi",
+    "es",
+    "fr",
+    "de",
+    "it",
+    "pt",
+    "shopping"
+  ]
+}

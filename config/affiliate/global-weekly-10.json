@@ -8,7 +8,7 @@
     "ends_at": "2026-11-12T00:00:00+09:00",
     "duration_hours": 168
   },
-  "status": "weekly_catalog_ready_khealth365_rollout_pending",
+  "status": "weekly_catalog_ready_global_rollout_approved",
   "source_of_truth": true,
   "selection": {
     "provider": "coupang_partners",
@@ -188,5 +188,26 @@
       "source": "authenticated_coupang_partners_generated_blog_tag",
       "candidate_id": "oy02"
     }
-  ]
+  ],
+  "rollout_approval": {
+    "approved_on": "2026-11-05",
+    "approval_source": "Owner explicitly instructed expansion to all WordPress, Blogspot, YouTube, TikTok, Facebook, Instagram and Threads channels in the current conversation.",
+    "pilot_run_id": "41980914786",
+    "pilot_result": {
+      "site": "https://k-health365.com",
+      "posts_found": 376,
+      "updated_and_verified": 376,
+      "errors": 0
+    },
+    "approved_scope": [
+      "wordpress",
+      "blogger_blogspot",
+      "youtube",
+      "tiktok",
+      "facebook",
+      "instagram",
+      "threads"
+    ],
+    "publishing_rule": "Per-platform publishing still requires verified destination identity, required OAuth scopes and platform-supported placements."
+  }
 }
