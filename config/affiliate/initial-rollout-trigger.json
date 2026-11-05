@@ -6,5 +6,7 @@
   "only_update_existing_published_posts": true,
   "preserve_post_status_and_dates": true,
   "no_delete": true,
-  "note": "One-time trigger. Sites without ten verified site-scoped products are skipped and reported; no cross-site catalog borrowing."
+  "note": "One-time trigger. Sites without ten verified site-scoped products are skipped and reported; no cross-site catalog borrowing.",
+  "retry": 1,
+  "updated_at_utc": "2026-11-05T01:40:00Z"
 }
