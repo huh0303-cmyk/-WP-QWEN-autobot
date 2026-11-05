@@ -62,7 +62,7 @@ def load_products():
     image_urls = [p["image_url"] for p in items]
     if len(set(image_urls)) != 10:
         die("고정 상품 10개의 대표 이미지가 중복됩니다.")
-    CATALOG.write_text(json.dumps(items, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+    CATALOG.write_text(json.dumps(items, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return items
 
 def render_block(products):
