@@ -85,6 +85,24 @@ def get_youtube_service():
     return build("youtube", "v3", credentials=creds)
 
 
+def _mozart_guard_path():
+    return os.path.join(ROOT, "artifacts", "cafe_mozart_upload_guard.json")
+
+
+def _write_mozart_guard(video_id, stage, title=""):
+    path = _mozart_guard_path()
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    payload = {
+        "channel_key": "mbb",
+        "video_id": video_id,
+        "title": title,
+        "stage": stage,
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+    }
+    with open(path, "w", encoding="utf-8") as handle:
+        json.dump(payload, handle, ensure_ascii=False, indent=2)
+
+
 def upload_to_youtube(service, video_path, thumb_path, title, description, tags=None):
     from googleapiclient.http import MediaFileUpload
     from youtube_english_metadata import validate_metadata
@@ -93,6 +111,19 @@ def upload_to_youtube(service, video_path, thumb_path, title, description, tags=
     is_mozart = channel_key == "mbb"
     if is_mozart and (not thumb_path or not os.path.isfile(thumb_path) or os.path.getsize(thumb_path) <= 0):
         raise RuntimeError("CAFE_MOZART thumbnail preflight failed; refusing to upload without a real thumbnail")
+    if is_mozart:
+        guard_path = _mozart_guard_path()
+        if os.path.isfile(guard_path):
+            try:
+                previous = json.loads(open(guard_path, encoding="utf-8").read())
+            except Exception as exc:
+                raise RuntimeError("CAFE_MOZART prior upload guard is unreadable; refusing duplicate upload") from exc
+            if previous.get("stage") != "verified":
+                raise RuntimeError(
+                    "CAFE_MOZART prior upload is not fully verified; reconcile video "
+                    + str(previous.get("video_id", "unknown"))
+                    + " before attempting another upload"
+                )
     # Keep Mozart private until its thumbnail is successfully applied.
     privacy_status = "private" if is_mozart else upload_privacy_status()
     status = {"selfDeclaredMadeForKids": False, "privacyStatus": privacy_status}
@@ -118,12 +149,15 @@ def upload_to_youtube(service, video_path, thumb_path, title, description, tags=
             if retries >= max_retries: raise
             time.sleep(min(2 ** retries, 8))
     video_id = response["id"]
+    if is_mozart:
+        _write_mozart_guard(video_id, "uploaded_private", title)
     if thumb_path and os.path.exists(thumb_path) and os.path.getsize(thumb_path) > 0:
         if is_mozart:
             service.thumbnails().set(videoId=video_id, media_body=MediaFileUpload(thumb_path)).execute()
             service.videos().update(
                 part="status", body={"id": video_id, "status": {"privacyStatus": upload_privacy_status()}}
             ).execute()
+            _write_mozart_guard(video_id, "published_waiting_verify", title)
         else:
             try:
                 service.thumbnails().set(videoId=video_id, media_body=MediaFileUpload(thumb_path)).execute()
@@ -163,6 +197,8 @@ def main():
     video_id = upload_to_youtube(youtube, video_path, thumb_path, os.environ["YT_TITLE"],
         os.environ.get("YT_DESCRIPTION", ""), [t.strip() for t in os.environ.get("YT_TAGS", "").split(",") if t.strip()])
     verify_uploaded_video(youtube, video_id, channel_key, upload_privacy_status())
+    if channel_key == "mbb":
+        _write_mozart_guard(video_id, "verified", os.environ.get("YT_TITLE", ""))
     studio_url = f"https://studio.youtube.com/video/{video_id}/edit"
     public_url = f"https://youtu.be/{video_id}"
     privacy_status = upload_privacy_status()
