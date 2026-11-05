@@ -25,3 +25,7 @@ The OAuth fallback code correction is committed, but a new workflow run on the c
 - Ten-language duplicate audit: https://github.com/huh0303-cmyk/-WP-QWEN-autobot/actions/runs/42048011059
 - OAuth fallback fix commit: https://github.com/huh0303-cmyk/-WP-QWEN-autobot/commit/4b462a66369c4e537340c0f12664643555820d88
 - Duplicate audit artifact: https://github.com/huh0303-cmyk/-WP-QWEN-autobot/actions/runs/42048011059/artifacts/13424603491
+## Additional safeguards added after the first audit
+Commit d8d8a19af134f3d2e0bedd120302b4689b0fbc33 changed the daily cron from 20:17 to 20:23 KST to re-register the scheduled trigger. The subsequent workflow hardening commit changes the manual language selector to an all-only choice and validates the generated batch manifest against the exact ten registered language codes before artifact upload. A partial batch now fails before publishing.
+
+Run 42048830045 generated nine Fish Audio language assets (ko, ja, zh, vi, es, fr, de, it, pt) because its manual input omitted en. Its publish job was later cancelled; no publication success is claimed. Run 42049150476 was also cancelled before generation. These are not release verification runs for the corrected main branch.
