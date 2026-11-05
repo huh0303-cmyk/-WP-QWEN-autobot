@@ -156,6 +156,8 @@ jobs:
               && -z "${GEMINI_API_KEY:-}" \
               && -z "${OPENAI_API_KEY:-}" \
               && -z "${LYRIA_API_KEY:-}" \
+              && "${AUTO_TOPIC:-true}" == "false" \
+              && -n "${CAPTION_TEXT:-}" \
               && -n "${PEXELS_API_KEY:-}" \
               && -n "${MUSIC_SOURCE_FOLDER_ID_GLOBALMUSIC:-}" \
               && -n "${THUMBNAIL_FOLDER_ID_GLOBALMUSIC:-}" ]]; then
