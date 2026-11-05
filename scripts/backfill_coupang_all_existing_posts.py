@@ -143,35 +143,39 @@ def main():
                 s = requests.Session(); s.auth = auth
                 posts = wp_posts(s, base)
                 for idx, post in enumerate(posts):
-                    if args.limit_per_site and idx >= args.limit_per_site: break
-                    raw = post.get("content",{}).get("raw")
-                    if raw is None:
-                        entry["errors"].append({"post_id":post.get("id"),"reason":"raw content unavailable"}); continue
-                    title = clean_title(post.get("title",{}).get("rendered",""))
-                    lang = lang_for(site, raw)
-                    new = apply_footer(raw,title,sid,lang)
-                    entry["posts_seen"] += 1
-                    report["totals"]["posts_seen"] += 1
-                    if new == raw:
-                        if HEADER_START in raw and HEADER_END in raw and START in raw and END in raw:
-                            entry["already_ten"] += 1
-                        elif "link.coupang.com/" in raw or DISCLOSURE in raw:
-                            entry["skipped_legacy"] += 1
+                    try:
+                        if args.limit_per_site and idx >= args.limit_per_site: break
+                        raw = post.get("content",{}).get("raw")
+                        if raw is None:
+                            entry["errors"].append({"post_id":post.get("id"),"reason":"raw content unavailable"}); continue
+                        title = clean_title(post.get("title",{}).get("rendered",""))
+                        lang = lang_for(site, raw)
+                        new = apply_footer(raw,title,sid,lang)
+                        entry["posts_seen"] += 1
+                        report["totals"]["posts_seen"] += 1
+                        if new == raw:
+                            if HEADER_START in raw and HEADER_END in raw and START in raw and END in raw:
+                                entry["already_ten"] += 1
+                            elif "link.coupang.com/" in raw or DISCLOSURE in raw:
+                                entry["skipped_legacy"] += 1
+                            else:
+                                entry["errors"].append({"post_id":post["id"],"reason":"footer unchanged; inspect catalog or legacy markup"})
+                            continue
+                        if args.mode == "apply":
+                            endpoint = base + "/wp-json/wp/v2/posts/" + str(post["id"])
+                            put = s.post(endpoint,json={"content":new},timeout=60); put.raise_for_status()
+                            check = s.get(endpoint,params={"context":"edit","_fields":"id,content,status,date"},timeout=60); check.raise_for_status()
+                            verified = check.json().get("content",{}).get("raw","")
+                            links = distinct_links(verified)
+                            expected = set(p["url"] for p in select_products(title,raw,sid))
+                            if HEADER_START not in verified or HEADER_END not in verified or START not in verified or END not in verified or not expected.issubset(links):
+                                entry["errors"].append({"post_id":post["id"],"reason":"read-back verification failed"}); continue
+                            entry["updated"] += 1; report["totals"]["updated"] += 1
                         else:
-                            entry["errors"].append({"post_id":post["id"],"reason":"footer unchanged; inspect catalog or legacy markup"})
-                        continue
-                    if args.mode == "apply":
-                        endpoint = base + "/wp-json/wp/v2/posts/" + str(post["id"])
-                        put = s.post(endpoint,json={"content":new},timeout=60); put.raise_for_status()
-                        check = s.get(endpoint,params={"context":"edit","_fields":"id,content,status,date"},timeout=60); check.raise_for_status()
-                        verified = check.json().get("content",{}).get("raw","")
-                        links = distinct_links(verified)
-                        expected = set(p["url"] for p in select_products(title,raw,sid))
-                        if HEADER_START not in verified or HEADER_END not in verified or START not in verified or END not in verified or not expected.issubset(links):
-                            entry["errors"].append({"post_id":post["id"],"reason":"read-back verification failed"}); continue
-                        entry["updated"] += 1; report["totals"]["updated"] += 1
-                    else:
-                        entry["updated"] += 1
+                            entry["updated"] += 1
+                    except Exception as exc:
+                        entry["errors"].append({"post_id": post.get("id"), "reason": "post failed; continuing to next post: " + str(exc)[:350]})
+                        report["totals"]["errors"] += 1
             elif platform == "blogger":
                 if not blogger_token:
                     entry["errors"].append("missing Blogger OAuth refresh-token secrets")
@@ -184,30 +188,34 @@ def main():
                     report["sites"].append(entry); continue
                 endpoint = f"https://www.googleapis.com/blogger/v3/blogs/{blog_id}/posts"
                 for idx, post in enumerate(blogger_posts(session,blog_id,blogger_token)):
-                    if args.limit_per_site and idx >= args.limit_per_site: break
-                    raw = post.get("content","")
-                    title = clean_title(post.get("title",""))
-                    new = apply_footer(raw,title,sid,lang_for(site,raw))
-                    entry["posts_seen"] += 1; report["totals"]["posts_seen"] += 1
-                    if new == raw:
-                        if HEADER_START in raw and HEADER_END in raw and START in raw and END in raw: entry["already_ten"] += 1
-                        elif "link.coupang.com/" in raw or DISCLOSURE in raw: entry["skipped_legacy"] += 1
-                        else: entry["errors"].append({"post_id":post.get("id"),"reason":"footer unchanged; inspect catalog or legacy markup"})
-                        continue
-                    if args.mode == "apply":
-                        payload = dict(post); payload["content"] = new
-                        put = session.put(endpoint + "/" + str(post["id"]),params={"fetchBody": "true"},
-                            headers={"Authorization":f"Bearer {blogger_token}"},json=payload,timeout=60)
-                        put.raise_for_status()
-                        verify = session.get(endpoint + "/" + str(post["id"]),params={"view":"ADMIN"},
-                            headers={"Authorization":f"Bearer {blogger_token}"},timeout=60)
-                        verify.raise_for_status()
-                        content = verify.json().get("content","")
-                        expected = set(p["url"] for p in select_products(title,raw,sid))
-                        if HEADER_START not in content or HEADER_END not in content or START not in content or END not in content or not expected.issubset(distinct_links(content)):
-                            entry["errors"].append({"post_id":post["id"],"reason":"Blogger read-back verification failed"}); continue
-                        entry["updated"] += 1; report["totals"]["updated"] += 1
-                    else: entry["updated"] += 1
+                    try:
+                        if args.limit_per_site and idx >= args.limit_per_site: break
+                        raw = post.get("content","")
+                        title = clean_title(post.get("title",""))
+                        new = apply_footer(raw,title,sid,lang_for(site,raw))
+                        entry["posts_seen"] += 1; report["totals"]["posts_seen"] += 1
+                        if new == raw:
+                            if HEADER_START in raw and HEADER_END in raw and START in raw and END in raw: entry["already_ten"] += 1
+                            elif "link.coupang.com/" in raw or DISCLOSURE in raw: entry["skipped_legacy"] += 1
+                            else: entry["errors"].append({"post_id":post.get("id"),"reason":"footer unchanged; inspect catalog or legacy markup"})
+                            continue
+                        if args.mode == "apply":
+                            payload = dict(post); payload["content"] = new
+                            put = session.put(endpoint + "/" + str(post["id"]),params={"fetchBody": "true"},
+                                headers={"Authorization":f"Bearer {blogger_token}"},json=payload,timeout=60)
+                            put.raise_for_status()
+                            verify = session.get(endpoint + "/" + str(post["id"]),params={"view":"ADMIN"},
+                                headers={"Authorization":f"Bearer {blogger_token}"},timeout=60)
+                            verify.raise_for_status()
+                            content = verify.json().get("content","")
+                            expected = set(p["url"] for p in select_products(title,raw,sid))
+                            if HEADER_START not in content or HEADER_END not in content or START not in content or END not in content or not expected.issubset(distinct_links(content)):
+                                entry["errors"].append({"post_id":post["id"],"reason":"Blogger read-back verification failed"}); continue
+                            entry["updated"] += 1; report["totals"]["updated"] += 1
+                        else: entry["updated"] += 1
+                    except Exception as exc:
+                        entry["errors"].append({"post_id": post.get("id"), "reason": "Blogger post failed; continuing to next post: " + str(exc)[:350]})
+                        report["totals"]["errors"] += 1
             else:
                 entry["errors"].append("unsupported platform")
         except Exception as exc:
