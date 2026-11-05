@@ -22,15 +22,15 @@ DISCLOSURE = "이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이�
 
 def wp_auth(site, credentials):
     item = credentials.get(site["site_id"]) or credentials.get(site.get("secret_name","")) or {}
-    user = item.get("username") or item.get("user")
-    password = item.get("app_password") or item.get("password")
+    user = item.get("username") or item.get("user") or os.getenv("WP_USER","").strip() or "huh0300@gmail.com"
+    password = item.get("app_password") or item.get("password") or os.getenv(site.get("secret_name",""),"").strip()
     return (user, password) if user and password else None
 
 def wp_posts(session, base):
     page = 1
     while True:
         response = session.get(base.rstrip("/") + "/wp-json/wp/v2/posts",
-            params={"status":"any","per_page":100,"page":page,"context":"edit",
+            params={"status":"publish","per_page":100,"page":page,"context":"edit",
                     "_fields":"id,link,title,content,status,date,modified"},
             timeout=60)
         if response.status_code == 400 and page > 1:
@@ -46,7 +46,7 @@ def blogger_posts(session, blog_id, token):
     endpoint = f"https://www.googleapis.com/blogger/v3/blogs/{blog_id}/posts"
     page_token = None
     while True:
-        params = {"fetchBodies":"true","maxResults":500,"status":["live","draft","scheduled"]}
+        params = {"fetchBodies":"true","maxResults":500,"status":["live"]}
         if page_token: params["pageToken"] = page_token
         r = session.get(endpoint, params=params, headers={"Authorization":f"Bearer {token}"}, timeout=60)
         r.raise_for_status()
@@ -95,10 +95,16 @@ def main():
     session = requests.Session()
     for site in REGISTRY.get("sites",[]):
         sid, platform = site.get("site_id",""), site.get("platform","")
+        if not site.get("enabled", True): continue
         if args.site_id and sid != args.site_id: continue
         if args.platform != "all" and platform != args.platform: continue
         site_key = sid.split("_",1)[-1]
         profile = PROFILE_BY_KEY.get(site_key,{})
+        # Resolve K-Health365's four missing official product images once before
+        # counting candidates. The helper persists the URLs in this run's workspace.
+        if sid == "wp_khealth365":
+            from scripts.khealth365_sitewide_coupang_10 import load_products as load_khealth_products
+            load_khealth_products()
         catalog_count = len(load_candidates(sid))
         entry = {"site_id":sid,"url":site.get("url"),"platform":platform,
                  "verified_products":catalog_count,"posts_seen":0,"updated":0,
@@ -113,7 +119,7 @@ def main():
             if platform == "wordpress":
                 auth = wp_auth(site, wp_credentials)
                 if not auth:
-                    entry["errors"].append("missing site credentials in WP_SITE_CREDENTIALS_JSON")
+                    entry["errors"].append("missing site credential: add the site's Application Password as GitHub Secret " + str(site.get("secret_name") or "(secret mapping missing)"))
                     report["totals"]["errors"] += 1
                     report["sites"].append(entry); continue
                 base = site["url"].rstrip("/")
