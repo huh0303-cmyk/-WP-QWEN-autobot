@@ -37,3 +37,12 @@ A code review does not prove the GitHub Actions environment secrets exist or are
  
 ## Status
 Code changes are committed to main. The global YouTube cost-hold setting was not disabled, no secrets were read, and no existing video was changed. The workflow has not yet produced a verified run or a YouTube upload receipt in this task; therefore successful publication is not claimed. The next scheduled poll is at minute 17 UTC each hour and will publish only when a due healing calendar row exists and all credential/identity checks pass.
+
+
+## Follow-up launch work — 2026-11-06
+- The first direct launch workflow passed all free-only credential and cost-gate checks but stopped because the calendar had no eligible READY row. No YouTube upload occurred in that attempt.
+- Added `scripts/healing_publish_direct.py`: the owner-requested first release can run without an existing READY calendar row, but it still requires the channel to be ON in the control Sheet, the exact locked UC ID, the free-only cost gate, public privacy policy, and a post-upload receipt. It appends a completed audit row after verification.
+- Added `scripts/healing_calendar_ensure.py`: it creates only missing rows, 2–3 per 7-day window, at randomized KST dates/times. Existing rows are never overwritten; channel OFF or identity mismatch fails closed.
+- Updated calendar selection so an old `자료수집`/`대본작성`/`검수중` row older than 12 hours no longer freezes the channel indefinitely. A recent claim (12 hours past to 2 hours ahead) still blocks duplicate work.
+- The first render-only retry exposed an uploader contract mismatch: the renderer wrote `healing-ambience.mp4` while the approved uploader reads `rain-75.mp4`. The renderer output was aligned to `rain-75.mp4`; the next direct launch run is being used to verify the corrected path.
+- The initial direct run did not upload a video. Do not mark the channel restored until a public YouTube video ID and exact-channel receipt are confirmed.
