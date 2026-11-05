@@ -113,16 +113,46 @@ jobs:
           sudo apt-get install -y ffmpeg
           python -m pip install --upgrade pip
           python -m pip install requests Pillow google-api-python-client google-auth google-auth-httplib2 google-auth-oauthlib google-genai google-generativeai edge-tts pydub mutagen numpy scipy moviepy
-      - name: Verify explicit cost-hold release
-        env:
-          COST_HOLD: ${{ vars.YOUTUBE_COST_HOLD }}
+      - name: Configure strict free-only CAFE_ROMANTIC run
+        if: ${{ inputs.channel == 'globalmusic' }}
         run: |
           set -euo pipefail
-          if [[ "${COST_HOLD,,}" != "false" ]]; then
-            echo "::error::Publishing blocked. Set the youtube-channels environment variable YOUTUBE_COST_HOLD=false only after owner-approved cost review."
+          {
+            echo "PLAYLIST_FREE_ONLY_CHANNEL=globalmusic"
+            echo "PLAYLIST_MUSIC_SOURCE=owner_drive"
+            echo "PLAYLIST_IMAGE_SOURCE=pexels_api"
+            echo "PLAYLIST_PAID_API_ENABLED=false"
+            echo "GEMINI_API_KEY="
+            echo "OPENAI_API_KEY="
+            echo "LYRIA_API_KEY="
+            echo "FISH_AUDIO_API_KEY="
+            echo "AUTO_TOPIC=false"
+          } >> "$GITHUB_ENV"
+          echo "CAFE_ROMANTIC free-only mode configured; paid image/music/TTS keys are disabled for this run."
+      - name: Verify explicit cost-hold release or strict free-only exception
+        env:
+          COST_HOLD: ${{ vars.YOUTUBE_COST_HOLD }}
+          CHANNEL: ${{ inputs.channel }}
+        run: |
+          set -euo pipefail
+          if [[ "${COST_HOLD,,}" == "false" ]]; then
+            echo "Cost hold explicitly released; secret values are not printed."
+          elif [[ "$CHANNEL" == "globalmusic" \
+              && "${PLAYLIST_FREE_ONLY_CHANNEL:-}" == "globalmusic" \
+              && "${PLAYLIST_MUSIC_SOURCE:-}" == "owner_drive" \
+              && "${PLAYLIST_IMAGE_SOURCE:-}" == "pexels_api" \
+              && "${PLAYLIST_PAID_API_ENABLED:-true}" == "false" \
+              && -z "${GEMINI_API_KEY:-}" \
+              && -z "${OPENAI_API_KEY:-}" \
+              && -z "${LYRIA_API_KEY:-}" \
+              && -n "${PEXELS_API_KEY:-}" \
+              && -n "${MUSIC_SOURCE_FOLDER_ID_GLOBALMUSIC:-}" \
+              && -n "${THUMBNAIL_FOLDER_ID_GLOBALMUSIC:-}" ]]; then
+            echo "Globalmusic free-only exception validated; no paid APIs can be called by this playlist path."
+          else
+            echo "::error::Publishing blocked. Other channels remain held until owner-approved cost review."
             exit 1
           fi
-          echo "Cost hold explicitly released; secret values are not printed."
       - name: Execute selected channel on GitHub-hosted runner
         env:
           CHANNEL: ${{ inputs.channel }}
