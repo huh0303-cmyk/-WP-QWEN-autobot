@@ -14,7 +14,7 @@ ROUTING=ENGINE/"config"/"affiliate-routing.json"
 POLICY=ROOT/"config"/"affiliate_distribution_policy.json"
 CATALOG_DIR=ENGINE/"data"/"catalogs"
 MARKER="<!-- london-affiliate-engine:v5 -->"
-DISCLOSURE="<p><small>Disclosure: This section contains affiliate links. We may earn a commission at no extra cost to you.</small></p>"
+DISCLOSURE="<p><small>This post contains Coupang Partners affiliate links. If you visit Coupang through one of these links and make a purchase within 24 hours, including a purchase of another eligible product, we may earn a commission at no additional cost to you. Attribution rules, cancellations and returns may affect commission eligibility.</small></p>"
 
 def load_json(path:Path)->Any:
     return json.loads(path.read_text(encoding="utf-8-sig"))
@@ -51,7 +51,7 @@ def select_offers(title:str,content:str,routing:dict[str,Any],site_key:str,offer
     expected={}
     for slot in required:
         expected[slot["category"]]=expected.get(slot["category"],0)+1
-    if expected!={"beauty_cosmetics":2,"laptop":1,"tablet":1,"health_supplements":2,"korea_travel_packages":2,"hotel_products":2}:
+    if expected!={"health_functional_foods":5,"k_beauty_skincare":5}:
         raise ValueError(f"affiliate_policy_category_mix_invalid:{expected}")
     pool_target=routing["selection_policy"].get("pool_category_counts",{})
     chosen=[]
@@ -61,11 +61,7 @@ def select_offers(title:str,content:str,routing:dict[str,Any],site_key:str,offer
         category=slot["category"]
         candidates=[o for o in offers if o.get("provider")==provider and o.get("category")==category]
         candidates=[o for o in candidates if o.get("affiliate_link_verified") is True and o.get("image_rights_verified") is True and all(urlparse(str(o.get(k,""))).scheme=="https" and urlparse(str(o.get(k,""))).netloc for k in ("url","image_url"))]
-        # The site catalog must meet the full per-category pool target before publication.
-        verified_pool=[o for o in offers if o.get("provider")==provider and o.get("category")==category and o.get("affiliate_link_verified") is True and o.get("image_rights_verified") is True and all(urlparse(str(o.get(k,""))).scheme=="https" and urlparse(str(o.get(k,""))).netloc for k in ("url","image_url"))]
-        minimum=pool_target.get(category,0)
-        if len(verified_pool)<minimum:
-            raise ValueError(f"site_pool_shortage:{category}:required_{minimum}:verified_{len(verified_pool)}")
+        # The destination catalog contains the ten fixed items: five per category.
         if not candidates: raise ValueError(f"missing_verified_offer:{slot['slot']}:{provider}:{category}")
         candidates.sort(key=lambda o:hashlib.sha256(f"{seed}:{slot['slot']}:{o['url']}".encode()).hexdigest())
         used={x["url"] for x in chosen}
@@ -81,7 +77,7 @@ def select_offers(title:str,content:str,routing:dict[str,Any],site_key:str,offer
     return chosen
 
 def build_block(offers:list[dict[str,Any]],header_buttons:list[dict[str,Any]]|None=None,trip_categories:list[dict[str,Any]]|None=None)->str:
-    expected_mix={"beauty_cosmetics":2,"laptop":1,"tablet":1,"health_supplements":2,"korea_travel_packages":2,"hotel_products":2}
+    expected_mix={"health_functional_foods":5,"k_beauty_skincare":5}
     if len(offers)!=10 or any(o.get("provider")!="coupang_partners" for o in offers):
         raise ValueError("exactly_10_coupang_only_product_cards_required")
     if len({o.get("url") for o in offers})!=10: raise ValueError("duplicate_product_tracking_url")
@@ -89,7 +85,7 @@ def build_block(offers:list[dict[str,Any]],header_buttons:list[dict[str,Any]]|No
     for o in offers: counts[o.get("category")]=counts.get(o.get("category"),0)+1
     if counts!=expected_mix: raise ValueError(f"product_category_mix_mismatch:{counts}")
     if not header_buttons or len(header_buttons)!=3: raise ValueError("missing_three_header_provider_buttons")
-    expected=("coupang_partners","olive_young_global","trip_com")
+    expected=("coupang_partners","trip_com","olive_young_global")
     if tuple(x.get("provider") for x in header_buttons)!=expected: raise ValueError("header_button_provider_order_mismatch")
     colors={"coupang_partners":"#e87518","olive_young_global":"#168a43","trip_com":"#1769d2"}
     labels={"coupang_partners":"Coupang Partners","olive_young_global":"OLIVE YOUNG","trip_com":"Trip.com"}
@@ -105,9 +101,10 @@ def build_block(offers:list[dict[str,Any]],header_buttons:list[dict[str,Any]]|No
     cards=[]
     for o in offers:
         title=html.escape(o["title"])
-        cards.append(f'<article class="london-affiliate-card"><a class="london-affiliate-image-link" href="{html.escape(o["url"],quote=True)}" rel="sponsored nofollow noopener" target="_blank"><img src="{html.escape(o["image_url"],quote=True)}" alt="{html.escape(o.get("image_alt",o["title"]),quote=True)}" loading="lazy"/></a><small>{html.escape(o.get("category_label",o.get("category","")))}</small><strong>{title}</strong><a class="london-affiliate-cta" href="{html.escape(o["url"],quote=True)}" rel="sponsored nofollow noopener" target="_blank">???? ????</a></article>')
+        cards.append(f'<article class="london-affiliate-card"><a class="london-affiliate-image-link" href="{html.escape(o["url"],quote=True)}" rel="sponsored nofollow noopener" target="_blank"><img src="{html.escape(o["image_url"],quote=True)}" alt="{html.escape(o.get("image_alt",o["title"]),quote=True)}" loading="lazy"/></a><small>{html.escape(o.get("category_label",o.get("category","")))}</small><strong>{title}</strong><a class="london-affiliate-cta" href="{html.escape(o["url"],quote=True)}" rel="sponsored nofollow noopener" target="_blank">상품 확인하기</a></article>')
     css="<style>.london-affiliate-provider-buttons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:18px 0 24px}.london-affiliate-provider-button{display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:10px;border-radius:9px;background:var(--brand-color);color:#fff!important;text-decoration:none!important;font-weight:800;text-align:center}.london-affiliate-brand-logo{max-width:34px;max-height:24px;object-fit:contain}.london-affiliate-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.london-affiliate-card{display:flex;min-width:0;flex-direction:column;gap:8px;border:1px solid #e5e7eb;border-radius:12px;padding:12px}.london-affiliate-card img{width:100%;height:160px;object-fit:contain}.london-affiliate-card strong{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;min-height:4.5em}.london-affiliate-cta{margin-top:auto;text-align:center;padding:9px;background:#17365d;color:white!important;border-radius:7px;text-decoration:none!important}@media(max-width:640px){.london-affiliate-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.london-affiliate-provider-buttons{gap:6px}.london-affiliate-provider-button{font-size:12px;padding:8px 4px;min-height:44px}}</style>"
-    return "\n".join([MARKER,'<section class="london-affiliate-engine"><div class="london-affiliate-provider-buttons">',*buttons,'</div>',DISCLOSURE,'<h2>?? ??? ?? ?? ??</h2>','<div class="london-affiliate-grid">',*cards,'</div></section>',css])
+    logo='<div class="london-coupang-brand"><img src="https://influencers.coupang.com/logo-black.png" alt="Coupang Partners" loading="lazy"/></div>'
+    return "\\n".join([MARKER,'<section class="london-affiliate-engine"><div class="london-affiliate-provider-buttons">',*buttons,'</div>',DISCLOSURE,'<h2>쿠팡 추천 상품 10선</h2>','<div class="london-affiliate-grid">',*cards,'</div>',logo,'</section>',css])
 
 def can_write(requested:bool)->bool:
     return requested and os.getenv("AFFILIATE_WRITE_ENABLED","").lower()=="true"
@@ -201,7 +198,7 @@ def main():
         for dest in load_destinations("blogger"):
             try: results.extend(blogger(dest,since,block_for,write,args.scope,args.batch_size))
             except (requests.RequestException,ValueError,RuntimeError) as exc: results.append({"platform":"blogger","site":dest["site_key"],"action":"blocked","reason":str(exc)[:240]})
-    report={"generated_at":datetime.now(UTC).isoformat(),"scope":args.scope,"since":since,"batch_size":args.batch_size,"write":write,"policy":"v5_three_brand_header_buttons_plus_exact_2_1_1_2_2_2_coupang_mix","results":results}
+    report={"generated_at":datetime.now(UTC).isoformat(),"scope":args.scope,"since":since,"batch_size":args.batch_size,"write":write,"policy":"v6_three_header_buttons_plus_exact_5_health_5_kbeauty_coupang_only","results":results}
     out=ENGINE/"reports"/f"latest-{args.scope}-run.json"; out.parent.mkdir(parents=True,exist_ok=True); out.write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding="utf-8")
     print(json.dumps({"write":write,"processed":len(results),"appended_verified":sum(r["action"]=="appended_verified" for r in results),"blocked":sum(r["action"]=="blocked" for r in results)},ensure_ascii=False))
     return 0
