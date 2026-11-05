@@ -280,11 +280,19 @@ def fresh_image(topic, workdir, service=None):
                 match = re.match(r"used_pexels_(\d+)", item.get("name", "").lower())
                 if match:
                     used_ids.add(int(match.group(1)))
-            queries = [
-                f"romantic couple cafe terrace {topic}",
-                "romantic couple seaside cafe",
-                "happy couple garden cafe coffee",
-            ]
+            if base.CHANNEL_KEY == "mbb":
+                queries = [
+                    "grand piano classical concert hall stage",
+                    "classical orchestra concert hall warm golden lighting",
+                    "antique piano sheet music candlelight",
+                    "violin cello piano classical music performance",
+                ]
+            else:
+                queries = [
+                    f"romantic couple cafe terrace {topic}",
+                    "romantic couple seaside cafe",
+                    "happy couple garden cafe coffee",
+                ]
             candidates = []
             for query in queries:
                 response = requests.get(
@@ -296,13 +304,22 @@ def fresh_image(topic, workdir, service=None):
                 )
                 response.raise_for_status()
                 photos = response.json().get("photos", [])
-                candidates = [
-                    photo for photo in photos
-                    if photo.get("id") not in used_ids
-                    and "couple" in (photo.get("alt") or "").lower()
-                    and any(term in (photo.get("alt") or "").lower()
-                            for term in ("cafe", "coffee", "terrace", "sea", "garden", "beach"))
-                ]
+                if base.CHANNEL_KEY == "mbb":
+                    relevant_terms = ("piano", "orchestra", "concert", "classical", "violin",
+                                      "cello", "music", "sheet", "keyboard", "hall")
+                    candidates = [
+                        photo for photo in photos
+                        if photo.get("id") not in used_ids
+                        and any(term in (photo.get("alt") or "").lower() for term in relevant_terms)
+                    ]
+                else:
+                    candidates = [
+                        photo for photo in photos
+                        if photo.get("id") not in used_ids
+                        and "couple" in (photo.get("alt") or "").lower()
+                        and any(term in (photo.get("alt") or "").lower()
+                                for term in ("cafe", "coffee", "terrace", "sea", "garden", "beach"))
+                    ]
                 if candidates:
                     break
             if not candidates:
@@ -392,6 +409,37 @@ def benchmark_thumbnail(_channel, image_path, output_path, topic, **_kwargs):
                   stroke_width=3, stroke_fill=(0, 0, 0, 180))
         draw.rounded_rectangle((60, 592, 400, 644), radius=18, fill=(216, 168, 91, 235))
         draw.text((82, 602), "FRENCH  ×  JAPANESE", font=sub_font, fill=(19, 28, 39, 255))
+    elif _channel == "mbb":
+        # Premium classical editorial treatment: preserve the instrument/photo as hero,
+        # place a dark left-side gradient behind concise ivory/gold typography.
+        pixels = overlay.load()
+        for x in range(0, 790):
+            alpha = int(205 * (1 - x / 790) ** 0.72)
+            for y in range(720):
+                pixels[x, y] = (12, 13, 18, alpha)
+        serif_path = "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf"
+        if not os.path.isfile(serif_path):
+            serif_path = font_path
+        brand_font = ImageFont.truetype(serif_path, 28)
+        title_size = 100
+        title_font = ImageFont.truetype(serif_path, title_size)
+        while draw.textlength("CLASSICAL", font=title_font) > 700 and title_size > 70:
+            title_size -= 2
+            title_font = ImageFont.truetype(serif_path, title_size)
+        sub_font = ImageFont.truetype(serif_path, 25)
+        small_font = ImageFont.truetype(font_path, 22)
+        draw.rounded_rectangle((58, 58, 270, 105), radius=5,
+                               fill=(22, 23, 28, 205), outline=(202, 169, 104, 235), width=2)
+        draw.text((78, 67), "CAFE MOZART", font=brand_font, fill=(246, 231, 194, 255))
+        draw.line((62, 165, 650, 165), fill=(202, 169, 104, 235), width=3)
+        draw.text((58, 220), "CLASSICAL", font=title_font, fill=(255, 249, 235, 255),
+                  stroke_width=2, stroke_fill=(12, 13, 18, 180))
+        draw.text((62, 365), "MASTERPIECES", font=sub_font, fill=(226, 195, 130, 255))
+        draw.line((62, 420, 590, 420), fill=(202, 169, 104, 210), width=2)
+        draw.text((62, 455), "MOZART  •  BACH  •  BEETHOVEN", font=small_font,
+                  fill=(255, 249, 235, 245))
+        draw.text((62, 505), "PIANO  •  STRINGS  •  ORCHESTRA", font=small_font,
+                  fill=(228, 224, 214, 235))
     else:
         size = 200
         title_font = ImageFont.truetype(font_path, size)
