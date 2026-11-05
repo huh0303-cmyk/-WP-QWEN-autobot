@@ -1,6 +1,8 @@
 """Shared, soft-quota Coupang Partners footer for WordPress and Blogger."""
 from __future__ import annotations
 import html, json, re
+from datetime import datetime
+from zoneinfo import ZoneInfo
 from pathlib import Path
 from urllib.parse import urlparse, urlunparse, unquote
 
@@ -13,9 +15,9 @@ LEGACY_MARKERS = ((START, END), ("<!-- KHEALTH365-COUPANG-START -->", "<!-- KHEA
 DISCLOSURE = "This post contains Coupang Partners affiliate links. If you visit Coupang through one of these links and make a purchase within 24 hours, including a purchase of another eligible product, we may earn a commission at no additional cost to you. Attribution rules, cancellations and returns may affect commission eligibility. / 이 게시물에는 쿠팡 파트너스 제휴 링크가 포함되어 있습니다. 이 링크를 통해 쿠팡에 방문한 뒤 24시간 이내에 다른 상품을 구매하더라도 운영정책상 실적으로 인정되는 구매라면 수수료를 제공받을 수 있습니다. 구매 경로의 최종 기여, 주문 취소 및 반품 등에 따라 수수료가 인정되지 않을 수 있습니다."
 COUPANG_TRADEMARK_NOTICE = "Coupang’s trademarks are used under license from Coupang, LLC or its affiliates."
 LOGOS = {
-    "trip_com": "https://dimg04.tripcdn.com/images/05E5012000rqtcwsyC749.png",
+    "trip_com": "https://commons.wikimedia.org/wiki/Special:FilePath/Trip.com_logo.svg",
     "olive_young_global": "https://dist.oliveyoung.com/fo/fe126e9b35/resources/images/common/logo.svg",
-    "coupang_partners": "https://influencers.coupang.com/logo-black.png",
+    "coupang_partners": "https://news.coupang.com/wp-content/uploads/2023/01/coupang-bi-brand-logo-230109-01.jpg",
 }
 POLICY_PATH = ROOT / "config/affiliate/london-shared-policy.json"
 
@@ -171,10 +173,20 @@ def select_products(title, article_text, site_id="", limit=10):
     # K-Health365 uses a fixed ten-product catalog. Reuse the same verified
     # offers in catalog order for every article until an operator replaces it.
     if key == "khealth365":
-        fixed_path = ROOT / "config/affiliate/k-health365-sitewide-10.json"
-        fixed_rows = _load_json(fixed_path)
-        if not isinstance(fixed_rows, list):
-            fixed_rows = []
+        fixed_path = ROOT / "config/affiliate/global-weekly-10.json"
+        weekly_data = _load_json(fixed_path)
+        if not isinstance(weekly_data, dict):
+            raise RuntimeError("Weekly Coupang catalog is missing or invalid.")
+        window = weekly_data.get("lock_window", {})
+        try:
+            now = datetime.now(ZoneInfo("Asia/Seoul"))
+            starts_at = datetime.fromisoformat(window["starts_at"])
+            ends_at = datetime.fromisoformat(window["ends_at"])
+        except (KeyError, TypeError, ValueError) as exc:
+            raise RuntimeError("Weekly Coupang catalog must define valid KST starts_at and ends_at.") from exc
+        if not (starts_at <= now < ends_at):
+            raise RuntimeError(f"Weekly Coupang set is outside its 168-hour lock window ({starts_at.isoformat()} to {ends_at.isoformat()}); update the ten products and dates before publishing.")
+        fixed_rows = weekly_data.get("items", [])
         fixed = []
         seen_urls, seen_images = set(), set()
         for raw in fixed_rows:
@@ -252,7 +264,7 @@ def render_header(site_id=""):
         # prohibit displaying it together with third-party marks. Keep it in
         # its own standalone row; Olive Young and Trip.com occupy a separate row.
         if provider == "coupang_partners":
-            buttons.append(f'<div class="london-provider-button coupang_partners"><img src="{logo}" alt="Coupang official logo" loading="lazy"><span><a href="{url}" target="_blank" rel="sponsored nofollow noopener">Coupang Partners 바로가기</a></span></div>')
+            buttons.append(f'<div class="london-provider-button coupang_partners"><span class="london-coupang-logo-crop"><img src="{logo}" alt="Coupang official logo" loading="lazy"></span><span><a href="{url}" target="_blank" rel="sponsored nofollow noopener">Coupang Partners 바로가기</a></span></div>')
         else:
             buttons.append(f'<a class="london-provider-button {provider}" href="{url}" target="_blank" rel="sponsored nofollow noopener" aria-label="{label}"><img src="{logo}" alt="{label} official logo" loading="lazy"></a>')
     coupang = buttons[0]
@@ -263,17 +275,20 @@ def render_header(site_id=""):
         + '<nav class="london-other-official-partners" aria-label="Other affiliate partners">' + other_partners + '</nav>'
         + '</div>'
         + '<style>.london-affiliate-partner-strip{margin:0 0 18px;padding:12px 0 16px;border-bottom:1px solid #e5e7eb}'
-        '.london-coupang-official-standalone{display:flex;justify-content:center;align-items:center;margin:0 auto 18px;padding:12px;max-width:360px}'
-        '.london-provider-button{min-height:54px;display:flex;align-items:center;justify-content:center;gap:9px;padding:8px 12px;background:#fff;text-decoration:none!important}'
-        '.london-provider-button img{display:block;max-width:100%;width:auto;height:auto;max-height:36px;object-fit:contain}'
-        '.london-provider-button.coupang_partners{flex-direction:column;border:0}'
-        '.london-provider-button.coupang_partners img{max-width:190px;max-height:42px}'
+        '.london-coupang-official-standalone{display:flex;justify-content:center;align-items:center;margin:0 auto 22px;padding:18px 12px;max-width:420px;min-height:96px;border-bottom:1px solid #f0f0f0}'
+        '.london-provider-button{min-height:70px;display:flex;align-items:center;justify-content:center;gap:9px;padding:10px 16px;background:#fff;text-decoration:none!important}'
+        '.london-provider-button img{display:block;max-width:100%;width:auto;height:auto;max-height:44px;object-fit:contain}'
+        '.london-provider-button.coupang_partners{flex-direction:column;border:0;min-height:88px}'
+        '.london-provider-button.coupang_partners img{width:520px;max-width:none;height:auto;max-height:none;display:block;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}'
+        '.london-provider-button.coupang_partners .london-coupang-logo-crop{width:260px;height:66px;overflow:hidden;position:relative;display:block}'
         '.london-provider-button.coupang_partners span{font-size:12px;font-weight:700}'
         '.london-provider-button.coupang_partners a{color:#333;text-decoration:underline}'
         '.london-other-official-partners{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;max-width:560px;margin:0 auto}'
         '.london-other-official-partners .london-provider-button{border:1px solid #e5e7eb;border-radius:10px;min-height:64px}'
-        '.london-other-official-partners img{max-height:34px;max-width:180px}'
-        '@media(max-width:520px){.london-coupang-official-standalone{margin-bottom:12px}.london-provider-button.coupang_partners img{max-width:160px}.london-other-official-partners{gap:8px}.london-other-official-partners .london-provider-button{min-height:54px;padding:6px}.london-other-official-partners img{max-width:140px;max-height:28px}}</style>'
+        '.london-other-official-partners img{max-height:44px;max-width:220px}'
+        '.london-other-official-partners .trip_com img{max-width:220px;max-height:44px}'
+        '.london-other-official-partners .olive_young_global img{max-width:220px;max-height:44px}'
+        '@media(max-width:520px){.london-coupang-official-standalone{margin-bottom:14px;min-height:82px}.london-provider-button.coupang_partners .london-coupang-logo-crop{width:230px;height:58px}.london-provider-button.coupang_partners img{width:460px}.london-other-official-partners{gap:8px}.london-other-official-partners .london-provider-button{min-height:62px;padding:6px}.london-other-official-partners img{max-width:150px;max-height:34px}}</style>'
         + HEADER_END)
 
 
