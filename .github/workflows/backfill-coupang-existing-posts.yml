@@ -47,6 +47,7 @@ jobs:
           SITE_ID: ${{ inputs.site_id }}
           LIMIT_PER_SITE: ${{ inputs.limit_per_site }}
           WP_SITE_CREDENTIALS_JSON: ${{ secrets.WP_SITE_CREDENTIALS_JSON }}
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
           BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
           BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
           BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
