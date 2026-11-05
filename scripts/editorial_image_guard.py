@@ -66,6 +66,29 @@ def filter_wp_images(site, images, auth=None):
         return []
 
 
+
+def strip_leading_inline_image_block(content):
+    """Remove a body-leading image-only block when the theme already shows featured_media.
+
+    Limited to the first content block: later editorial and product images remain.
+    """
+    import re
+    if not content:
+        return content
+    source = content.lstrip()
+    patterns = (
+        r"^(<figure\b[^>]*>.*?</figure>\s*)",
+        r"^(<p\b[^>]*>\s*<img\b[^>]*>\s*</p>\s*)",
+        r"^(<img\b[^>]*>\s*)",
+    )
+    for pattern in patterns:
+        match = re.match(pattern, source, flags=re.IGNORECASE | re.DOTALL)
+        if match and re.search(r"<img\b", match.group(1), flags=re.IGNORECASE):
+            leading_ws = len(content) - len(content.lstrip())
+            return content[:leading_ws] + source[match.end():].lstrip()
+    return content
+
+
 def strip_title_duplicate_lead_image(content, title):
     """Remove only a leading inline hero whose ALT exactly matches the post title.
 
