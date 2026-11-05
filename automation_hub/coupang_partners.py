@@ -16,7 +16,7 @@ DISCLOSURE = "This post contains Coupang Partners affiliate links. If you visit 
 COUPANG_TRADEMARK_NOTICE = "Coupang’s trademarks are used under license from Coupang, LLC or its affiliates."
 LOGOS = {
     "trip_com": "https://commons.wikimedia.org/wiki/Special:FilePath/Trip.com_logo.svg",
-    "olive_young_global": "https://dist.oliveyoung.com/fo/fe126e9b35/resources/images/common/logo.svg",
+    "olive_young_global": "https://corp.oliveyoung.com/img/about/img_brand_logo-0302319eaf2f635e58ce7cf02502e21b.png",
     "coupang_partners": "https://commons.wikimedia.org/wiki/Special:FilePath/Coupang_logo.svg",
 }
 POLICY_PATH = ROOT / "config/affiliate/london-shared-policy.json"
