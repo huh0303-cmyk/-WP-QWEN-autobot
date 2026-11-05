@@ -55,3 +55,37 @@ A verified public reference is Cafe Music BGM channel's “Relaxing Jazz Music -
 - After the canary succeeds, activate the documented 2–3 day interval (approximately 2–3 uploads per week) and monitor actual public receipts, not workflow green checks.
 
 **Status on 2026-11-05: root causes identified; no production setting was bypassed, no existing video was changed, and no new video was uploaded. This channel is not yet recovered.**
+
+
+## 2026-11-05 execution update — verified fixes (supersedes the earlier "no changes" status above)
+
+### Confirmed live thumbnail repair
+
+- Updated the latest public CAFE_ROMANTIC video, `TxnTmonyVAQ` (published 2026-10-05), with a new 1280×720 thumbnail.
+- The old centered `PLAYLIST` overlay was replaced with a large, unobstructed couple photo, a restrained `CAFE ROMANTIC` brand label, `LOVE SONGS`, and a small `FRENCH × JAPANESE` descriptor.
+- Source image is a free Pexels photo (photo 5910752); the original and final thumbnail are kept in the owner's private Drive folder, not committed as binary media to Git.
+- The first refresh workflow reported a false negative because the script incorrectly expected `thumbnails.set` to return a `high/standard/maxres` object. The YouTube API had accepted the update. The verification code was corrected to read back the YouTube CDN image and compare it to the submitted file.
+- Second refresh workflow passed: run `42051498065`. CDN read-back mean pixel difference was `0.53`, and the video thumbnail was independently visible in the vidIQ image result.
+
+### Music library and thumbnail source repaired
+
+- Root cause: `MUSIC_SOURCE_FOLDER_ID_GLOBALMUSIC` was absent from the `youtube-channels` GitHub environment. The actual private Drive folder was identified from the local Google Drive metadata database, and the missing environment secret was populated. The secret value is intentionally not recorded here.
+- Created a private `approved.json` in the owner's Globalmusic Drive music folder. It references 25 owner-paid Suno tracks, each with SHA-256, duration, language, rights, and approval fields. No audio files or credentials were committed to Git.
+- The verified pool contains 14 French and 11 Japanese unique-title tracks, approximately 78.1 minutes total.
+- The GitHub-hosted preflight downloaded the actual Drive files, verified hashes and durations, and tested the selector: 18 tracks, 55.3 minutes, balanced 9 French + 9 Japanese. It also verified an unused Pexels thumbnail source and a configured Pexels key.
+- Preflight passed: run `42052401575`.
+
+### Workflow and guardrail changes
+
+- `scripts/youtube_playlist_maker.py`: added `owner_drive` support that downloads only manifest-approved files and verifies SHA-256 before use; added a free Pexels thumbnail source with one-use image tracking; changed Globalmusic thumbnail composition so text stays below faces.
+- `scripts/youtube_github_worker.py`: Globalmusic now explicitly selects `owner_drive` music and `pexels_api` thumbnails, with paid generation disabled.
+- `automation_hub/youtube_github_runtime.py`: added a narrowly scoped cost-hold exception for `globalmusic` only when owner-drive music, Pexels images, required free credentials, and all paid API disablement checks are present. Other channels remain blocked by the global cost hold.
+- `.github/workflows/youtube-github-worker.yml`: configures the strict free-only environment for Globalmusic and validates the exception before execution.
+- `config/playlist_asset_policy.json` and `config/youtube_channels.json`: record the verified asset source, channel-specific 2–3 day cadence, and corrected channel snapshot (38 videos).
+
+### Current publication status
+
+- A one-channel manual publish was dispatched with `confirm_publication=true` using the existing worker: run `42052803008`.
+- This is the canary run. Do not report a new video as published until the workflow records the exact channel ID, video ID, public URL, duration, thumbnail, and `privacyStatus=public`.
+- The global scheduler for all channels remains unchanged. A dedicated CAFE_ROMANTIC 2–3 day schedule should be activated only after this canary has a verified public receipt.
+- No other channel's cost-hold status or publishing schedule was changed.
