@@ -12,7 +12,7 @@ import requests
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from automation_hub.coupang_partners import apply_footer, load_candidates, START, END
+from automation_hub.coupang_partners import apply_footer, load_candidates, select_products, HEADER_START, HEADER_END, START, END
 
 REGISTRY = json.loads((ROOT / "config/automation_hub_sites.json").read_text(encoding="utf-8"))
 PROFILES = json.loads((ROOT / "config/content_engine_profiles.json").read_text(encoding="utf-8"))
@@ -117,12 +117,10 @@ def main():
                  "already_ten":0,"needs_catalog":0,"skipped_legacy":0,"errors":[]}
         if catalog_count < 10:
             entry["needs_catalog"] = 1
-            entry["errors"].append(f"site catalog has {catalog_count}/10 verified unique products; no cross-site borrowing")
+            entry["catalog_note"] = f"{catalog_count}/10 verified site-specific products; apply available cards and all three banners"
             if khealth_image_error:
-                entry["errors"].append("official image resolution blocked; no substitute used: " + khealth_image_error)
+                entry["image_note"] = "official image resolution blocked; no substitute used: " + khealth_image_error
             report["totals"]["needs_catalog"] += 1
-            report["sites"].append(entry)
-            continue
         try:
             if platform == "wordpress":
                 auth = wp_auth(site, wp_credentials)
@@ -144,7 +142,7 @@ def main():
                     entry["posts_seen"] += 1
                     report["totals"]["posts_seen"] += 1
                     if new == raw:
-                        if START in raw and END in raw and len(distinct_links(raw)) >= 10:
+                        if HEADER_START in raw and HEADER_END in raw and START in raw and END in raw:
                             entry["already_ten"] += 1
                         elif "link.coupang.com/" in raw or DISCLOSURE in raw:
                             entry["skipped_legacy"] += 1
@@ -157,8 +155,8 @@ def main():
                         check = s.get(endpoint,params={"context":"edit","_fields":"id,content,status,date"},timeout=60); check.raise_for_status()
                         verified = check.json().get("content",{}).get("raw","")
                         links = distinct_links(verified)
-                        expected = set(p["url"] for p in __import__("automation_hub.coupang_partners",fromlist=["select_products"]).select_products(title,raw,sid))
-                        if START not in verified or END not in verified or len(expected) != 10 or len(expected.intersection(links)) < 10:
+                        expected = set(p["url"] for p in select_products(title,raw,sid))
+                        if HEADER_START not in verified or HEADER_END not in verified or START not in verified or END not in verified or not expected.issubset(links):
                             entry["errors"].append({"post_id":post["id"],"reason":"read-back verification failed"}); continue
                         entry["updated"] += 1; report["totals"]["updated"] += 1
                     else:
@@ -181,7 +179,7 @@ def main():
                     new = apply_footer(raw,title,sid,lang_for(site,raw))
                     entry["posts_seen"] += 1; report["totals"]["posts_seen"] += 1
                     if new == raw:
-                        if START in raw and END in raw and len(distinct_links(raw)) >= 10: entry["already_ten"] += 1
+                        if HEADER_START in raw and HEADER_END in raw and START in raw and END in raw: entry["already_ten"] += 1
                         elif "link.coupang.com/" in raw or DISCLOSURE in raw: entry["skipped_legacy"] += 1
                         else: entry["errors"].append({"post_id":post.get("id"),"reason":"footer unchanged; inspect catalog or legacy markup"})
                         continue
@@ -194,7 +192,8 @@ def main():
                             headers={"Authorization":f"Bearer {blogger_token}"},timeout=60)
                         verify.raise_for_status()
                         content = verify.json().get("content","")
-                        if START not in content or END not in content or len(distinct_links(content)) < 10:
+                        expected = set(p["url"] for p in select_products(title,raw,sid))
+                        if HEADER_START not in content or HEADER_END not in content or START not in content or END not in content or not expected.issubset(distinct_links(content)):
                             entry["errors"].append({"post_id":post["id"],"reason":"Blogger read-back verification failed"}); continue
                         entry["updated"] += 1; report["totals"]["updated"] += 1
                     else: entry["updated"] += 1
