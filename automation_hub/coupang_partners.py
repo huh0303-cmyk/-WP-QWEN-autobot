@@ -382,10 +382,39 @@ def _remove_legacy_single_product_modules(content):
             offset = end_pos
     return content
 
+def _remove_legacy_provider_and_product_shelf(content):
+    """Remove the old text-button/Trip category/ Korean product shelf as one block.
+
+    The legacy block starts at its Coupang Partners tracked button and ends
+    after the old three-provider logo row. The new canonical footer is rebuilt
+    immediately afterwards, so article copy and related links remain intact.
+    """
+    content = content or ""
+    start = re.search(
+        r'<a\\b(?=[^>]*href=[\\x22\\x27]https://link\\.coupang\\.com/)[^>]*>\\s*Coupang\\s+Partners\\s*</a>',
+        content, re.I | re.S
+    )
+    if not start:
+        return content
+    tail = content[start.start():]
+    logo = re.search(
+        r'<a\\b(?=[^>]*aria-label=[\\x22\\x27]Trip\\.com company logo[\\x22\\x27])[^>]*>[\\s\\S]*?</a>',
+        tail, re.I
+    )
+    if logo:
+        return content[:start.start()] + tail[logo.end():]
+    # Fallback for older versions without a logo row: remove only the legacy
+    # block up to the next canonical category/tags/footer boundary.
+    boundary = re.search(r'<(?:div|section)\\b[^>]*(?:class=[\\x22\\x27][^\\x22\\x27]*(?:post-categories|entry-footer|tags-links)[^\\x22\\x27]*[\\x22\\x27])', tail, re.I)
+    if boundary:
+        return content[:start.start()] + tail[boundary.start():]
+    return content
+
 def apply_footer(content, title, site_id="", lang="en"):
     """Keep article body intact; place the three official partner logos immediately above the ten product cards at the footer."""
     content = _remove_managed_affiliate_blocks(content or "")
     content = _remove_legacy_single_product_modules(content)
+    content = _remove_legacy_provider_and_product_shelf(content)
     clean = content
     marker_pairs = ((HEADER_START, HEADER_END), (START, END), *LEGACY_MARKERS[1:])
     for old_start, old_end in marker_pairs:
