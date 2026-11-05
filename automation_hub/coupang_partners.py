@@ -233,7 +233,6 @@ def render_header(site_id=""):
     return (HEADER_START
         + '<div class="london-affiliate-partner-strip" aria-label="Official affiliate partner logos">'
         + '<a class="london-coupang-brand" href="' + coupang_url + '" target="_blank" rel="sponsored nofollow noopener" aria-label="Coupang affiliate link"><img src="' + coupang_logo + '" alt="Coupang logo" loading="lazy" decoding="async"></a>'
-        + '<a class="london-coupang-text-link" href="' + coupang_url + '" target="_blank" rel="sponsored nofollow noopener">Coupang Partners tracked destination</a>'
         + '<div class="london-third-party-partners">'
         + '<a class="london-provider-button olive_young_global" href="' + olive_url + '" target="_blank" rel="sponsored nofollow noopener" title="' + html.escape(olive_note, quote=True) + '"><img src="' + olive_logo + '" alt="OLIVE YOUNG official company logo" loading="lazy" decoding="async"><span>OLIVE YOUNG</span><small>' + html.escape(olive_note) + '</small></a>'
         + '<a class="london-provider-button trip_com" href="' + trip_url + '" target="_blank" rel="sponsored nofollow noopener"><img src="' + trip_logo + '" alt="Trip.com official company logo" loading="lazy" decoding="async"><span>Trip.com</span></a>'
