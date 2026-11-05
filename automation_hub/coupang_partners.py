@@ -2,7 +2,7 @@
 from __future__ import annotations
 import html, json, re
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlunparse, unquote
 
 ROOT = Path(__file__).resolve().parents[1]
 START = "<!-- LONDON-COUPANG-PARTNERS-START -->"
@@ -144,6 +144,17 @@ def _category(item):
         if any(term in s for term in terms): return cat
     return "korea_lifestyle_hot_items"
 
+def _canonical_asset_url(value):
+    """Normalize equivalent escaped/unescaped URLs for duplicate-image checks."""
+    try:
+        parsed = urlparse(str(value or "").strip())
+        if not parsed.scheme or not parsed.netloc:
+            return ""
+        path = unquote(parsed.path)
+        return urlunparse((parsed.scheme.lower(), parsed.netloc.lower(), path, "", "", ""))
+    except (TypeError, ValueError):
+        return ""
+
 def select_products(title, article_text, site_id="", limit=10):
     # Ten unique, verified Coupang offers are mandatory. Never publish a partial block.
     key = _resolve_site_key(site_id)
@@ -152,6 +163,25 @@ def select_products(title, article_text, site_id="", limit=10):
     clean_text = article_text or ""
     for old_start, old_end in LEGACY_MARKERS:
         clean_text = re.sub(re.escape(old_start) + r".*?" + re.escape(old_end), " ", clean_text, flags=re.S)
+    # Never add a product already linked in the article's own content (including
+    # a standalone topic recommendation outside the managed footer).
+    existing_urls = set(re.findall(r"""https://link\.coupang\.com/a/[A-Za-z0-9]+""", clean_text, re.I))
+    existing_images = {
+        _canonical_asset_url(src)
+        for src in re.findall(r"""<img\b[^>]*\bsrc\s*=\s*["']([^"']+)["']""", clean_text, re.I)
+    }
+    unique_pool, seen_urls, seen_images = [], set(), set()
+    for item in pool:
+        image_key = _canonical_asset_url(item.get("image"))
+        if item["url"] in existing_urls or (image_key and image_key in existing_images):
+            continue
+        if item["url"] in seen_urls or not image_key or image_key in seen_images:
+            continue
+        seen_urls.add(item["url"])
+        seen_images.add(image_key)
+        unique_pool.append(item)
+    pool = unique_pool
+    if len(pool) < 10: return []
     subject = f"{title} {clean_text[:5000]}"
     ranked = sorted(pool, key=lambda p: (_score(p, subject), p.get("price_krw") is not None and p["price_krw"] <= 30000, p["source"] == "beauty"), reverse=True)
     chosen, used = [], set()
