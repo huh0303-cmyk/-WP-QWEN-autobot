@@ -108,11 +108,21 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install free runner tools
+        env:
+          CHANNEL: ${{ inputs.channel }}
         run: |
-          sudo apt-get update
-          sudo apt-get install -y ffmpeg
+          set -euo pipefail
+          if ! command -v ffmpeg >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq ffmpeg
+          fi
           python -m pip install --upgrade pip
-          python -m pip install requests Pillow google-api-python-client google-auth google-auth-httplib2 google-auth-oauthlib google-genai google-generativeai edge-tts pydub mutagen numpy scipy moviepy
+          if [[ "$CHANNEL" == "globalmusic" ]]; then
+            # Playlist-only path: no Gemini, Edge TTS, or paid-generation SDKs are needed.
+            python -m pip install --disable-pip-version-check requests Pillow google-api-python-client google-auth google-auth-httplib2 google-auth-oauthlib pydub mutagen numpy scipy moviepy
+          else
+            python -m pip install --disable-pip-version-check requests Pillow google-api-python-client google-auth google-auth-httplib2 google-auth-oauthlib google-genai google-generativeai edge-tts pydub mutagen numpy scipy moviepy
+          fi
       - name: Configure strict free-only CAFE_ROMANTIC run
         if: ${{ inputs.channel == 'globalmusic' }}
         run: |
@@ -127,6 +137,7 @@ jobs:
             echo "LYRIA_API_KEY="
             echo "FISH_AUDIO_API_KEY="
             echo "AUTO_TOPIC=false"
+            echo "CAPTION_TEXT=French and Japanese love songs for a quiet cafe evening."
           } >> "$GITHUB_ENV"
           echo "CAFE_ROMANTIC free-only mode configured; paid image/music/TTS keys are disabled for this run."
       - name: Verify explicit cost-hold release or strict free-only exception
