@@ -5,12 +5,15 @@ from __future__ import annotations
 import datetime as dt
 import os
 import sys
+import time
+
+import requests
 from pathlib import Path
 
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
-from PIL import Image
+from PIL import Image, ImageChops, ImageStat
 
 EXPECTED_CHANNEL_ID = "UCbJfEtsffpgI5MsKkB7BYvQ"
 THUMBNAIL_NAME = os.getenv("THUMBNAIL_FILE_NAME", "cafe_romantic_thumbnail_2026-11-05.jpg")
@@ -135,21 +138,40 @@ def main() -> int:
         videoId=target["id"],
         media_body=MediaFileUpload(str(image_path), mimetype="image/jpeg", resumable=True),
     ).execute()
-    if not any(response.get(size) for size in ("high", "standard", "maxres")):
-        raise RuntimeError("YouTube did not return a verified custom-thumbnail resource")
-    verify = youtube.videos().list(part="snippet,status", id=target["id"]).execute().get("items", [])
-    if len(verify) != 1 or verify[0].get("snippet", {}).get("channelId") != EXPECTED_CHANNEL_ID:
-        raise RuntimeError("Thumbnail update read-back failed: video/channel identity changed")
-    thumbnails = verify[0].get("snippet", {}).get("thumbnails", {})
-    if not (thumbnails.get("high") or thumbnails.get("standard") or thumbnails.get("maxres")):
-        raise RuntimeError("Thumbnail read-back returned no usable custom thumbnail")
-    print(
-        "THUMBNAIL_UPDATE_VERIFIED "
-        f"channel_id={EXPECTED_CHANNEL_ID} "
-        f"video_id={target['id']} "
-        f"video_url=https://www.youtube.com/watch?v={target['id']} "
-        f"thumbnail_keys={','.join(sorted(thumbnails.keys()))}"
-    )
+    # thumbnails.set may return only kind/etag, not the thumbnail resource itself.
+    # Verify the actual CDN image against our submitted file instead of assuming
+    # the response object contains high/standard/maxres fields.
+    print(f"THUMBNAIL_SET_API_ACCEPTED response_keys={','.join(sorted(response.keys()))}")
+    last_diff = None
+    for attempt in range(1, 7):
+        verify = youtube.videos().list(part="snippet,status", id=target["id"]).execute().get("items", [])
+        if len(verify) != 1 or verify[0].get("snippet", {}).get("channelId") != EXPECTED_CHANNEL_ID:
+            raise RuntimeError("Thumbnail update read-back failed: video/channel identity changed")
+        thumbnails = verify[0].get("snippet", {}).get("thumbnails", {})
+        thumb = thumbnails.get("maxres") or thumbnails.get("standard") or thumbnails.get("high")
+        if not thumb or not thumb.get("url"):
+            raise RuntimeError("Thumbnail read-back returned no usable thumbnail URL")
+        cdn = requests.get(thumb["url"], params={"refresh": str(int(time.time()))}, timeout=30)
+        cdn.raise_for_status()
+        cdn_path = workdir / "youtube_thumbnail_readback.jpg"
+        cdn_path.write_bytes(cdn.content)
+        with Image.open(image_path) as submitted:
+            submitted_rgb = submitted.convert("RGB").resize((320, 180))
+        with Image.open(cdn_path) as actual:
+            actual_rgb = actual.convert("RGB").resize((320, 180))
+        last_diff = ImageStat.Stat(ImageChops.difference(submitted_rgb, actual_rgb).convert("L")).mean[0]
+        print(f"THUMBNAIL_READBACK attempt={attempt} mean_pixel_difference={last_diff:.2f}")
+        if last_diff < 45:
+            print(
+                "THUMBNAIL_UPDATE_VERIFIED "
+                f"channel_id={EXPECTED_CHANNEL_ID} "
+                f"video_id={target['id']} "
+                f"video_url=https://www.youtube.com/watch?v={target['id']} "
+                f"thumbnail_keys={','.join(sorted(thumbnails.keys()))}"
+            )
+            return 0
+        time.sleep(3)
+    raise RuntimeError(f"Thumbnail CDN read-back did not match submitted image; mean difference={last_diff:.2f}")
     return 0
 
 
