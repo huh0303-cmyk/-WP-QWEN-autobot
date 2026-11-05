@@ -14,6 +14,8 @@ on:
       - "tests/test_github_only_routing.py"
       - "tests/test_survival_adjective_short.py"
       - "scripts/survival_adjective_short.py"
+      - "scripts/select_unique_survival_pair.py"
+      - "tests/test_select_unique_survival_pair.py"
       - "scripts/publish_survival_adjective_shorts.py"
       - "scripts/audit_no_vps_runtime.py"
       - "deploy/**"
