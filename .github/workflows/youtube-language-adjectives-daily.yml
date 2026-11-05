@@ -140,11 +140,12 @@ jobs:
           fi
           ARGS=(--date "$TARGET_DATE" --languages "$LANGUAGES" --pair-id "$PAIR_ID")
           python scripts/survival_adjective_short.py "${ARGS[@]}"
-          python - <<'PY'
+          TARGET_DATE="$TARGET_DATE" python - <<'PY'
           import json
+          import os
           from pathlib import Path
           expected = {"ko", "en", "ja", "zh", "vi", "es", "fr", "de", "it", "pt"}
-          manifest = Path("artifacts/youtube/language-adjectives") / "${TARGET_DATE}" / "batch_manifest.json"
+          manifest = Path("artifacts/youtube/language-adjectives") / os.environ["TARGET_DATE"] / "batch_manifest.json"
           data = json.loads(manifest.read_text(encoding="utf-8"))
           completed = data.get("completed_languages", [])
           if len(completed) != 10 or set(completed) != expected:
