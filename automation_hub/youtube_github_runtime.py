@@ -17,17 +17,37 @@ def cost_hold_active() -> bool:
 
 
 def free_only_channel_allowed(channel_key: str) -> bool:
-    """Permit narrowly configured no-paid-API playlist paths while global cost hold remains active."""
+    """Permit only isolated no-paid-API playlist paths while the global cost hold remains active."""
     channel = channel_key.strip().lower()
-    if channel not in {"globalmusic", "mbb"}:
+    if channel not in {"globalmusic", "mbb", "healing"}:
         return False
     if os.environ.get("PLAYLIST_FREE_ONLY_CHANNEL", "").strip().lower() != channel:
         return False
     if os.environ.get("PLAYLIST_PAID_API_ENABLED", "false").strip().lower() not in {"false", "0", "no", "off"}:
         return False
+
+    if channel == "healing":
+        paid_keys = ("GEMINI_API_KEY", "OPENAI_API_KEY", "LYRIA_API_KEY",
+                     "FISH_AUDIO_API_KEY", "PIXABAY_KEY", "PEXELS_API_KEY")
+        if any(os.environ.get(key, "").strip() for key in paid_keys):
+            return False
+        if os.environ.get("PLAYLIST_MUSIC_SOURCE", "") != "free_natural_ambience":
+            return False
+        if os.environ.get("PLAYLIST_IMAGE_SOURCE", "") != "pexels_direct_free":
+            return False
+        if os.environ.get("AUTO_TOPIC", "").strip().lower() != "false":
+            return False
+        if os.environ.get("HEALING_VARIANT", "") != "sequential":
+            return False
+        required_free = (
+            "SHEET_ID", "GOOGLE_OAUTH_CLIENT_ID", "GOOGLE_OAUTH_CLIENT_SECRET",
+            "GOOGLE_OAUTH_REFRESH_TOKEN", "YOUTUBE_OAUTH_CLIENT_ID_HEALING",
+            "YOUTUBE_OAUTH_CLIENT_SECRET_HEALING", "YOUTUBE_OAUTH_REFRESH_TOKEN_HEALING",
+        )
+        return all(os.environ.get(key, "").strip() for key in required_free)
+
     if any(os.environ.get(key, "").strip() for key in ("GEMINI_API_KEY", "OPENAI_API_KEY", "LYRIA_API_KEY")):
         return False
-
     if channel == "globalmusic":
         if os.environ.get("PLAYLIST_MUSIC_SOURCE", "") != "owner_drive":
             return False
@@ -58,11 +78,10 @@ def free_only_channel_allowed(channel_key: str) -> bool:
         )
     return all(os.environ.get(key, "").strip() for key in required_free)
 
-
 def check_cost_hold(channel_key: str = "") -> None:
     if cost_hold_active():
         if free_only_channel_allowed(channel_key):
-            print("COST_HOLD_FREE_ONLY_EXCEPTION channel=globalmusic paid_apis=disabled", flush=True)
+            print(f"COST_HOLD_FREE_ONLY_EXCEPTION channel={channel_key} paid_apis=disabled", flush=True)
             return
         raise RuntimeError(
             "YouTube publishing is held: set YOUTUBE_COST_HOLD=false only after owner-approved cost review, "
