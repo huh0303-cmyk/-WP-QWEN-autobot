@@ -24,4 +24,4 @@ jobs:
           python-version: "3.11"
       - run: python -m pip install --upgrade pip pytest requests
       - run: python -m py_compile automation_hub/coupang_partners.py scripts/backfill_coupang_all_existing_posts.py scripts/audit_coupang_catalog_coverage.py scripts/publish_blogger_33_now.py scripts/autopost_mega.py scripts/london_four_agent_pipeline.py
-      - run: pytest -q tests/test_coupang_partners.py
+      - run: PYTHONPATH=. pytest -q tests/test_coupang_partners.py
