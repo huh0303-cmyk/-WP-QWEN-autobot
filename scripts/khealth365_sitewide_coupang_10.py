@@ -119,10 +119,10 @@ def main():
     ap.add_argument("--limit", type=int, default=0, help="0 means all published posts")
     ap.add_argument("--post-id", type=int, default=0, help="Process exactly one WordPress post ID")
     args = ap.parse_args()
-    user = os.getenv("KHEALTH365_WP_USER", "").strip()
-    password = os.getenv("KHEALTH365_WP_APP_PASSWORD", "").strip()
+    user = (os.getenv("KHEALTH365_WP_USER") or os.getenv("WP_USER") or "huh0303@gmail.com").strip()
+    password = (os.getenv("KHEALTH365_WP_APP_PASSWORD") or os.getenv("KHEALTH365COM") or "").strip()
     if not user or not password:
-        die("GitHub Secrets KHEALTH365_WP_USER / KHEALTH365_WP_APP_PASSWORD 필요")
+        die("GitHub Secret KHEALTH365COM (또는 KHEALTH365_WP_APP_PASSWORD) 필요")
     # Resolve and persist any missing official product images once. Subsequent
     # runs reuse the same ten products and saved image URLs without reselection.
     load_products()
