@@ -143,6 +143,7 @@ jobs:
           name: cafe-mozart-free-only-${{ github.run_id }}
           path: |
             artifacts/youtube_playlist_result.json
+            artifacts/cafe_mozart_upload_guard.json
             data/youtube_github_queue/logs/
             playlist_output/final.mp4
             playlist_output/thumbnail.*
