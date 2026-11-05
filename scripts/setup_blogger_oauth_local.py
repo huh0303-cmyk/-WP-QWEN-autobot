@@ -102,6 +102,30 @@ def main() -> int:
         raise SystemExit("필수 scope 누락; 기존 GitHub token은 변경하지 마세요: " + ", ".join(missing))
     print("검증된 OAuth scope: " + ", ".join(sorted(granted_scopes)))
 
+    headers = {"Authorization": f"Bearer {access_token}"}
+    drive_check = requests.get(
+        "https://www.googleapis.com/drive/v3/about",
+        headers=headers, params={"fields": "user"}, timeout=20,
+    )
+    if drive_check.status_code != 200:
+        raise SystemExit(f"Drive API 보존 검사 실패: HTTP {drive_check.status_code}")
+    sheet_id = "1zAcVHEmkVip4VC5ldVeKkPp6qXIgxm8zoGeHEkUkacc"
+    sheets_check = requests.get(
+        f"https://sheets.googleapis.com/v4/spreadsheets/{sheet_id}",
+        headers=headers, params={"fields": "spreadsheetId,properties.title"}, timeout=20,
+    )
+    if sheets_check.status_code != 200:
+        raise SystemExit(f"기존 Control Room Sheets 접근 검사 실패: HTTP {sheets_check.status_code}")
+    blogger_check = requests.get(
+        "https://www.googleapis.com/blogger/v3/users/self/blogs",
+        headers=headers, timeout=20,
+    )
+    if blogger_check.status_code != 200:
+        raise SystemExit(f"Blogger API 접근 검사 실패: HTTP {blogger_check.status_code}")
+    blog_count = len(blogger_check.json().get("items", []))
+    print("Drive API: OK; Control Room Sheets API: OK; Blogger API: OK")
+    print(f"OAuth 계정에서 확인된 Blogger 블로그 수: {blog_count}")
+
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT.write_text(
         json.dumps(
