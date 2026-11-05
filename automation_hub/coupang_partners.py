@@ -16,7 +16,7 @@ DISCLOSURE = "This post contains Coupang Partners affiliate links. If you visit 
 COUPANG_TRADEMARK_NOTICE = "Coupang’s trademarks are used under license from Coupang, LLC or its affiliates."
 LOGOS = {
     "trip_com": "https://commons.wikimedia.org/wiki/Special:FilePath/Trip.com_logo.svg",
-    "olive_young_global": "https://corp.oliveyoung.com/img/about/img_brand_logo-0302319eaf2f635e58ce7cf02502e21b.png",
+    "olive_young_global": "https://dist.oliveyoung.com/fo/fe126e9b35/resources/images/common/logo.svg",
     "coupang_partners": "https://commons.wikimedia.org/wiki/Special:FilePath/Coupang_logo.svg",
 }
 POLICY_PATH = ROOT / "config/affiliate/london-shared-policy.json"
@@ -239,14 +239,12 @@ def select_products(title, article_text, site_id="", limit=10):
     pool = unique_pool
     if not pool: return []
     ranked = sorted(pool, key=lambda p: (_category(p) != "health_functional_foods", p["title"].lower()))
-    chosen = []
-    for category in ("health_functional_foods", "k_beauty_skincare"):
-        candidates = [p for p in ranked if _category(p) == category]
-        if len(candidates) < 5:
-            raise ValueError(f"affiliate_catalog_requires_five_{category}:found_{len(candidates)}")
-        chosen.extend(candidates[:5])
-    chosen = chosen[:min(limit, 10)]
-    return chosen
+    # Coverage-first fleet rollout: use all verified destination-scoped offers up to ten.
+    # A site with fewer than five items in either category is not blocked.
+    chosen = [p for p in ranked if _category(p) in {"health_functional_foods", "k_beauty_skincare"}]
+    if not chosen:
+        chosen = ranked
+    return chosen[:min(limit, 10)]
 
 def render_header(site_id=""):
     header = load_header_buttons(site_id)
@@ -296,12 +294,9 @@ def render_header(site_id=""):
 
 def render_footer(title, article_text, site_id="", lang="en"):
     products = select_products(title, article_text, site_id)
-    if len(products) != 10:
-        raise RuntimeError(f"K-Health365 footer must contain exactly 10 products; got {len(products)}")
-    beauty_count = sum(1 for p in products if _category(p) == "k_beauty_skincare")
-    health_count = sum(1 for p in products if _category(p) == "health_functional_foods")
-    if beauty_count != 5 or health_count != 5:
-        raise RuntimeError(f"K-Health365 footer requires 5 K-Beauty + 5 K-Health; got {beauty_count}+{health_count}")
+    if not products:
+        raise RuntimeError("No verified destination-specific affiliate products are available.")
+    products = products[:10]
     cards = []
     for p in products:
         url, image, name = (html.escape(p[k], quote=True) for k in ("url","image","title"))
