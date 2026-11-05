@@ -21,7 +21,7 @@ The ten items are Coupang Partners only. Product title, product ID, tracking URL
 ## Channel-aware rendering
 
 - WordPress: ten responsive product cards at the bottom of eligible articles; use the same global records.
-- Blogger/Blogspot: ten product cards at the bottom where template support allows; same global records.
+- Blogger/Blogspot: place official partner logos immediately above the ten product cards at the article footer where template support allows; do not place them at the article top.
 - YouTube: list the ten tracked links in the description, grouped into K-Beauty (5) and health (5); use a pinned comment/index where permitted. Do not describe text links as embedded shopping cards.
 - Instagram: use one canonical weekly landing page as the profile/bio destination; use Story links or other clickable surfaces only where the account supports them.
 - Threads: use the same weekly landing page in profile or post links where supported; do not assume all post URLs are clickable.
@@ -45,3 +45,8 @@ Top partner banners are separate from the ten Coupang product cards. Their links
 ## Deployment gate
 
 This document and the canonical catalog define the global design. They do not by themselves publish or edit every destination. Keep fleet live writes disabled until the K-Health365 pilot is verified and the owner explicitly approves expansion. Platform adapters must check account permissions and platform rules; report unsupported edits as pending rather than claiming success.
+
+
+## Official partner logo placement
+
+For the K-Health365 pilot, use the official logo artwork from each company's own asset domain: Coupang Partners asset, OLIVE YOUNG official CDN, and Trip.com logo URL declared by Trip.com itself. The logo module belongs immediately above the ten product cards in the article footer, not at the top of the article. Coupang's official media guidelines prohibit hyperlinking its logo and prohibit placing it together with third-party marks; therefore show the Coupang logo in its own standalone row with a separate tracked text link, then show OLIVE YOUNG and Trip.com logos in a separate row. Preserve original artwork and proportions.
