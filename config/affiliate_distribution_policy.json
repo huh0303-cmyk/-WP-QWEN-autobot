@@ -8,6 +8,36 @@
   },
   "required_slots": [
     {
+      "slot": "coupang_10",
+      "provider": "coupang_partners",
+      "category": "k_beauty_skincare",
+      "position": 10
+    },
+    {
+      "slot": "coupang_09",
+      "provider": "coupang_partners",
+      "category": "k_beauty_skincare",
+      "position": 9
+    },
+    {
+      "slot": "coupang_08",
+      "provider": "coupang_partners",
+      "category": "k_beauty_skincare",
+      "position": 8
+    },
+    {
+      "slot": "coupang_07",
+      "provider": "coupang_partners",
+      "category": "k_beauty_skincare",
+      "position": 7
+    },
+    {
+      "slot": "coupang_06",
+      "provider": "coupang_partners",
+      "category": "k_beauty_skincare",
+      "position": 6
+    },
+    {
       "slot": "coupang_01",
       "provider": "coupang_partners",
       "category": "health_functional_foods",
@@ -36,36 +66,6 @@
       "provider": "coupang_partners",
       "category": "health_functional_foods",
       "position": 5
-    },
-    {
-      "slot": "coupang_06",
-      "provider": "coupang_partners",
-      "category": "k_beauty_skincare",
-      "position": 6
-    },
-    {
-      "slot": "coupang_07",
-      "provider": "coupang_partners",
-      "category": "k_beauty_skincare",
-      "position": 7
-    },
-    {
-      "slot": "coupang_08",
-      "provider": "coupang_partners",
-      "category": "k_beauty_skincare",
-      "position": 8
-    },
-    {
-      "slot": "coupang_09",
-      "provider": "coupang_partners",
-      "category": "k_beauty_skincare",
-      "position": 9
-    },
-    {
-      "slot": "coupang_10",
-      "provider": "coupang_partners",
-      "category": "k_beauty_skincare",
-      "position": 10
     }
   ],
   "catalog_rules": {
