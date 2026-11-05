@@ -110,9 +110,9 @@ def main():
             # Only vocabulary-pair title patterns (e.g. "high vs low" or
             # "book • phone") are eligible for title-based cleanup. Generic
             # quiz/engagement titles can be reused for different questions.
-            pair_title = bool(re.search(r"\\bvs\\b|[•]", title_text, flags=re.IGNORECASE))
-            first_description_line = re.split(r"[\\r\\n]", description, maxsplit=1)[0]
-            first_sentence = re.split(r"(?<=[.!?])\\s+", first_description_line, maxsplit=1)[0]
+            pair_title = bool(re.search(r"\bvs\b|[•]", title_text, flags=re.IGNORECASE))
+            first_description_line = re.split(r"[\r\n]", description, maxsplit=1)[0]
+            first_sentence = re.split(r"(?<=[.!?])\s+", first_description_line, maxsplit=1)[0]
             description_key = norm(first_sentence)
             pair_key = semantic_pair_key(video, code, pairs)
             if pair_title and title_key and description_key:
