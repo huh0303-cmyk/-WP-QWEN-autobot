@@ -2,7 +2,8 @@
 """Insert or refresh the three-partner header banner on every published K-Health365 post."""
 import os, re, json, time
 from pathlib import Path
-import requests
+import requests, sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from automation_hub.coupang_partners import render_header, HEADER_START, HEADER_END
 
 SITE = "https://k-health365.com"
