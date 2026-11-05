@@ -1,9 +1,19 @@
-name: CAFE HEALING Free-Only GitHub Scheduler
+name: CAFE HEALING Free-Only GitHub Publisher
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/cafe-healing-github-scheduler.yml"
   schedule:
-    - cron: "17 * * * *"
+    - cron: "3,19,37,53 * * * *"
   workflow_dispatch:
+    inputs:
+      publish_now:
+        description: "Publish the next READY CAFE HEALING calendar item immediately"
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -13,19 +23,21 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  publish-due-healing:
+  publish-healing:
     runs-on: ubuntu-latest
     environment: youtube-channels
-    timeout-minutes: 180
+    timeout-minutes: 240
     env:
       PYTHONUNBUFFERED: "1"
       YOUTUBE_COST_HOLD: ${{ vars.YOUTUBE_COST_HOLD }}
       PLAYLIST_FREE_ONLY_CHANNEL: healing
-      PLAYLIST_MUSIC_SOURCE: procedural_free
+      PLAYLIST_MUSIC_SOURCE: free_natural_ambience
       PLAYLIST_IMAGE_SOURCE: pexels_direct_free
       PLAYLIST_PAID_API_ENABLED: "false"
       AUTO_TOPIC: "false"
-      HEALING_VARIANT: random
+      HEALING_VARIANT: sequential
+      HEALING_THUMBNAIL_HISTORY: data/healing_thumbnail_history.json
+      HEALING_CATEGORY_HISTORY: data/healing_category_history.json
       GEMINI_API_KEY: ""
       OPENAI_API_KEY: ""
       LYRIA_API_KEY: ""
@@ -41,28 +53,44 @@ jobs:
       YOUTUBE_OAUTH_REFRESH_TOKEN_HEALING: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_HEALING }}
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Install free runner tools
+
+      - name: Install free runner tools only
         run: |
           set -euo pipefail
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg
           python -m pip install --upgrade pip
           python -m pip install --disable-pip-version-check requests Pillow google-api-python-client google-auth google-auth-httplib2 google-auth-oauthlib pydub mutagen numpy scipy moviepy
+
+      - name: Restore theme and thumbnail rotation history
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            data/healing_thumbnail_history.json
+            data/healing_category_history.json
+          key: cafe-healing-state-${{ github.run_id }}
+          restore-keys: |
+            cafe-healing-state-
+
       - name: Validate isolated free-only healing path
         run: |
           set -euo pipefail
           test "${PLAYLIST_FREE_ONLY_CHANNEL}" = "healing"
+          test "${PLAYLIST_MUSIC_SOURCE}" = "free_natural_ambience"
+          test "${PLAYLIST_IMAGE_SOURCE}" = "pexels_direct_free"
           test "${PLAYLIST_PAID_API_ENABLED}" = "false"
           test "${AUTO_TOPIC}" = "false"
-          test "${HEALING_VARIANT}" = "random"
+          test "${HEALING_VARIANT}" = "sequential"
           test -z "${GEMINI_API_KEY}"
           test -z "${OPENAI_API_KEY}"
           test -z "${LYRIA_API_KEY}"
           test -z "${FISH_AUDIO_API_KEY}"
           test -z "${PIXABAY_KEY}"
+          test -z "${PEXELS_API_KEY}"
           test -n "${SHEET_ID}"
           test -n "${GOOGLE_OAUTH_CLIENT_ID}"
           test -n "${GOOGLE_OAUTH_CLIENT_SECRET}"
@@ -71,16 +99,34 @@ jobs:
           test -n "${YOUTUBE_OAUTH_CLIENT_SECRET_HEALING}"
           test -n "${YOUTUBE_OAUTH_REFRESH_TOKEN_HEALING}"
           test -f assets/playlist-review/forest-birds-cc0.mp3
-          echo "Free-only CAFE HEALING checks passed; paid generation providers are disabled."
-      - name: Process only a due CAFE HEALING calendar row
+          echo "CAFE HEALING: free-only credentials and local CC0 asset presence verified."
+
+      - name: Start the owner-requested first release immediately
+        if: ${{ (github.event_name == 'push' && contains(github.event.head_commit.message, '[healing-start-now]')) || (github.event_name == 'workflow_dispatch' && inputs.publish_now == true) }}
+        run: python scripts/youtube_github_worker.py --enqueue-channel healing
+
+      - name: Process only a due randomized calendar slot
+        if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.publish_now != true) }}
         run: python scripts/youtube_github_scheduler.py --channel healing
+
+      - name: Save theme and thumbnail rotation history
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            data/healing_thumbnail_history.json
+            data/healing_category_history.json
+          key: cafe-healing-state-${{ github.run_id }}
+
       - name: Save sanitized healing receipts and logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: cafe-healing-github-scheduler-${{ github.run_id }}
+          name: cafe-healing-publisher-${{ github.run_id }}
           path: |
             artifacts/youtube_playlist_result.json
+            data/healing_thumbnail_history.json
+            data/healing_category_history.json
             data/youtube_github_queue/logs/
           if-no-files-found: warn
           retention-days: 30
