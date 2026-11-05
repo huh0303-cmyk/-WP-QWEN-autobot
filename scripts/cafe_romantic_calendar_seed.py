@@ -15,9 +15,9 @@ from gsheets_direct import get_sheets_service
 from automation_hub.youtube_calendar import KST, read_calendar, select_next_ready
 
 SHEET_TAB = "14일_콘텐츠운영캘린더"
-SCHEDULE_ID = "CAL-20261106-GLOBALMUSIC-01"
-PLANNED_AT = "2026-11-06 20:17 KST"
-TOPIC = "French & Japanese Love Songs for a Quiet Café Evening | Romantic Acoustic Playlist"
+SCHEDULE_ID = "CAL-20261106-GLOBALMUSIC-02"
+PLANNED_AT = "2026-11-06 20:30 KST"
+TOPIC = "A Quiet Paris Cafe at Sunset | French and Japanese Romantic Acoustic Songs"
 
 
 def main() -> int:
