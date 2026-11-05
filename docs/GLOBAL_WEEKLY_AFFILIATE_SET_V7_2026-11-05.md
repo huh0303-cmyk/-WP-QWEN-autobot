@@ -9,12 +9,10 @@ Lock window: 2026-11-05 00:00 KST through 2026-11-12 00:00 KST (168 hours)
 
 The same ten product records are the single source of truth for all registered WordPress, Blogger/Blogspot, YouTube, Instagram, Threads and TikTok destinations. Do not create a different product mix or tracking URL set per site, account, channel, post or article during the lock window.
 
-Composition and display order:
-1. Featured first: Lacto-Fit Gold probiotic (health functional food)
-2. Remaining four health functional food / wellness products
-3. Five K-Beauty skincare products
-
-The category balance remains exactly five health + five K-Beauty; the featured first item is a merchandising priority, not an extra slot.
+Composition:
+- Five health functional food / wellness products
+- Five K-Beauty skincare products
+- No product has a permanent first position or privileged placement. Product order is determined by the current weekly catalog and may change at the next weekly review.
 
 The ten items are Coupang Partners only. Product title, product ID, tracking URL and image URL must stay paired. No random selection or per-channel substitution.
 
@@ -30,7 +28,7 @@ The ten items are Coupang Partners only. Product title, product ID, tracking URL
 
 ## 7-day lock and review
 
-During the 168-hour window, keep the set unchanged across all channels. Do not rotate products just to make the weekly list look new.
+During the 168-hour window, keep the set unchanged across all channels. Change the ten-product set at the weekly review cadence (every 168 hours). Do not change it midweek except for broken tracking links, unavailable products, image/rights failures, or platform/policy restrictions. There is no permanently fixed featured product.
 
 A midweek replacement is permitted only when a tracked link is broken, the product is unavailable, its image fails or loses permission, or a documented platform/policy restriction requires it. Replacement must come from the authenticated Coupang Partners account, pass link/image checks, and be updated consistently across all channels. Record the change and retain the previous snapshot for rollback.
 
