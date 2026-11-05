@@ -24,6 +24,7 @@ jobs:
           BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
           BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
           BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+          EXPECTED_GOOGLE_OAUTH_CLIENT_ID: 886253028121-p9t51uqhefjtirpvfljq4pn1buvjvk0b.apps.googleusercontent.com
         run: python scripts/blogger_verify_account.py
       - uses: actions/upload-artifact@v4
         if: always()
