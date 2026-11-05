@@ -10,8 +10,11 @@ Lock window: 2026-11-05 00:00 KST through 2026-11-12 00:00 KST (168 hours)
 The same ten product records are the single source of truth for all registered WordPress, Blogger/Blogspot, YouTube, Instagram, Threads and TikTok destinations. Do not create a different product mix or tracking URL set per site, account, channel, post or article during the lock window.
 
 Composition and display order:
-1. K-Beauty skincare: five products
-2. Health functional food / wellness: five products
+1. Featured first: Lacto-Fit Gold probiotic (health functional food)
+2. Remaining four health functional food / wellness products
+3. Five K-Beauty skincare products
+
+The category balance remains exactly five health + five K-Beauty; the featured first item is a merchandising priority, not an extra slot.
 
 The ten items are Coupang Partners only. Product title, product ID, tracking URL and image URL must stay paired. No random selection or per-channel substitution.
 
