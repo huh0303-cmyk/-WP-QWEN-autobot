@@ -101,9 +101,9 @@ def strip_leading_duplicate_block(content: str, hero_url: str, hero_sha256: str 
     """
     stripped = content.lstrip()
     patterns = (
-        r"^(<figure\\b[^>]*>.*?</figure>\\s*)",
-        r"^(<p\\b[^>]*>\\s*<img\\b[^>]*>\\s*</p>\\s*)",
-        r"^(<img\\b[^>]*>\\s*)",
+        r"^(<figure\b[^>]*>.*?</figure>\s*)",
+        r"^(<p\b[^>]*>\s*<img\b[^>]*>\s*</p>\s*)",
+        r"^(<img\b[^>]*>\s*)",
     )
     match = None
     for pattern in patterns:
@@ -114,10 +114,10 @@ def strip_leading_duplicate_block(content: str, hero_url: str, hero_sha256: str 
         return None
 
     block = match.group(1)
-    image = re.search(r"<img\\b[^>]*>", block, flags=re.IGNORECASE | re.DOTALL)
+    image = re.search(r"<img\b[^>]*>", block, flags=re.IGNORECASE | re.DOTALL)
     if not image:
         return None
-    src = re.search(r"""\\bsrc\\s*=\\s*(['"])(.*?)\\1""", image.group(0),
+    src = re.search(r"""\bsrc\s*=\s*(['"])(.*?)\1""", image.group(0),
                     flags=re.IGNORECASE | re.DOTALL)
     if not src:
         return None
@@ -128,7 +128,7 @@ def strip_leading_duplicate_block(content: str, hero_url: str, hero_sha256: str 
         same = bool(candidate_sha and candidate_sha == hero_sha256)
     if not same:
         return None
-    return stripped[match.end():].lstrip("\\n").lstrip()
+    return stripped[match.end():].lstrip("\n").lstrip()
 
 
 def fix_site(site: dict) -> dict:
