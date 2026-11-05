@@ -16,11 +16,36 @@ def cost_hold_active() -> bool:
     return value not in {"false", "0", "no", "off"}
 
 
-def check_cost_hold() -> None:
+def free_only_channel_allowed(channel_key: str) -> bool:
+    """Permit only the explicitly requested Globalmusic path when every paid API is disabled."""
+    if channel_key != "globalmusic" or os.environ.get("PLAYLIST_FREE_ONLY_CHANNEL", "") != "globalmusic":
+        return False
+    if os.environ.get("PLAYLIST_MUSIC_SOURCE", "") != "owner_drive":
+        return False
+    if os.environ.get("PLAYLIST_IMAGE_SOURCE", "") != "pexels_api":
+        return False
+    if os.environ.get("PLAYLIST_PAID_API_ENABLED", "false").strip().lower() not in {"false", "0", "no", "off"}:
+        return False
+    if any(os.environ.get(key, "").strip() for key in ("GEMINI_API_KEY", "OPENAI_API_KEY", "LYRIA_API_KEY")):
+        return False
+    required_free = (
+        "GOOGLE_OAUTH_REFRESH_TOKEN",
+        "MUSIC_SOURCE_FOLDER_ID_GLOBALMUSIC",
+        "THUMBNAIL_FOLDER_ID_GLOBALMUSIC",
+        "PEXELS_API_KEY",
+        "YOUTUBE_OAUTH_REFRESH_TOKEN_GLOBALMUSIC",
+    )
+    return all(os.environ.get(key, "").strip() for key in required_free)
+
+
+def check_cost_hold(channel_key: str = "") -> None:
     if cost_hold_active():
+        if free_only_channel_allowed(channel_key):
+            print("COST_HOLD_FREE_ONLY_EXCEPTION channel=globalmusic paid_apis=disabled", flush=True)
+            return
         raise RuntimeError(
-            "YouTube publishing is held: set the GitHub Actions variable "
-            "YOUTUBE_COST_HOLD=false only after the owner has approved cost review."
+            "YouTube publishing is held: set YOUTUBE_COST_HOLD=false only after owner-approved cost review, "
+            "or use the strictly validated Globalmusic free-only pipeline."
         )
 
 
@@ -30,7 +55,7 @@ def queue_root() -> Path:
 
 
 def enqueue(channel_key: str, label: str, state_group: str, run_now: bool = True) -> dict:
-    check_cost_hold()
+    check_cost_hold(channel_key)
     root = queue_root()
     pending, running = root / "pending", root / "running"
     pending.mkdir(parents=True, exist_ok=True)
