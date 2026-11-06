@@ -1,4 +1,4 @@
-﻿name: Meta five-account daily readiness check
+name: Meta five-account daily readiness check
 
 on:
   schedule:
@@ -11,32 +11,39 @@ permissions:
 jobs:
   preflight:
     runs-on: ubuntu-latest
-    environment: social-publish
+    environment: META-SOCIAL
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Check all ten account-specific Meta connections
+      - name: Verify exact Instagram and Threads account identities (read-only)
         env:
           META_INSTAGRAM_SEOUL_TOPIK_ACCESS_TOKEN: ${{ secrets.META_INSTAGRAM_SEOUL_TOPIK_ACCESS_TOKEN }}
-          META_INSTAGRAM_SEOUL_TOPIK_USER_ID: ${{ secrets.META_INSTAGRAM_SEOUL_TOPIK_USER_ID }}
+          META_INSTAGRAM_SEOUL_TOPIK_USER_ID: ${{ vars.META_INSTAGRAM_SEOUL_TOPIK_USER_ID }}
           META_INSTAGRAM_SEOUL_JISOO_ACCESS_TOKEN: ${{ secrets.META_INSTAGRAM_SEOUL_JISOO_ACCESS_TOKEN }}
-          META_INSTAGRAM_SEOUL_JISOO_USER_ID: ${{ secrets.META_INSTAGRAM_SEOUL_JISOO_USER_ID }}
+          META_INSTAGRAM_SEOUL_JISOO_USER_ID: ${{ vars.META_INSTAGRAM_SEOUL_JISOO_USER_ID }}
           META_INSTAGRAM_SEOUL_CHRIS_ACCESS_TOKEN: ${{ secrets.META_INSTAGRAM_SEOUL_CHRIS_ACCESS_TOKEN }}
-          META_INSTAGRAM_SEOUL_CHRIS_USER_ID: ${{ secrets.META_INSTAGRAM_SEOUL_CHRIS_USER_ID }}
+          META_INSTAGRAM_SEOUL_CHRIS_USER_ID: ${{ vars.META_INSTAGRAM_SEOUL_CHRIS_USER_ID }}
           META_INSTAGRAM_ENGLISH_PICK1_ACCESS_TOKEN: ${{ secrets.META_INSTAGRAM_ENGLISH_PICK1_ACCESS_TOKEN }}
-          META_INSTAGRAM_ENGLISH_PICK1_USER_ID: ${{ secrets.META_INSTAGRAM_ENGLISH_PICK1_USER_ID }}
+          META_INSTAGRAM_ENGLISH_PICK1_USER_ID: ${{ vars.META_INSTAGRAM_ENGLISH_PICK1_USER_ID }}
           META_INSTAGRAM_JAPANESE_PICK_ACCESS_TOKEN: ${{ secrets.META_INSTAGRAM_JAPANESE_PICK_ACCESS_TOKEN }}
-          META_INSTAGRAM_JAPANESE_PICK_USER_ID: ${{ secrets.META_INSTAGRAM_JAPANESE_PICK_USER_ID }}
+          META_INSTAGRAM_JAPANESE_PICK_USER_ID: ${{ vars.META_INSTAGRAM_JAPANESE_PICK_USER_ID }}
           META_THREADS_SEOUL_TOPIK_ACCESS_TOKEN: ${{ secrets.META_THREADS_SEOUL_TOPIK_ACCESS_TOKEN }}
-          META_THREADS_SEOUL_TOPIK_USER_ID: ${{ secrets.META_THREADS_SEOUL_TOPIK_USER_ID }}
+          META_THREADS_SEOUL_TOPIK_USER_ID: ${{ vars.META_THREADS_SEOUL_TOPIK_USER_ID }}
           META_THREADS_SEOUL_JISOO_ACCESS_TOKEN: ${{ secrets.META_THREADS_SEOUL_JISOO_ACCESS_TOKEN }}
-          META_THREADS_SEOUL_JISOO_USER_ID: ${{ secrets.META_THREADS_SEOUL_JISOO_USER_ID }}
+          META_THREADS_SEOUL_JISOO_USER_ID: ${{ vars.META_THREADS_SEOUL_JISOO_USER_ID }}
           META_THREADS_SEOUL_CHRIS_ACCESS_TOKEN: ${{ secrets.META_THREADS_SEOUL_CHRIS_ACCESS_TOKEN }}
-          META_THREADS_SEOUL_CHRIS_USER_ID: ${{ secrets.META_THREADS_SEOUL_CHRIS_USER_ID }}
+          META_THREADS_SEOUL_CHRIS_USER_ID: ${{ vars.META_THREADS_SEOUL_CHRIS_USER_ID }}
           META_THREADS_ENGLISH_PICK1_ACCESS_TOKEN: ${{ secrets.META_THREADS_ENGLISH_PICK1_ACCESS_TOKEN }}
-          META_THREADS_ENGLISH_PICK1_USER_ID: ${{ secrets.META_THREADS_ENGLISH_PICK1_USER_ID }}
+          META_THREADS_ENGLISH_PICK1_USER_ID: ${{ vars.META_THREADS_ENGLISH_PICK1_USER_ID }}
           META_THREADS_JAPANESE_PICK_ACCESS_TOKEN: ${{ secrets.META_THREADS_JAPANESE_PICK_ACCESS_TOKEN }}
-          META_THREADS_JAPANESE_PICK_USER_ID: ${{ secrets.META_THREADS_JAPANESE_PICK_USER_ID }}
-        run: python scripts/meta_account_preflight.py
+          META_THREADS_JAPANESE_PICK_USER_ID: ${{ vars.META_THREADS_JAPANESE_PICK_USER_ID }}
+        run: python scripts/meta_account_preflight.py --report-path reports/meta_preflight.json
+      - name: Upload sanitized identity verification report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: meta-account-preflight-${{ github.run_id }}
+          path: reports/meta_preflight.json
+          if-no-files-found: ignore

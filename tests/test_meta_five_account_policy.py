@@ -17,7 +17,7 @@ class MetaFiveAccountPolicyTests(unittest.TestCase):
   with patch.dict(os.environ, {}, clear=True):
    r=mod.readiness(mod.load_policy())
   self.assertEqual(r['ready_connections'],0)
-  self.assertEqual(len(r['missing_secret_names']),20)
+  self.assertEqual(len(r['missing_secret_names']),10)
   self.assertFalse(r['publish_enabled'])
   self.assertFalse(r['publication_performed'])
 if __name__=='__main__': unittest.main()
