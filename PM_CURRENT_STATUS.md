@@ -1,6 +1,6 @@
 # PM CURRENT STATUS
 
-Updated: 2026-09-26 KST
+Updated: 2026-11-06 KST
 Role: London Project current source-of-truth summary
 
 ## North Star
@@ -18,13 +18,13 @@ Role: London Project current source-of-truth summary
 
 Any older references to WP 24, WP 26/27, Blogger 27, or combined counts are historical and must not be used as the current operating baseline.
 
-## Runtime architecture
-- GitHub: source/configuration/version history/rollback; do not use it as the default heavy video renderer.
-- Hostinger VPS: 24/7 runtime and YouTube generation/render/upload worker.
-- n8n Community Edition: target orchestration layer for schedules, retries, queues, isolation and receipts.
-- Existing Python/systemd components may remain behind n8n when they are proven and cheaper to reuse.
-- Control Korea365: executive status/approval surface.
-- Local persistent browser automation is required for browser-only destinations such as Tistory/Naver where no stable write API path is available.
+## Runtime architecture — current owner directive (2026-11-06)
+- VPS, SSH, Linux server runtime, systemd, server-local queues and server-hosted n8n are not approved execution paths. Do not use or restore them.
+- Instagram/Threads account authentication and publishing work is performed on the owner's authorized Windows PC through Desktop Commander and PowerShell.
+- GitHub is the source/configuration/version-history/rollback repository.
+- https://control.korea365.org/ is the GitHub Pages executive dashboard (source: main:/docs/index.html).
+- Local-PC jobs require the PC to be powered on, connected and authenticated; do not describe them as 24/7 server execution.
+- Other platform-specific automation may use only separately approved, currently verified execution paths; do not infer a VPS dependency.
 
 ## Platform rules
 ### WordPress 25
@@ -76,3 +76,15 @@ Completion evidence should include:
 - API/cost impact when relevant
 - commit SHA
 - next action
+
+
+## Instagram and Threads — Seoul Jisoo / Seoul Chris (2026-11-06)
+- Instagram and Threads use the same five designated handles: seoul_topik, english_pick, japanese_pick, seoul_jisoo, seoul_chris.
+- Seoul Jisoo and Seoul Chris each target 3 distinct posts per day, randomized within 08:00–23:00 KST, with at least 120 minutes between posts per account.
+- Jisoo covers health and broad political/social/economic/sports/entertainment/lifestyle hot issues; health functional foods only when relevant.
+- Chris covers K-beauty, skincare, cosmetics and broader popular trends; cosmetics only when relevant.
+- Editorial-first: entertaining/useful content is primary; contextual Coupang Partners link only at the end, with disclosure and verified tracking URL. No forced product placement.
+- Check Naver search-interest terms and news sources daily. Do not invent search-volume rankings. Separate facts, allegations and opinion in political coverage; verify current sports data.
+- Instagram and Threads copy must be platform-native, not verbatim duplicates.
+- Publish authorization remains pending until account identity, write scope and a real publication receipt are verified. Schedule policy does not mean live publishing is active.
+- Binding policy: config/sns_six_channel_policy.json; detailed guide: docs/SEOUL_JISOO_CHRIS_EDITORIAL_POLICY_2026-11-06.md; dashboard: https://control.korea365.org/.
