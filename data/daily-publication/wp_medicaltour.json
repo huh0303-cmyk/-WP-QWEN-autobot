@@ -1,1 +1,1 @@
-{"day": "2026-11-02", "status": "DISPATCHED", "attempts": 1, "claim": "daily-2026-11-02-wp_medicaltour-661d97fe", "claimed_at": "2026-11-02T22:22:13.756606+09:00", "run_id": 41452425929, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-11-06", "status": "PUBLISHED", "public_url": "https://koreamedicaltour.com/korean-healthcare-regulations-for-overseas-patients-accreditation-policy-protections-and-travel-logistics/", "published_at": "2026-11-05T18:06:37Z"}
