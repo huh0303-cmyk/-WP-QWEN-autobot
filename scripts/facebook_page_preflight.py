@@ -24,9 +24,10 @@ def inspect_page(key: str, page_id: str, token: str, api_version: str = "v25.0",
         row["status"] = "MISSING_PAGE_ID_OR_ACCESS_TOKEN"
         return row
     try:
+        # Page access-token identity check only. Do not infer write permission.
         response = session.get(
-            f"https://graph.facebook.com/{api_version}/{page_id}",
-            params={"fields": "id,name,tasks", "access_token": token},
+            f"https://graph.facebook.com/{api_version}/me",
+            params={"fields": "id,name", "access_token": token},
             timeout=20,
         )
         row["http_status"] = response.status_code
@@ -35,19 +36,13 @@ def inspect_page(key: str, page_id: str, token: str, api_version: str = "v25.0",
             error = payload.get("error", {}) if isinstance(payload, dict) else {}
             row["status"] = "INVALID_OR_UNAUTHORIZED_PAGE_TOKEN"
             row["error_code"] = error.get("code")
+            row["error_subcode"] = error.get("error_subcode")
+            row["error_type"] = error.get("type")
+            row["error_message"] = str(error.get("message", ""))[:240]
             return row
-        tasks = payload.get("tasks") or []
         row["resolved_page_id"] = str(payload.get("id", ""))
         row["page_name"] = payload.get("name", "")
-        row["tasks"] = [str(task) for task in tasks]
-        row["create_content_task_present"] = any(
-            task in {"CREATE_CONTENT", "MANAGE"} for task in row["tasks"]
-        )
-        row["status"] = (
-            "PAGE_IDENTITY_AND_CREATE_TASK_VERIFIED"
-            if row["create_content_task_present"]
-            else "PAGE_IDENTITY_VERIFIED_WRITE_TASK_UNCONFIRMED"
-        )
+        row["status"] = "PAGE_IDENTITY_VERIFIED_WRITE_TASK_UNCONFIRMED"
         return row
     except (requests.RequestException, ValueError, TypeError):
         row["status"] = "FACEBOOK_GRAPH_API_REQUEST_FAILED"
@@ -62,11 +57,11 @@ def main() -> int:
         inspect_page(key, os.getenv(id_name, "").strip(), os.getenv(token_name, "").strip(), version)
         for key, id_name, token_name in PAGES
     ]
-    verified = sum(row["status"] == "PAGE_IDENTITY_AND_CREATE_TASK_VERIFIED" for row in rows)
+    verified = sum(row["status"].startswith("PAGE_IDENTITY_VERIFIED") for row in rows)
     report = {
         "expected_connections": len(PAGES),
         "identity_verified_connections": sum(row["status"].startswith("PAGE_IDENTITY_") for row in rows),
-        "create_task_verified_connections": verified,
+        "write_task_verified_connections": 0,
         "publish_enabled": False,
         "publication_performed": False,
         "connections": rows,

@@ -58,7 +58,7 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install requests -q
-      - name: Verify the two configured Facebook Page identities and create-content tasks (read-only)
+      - name: Verify the two configured Facebook Page identities (read-only; no publishing)
         env:
           FB_PAGE_ACCESS_TOKEN_ENGLISH: ${{ secrets.FB_PAGE_ACCESS_TOKEN_ENGLISH }}
           FB_PAGE_ID_ENGLISH: ${{ secrets.FB_PAGE_ID_ENGLISH }}

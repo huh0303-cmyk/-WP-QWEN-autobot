@@ -11,20 +11,19 @@ class FacebookPreflightTests(unittest.TestCase):
         session.get.assert_not_called()
         self.assertFalse(result["publication_performed"])
 
-    def test_page_identity_and_create_task_are_verified_read_only(self):
+    def test_page_identity_is_verified_but_write_task_remains_unconfirmed(self):
         response = Mock(status_code=200, content=b"{}")
-        response.json.return_value = {"id": "123", "name": "English Page", "tasks": ["CREATE_CONTENT"]}
+        response.json.return_value = {"id": "123", "name": "English Page"}
         session = Mock()
         session.get.return_value = response
         result = inspect_page("english", "123", "not-printed", session=session)
-        self.assertEqual(result["status"], "PAGE_IDENTITY_AND_CREATE_TASK_VERIFIED")
-        self.assertTrue(result["create_content_task_present"])
+        self.assertEqual(result["status"], "PAGE_IDENTITY_VERIFIED_WRITE_TASK_UNCONFIRMED")
         self.assertFalse(result["publication_performed"])
         self.assertNotIn("not-printed", repr(result))
 
     def test_identity_without_create_task_is_not_write_verified(self):
         response = Mock(status_code=200, content=b"{}")
-        response.json.return_value = {"id": "123", "name": "English Page", "tasks": ["ANALYZE"]}
+        response.json.return_value = {"id": "123", "name": "English Page"}
         session = Mock()
         session.get.return_value = response
         result = inspect_page("english", "123", "token", session=session)
