@@ -1,1 +1,1 @@
-{"day": "2026-11-04", "status": "DISPATCHED", "attempts": 1, "claim": "daily-2026-11-04-wp_jobglobal-916cf375", "claimed_at": "2026-11-04T21:54:42.922147+09:00", "run_id": 41833420140, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-11-06", "status": "PUBLISHED", "public_url": "https://jobkoreaglobal.com/mitigation-strategies-for-foreign-worker-retention-in-korean-corporate-environments/", "published_at": "2026-11-05T19:11:51Z"}
