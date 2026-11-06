@@ -76,4 +76,35 @@ class MetaPublishTests(unittest.TestCase):
             with self.assertRaises(ValueError): m.publish('threads',self.meta,'caption')
             api.assert_not_called()
 
+
+    def test_canonical_five_account_credentials_for_both_platforms(self):
+        cases = [
+            ("SEOUL_TOPIK", "instagram", "META_INSTAGRAM_SEOUL_TOPIK_ACCESS_TOKEN", "META_INSTAGRAM_SEOUL_TOPIK_USER_ID", "ig-topik", "101"),
+            ("SEOUL_JISOO", "instagram", "META_INSTAGRAM_SEOUL_JISOO_ACCESS_TOKEN", "META_INSTAGRAM_SEOUL_JISOO_USER_ID", "ig-jisoo", "102"),
+            ("SEOUL_CHRIS", "instagram", "META_INSTAGRAM_SEOUL_CHRIS_ACCESS_TOKEN", "META_INSTAGRAM_SEOUL_CHRIS_USER_ID", "ig-chris", "103"),
+            ("ENGLISH_PICK1", "instagram", "META_INSTAGRAM_ENGLISH_PICK1_ACCESS_TOKEN", "META_INSTAGRAM_ENGLISH_PICK1_USER_ID", "ig-english", "104"),
+            ("JAPANESE_PICK", "instagram", "META_INSTAGRAM_JAPANESE_PICK_ACCESS_TOKEN", "META_INSTAGRAM_JAPANESE_PICK_USER_ID", "ig-japanese", "105"),
+            ("SEOUL_TOPIK", "threads", "META_THREADS_SEOUL_TOPIK_ACCESS_TOKEN", "META_THREADS_SEOUL_TOPIK_USER_ID", "th-topik", "201"),
+            ("SEOUL_JISOO", "threads", "META_THREADS_SEOUL_JISOO_ACCESS_TOKEN", "META_THREADS_SEOUL_JISOO_USER_ID", "th-jisoo", "202"),
+            ("SEOUL_CHRIS", "threads", "META_THREADS_SEOUL_CHRIS_ACCESS_TOKEN", "META_THREADS_SEOUL_CHRIS_USER_ID", "th-chris", "203"),
+            ("ENGLISH_PICK1", "threads", "META_THREADS_ENGLISH_PICK1_ACCESS_TOKEN", "META_THREADS_ENGLISH_PICK1_USER_ID", "th-english", "204"),
+            ("JAPANESE_PICK", "threads", "META_THREADS_JAPANESE_PICK_ACCESS_TOKEN", "META_THREADS_JAPANESE_PICK_USER_ID", "th-japanese", "205"),
+        ]
+        for brand, platform, token_name, user_name, token, user in cases:
+            with self.subTest(brand=brand, platform=platform):
+                os.environ["SOCIAL_BRAND"] = brand
+                os.environ[token_name] = token
+                os.environ[user_name] = user
+                base, actual_user, actual_token = m.account(platform)
+                self.assertEqual(actual_user, user)
+                self.assertEqual(actual_token, token)
+                self.assertIn("graph.", base)
+
+    def test_canonical_account_never_falls_back_to_legacy_or_another_brand(self):
+        os.environ["SOCIAL_BRAND"] = "SEOUL_JISOO"
+        os.environ["IG_ACCESS_TOKEN_SEOUL_JISOO"] = "legacy-must-not-be-used"
+        os.environ["IG_USER_ID_SEOUL_JISOO"] = "999"
+        with self.assertRaisesRegex(ValueError, "META_INSTAGRAM_SEOUL_JISOO"):
+            m.account("instagram")
+
 if __name__ == '__main__': unittest.main()
