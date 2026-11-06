@@ -703,3 +703,15 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - 제작 차단: Starbucks는 worker에서 `PLAYLIST_MUSIC_SOURCE=owner_local` 또는 무료 썸네일 소스를 명시하지 않는다. 기본은 `approved_bank` 음악과 `gemini_app_export` 썸네일이며, 후자는 검수된 `gemini_*` 파일을 요구한다. 2026-10-01 기존 배치 영수증에도 Starbucks `WAITING_ASSETS`가 기록되어 있다. owner library 모듈에는 `instrumental_cafe`/SHA-256/rights/50–70분 검증 기능이 있지만 GitHub worker 경로에 연결되지 않았고, 현재 완전한 검수 오디오 풀·신규 1280x720 썸네일의 실행기 사전검사 영수증은 없다.
 - 조치: `docs/STARBUCKS_VIBES_PUBLISHING_STOP_AUDIT_2026-11-06.md`를 커밋 `f2ae3288625da40f22c94111d8a9529d57040393`로 저장. 글로벌 비용 보류·유료 API·OAuth 비밀·Google Sheet·기존 영상은 변경하지 않았고, publish workflow dispatch도 실행하지 않았다. 공개 업로드 완료를 주장하지 않는다.
 - 복구 조건: Starbucks 전용 private approved manifest/audio pool 및 신규 썸네일의 Drive preflight를 통과시키고, paid API가 완전히 비활성화된 free-only worker 경로와 CI를 추가한 뒤, 단일 canary에서 exact channel/video ID, 제목, 길이, 썸네일 CDN read-back, `privacyStatus=public`을 검증한다. 그 후에만 주 2–3회 자동 cadence를 활성화한다.
+
+## meta-five-account-daily-policy-20261106
+
+- task_id: meta-five-account-daily-policy-20261106
+- User explicitly confirmed the same five handles are used on Instagram and Threads: seoul_topik, seoul_jisoo, seoul_chris, english_pick1, japanese_pick.
+- Added canonical policy config/meta_five_account_daily_policy.json and operating documentation docs/META_FIVE_ACCOUNT_DAILY_POLICY_2026-11-06.md. Scope is exactly five accounts on each platform (10 account-platform connections); user-provided content topics and KST daily randomized window are recorded.
+- Added scripts/meta_account_preflight.py, which checks account-specific token and numeric user-ID environment variables without printing credential values. Added .github/workflows/meta-five-account-daily-preflight.yml with a daily 09:10 KST readiness check and manual dispatch.
+- Added tests/test_meta_five_account_policy.py.
+- Verification: preflight self-test PASS; 3/3 unit tests PASS; workflow YAML parse PASS; git diff --check PASS.
+- Safety state: publish_enabled=false. No Meta OAuth was completed, no account-specific token/user ID or write scope was verified, no content queue/publisher was wired to this five-account mapping, and no public post was attempted. The scheduled workflow is a readiness check only and will not publish. GitHub scheduled workflows execute from the default branch; the schedule is not live until this branch is reviewed and merged into main.
+- Remaining: owner must approve each account's Meta OAuth consent and platform-specific publish scopes; store resulting account-specific token/user-ID pairs as GitHub Actions environment secrets using names in the policy; then implement/verify the daily content queue and publisher against each account before enabling public posting.
+
