@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-05T02:20:29.170654+00:00",
+  "generated_at": "2026-11-06T02:21:46.441624+00:00",
   "domains": {
     "k-trip365.com": {
       "provider": "GoDaddy.com, LLC",
@@ -86,10 +86,10 @@
       "error": ""
     },
     "theseouljournal.com": {
-      "provider": "Gabia, Inc.",
-      "registered_date": "2025-09-29",
-      "expiry_date": "2027-09-29",
-      "error": ""
+      "provider": "",
+      "registered_date": "",
+      "expiry_date": "",
+      "error": "ConnectionError"
     },
     "ktech365.com": {
       "provider": "Gabia, Inc.",

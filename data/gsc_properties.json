@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-05T11:09:26.920196+09:00",
+  "generated_at": "2026-11-06T11:10:37.382989+09:00",
   "count": 119,
   "properties": [
     {
@@ -136,7 +136,7 @@
     },
     {
       "siteUrl": "https://ki-korea.com/",
-      "permissionLevel": "siteOwner"
+      "permissionLevel": "siteUnverifiedUser"
     },
     {
       "siteUrl": "https://kieca-korea.blogspot.com/",
@@ -400,7 +400,7 @@
     },
     {
       "siteUrl": "sc-domain:ki-korea.com",
-      "permissionLevel": "siteOwner"
+      "permissionLevel": "siteUnverifiedUser"
     },
     {
       "siteUrl": "sc-domain:kieca-korea.org",
