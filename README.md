@@ -1,11 +1,14 @@
 # 통합 블로그 자동발행 허브
 
+> **CURRENT OWNER RULE (2026-11-06):** No VPS, SSH, systemd, server-local queue, or server-hosted n8n. Instagram/Threads account work runs on the authorized Windows PC through Desktop Commander and PowerShell. GitHub is source/version history; `control.korea365.org` is the GitHub Pages dashboard. Current binding rules: [CURRENT_OPERATING_RULES.md](CURRENT_OPERATING_RULES.md).
+
+
 > 프로젝트의 고정 운영 범위와 비용 안전 원칙은 [OPERATING_MANDATE.md](OPERATING_MANDATE.md)를 최우선 기준으로 따릅니다.
 > 글·제목·이미지·카드뉴스·완료 알림은 [docs/EDITORIAL_AND_MEDIA_MANDATE.md](docs/EDITORIAL_AND_MEDIA_MANDATE.md)를 필수로 따릅니다.
 
 모든 운영 화면, 스케줄 계산과 실행 로그는 한국시간 `Asia/Seoul` 기준입니다. GitHub Actions의 cron 문법과 YouTube API의 `publishAt` 전송값만 서비스 규칙상 UTC를 사용하며, 코드가 자동 변환하므로 사용자는 구글시트에 한국시간만 입력합니다.
 
-Google Sheets를 운영 화면으로, GitHub Actions를 서버로 사용하는 다계정 발행기입니다. 기존 WordPress 27개(A그룹 17, B그룹 8, 신문사 2)는 각 사이트의 발행량·카테고리·페르소나·톤·글자 수·키워드·RSS 설정을 독립적으로 사용합니다. 사이트와 계정 수를 코드에서 제한하지 않습니다.
+GitHub를 코드·설정·버전 이력의 기준 저장소로 사용하고, 대시보드는 GitHub Pages로 제공하는 다계정 운영 허브입니다. SNS 계정 인증과 Instagram/Threads 게시 작업은 사용자의 Windows 로컬 PC에서 Desktop Commander·PowerShell로 수행합니다. 기존 WordPress 27개(A그룹 17, B그룹 8, 신문사 2)는 각 사이트의 발행량·카테고리·페르소나·톤·글자 수·키워드·RSS 설정을 독립적으로 사용합니다. 사이트와 계정 수를 코드에서 제한하지 않습니다.
 
 ## 현재 지원 범위
 
@@ -33,7 +36,7 @@ Google Sheets를 운영 화면으로, GitHub Actions를 서버로 사용하는 �
 
 플레이리스트 채널 `globalmusic`, `healing`, `starbucks`, `mbb`, `kpop`과 지식채널 `nasa`, `history`, `invention`, `silent_era`, `retro_reels`를 기본 등록합니다. 등록 행을 추가하면 같은 구조로 채널 수를 늘릴 수 있습니다.
 
-**GitHub-only 전환 상태:** 기존 VPS 작업 큐와 SSH 기반 YouTube 워크플로우는 폐기했습니다. `youtube-github-worker.yml`은 채널 하나를 수동 실행하며, `confirm_publication=true`와 `YOUTUBE_COST_HOLD=false`가 필요합니다. `youtube-github-scheduler.yml`은 매시간 Google Sheets 달력을 확인하되, 자동 발행은 `YOUTUBE_AUTO_PUBLISH_ENABLED=true`와 `YOUTUBE_COST_HOLD=false`가 모두 명시될 때만 진행합니다. 두 변수는 기본적으로 활성화하지 않았으며, 정확한 채널 ID 확인과 승인된 발행 테스트가 끝나기 전까지 자동 발행은 중지 상태입니다.
+**현재 실행 원칙:** VPS·SSH·systemd·서버형 n8n은 사용하지 않습니다. Instagram/Threads의 계정 인증과 게시 작업은 Windows 로컬 PC에서 수행하며, 로컬 PC가 꺼져 있거나 인증이 만료되면 실행되지 않습니다. GitHub Actions는 별도로 승인된 워크플로에 한해서만 사용하며 로컬 SNS 발행을 대신한다고 간주하지 않습니다. 기존 VPS 작업 큐와 SSH 기반 워크플로우는 폐기했습니다. `youtube-github-worker.yml`은 채널 하나를 수동 실행하며, `confirm_publication=true`와 `YOUTUBE_COST_HOLD=false`가 필요합니다. `youtube-github-scheduler.yml`은 매시간 Google Sheets 달력을 확인하되, 자동 발행은 `YOUTUBE_AUTO_PUBLISH_ENABLED=true`와 `YOUTUBE_COST_HOLD=false`가 모두 명시될 때만 진행합니다. 두 변수는 기본적으로 활성화하지 않았으며, 정확한 채널 ID 확인과 승인된 발행 테스트가 끝나기 전까지 자동 발행은 중지 상태입니다.
 
 업로드 직전 OAuth 계정의 실제 YouTube channel ID를 시트/등록부의 기대 ID와 비교합니다. 다르면 `OAuth channel mismatch`로 즉시 중단하므로 다른 채널에 잘못 올리지 않습니다. 텍스트는 `AI_TEXT_PROVIDER=openai`, AI 이미지 생성은 차단 상태이며 무료 스톡·퍼블릭도메인·기존 이미지 소스만 허용됩니다.
 
@@ -103,8 +106,4 @@ python -m automation_hub.cli validate
 
 ## Seoul Journal Shorts Studio (separate app)
 
-A standalone Streamlit production UI reuses `scripts/seoul_journal_shorts_pipeline.py` without replacing the London Project control center. App entrypoint: [`apps/seoul_journal_studio.py`](apps/seoul_journal_studio.py). Dependencies: [`requirements-seoul-journal-studio.txt`](requirements-seoul-journal-studio.txt). VPS service template and prerequisites: [deployment notes](deploy/DEPLOY_SEOUL_JOURNAL_STUDIO.md).
-
-Features: Naver article extraction, AI script draft/edit, 1.2x narration generation, vertical video rendering, estimated-timing Korean subtitle burn-in, video preview/download, explicit confirmation before private-only YouTube upload with expected channel-ID validation. No automatic public publishing is implemented.
-
-This app has been committed to the repository, but is **not considered deployed or production-verified** until the Hostinger VPS service, environment secrets, TLS/authenticated reverse proxy, and end-to-end tests are verified. Do not expose Streamlit port 8501 directly to the internet. Existing video cost-hold safeguards remain in force.
+This optional Streamlit studio is a local-PC tool only. Do not deploy it to a VPS or expose a server port. It is not part of the Instagram/Threads scheduler and does not imply that social publishing is connected. See [CURRENT_OPERATING_RULES.md](CURRENT_OPERATING_RULES.md) for the approved execution environment.
