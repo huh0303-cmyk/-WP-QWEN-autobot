@@ -16,7 +16,7 @@ PASSWORD = os.getenv("KOREA365ORG", "").strip()
 TIMEOUT = 30
 
 PRIVACY_HTML = """<h2>Privacy Policy</h2>
-<p><strong>Korea365</strong> respects your privacy. This policy explains the information processed when you visit korea365.org and when you choose to connect an Instagram or Threads account to the SIS Center Publisher application operated for Korea365 social publishing.</p>
+<p><strong>Korea365</strong> respects your privacy. This policy explains the information processed when you visit korea365.org and when you choose to connect an Instagram or Threads account to the SIS Center Publisher application operated by SeoulTopik Center.</p>
 <p><strong>Effective date:</strong> 6 November 2026. This policy may be updated when the service or applicable requirements change.</p>
 <h2>1. Information collected</h2>
 <ul>
@@ -42,14 +42,14 @@ PRIVACY_HTML = """<h2>Privacy Policy</h2>
 <h2>6. Cookies and advertising</h2>
 <p>korea365.org may use essential cookies and, where enabled, analytics or advertising services such as Google AdSense. You can manage cookies through your browser settings and manage Google advertising preferences through Google’s ad settings.</p>
 <h2>7. Your choices and requests</h2>
-<p>You may request access, correction or deletion of personal information, or ask to disconnect a social account. Please use the <a href="https://korea365.org/data-deletion/">Data Deletion Instructions</a> page or contact <a href="mailto:huh0303@gmail.com">huh0303@gmail.com</a>. Do not email passwords, access tokens, verification codes or government identification numbers.</p>
+<p>You may request access, correction or deletion of personal information, or ask to disconnect a social account. Please use the <a href="https://korea365.org/data-deletion/">Data Deletion Instructions</a> page or contact <a href="mailto:koreacenter24@gmail.com">koreacenter24@gmail.com</a>. Do not email passwords, access tokens, verification codes or government identification numbers.</p>
 <h2>8. Contact</h2>
-<p>Privacy and data requests: <a href="mailto:huh0303@gmail.com">huh0303@gmail.com</a>.</p>
+<p>Privacy and data requests: <a href="mailto:koreacenter24@gmail.com">koreacenter24@gmail.com</a>.</p>
 <h2>9. Policy changes</h2>
 <p>Material changes will be reflected on this page with an updated effective date.</p>"""
 
 DELETION_HTML = """<h2>Data Deletion Instructions</h2>
-<p>This page explains how to request deletion of information associated with an Instagram or Threads account connected to the SIS Center Publisher social publishing service operated for Korea365.</p>
+<p>This page explains how to request deletion of information associated with an Instagram or Threads account connected to the SIS Center Publisher social publishing service operated by SeoulTopik Center.</p>
 <h2>1. Revoke access first (recommended)</h2>
 <ol>
 <li>Open the Instagram or Threads settings for the account you connected.</li>
@@ -58,7 +58,7 @@ DELETION_HTML = """<h2>Data Deletion Instructions</h2>
 <li>If you cannot find the setting, contact us and we will guide you through disconnecting the account.</li>
 </ol>
 <h2>2. Request deletion by email</h2>
-<p>Email <a href="mailto:huh0303@gmail.com?subject=Korea365%20Meta%20Data%20Deletion%20Request">huh0303@gmail.com</a> with the subject <strong>Korea365 Meta Data Deletion Request</strong>.</p>
+<p>Email <a href="mailto:koreacenter24@gmail.com?subject=Korea365%20Meta%20Data%20Deletion%20Request">koreacenter24@gmail.com</a> with the subject <strong>Korea365 Meta Data Deletion Request</strong>.</p>
 <p>Please include:</p>
 <ul>
 <li>The platform: Instagram or Threads (or both).</li>
@@ -78,8 +78,19 @@ DELETION_HTML = """<h2>Data Deletion Instructions</h2>
 <h2>4. Processing time and confirmation</h2>
 <p>We will acknowledge the request, verify it where reasonably necessary, and complete deletion or explain any lawful retention exception within 30 days. If additional time is needed, we will notify you. A confirmation will be sent to the reply email address.</p>
 <h2>5. Contact</h2>
-<p>Data deletion contact: <a href="mailto:huh0303@gmail.com">huh0303@gmail.com</a>.</p>
+<p>Data deletion contact: <a href="mailto:koreacenter24@gmail.com">koreacenter24@gmail.com</a>.</p>
 <p>For more information, read the <a href="https://korea365.org/privacy-policy/">Privacy Policy</a>.</p>"""
+
+TERMS_HTML = """<h2>Terms of Service</h2>
+<p>SIS Center Publisher is an internal publishing tool operated by <strong>SeoulTopik Center</strong> for authorized operators who manage the Center's Instagram and Threads accounts.</p>
+<p><strong>Effective date:</strong> 6 November 2026.</p>
+<h2>1. Authorized use</h2><p>Only authorized operators may use the app. Users must connect only accounts they own or are authorized to manage and must complete Meta's own authorization process.</p>
+<h2>2. Content and publishing</h2><p>Operators are responsible for ensuring that captions, images, videos, disclosures and other materials comply with applicable law, intellectual-property rights, privacy rights and Meta policies. Publishing depends on Meta API permissions and availability; a post is not considered published until its resulting post ID or URL is verified.</p>
+<h2>3. Data and account disconnection</h2><p>The app processes only the account and publishing information needed for its functions. Account owners may revoke access through Meta settings and request deletion of app-held data using the <a href="https://korea365.org/data-deletion/">Data Deletion Instructions</a>.</p>
+<h2>4. Prohibited use</h2><p>Unauthorized account access, spam, deceptive content, unlawful content, rights infringement, and attempts to bypass platform safeguards are prohibited.</p>
+<h2>5. Changes and availability</h2><p>Features may change or become unavailable due to Meta API changes, permission limits, security requirements or maintenance.</p>
+<h2>6. Contact</h2><p>SeoulTopik Center: <a href="mailto:koreacenter24@gmail.com">koreacenter24@gmail.com</a>.</p>
+""" 
 
 def request(method, path, **kwargs):
     response = requests.request(
@@ -111,11 +122,13 @@ def main():
         raise SystemExit("WordPress authentication was not verified.")
     privacy = upsert("privacy-policy", "Privacy Policy", PRIVACY_HTML)
     deletion = upsert("data-deletion", "Data Deletion Instructions", DELETION_HTML)
+    terms = upsert("terms-of-service", "Terms of Service", TERMS_HTML)
     # Public read-back: require published pages and exact canonical links.
     checks = []
     for slug, expected in (
         ("privacy-policy", "https://korea365.org/privacy-policy/"),
         ("data-deletion", "https://korea365.org/data-deletion/"),
+        ("terms-of-service", "https://korea365.org/terms-of-service/"),
     ):
         rows = requests.get(BASE + "/pages", params={"slug": slug, "_fields": "id,slug,status,link"}, timeout=TIMEOUT)
         if not rows.ok or not rows.json():
@@ -125,7 +138,7 @@ def main():
             raise RuntimeError(f"Public page verification mismatch for {slug}.")
         checks.append(row["link"])
     print("WORDPRESS_AUTH=verified")
-    print("PAGES_PUBLISHED_AND_PUBLICLY_VERIFIED=2")
+    print("PAGES_PUBLISHED_AND_PUBLICLY_VERIFIED=3")
     for link in checks:
         print(link)
 
