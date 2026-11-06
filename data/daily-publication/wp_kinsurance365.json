@@ -1,1 +1,1 @@
-{"day": "2026-11-04", "status": "DISPATCHED", "attempts": 2, "claim": "daily-2026-11-04-wp_kinsurance365-127887d0", "claimed_at": "2026-11-04T21:54:42.922147+09:00", "run_id": 41833428421, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-11-06", "status": "PUBLISHED", "public_url": "https://koreainsurance365.com/chronic-illness-management-and-nhis-coverage-benefits-for-foreign-residents-in-korea/", "published_at": "2026-11-05T18:14:30Z"}
