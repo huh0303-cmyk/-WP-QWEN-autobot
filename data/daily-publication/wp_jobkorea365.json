@@ -1,1 +1,1 @@
-{"day": "2026-11-05", "status": "DISPATCHED", "attempts": 1, "claim": "daily-2026-11-05-wp_jobkorea365-d7d8ccae", "claimed_at": "2026-11-05T22:03:37.136939+09:00", "run_id": 42032449139, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-11-06", "status": "PUBLISHED", "public_url": "https://jobkorea365.com/regional-salary-variations-and-employment-standards-for-foreign-workers-in-korea/", "published_at": "2026-11-05T19:07:37Z"}
