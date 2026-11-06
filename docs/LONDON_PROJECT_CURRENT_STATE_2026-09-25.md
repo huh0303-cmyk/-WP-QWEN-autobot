@@ -1,4 +1,7 @@
-# London Project — Canonical Current State
+# London Project — Historical Current State (2026-09-25)
+
+> **HISTORICAL CHECKPOINT — SUPERSEDED 2026-11-06:** This file records an older state and is retained for audit only. For current execution, follow [CURRENT_OPERATING_RULES.md](../CURRENT_OPERATING_RULES.md), [PM_CURRENT_STATUS.md](../PM_CURRENT_STATUS.md), and [config/sns_six_channel_policy.json](../config/sns_six_channel_policy.json). Do not use any VPS/SSH/systemd/n8n-hosted-runtime instructions or the older SNS cadence/handles below.
+
 
 Updated: 2026-09-25 (Asia/Seoul)
 
@@ -55,14 +58,11 @@ Production result recorded on 2026-09-24/25:
 - Jobs for all ten locked keys were queued for private/review publishing only.
 - Control-room state and the ten-channel lock were synchronized. See `data/youtube-ten-channel-lock.json` and `data/youtube-ten-control-receipt.json` on production when auditing runtime state.
 
-## Blogspot 33: daily production policy
+## Blogspot 33: historical 2026-09-25 checkpoint — not a current runtime instruction
 
-- All 33 blogs were checked through the Blogger API, public URL, metadata, and registry rows.
-- Production scheduling runs on the VPS, not by relying on the previously failing GitHub Actions text-generation path.
-- The daily coordinator starts at 00:05 KST and spreads 33 individual jobs approximately from 06:10 to 23:20 KST.
-- Each blog receives exactly one public post per date when successful; the publisher uses a date/account idempotency key.
-- Generation/transient failures are retried without duplicating a successful publication.
-- The systemd units and scheduler scripts committed with this record are the deployable source of truth.
+- The following scheduler details described a former architecture and are retained only as historical evidence.
+- Do not use the VPS, SSH, systemd, or server-local scheduler described in this checkpoint.
+- Current approved runtime paths must be verified separately in CURRENT_OPERATING_RULES.md and PM_CURRENT_STATUS.md.
 
 ## WordPress correction recorded
 
@@ -70,29 +70,9 @@ Production result recorded on 2026-09-24/25:
 - The visible sentence was removed while license provenance remains internal.
 - `scripts/free_article_supplier.py` was corrected so future posts do not expose that operational caption.
 
-## Social network six-role matrix
+## Social network policy — historical six-role checkpoint (superseded 2026-11-06)
 
-Applies identically to TikTok, Instagram, Facebook, and Threads:
-
-1. Korean / TOPIK
-2. Japanese
-3. English
-4. Health supplements and health shopping
-5. Travel, hotels, and K-pop ticket shopping
-6. Lifestyle hot-item shopping
-
-Roles 4–6 are shopping channels. Target cadence is one public post per verified account per day, randomly distributed from 08:10 to 22:50 KST, with at least a 15-minute spacing and a per-platform/account/date duplicate guard.
-
-The machine-readable authority is `config/sns_six_channel_policy.json`.
-
-Status at this checkpoint:
-
-- Required slots: 24 (6 roles × 4 platforms)
-- Existing/observed identities: 13
-- Missing identities: 11
-- Verified write connections: 0 of 24
-
-Therefore the desired policy is recorded, but public SNS automation must remain disabled per account until OAuth/write permission is actually verified. Existing handles and the missing-slot list are fully captured in the JSON; do not ask the owner to re-list them.
+This old six-role matrix and its one-post-per-day cadence are retained for audit only. Current Instagram and Threads structure is five accounts: seoul_topik, english_pick, japanese_pick, seoul_jisoo, seoul_chris. Seoul Jisoo and Seoul Chris each target three distinct editorial posts daily, randomized 08:00–23:00 KST, with content-first affiliate placement. See [current policy](../CURRENT_OPERATING_RULES.md) and [machine-readable configuration](../config/sns_six_channel_policy.json).
 
 ## Control room state
 
