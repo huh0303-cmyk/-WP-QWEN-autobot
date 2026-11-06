@@ -30,7 +30,7 @@ async def extract_widget_total(page):
                 if not await node.is_visible():
                     continue
                 raw = (await node.inner_text(timeout=1500)).strip()
-                if re.fullmatch(r"[\\d,]+", raw):
+                if re.fullmatch(r"[\d,]+", raw):
                     values.append(int(raw.replace(",", "")))
             except Exception:
                 continue
