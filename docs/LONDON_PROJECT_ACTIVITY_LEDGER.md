@@ -675,3 +675,15 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - Existing preflight (generated 2026-11-03) is preview-only (live_writes_enabled=false); 23 YouTube channels listed; social publish connections show 0 for TikTok, Instagram, Threads and Facebook. Treat as stale baseline and re-run before rollout. Do not claim social publication without receipts.
 - Power settings changed on AC: standby timeout = Never (0); hibernate timeout = Never (0). Monitor may turn off; PC must remain awake and powered for local DC/PS work. Reverify after reboot or power-plan change.
 - Next actions: audit master products (deduplicate, count per category, check image/link fields); finalize SeoulMall six collections and add 20 products through authenticated Coupang portal; verify public store; then build/test reusable responsive banner component and apply to K-trip365 first, followed by the locked site sequence. Keep all writes backed up and verified.
+
+## meta-five-account-daily-policy-20261106
+
+- task_id: meta-five-account-daily-policy-20261106
+- User explicitly confirmed the same five handles are used on Instagram and Threads: seoul_topik, seoul_jisoo, seoul_chris, english_pick1, japanese_pick.
+- Added canonical policy config/meta_five_account_daily_policy.json and operating documentation docs/META_FIVE_ACCOUNT_DAILY_POLICY_2026-11-06.md. Scope is exactly five accounts on each platform (10 account-platform connections); user-provided content topics and KST daily randomized window are recorded.
+- Added scripts/meta_account_preflight.py, which checks account-specific token and numeric user-ID environment variables without printing credential values. Added .github/workflows/meta-five-account-daily-preflight.yml with a daily 09:10 KST readiness check and manual dispatch.
+- Added tests/test_meta_five_account_policy.py.
+- Verification: preflight self-test PASS; 3/3 unit tests PASS; workflow YAML parse PASS; git diff --check PASS.
+- Safety state: publish_enabled=false. No Meta OAuth was completed, no account-specific token/user ID or write scope was verified, no content queue/publisher was wired to this five-account mapping, and no public post was attempted. The scheduled workflow is a readiness check only and will not publish. GitHub scheduled workflows execute from the default branch; the schedule is not live until this branch is reviewed and merged into main.
+- Remaining: owner must approve each account's Meta OAuth consent and platform-specific publish scopes; store resulting account-specific token/user-ID pairs as GitHub Actions environment secrets using names in the policy; then implement/verify the daily content queue and publisher against each account before enabling public posting.
+
