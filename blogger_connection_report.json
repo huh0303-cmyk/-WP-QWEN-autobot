@@ -1,11 +1,34 @@
 {
   "ok": true,
+  "identity_ok": true,
+  "url_alignment_ok": false,
   "configured_count": 33,
   "oauth_visible_count": 33,
   "matched_count": 33,
   "connected_count": 33,
   "missing": [],
-  "url_mismatches": [],
+  "url_mismatches": [
+    {
+      "site_id": "blogger_medicaltour",
+      "configured_url": "https://koreamedicaltour365.blogspot.com",
+      "oauth_url": "https://medical.k-health365.com/"
+    },
+    {
+      "site_id": "blogger_oliveyoung",
+      "configured_url": "https://oliveyoungkorea.blogspot.com",
+      "oauth_url": "https://beauty.k-health365.com/"
+    },
+    {
+      "site_id": "blogger_khealth365",
+      "configured_url": "https://k-health365.blogspot.com",
+      "oauth_url": "https://lab.k-health365.com/"
+    },
+    {
+      "site_id": "blogger_kmedical_job_center",
+      "configured_url": "https://k-health365-edu.blogspot.com",
+      "oauth_url": "https://job.k-health365.com/"
+    }
+  ],
   "matched_site_ids": [
     "blogger_ktrip365",
     "blogger_kworld365",
