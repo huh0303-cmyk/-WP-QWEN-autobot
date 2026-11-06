@@ -135,14 +135,10 @@ async def run():
             target["source"] = row["source"]
             target["checked_at"] = checked_at
         else:
-            # A stale or unverified total must never appear as a current pageview
-            # value or participate in ranking. Keep history for audit, but fail closed.
-            target["total_pageviews"] = None
-            target["daily_pageviews"] = None
+            # Preserve last-known good totals, but never label a failed refresh as healthy.
             target["last_attempt_at"] = checked_at
             target["last_attempt_status"] = row["status"]
             target["status"] = row["status"]
-            target["source"] = None
     pageviews["generated_at"] = checked_at
     pageviews["source"] = payload["source"]
     pageviews["successful"] = payload["successful"]
