@@ -176,16 +176,6 @@
     {
       "platform": "Instagram",
       "role": "english",
-      "display_name": "English Survival",
-      "handle": "englishsurvival1",
-      "url": "https://www.instagram.com/englishsurvival1/",
-      "account_exists": true,
-      "identity_verified": true,
-      "publish_connected": false
-    },
-    {
-      "platform": "Instagram",
-      "role": "english",
       "display_name": "English Pick",
       "handle": "english_pick",
       "url": "https://www.instagram.com/english_pick/",
@@ -193,16 +183,6 @@
       "identity_verified": false,
       "publish_connected": false,
       "note": "Owner-designated five-account structure (2026-11-06). Public identity must be rechecked; API write authorization and publication receipt are not yet verified."
-    },
-    {
-      "platform": "Instagram",
-      "role": "health_shop",
-      "display_name": "서울 헬스365",
-      "handle": "seoul_health365",
-      "url": "https://www.instagram.com/seoul_health365/",
-      "account_exists": true,
-      "identity_verified": true,
-      "publish_connected": false
     },
     {
       "platform": "Instagram",
@@ -229,17 +209,6 @@
     {
       "platform": "Instagram",
       "role": "japanese",
-      "display_name": "Japanese Survival",
-      "handle": "japanese_survival1",
-      "url": "https://www.instagram.com/japanese_survival1/",
-      "account_exists": true,
-      "identity_verified": true,
-      "publish_connected": false,
-      "note": "2026-10-01 Meta 계정 센터에서 Japanese Survival 표시 이름과 japanese_survival1 핸들 확인. japanese_survival 정확 핸들은 사용 불가. 게시 로그인 필요."
-    },
-    {
-      "platform": "Instagram",
-      "role": "japanese",
       "display_name": "Japanese Pick",
       "handle": "japanese_pick",
       "url": "https://www.instagram.com/japanese_pick/",
@@ -252,46 +221,12 @@
       "platform": "Instagram",
       "role": "korean_topik",
       "display_name": "Seoul TOPIK",
-      "handle": "sis_topik1",
-      "url": "https://www.instagram.com/sis_topik1/",
-      "account_exists": true,
-      "identity_verified": true,
-      "publish_connected": false,
-      "current_public_name": "서울국제대학 SIS - Language center",
-      "note": "공개 프로필·Meta 계정 센터 확인. 과거 게시 영수증은 있으나 현재 CONTROL 자동 게시 권한은 미검증."
-    },
-    {
-      "platform": "Instagram",
-      "role": "korean_topik",
-      "display_name": "Seoul TOPIK",
       "handle": "seoul_topik",
       "url": "https://www.instagram.com/seoul_topik/",
       "account_exists": true,
       "identity_verified": false,
       "publish_connected": false,
       "note": "Owner-designated five-account structure (2026-11-06). Public identity must be rechecked; API write authorization and publication receipt are not yet verified."
-    },
-    {
-      "platform": "Instagram",
-      "role": "travel_shop",
-      "display_name": "서울 트립365",
-      "handle": "seoul_trip365",
-      "url": "https://www.instagram.com/seoul_trip365/",
-      "account_exists": true,
-      "identity_verified": true,
-      "publish_connected": false,
-      "note": "2026-09-25 계정 전환 목록 및 이메일 코드 인증 화면에서 확인"
-    },
-    {
-      "platform": "Threads",
-      "role": "english",
-      "display_name": "English Survival",
-      "handle": "english_survival_1",
-      "url": "https://www.threads.com/@english_survival_1",
-      "account_exists": true,
-      "identity_verified": true,
-      "publish_connected": false,
-      "note": "2026-09-29 브라우저 공개 게시 영수증 있음. 현재 CONTROL 자동 게시 권한은 미검증."
     },
     {
       "platform": "Threads",
@@ -307,16 +242,6 @@
     {
       "platform": "Threads",
       "role": "health_shop",
-      "display_name": "서울 헬스365",
-      "handle": "seoul_health365",
-      "url": "https://www.threads.com/@seoul_health365",
-      "account_exists": true,
-      "identity_verified": true,
-      "publish_connected": false
-    },
-    {
-      "platform": "Threads",
-      "role": "health_shop",
       "display_name": "Seoul Jisoo",
       "handle": "seoul_jisoo",
       "url": "https://www.threads.com/@seoul_jisoo",
@@ -328,17 +253,6 @@
     {
       "platform": "Threads",
       "role": "hot_item_shop",
-      "display_name": "Seoul Jisoo",
-      "handle": "",
-      "url": "",
-      "account_exists": false,
-      "identity_verified": false,
-      "publish_connected": false,
-      "note": "2026-10-01 Meta Accounts Center showed only @english_survival_1 and @seoultopik Threads. Old @seoul_item365 and new @seoul_jisoo direct URLs led to login; shopping identity remains unverified."
-    },
-    {
-      "platform": "Threads",
-      "role": "hot_item_shop",
       "display_name": "Seoul Chris",
       "handle": "seoul_chris",
       "url": "https://www.threads.com/@seoul_chris",
@@ -346,16 +260,6 @@
       "identity_verified": false,
       "publish_connected": false,
       "note": "Owner-designated five-account structure (2026-11-06). Public identity must be rechecked; API write authorization and publication receipt are not yet verified."
-    },
-    {
-      "platform": "Threads",
-      "role": "japanese",
-      "display_name": "Japanese Survival",
-      "handle": "",
-      "url": "",
-      "account_exists": false,
-      "identity_verified": false,
-      "publish_connected": false
     },
     {
       "platform": "Threads",
@@ -372,32 +276,12 @@
       "platform": "Threads",
       "role": "korean_topik",
       "display_name": "Seoul TOPIK",
-      "handle": "seoultopik",
-      "url": "https://www.threads.com/@seoultopik",
-      "account_exists": true,
-      "identity_verified": true,
-      "publish_connected": false
-    },
-    {
-      "platform": "Threads",
-      "role": "korean_topik",
-      "display_name": "Seoul TOPIK",
       "handle": "seoul_topik",
       "url": "https://www.threads.com/@seoul_topik",
       "account_exists": true,
       "identity_verified": false,
       "publish_connected": false,
       "note": "Owner-designated five-account structure (2026-11-06). Public identity must be rechecked; API write authorization and publication receipt are not yet verified."
-    },
-    {
-      "platform": "Threads",
-      "role": "travel_shop",
-      "display_name": "서울 라이프365",
-      "handle": "seoul_life365",
-      "url": "https://www.threads.com/@seoul_life365",
-      "account_exists": true,
-      "identity_verified": true,
-      "publish_connected": false
     },
     {
       "platform": "Facebook",
