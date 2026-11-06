@@ -15,9 +15,20 @@ import requests
 
 def account(platform):
     brand = os.getenv("SOCIAL_BRAND", "TOPIK").upper()
-    if brand not in {"TOPIK", "ENGLISH", "LANGUAGE"}:
+    # Keep legacy TOPIK/ENGLISH/LANGUAGE secret names intact while allowing
+    # four separately authenticated Instagram brands. No cross-account fallback.
+    suffixes = {
+        "TOPIK": "",
+        "ENGLISH": "_ENGLISH",
+        "LANGUAGE": "_LANGUAGE",
+        "ENGLISH_PICK": "_ENGLISH_PICK",
+        "JAPANESE_SPEAK": "_JAPANESE_SPEAK",
+        "SEOUL_JISOO": "_SEOUL_JISOO",
+        "SEOUL_CHRIS": "_SEOUL_CHRIS",
+    }
+    if brand not in suffixes:
         raise ValueError("Unknown SOCIAL_BRAND")
-    suffix = "" if brand == "TOPIK" else "_" + brand
+    suffix = suffixes[brand]
     prefix = "IG" if platform == "instagram" else "THREADS"
     token = os.getenv(prefix + "_ACCESS_TOKEN" + suffix, "")
     user = os.getenv(prefix + "_USER_ID" + suffix, "")
