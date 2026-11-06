@@ -11,6 +11,7 @@ permissions:
 jobs:
   preflight:
     runs-on: ubuntu-latest
+    environment: social-publish
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -39,3 +40,4 @@ jobs:
           META_THREADS_JAPANESE_PICK_ACCESS_TOKEN: ${{ secrets.META_THREADS_JAPANESE_PICK_ACCESS_TOKEN }}
           META_THREADS_JAPANESE_PICK_USER_ID: ${{ secrets.META_THREADS_JAPANESE_PICK_USER_ID }}
         run: python scripts/meta_account_preflight.py
+
