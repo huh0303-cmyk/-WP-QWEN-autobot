@@ -47,3 +47,28 @@ jobs:
           name: meta-account-preflight-${{ github.run_id }}
           path: reports/meta_preflight.json
           if-no-files-found: ignore
+
+  facebook-preflight:
+    runs-on: ubuntu-latest
+    environment: social-publish
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: Verify the two configured Facebook Page identities and create-content tasks (read-only)
+        env:
+          FB_PAGE_ACCESS_TOKEN_ENGLISH: ${{ secrets.FB_PAGE_ACCESS_TOKEN_ENGLISH }}
+          FB_PAGE_ID_ENGLISH: ${{ secrets.FB_PAGE_ID_ENGLISH }}
+          FB_PAGE_ACCESS_TOKEN_LANGUAGE: ${{ secrets.FB_PAGE_ACCESS_TOKEN_LANGUAGE }}
+          FB_PAGE_ID_LANGUAGE: ${{ secrets.FB_PAGE_ID_LANGUAGE }}
+          META_GRAPH_API_VERSION: ${{ vars.META_GRAPH_API_VERSION }}
+        run: python scripts/facebook_page_preflight.py --report-path reports/facebook_page_preflight.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: facebook-page-preflight-${{ github.run_id }}
+          path: reports/facebook_page_preflight.json
+          if-no-files-found: ignore

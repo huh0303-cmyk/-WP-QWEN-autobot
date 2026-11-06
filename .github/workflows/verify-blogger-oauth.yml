@@ -8,6 +8,7 @@ permissions:
 
 jobs:
   verify:
+    environment: blogger
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -21,10 +22,9 @@ jobs:
       # still required before any Blogger post can be created or edited.
       - name: Verify OAuth can read the exact 33 configured Blogger IDs
         env:
-          BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
-          BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
-          BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
-          EXPECTED_GOOGLE_OAUTH_CLIENT_ID: 771652206896-lhf48nk3dic098m29ekt9phnsun616e4.apps.googleusercontent.com
+          BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
+          BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
+          BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
         run: python scripts/blogger_verify_account.py
       - uses: actions/upload-artifact@v4
         if: always()

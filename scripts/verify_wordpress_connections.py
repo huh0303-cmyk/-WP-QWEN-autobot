@@ -49,7 +49,16 @@ def main() -> int:
                     result["user_id"] = payload.get("id")
                     result["user_name"] = payload.get("name")
                 else:
-                    result["error"] = "authentication_or_rest_error"
+                    body = (response.text or "").lower()
+                    if response.status_code == 403 and (
+                        "hcdn-cgi/jschallenge" in body
+                        or "checking your browser before accessing" in body
+                    ):
+                        result["error"] = "hcdn_browser_challenge"
+                    elif response.status_code == 403:
+                        result["error"] = "http_403_access_denied"
+                    else:
+                        result["error"] = "authentication_or_rest_error"
             except requests.RequestException as exc:
                 result["error"] = type(exc).__name__
         results.append(result)
