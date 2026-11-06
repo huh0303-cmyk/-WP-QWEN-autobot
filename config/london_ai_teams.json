@@ -1,0 +1,149 @@
+{
+  "project": "london-project",
+  "version": "1.0",
+  "created": "2026-11-06",
+  "status": "design_only_shadow_mode_not_enabled",
+  "canonical_repo": "huh0303-cmyk/-WP-QWEN-autobot",
+  "principles": [
+    "reuse_existing_factories",
+    "destination_failure_isolation",
+    "verified_publication_only",
+    "free_first_no_unapproved_paid_services",
+    "actual_revenue_data_only"
+  ],
+  "executive_owner": "chairman",
+  "operating_pm": "primary_project_pm",
+  "teams": [
+    {
+      "id": "youtube",
+      "name": "YouTube팀",
+      "scope": [
+        "existing_vps_youtube_factory"
+      ],
+      "agents": [
+        "team_lead",
+        "researcher",
+        "producer",
+        "qa_policy",
+        "publisher",
+        "performance_analyst"
+      ],
+      "publish_requires": "exact_channel_id_and_write_auth"
+    },
+    {
+      "id": "tiktok",
+      "name": "TikTok팀",
+      "scope": [
+        "verified_tiktok_accounts"
+      ],
+      "agents": [
+        "team_lead",
+        "researcher",
+        "shortform_producer",
+        "qa_policy",
+        "publisher",
+        "performance_analyst"
+      ],
+      "publish_requires": "verified_account_and_official_publish_permission"
+    },
+    {
+      "id": "blogs",
+      "name": "WordPress·Blogspot팀",
+      "scope": [
+        "wordpress_25_factory",
+        "blogger_33_factory"
+      ],
+      "agents": [
+        "team_lead",
+        "keyword_researcher",
+        "writer",
+        "seo_editor",
+        "qa_policy",
+        "publisher",
+        "performance_analyst"
+      ],
+      "publish_requires": "destination_specific_auth_and_audit"
+    },
+    {
+      "id": "facebook",
+      "name": "Facebook팀",
+      "scope": [
+        "verified_facebook_pages"
+      ],
+      "agents": [
+        "team_lead",
+        "researcher",
+        "producer",
+        "qa_policy",
+        "publisher",
+        "performance_analyst"
+      ],
+      "publish_requires": "verified_page_and_publish_permission"
+    },
+    {
+      "id": "instagram_threads",
+      "name": "Instagram·Threads팀",
+      "scope": [
+        "verified_instagram_accounts",
+        "verified_threads_profiles"
+      ],
+      "agents": [
+        "team_lead",
+        "researcher",
+        "reels_carousel_producer",
+        "threads_writer",
+        "qa_policy",
+        "publisher",
+        "performance_analyst"
+      ],
+      "publish_requires": "separate_verified_permissions_per_platform"
+    }
+  ],
+  "shared_capabilities": [
+    "content_research",
+    "content_calendar",
+    "duplicate_check",
+    "copyright_policy_check",
+    "affiliate_link_validation",
+    "analytics",
+    "revenue_attribution",
+    "cost_guard"
+  ],
+  "runtime": {
+    "mode": "shadow_first",
+    "new_scheduler": false,
+    "new_paid_services": false,
+    "control_korea365": "read_only",
+    "retry_max": 1,
+    "completion_authority": "deterministic_audit_engine",
+    "task_ledger": "existing_append_only_activity_ledger",
+    "cross_destination_failure": false
+  },
+  "revenue": {
+    "primary_kpi": "verified_net_revenue",
+    "measure_only_connected_source_data": true,
+    "include_cancellations_refunds_fees_and_costs": true,
+    "blog_affiliate_standard": {
+      "coupang_products_per_post": 10,
+      "placement": "post_bottom",
+      "tracking_url_required": true
+    },
+    "never_infer_missing_metrics": true
+  },
+  "exclusions": [
+    "WPVibe",
+    "unapproved_paid_api",
+    "unapproved_paid_saas",
+    "unlicensed_images",
+    "automatic_publication_without_verified_account_permissions",
+    "newsroom_2",
+    "tistory_and_naver_unless_separately_authorized"
+  ],
+  "rollout": [
+    "phase_0_read_only_audit",
+    "phase_1_team_contracts",
+    "phase_2_shadow_mode",
+    "phase_3_approved_publishing",
+    "phase_4_revenue_optimization"
+  ]
+}
