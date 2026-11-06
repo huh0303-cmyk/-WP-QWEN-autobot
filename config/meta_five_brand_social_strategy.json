@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "effective_at_kst": "2026-11-07",
+  "status": "POLICY_DOCUMENTED_RENAME_AND_PUBLISH_AUTH_PENDING",
+  "target_brands": [
+    "seoul_topik",
+    "seoul_chris",
+    "seoul_jisoo",
+    "english_pick",
+    "japanese_pick"
+  ],
+  "proposed_facebook_page_renames_in_screenshot_order": [
+    {
+      "current_name": "K - DuHoc Center",
+      "target_name": "seoul_topik"
+    },
+    {
+      "current_name": "K-Du học",
+      "target_name": "seoul_chris"
+    },
+    {
+      "current_name": "KLIC - Viện Ngôn Ngữ & Văn Hoá Hàn Quốc",
+      "target_name": "seoul_jisoo"
+    },
+    {
+      "current_name": "Viện Ngôn Ngữ Văn Hoá Hàn Quốc",
+      "target_name": "english_pick"
+    },
+    {
+      "current_name": "Westlake Vietnam",
+      "target_name": "japanese_pick"
+    }
+  ],
+  "instagram_handle_mismatch": {
+    "requested_brand_handle": "english_pick",
+    "handle_seen_in_screenshot": "english_pick1",
+    "action": "Do not change account IDs, OAuth credentials, or secret keys until the owner confirms the actual Instagram username change."
+  },
+  "shared_topics": {
+    "commerce": [
+      "K-beauty",
+      "skincare",
+      "cosmetics",
+      "health functional foods"
+    ],
+    "reach": [
+      "politics",
+      "sports",
+      "society",
+      "economy",
+      "international news",
+      "entertainment",
+      "trending topics"
+    ]
+  },
+  "rules": {
+    "editorial_value_percent": "80-90",
+    "contextual_commerce_percent_max": 20,
+    "affiliate_links": "Verified tracking URLs only, with clear disclosure",
+    "current_affairs": "Dated reliable sources; distinguish facts, allegations, and opinions",
+    "health": "No unsupported disease-treatment, prevention, or guaranteed-effect claims",
+    "platform_copy": "Unique native captions per platform and account",
+    "publishing_gate": "Exact destination identity and write permission required; save public URL/media ID receipt"
+  },
+  "brand_roles": {
+    "seoul_topik": "Korean language, TOPIK, study and life in Korea",
+    "seoul_chris": "K-beauty, skincare, cosmetics and beauty trends",
+    "seoul_jisoo": "Health, everyday life, consumer issues and broad trending topics",
+    "english_pick": "English conversation, US/global culture and practical trends",
+    "japanese_pick": "Japanese conversation, Japanese culture and practical trends"
+  },
+  "publishing_enabled": false,
+  "credentials_must_never_be_committed": true
+}
