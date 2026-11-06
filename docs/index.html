@@ -97,7 +97,14 @@ var VISITOR_DATA=null;
 var SOCIAL_DATA=null;
 var SOCIAL_METRICS=null;
 function metricNumber(v,unit){return v===null||v===undefined||!Number.isFinite(Number(v))?'<span class="na">미수집</span>':'<b>'+f(Number(v))+'</b>'+(unit?' <span class="na">'+unit+'</span>':'');}
-function metricDay(v){return v?esc(String(v).slice(0,10)):'<span class="na">미확인</span>';}
+function metricDay(v){
+ if(!v)return '<span class="na">\uBBF8\uD655\uC778</span>';
+ var day=String(v).slice(0,10);
+ var today=new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Seoul'});
+ var ageDays=Math.floor((Date.parse(today+'T00:00:00Z')-Date.parse(day+'T00:00:00Z'))/86400000);
+ var label=esc(day);
+ return ageDays>=3?'<span style="color:#b45309;font-weight:700">'+label+' | '+ageDays+'\uC77C+ \uBBF8\uBC1C\uD589</span>':label;
+}
 function metricKey(a){var h=String(a.handle||'').replace(/^@/,'').trim().toLowerCase();return String(a.platform||'').toLowerCase()+'|'+(h||String(a.url||'').trim().toLowerCase());}
 function f(v){return Number(v).toLocaleString()}
 function d(v){if(v===null||v===undefined)return '';return v>0?'<span class="d up">▲ +'+f(v)+'</span>':v<0?'<span class="d down">▼ -'+f(Math.abs(v))+'</span>':'<span class="d na">– 0</span>'}
@@ -269,8 +276,14 @@ function drawSocial(data){
   if(at!==bt)return bt-at;
   return String(a.name||'').localeCompare(String(b.name||''),'ko');
  });
- var mc=SOCIAL_METRICS&&SOCIAL_METRICS.generated_at_kst?(' · 통계 스냅샷 '+String(SOCIAL_METRICS.generated_at_kst).slice(0,16).replace('T',' ')):'';
- document.getElementById('social-meta').textContent=socialPlatform+' 계정 '+list.length+'개 · '+(socialPlatform==='YouTube'?'구독자':'팔로워')+' 기준으로 이 플랫폼 안에서 순위 · 구독자/팔로워·조회수·콘텐츠 수 증감 포함'+mc+' · 미수집 항목은 별도 표시';
+ var registryAt=String(data.generated_at||'미확인').slice(0,10);
+ var registryDate=data.generated_at?new Date(String(data.generated_at).slice(0,10)+'T00:00:00+09:00'):null;
+ var registryAgeDays=registryDate?(Date.now()-registryDate.getTime())/86400000:Infinity;
+ var registryStale=!Number.isFinite(registryAgeDays)||registryAgeDays>7;
+ var mc=SOCIAL_METRICS&&SOCIAL_METRICS.generated_at_kst?(' | 통계 스냅샷 '+String(SOCIAL_METRICS.generated_at_kst).slice(0,16).replace('T',' ')):'';
+ var socialMeta=document.getElementById('social-meta');
+ socialMeta.textContent=socialPlatform+' 계정 '+list.length+'개 | 계정목록 기준 '+registryAt+(registryStale?' | 계정목록 갱신 필요':'')+' | '+(socialPlatform==='YouTube'?'구독자':'팔로워')+' 기준으로 이 플랫폼 안에서 순위 | 구독자/팔로워?조회수?콘텐츠 수 증감 포함'+mc+' | 미수집 항목은 별도 표시';
+ socialMeta.style.color=registryStale?'#b45309':'';
  var socialRank=0;
  document.getElementById('social-rows').innerHTML=list.map(function(a){
   var name=esc(a.name||a.handle||'계정명 미등록');
