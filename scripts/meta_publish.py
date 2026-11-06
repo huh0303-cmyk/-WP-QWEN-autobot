@@ -14,28 +14,51 @@ import requests
 
 
 def account(platform):
-    brand = os.getenv("SOCIAL_BRAND", "TOPIK").upper()
-    # Keep legacy TOPIK/ENGLISH/LANGUAGE secret names intact while allowing
-    # four separately authenticated Instagram brands. No cross-account fallback.
-    suffixes = {
-        "TOPIK": "",
-        "ENGLISH": "_ENGLISH",
-        "LANGUAGE": "_LANGUAGE",
-        "ENGLISH_PICK": "_ENGLISH_PICK",
-        "JAPANESE_SPEAK": "_JAPANESE_SPEAK",
-        "SEOUL_JISOO": "_SEOUL_JISOO",
-        "SEOUL_CHRIS": "_SEOUL_CHRIS",
+    """Resolve one exact account/platform credential pair.
+
+    Canonical names match config/meta_five_account_daily_policy.json:
+    META_{PLATFORM}_{ACCOUNT_KEY}_{ACCESS_TOKEN|USER_ID}.
+    Legacy names remain supported for existing TOPIK/ENGLISH/LANGUAGE jobs;
+    credentials are never borrowed from another account.
+    """
+    if platform not in {"instagram", "threads"}:
+        raise ValueError("Unsupported Meta platform")
+
+    brand = os.getenv("SOCIAL_BRAND", "TOPIK").strip().upper()
+    account_keys = {
+        "TOPIK": "SEOUL_TOPIK",
+        "SEOUL_TOPIK": "SEOUL_TOPIK",
+        "SEOUL_JISOO": "SEOUL_JISOO",
+        "SEOUL_CHRIS": "SEOUL_CHRIS",
+        "ENGLISH_PICK1": "ENGLISH_PICK1",
+        "ENGLISH_PICK": "ENGLISH_PICK1",
+        "JAPANESE_PICK": "JAPANESE_PICK",
     }
-    if brand not in suffixes:
+    if brand not in account_keys and brand not in {"ENGLISH", "LANGUAGE"}:
         raise ValueError("Unknown SOCIAL_BRAND")
-    suffix = suffixes[brand]
-    prefix = "IG" if platform == "instagram" else "THREADS"
-    token = os.getenv(prefix + "_ACCESS_TOKEN" + suffix, "")
-    user = os.getenv(prefix + "_USER_ID" + suffix, "")
-    if not token or not user:
-        raise ValueError(f"Missing {prefix}_ACCESS_TOKEN{suffix}/{prefix}_USER_ID{suffix}")
+
+    platform_key = platform.upper()
+    account_key = account_keys.get(brand)
+    if account_key:
+        token_name = f"META_{platform_key}_{account_key}_ACCESS_TOKEN"
+        user_name = f"META_{platform_key}_{account_key}_USER_ID"
+        token = os.getenv(token_name, "").strip()
+        user = os.getenv(user_name, "").strip()
+        if not token or not user:
+            raise ValueError(f"Missing {token_name}/{user_name}")
+    else:
+        # Backward compatibility for the three pre-existing legacy brands only.
+        legacy_suffix = {"TOPIK": "", "ENGLISH": "_ENGLISH", "LANGUAGE": "_LANGUAGE"}[brand]
+        legacy_prefix = "IG" if platform == "instagram" else "THREADS"
+        token_name = legacy_prefix + "_ACCESS_TOKEN" + legacy_suffix
+        user_name = legacy_prefix + "_USER_ID" + legacy_suffix
+        token = os.getenv(token_name, "").strip()
+        user = os.getenv(user_name, "").strip()
+        if not token or not user:
+            raise ValueError(f"Missing {token_name}/{user_name}")
+
     if not user.isdigit():
-        raise ValueError(f"{prefix}_USER_ID must be a numeric API user ID")
+        raise ValueError(f"{user_name} must be a numeric API user ID")
     if platform == "instagram":
         login = os.getenv("IG_LOGIN_TYPE", "facebook")
         if login not in {"facebook", "instagram"}:
@@ -45,7 +68,6 @@ def account(platform):
     else:
         base = "https://graph.threads.net/v1.0"
     return base, user, token
-
 
 def api(method, url, token, **fields):
     # Tokens stay out of URLs and exception messages. No automatic POST retries.
