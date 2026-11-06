@@ -279,6 +279,8 @@ def one(h, props, platform, url, display_name, ref, prev_hist):
     content_meta = content_metadata(url, platform)
     row["content"] = content_meta.get("content_count")
     row["latest_publish_date"] = content_meta.get("latest_publish_date")
+    if platform == "blogspot":
+        row["content_metadata_source"] = "Blogger public Atom JSON feed"
     p = prev_hist.get(row["site"], {})
     if row["content"] is not None and p.get("content") is not None:
         row["content_delta"] = row["content"] - p["content"]
@@ -388,6 +390,7 @@ def main():
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps({
         "generated_at": now.isoformat(), "reference_date": ref.isoformat(),
+        "blogspot_content_metadata_checked_at": now.isoformat(),
         "blogger_pageviews": blogger_pageviews,
         "basis": "매일 07:00 KST 갱신 · GSC 검색 클릭·노출 기준일은 3일 전(GSC 지연 반영) · 클릭수는 사이트 방문자 수가 아님 · 색인수는 GSC 사이트맵 보고값이며 노출 페이지 수가 아님.",
         "rows": rows}, ensure_ascii=False, indent=1), encoding="utf-8")
