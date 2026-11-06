@@ -3,8 +3,9 @@
 Metrics per site (reference day = day before yesterday KST, so GSC data is more settled):
  1 day-before-yesterday search clicks (daily traffic proxy) + delta vs three days ago
  2 cumulative clicks (GSC, all available history) + delta (= reference-day clicks)
- 3 content count (WP REST / Blogspot feed) + delta vs previous snapshot
- 4 GSC sitemap indexed URL count + delta vs previous snapshot (not search impressions)
+ 3 content count (WP REST / Blogger feed) + delta vs previous snapshot
+ 4 latest publish dates (WordPress REST / Blogger, Tistory, Naver public feeds)
+ 5 GSC sitemap indexed URL count + delta vs previous snapshot (not search impressions)
 """
 import datetime as dt
 import html
@@ -12,9 +13,11 @@ import json
 import os
 import re
 import sys
+import xml.etree.ElementTree as ET
 from concurrent.futures import ThreadPoolExecutor
+from email.utils import parsedate_to_datetime
 from pathlib import Path
-from urllib.parse import quote
+from urllib.parse import quote, urlparse
 
 import requests
 
@@ -117,6 +120,32 @@ def content_metadata(url, platform):
                                     break
                 return {"content_count": int(total) if total is not None else None,
                         "latest_publish_date": latest}
+        elif platform in {"tistory", "naver"}:
+            # Tistory and Naver public RSS feeds expose recent published dates.
+            # Their feeds are capped, so do not mistake feed item count for total posts.
+            if platform == "tistory":
+                endpoint = url.rstrip("/") + "/rss"
+            else:
+                blog_id = urlparse(url).path.strip("/").split("/")[0]
+                if not blog_id:
+                    return {"content_count": None, "latest_publish_date": None}
+                endpoint = "https://rss.blog.naver.com/" + quote(blog_id, safe="") + ".xml"
+            r = requests.get(endpoint, timeout=25, headers={"User-Agent": "Mozilla/5.0 LondonProjectDashboard/1.0"})
+            if r.ok:
+                root = ET.fromstring(r.content)
+                item = root.find(".//channel/item")
+                latest = None
+                if item is not None:
+                    published = item.findtext("pubDate") or item.findtext("{http://purl.org/dc/elements/1.1/}date")
+                    if published:
+                        try:
+                            latest = parsedate_to_datetime(published).date().isoformat()
+                        except (TypeError, ValueError, OverflowError):
+                            try:
+                                latest = dt.datetime.fromisoformat(published.replace("Z", "+00:00")).date().isoformat()
+                            except (TypeError, ValueError):
+                                latest = None
+                return {"content_count": None, "latest_publish_date": latest}
         return {"content_count": None, "latest_publish_date": None}
     except Exception:
         return {"content_count": None, "latest_publish_date": None}
@@ -279,8 +308,13 @@ def one(h, props, platform, url, display_name, ref, prev_hist):
     content_meta = content_metadata(url, platform)
     row["content"] = content_meta.get("content_count")
     row["latest_publish_date"] = content_meta.get("latest_publish_date")
-    if platform == "blogspot":
-        row["content_metadata_source"] = "Blogger public Atom JSON feed"
+    metadata_sources = {
+        "blogspot": "Blogger public Atom JSON feed",
+        "tistory": "Tistory public RSS feed",
+        "naver": "Naver public RSS feed",
+    }
+    if platform in metadata_sources:
+        row["content_metadata_source"] = metadata_sources[platform]
     p = prev_hist.get(row["site"], {})
     if row["content"] is not None and p.get("content") is not None:
         row["content_delta"] = row["content"] - p["content"]
