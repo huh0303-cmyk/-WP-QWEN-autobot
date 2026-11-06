@@ -1,0 +1,23 @@
+name: Publish Korea365 Meta privacy and deletion pages
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  publish-policy-pages:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests
+      - name: Publish and verify Korea365 privacy pages
+        env:
+          WP_USER: huh0303@gmail.com
+          KOREA365ORG: ${{ secrets.KOREA365ORG }}
+        run: python scripts/publish_korea365_meta_policy_pages.py
