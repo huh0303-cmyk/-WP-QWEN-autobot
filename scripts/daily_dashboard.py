@@ -102,10 +102,21 @@ def content_metadata(url, platform):
                 entries = feed.get("entry", [])
                 latest = None
                 if entries:
-                    for item in entries[0].get("published", []):
-                        latest = item.get("$t", "")[:10]
+                    # Blogger Atom JSON represents published as an object:
+                    # {"$t": "2026-11-06T..."}. Older/custom feeds may expose
+                    # a list, so accept both shapes without discarding the count.
+                    published = entries[0].get("published")
+                    if isinstance(published, dict):
+                        latest = str(published.get("$t") or "")[:10] or None
+                    elif isinstance(published, list):
+                        for item in published:
+                            if isinstance(item, dict):
+                                candidate = str(item.get("$t") or "")[:10]
+                                if candidate:
+                                    latest = candidate
+                                    break
                 return {"content_count": int(total) if total is not None else None,
-                        "latest_publish_date": latest or None}
+                        "latest_publish_date": latest}
         return {"content_count": None, "latest_publish_date": None}
     except Exception:
         return {"content_count": None, "latest_publish_date": None}
