@@ -1,6 +1,11 @@
 name: 27개 사이트 방문자/색인 현황 · 매일 07:07 KST
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/daily_site_traffic.py"
+      - ".github/workflows/daily-site-traffic.yml"
   schedule:
     - cron: '7 22 * * *'  # 07:07 KST
   workflow_dispatch: {}
