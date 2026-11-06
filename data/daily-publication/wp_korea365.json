@@ -1,1 +1,1 @@
-{"day": "2026-11-04", "status": "DISPATCHED", "attempts": 1, "claim": "daily-2026-11-04-wp_korea365-b1d46a2b", "claimed_at": "2026-11-04T18:49:18.245244+09:00", "run_id": 41810176334, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-11-06", "status": "PUBLISHED", "public_url": "https://korea365.org/administrative-alignment-and-public-service-engagement-for-residents-with-international-ties/", "published_at": "2026-11-05T19:16:20Z"}
