@@ -1,13 +1,63 @@
 {
   "version": 1,
-  "effective_date": "2026-09-25",
+  "effective_date": "2026-11-06",
   "timezone": "Asia/Seoul",
   "cadence": "1_public_post_per_account_per_day_after_publish_auth_verified",
   "schedule": {
     "window_start": "08:10",
     "window_end": "22:50",
     "randomize_daily": true,
-    "minimum_gap_minutes": 15
+    "minimum_gap_minutes": 15,
+    "account_overrides": [
+      {
+        "platform": "Instagram",
+        "handle": "seoul_jisoo",
+        "posts_per_day": 3,
+        "window_start": "08:00",
+        "window_end": "23:00",
+        "timezone": "Asia/Seoul",
+        "randomize_daily": true,
+        "minimum_gap_minutes": 120,
+        "distinct_topics_per_day": true,
+        "editorial_first": true
+      },
+      {
+        "platform": "Instagram",
+        "handle": "seoul_chris",
+        "posts_per_day": 3,
+        "window_start": "08:00",
+        "window_end": "23:00",
+        "timezone": "Asia/Seoul",
+        "randomize_daily": true,
+        "minimum_gap_minutes": 120,
+        "distinct_topics_per_day": true,
+        "editorial_first": true
+      },
+      {
+        "platform": "Threads",
+        "handle": "seoul_jisoo",
+        "posts_per_day": 3,
+        "window_start": "08:00",
+        "window_end": "23:00",
+        "timezone": "Asia/Seoul",
+        "randomize_daily": true,
+        "minimum_gap_minutes": 120,
+        "distinct_topics_per_day": true,
+        "editorial_first": true
+      },
+      {
+        "platform": "Threads",
+        "handle": "seoul_chris",
+        "posts_per_day": 3,
+        "window_start": "08:00",
+        "window_end": "23:00",
+        "timezone": "Asia/Seoul",
+        "randomize_daily": true,
+        "minimum_gap_minutes": 120,
+        "distinct_topics_per_day": true,
+        "editorial_first": true
+      }
+    ]
   },
   "platforms": [
     "TikTok",
@@ -40,9 +90,9 @@
     {
       "order": 4,
       "key": "health_shop",
-      "name": "헬스 쇼핑",
+      "name": "서울지수 · 건강·핫이슈",
       "shopping": true,
-      "topic": "건강기능식품과 건강용품의 근거 중심 정보, 과장 효능 금지"
+      "topic": "건강과 생활 이슈를 중심으로 정치·사회·경제·스포츠·연예·소비자 이슈까지 폭넓고 재미있게 다룬다. 건강기능식품은 해당 콘텐츠와 직접 관련될 때만 근거·한계·주의사항을 설명한 뒤 마지막에 자연스럽게 연결한다."
     },
     {
       "order": 5,
@@ -54,33 +104,12 @@
     {
       "order": 6,
       "key": "hot_item_shop",
-      "name": "생활 핫아이템 쇼핑",
+      "name": "서울크리스 · K-뷰티·핫이슈",
       "shopping": true,
-      "topic": "생활용품, 여행용품, 화제 상품의 실용 정보"
+      "topic": "K-뷰티·피부관리·화장품 트렌드를 중심으로 연예·문화·사회·스포츠 등 대중 핫이슈도 폭넓게 다룬다. 화장품은 해당 콘텐츠와 직접 관련될 때만 성분·용도·주의사항을 확인한 뒤 마지막에 자연스럽게 연결한다."
     }
   ],
   "accounts": [
-    {
-      "platform": "TikTok",
-      "role": "korean_topik",
-      "display_name": "SIS Korean · TOPIK",
-      "handle": "sis_topik",
-      "url": "https://www.tiktok.com/@sis_topik",
-      "account_exists": true,
-      "identity_verified": true,
-      "publish_connected": false,
-      "current_public_name": "서울국제대학SIS"
-    },
-    {
-      "platform": "TikTok",
-      "role": "japanese",
-      "display_name": "SIS Japanese · Survival",
-      "handle": "",
-      "url": "",
-      "account_exists": false,
-      "identity_verified": false,
-      "publish_connected": false
-    },
     {
       "platform": "TikTok",
       "role": "english",
@@ -104,6 +133,38 @@
     },
     {
       "platform": "TikTok",
+      "role": "hot_item_shop",
+      "display_name": "Seoul Jisoo",
+      "handle": "",
+      "url": "",
+      "account_exists": false,
+      "identity_verified": false,
+      "publish_connected": false,
+      "note": "2026-10-01 direct TikTok check: legacy @sis_languageccenter exists as SIS-LANGUAGEcenter with language videos, not Jisoo shopping. Shopping account handle/ownership unverified."
+    },
+    {
+      "platform": "TikTok",
+      "role": "japanese",
+      "display_name": "SIS Japanese · Survival",
+      "handle": "",
+      "url": "",
+      "account_exists": false,
+      "identity_verified": false,
+      "publish_connected": false
+    },
+    {
+      "platform": "TikTok",
+      "role": "korean_topik",
+      "display_name": "SIS Korean · TOPIK",
+      "handle": "sis_topik",
+      "url": "https://www.tiktok.com/@sis_topik",
+      "account_exists": true,
+      "identity_verified": true,
+      "publish_connected": false,
+      "current_public_name": "서울국제대학SIS"
+    },
+    {
+      "platform": "TikTok",
       "role": "travel_shop",
       "display_name": "Seoul Travel365 Shop",
       "handle": "",
@@ -113,15 +174,79 @@
       "publish_connected": false
     },
     {
-      "platform": "TikTok",
-      "role": "hot_item_shop",
-      "display_name": "Seoul Jisoo",
-      "handle": "",
-      "url": "",
-      "account_exists": false,
+      "platform": "Instagram",
+      "role": "english",
+      "display_name": "English Survival",
+      "handle": "englishsurvival1",
+      "url": "https://www.instagram.com/englishsurvival1/",
+      "account_exists": true,
+      "identity_verified": true,
+      "publish_connected": false
+    },
+    {
+      "platform": "Instagram",
+      "role": "english",
+      "display_name": "English Pick",
+      "handle": "english_pick",
+      "url": "https://www.instagram.com/english_pick/",
+      "account_exists": true,
       "identity_verified": false,
       "publish_connected": false,
-      "note": "2026-10-01 direct TikTok check: legacy @sis_languageccenter exists as SIS-LANGUAGEcenter with language videos, not Jisoo shopping. Shopping account handle/ownership unverified."
+      "note": "Owner-designated five-account structure (2026-11-06). Public identity must be rechecked; API write authorization and publication receipt are not yet verified."
+    },
+    {
+      "platform": "Instagram",
+      "role": "health_shop",
+      "display_name": "서울 헬스365",
+      "handle": "seoul_health365",
+      "url": "https://www.instagram.com/seoul_health365/",
+      "account_exists": true,
+      "identity_verified": true,
+      "publish_connected": false
+    },
+    {
+      "platform": "Instagram",
+      "role": "health_shop",
+      "display_name": "Seoul Jisoo",
+      "handle": "seoul_jisoo",
+      "url": "https://www.instagram.com/seoul_jisoo/",
+      "account_exists": true,
+      "identity_verified": false,
+      "publish_connected": false,
+      "note": "Owner-designated five-account structure (2026-11-06). Public identity must be rechecked; API write authorization and publication receipt are not yet verified."
+    },
+    {
+      "platform": "Instagram",
+      "role": "hot_item_shop",
+      "display_name": "Seoul Chris",
+      "handle": "seoul_chris",
+      "url": "https://www.instagram.com/seoul_chris/",
+      "account_exists": true,
+      "identity_verified": false,
+      "publish_connected": false,
+      "note": "Owner-designated five-account structure (2026-11-06). Public identity must be rechecked; API write authorization and publication receipt are not yet verified."
+    },
+    {
+      "platform": "Instagram",
+      "role": "japanese",
+      "display_name": "Japanese Survival",
+      "handle": "japanese_survival1",
+      "url": "https://www.instagram.com/japanese_survival1/",
+      "account_exists": true,
+      "identity_verified": true,
+      "publish_connected": false,
+      "note": "2026-10-01 Meta 계정 센터에서 Japanese Survival 표시 이름과 japanese_survival1 핸들 확인. japanese_survival 정확 핸들은 사용 불가. 게시 로그인 필요."
+    },
+    {
+      "platform": "Instagram",
+      "role": "japanese",
+      "display_name": "Japanese Pick",
+      "handle": "japanese_pick",
+      "url": "https://www.instagram.com/japanese_pick/",
+      "account_exists": true,
+      "identity_verified": false,
+      "publish_connected": false,
+      "note": "Owner-designated five-account structure (2026-11-06). Public identity must be rechecked; API write authorization and publication receipt are not yet verified."
     },
     {
       "platform": "Instagram",
@@ -137,34 +262,14 @@
     },
     {
       "platform": "Instagram",
-      "role": "japanese",
-      "display_name": "Japanese Survival",
-      "handle": "japanese_survival1",
-      "url": "https://www.instagram.com/japanese_survival1/",
+      "role": "korean_topik",
+      "display_name": "Seoul TOPIK",
+      "handle": "seoul_topik",
+      "url": "https://www.instagram.com/seoul_topik/",
       "account_exists": true,
-      "identity_verified": true,
+      "identity_verified": false,
       "publish_connected": false,
-      "note": "2026-10-01 Meta 계정 센터에서 Japanese Survival 표시 이름과 japanese_survival1 핸들 확인. japanese_survival 정확 핸들은 사용 불가. 게시 로그인 필요."
-    },
-    {
-      "platform": "Instagram",
-      "role": "english",
-      "display_name": "English Survival",
-      "handle": "englishsurvival1",
-      "url": "https://www.instagram.com/englishsurvival1/",
-      "account_exists": true,
-      "identity_verified": true,
-      "publish_connected": false
-    },
-    {
-      "platform": "Instagram",
-      "role": "health_shop",
-      "display_name": "서울 헬스365",
-      "handle": "seoul_health365",
-      "url": "https://www.instagram.com/seoul_health365/",
-      "account_exists": true,
-      "identity_verified": true,
-      "publish_connected": false
+      "note": "Owner-designated five-account structure (2026-11-06). Public identity must be rechecked; API write authorization and publication receipt are not yet verified."
     },
     {
       "platform": "Instagram",
@@ -178,43 +283,121 @@
       "note": "2026-09-25 계정 전환 목록 및 이메일 코드 인증 화면에서 확인"
     },
     {
-      "platform": "Instagram",
-      "role": "hot_item_shop",
+      "platform": "Threads",
+      "role": "english",
+      "display_name": "English Survival",
+      "handle": "english_survival_1",
+      "url": "https://www.threads.com/@english_survival_1",
+      "account_exists": true,
+      "identity_verified": true,
+      "publish_connected": false,
+      "note": "2026-09-29 브라우저 공개 게시 영수증 있음. 현재 CONTROL 자동 게시 권한은 미검증."
+    },
+    {
+      "platform": "Threads",
+      "role": "english",
+      "display_name": "English Pick",
+      "handle": "english_pick",
+      "url": "https://www.threads.com/@english_pick",
+      "account_exists": true,
+      "identity_verified": false,
+      "publish_connected": false,
+      "note": "Owner-designated five-account structure (2026-11-06). Public identity must be rechecked; API write authorization and publication receipt are not yet verified."
+    },
+    {
+      "platform": "Threads",
+      "role": "health_shop",
+      "display_name": "서울 헬스365",
+      "handle": "seoul_health365",
+      "url": "https://www.threads.com/@seoul_health365",
+      "account_exists": true,
+      "identity_verified": true,
+      "publish_connected": false
+    },
+    {
+      "platform": "Threads",
+      "role": "health_shop",
       "display_name": "Seoul Jisoo",
       "handle": "seoul_jisoo",
-      "url": "https://www.instagram.com/seoul_jisoo/",
+      "url": "https://www.threads.com/@seoul_jisoo",
       "account_exists": true,
       "identity_verified": true,
       "publish_connected": false,
-      "current_public_name": "Chris Huh",
-      "note": "@seoul_jisoo 핸들 확인. 공개 표시 이름은 아직 Chris Huh이며 Seoul Jisoo 변경은 Meta 재인증 대기."
+      "note": "Owner-designated five-account structure (2026-11-06). Public identity must be rechecked; API write authorization and publication receipt are not yet verified."
     },
     {
-      "platform": "Facebook",
-      "role": "korean_topik",
-      "display_name": "서울국제대학 SIS - TOPIK Center",
+      "platform": "Threads",
+      "role": "hot_item_shop",
+      "display_name": "Seoul Jisoo",
       "handle": "",
-      "url": "https://www.facebook.com/profile.php?id=61588777439380",
-      "account_exists": true,
-      "identity_verified": true,
+      "url": "",
+      "account_exists": false,
+      "identity_verified": false,
       "publish_connected": false,
-      "note": "과거 공식 게시 영수증 있음. 현재 VPS Meta 쓰기 자격 증명은 없어 CONTROL 자동 게시 권한 미확인.",
-      "profile_id": "61588777439380",
-      "page_asset_id": "1128119143729384"
+      "note": "2026-10-01 Meta Accounts Center showed only @english_survival_1 and @seoultopik Threads. Old @seoul_item365 and new @seoul_jisoo direct URLs led to login; shopping identity remains unverified."
     },
     {
-      "platform": "Facebook",
+      "platform": "Threads",
+      "role": "hot_item_shop",
+      "display_name": "Seoul Chris",
+      "handle": "seoul_chris",
+      "url": "https://www.threads.com/@seoul_chris",
+      "account_exists": true,
+      "identity_verified": false,
+      "publish_connected": false,
+      "note": "Owner-designated five-account structure (2026-11-06). Public identity must be rechecked; API write authorization and publication receipt are not yet verified."
+    },
+    {
+      "platform": "Threads",
       "role": "japanese",
       "display_name": "Japanese Survival",
       "handle": "",
-      "url": "https://www.facebook.com/profile.php?id=61593057083167",
+      "url": "",
+      "account_exists": false,
+      "identity_verified": false,
+      "publish_connected": false
+    },
+    {
+      "platform": "Threads",
+      "role": "japanese",
+      "display_name": "Japanese Pick",
+      "handle": "japanese_pick",
+      "url": "https://www.threads.com/@japanese_pick",
+      "account_exists": true,
+      "identity_verified": false,
+      "publish_connected": false,
+      "note": "Owner-designated five-account structure (2026-11-06). Public identity must be rechecked; API write authorization and publication receipt are not yet verified."
+    },
+    {
+      "platform": "Threads",
+      "role": "korean_topik",
+      "display_name": "Seoul TOPIK",
+      "handle": "seoultopik",
+      "url": "https://www.threads.com/@seoultopik",
       "account_exists": true,
       "identity_verified": true,
+      "publish_connected": false
+    },
+    {
+      "platform": "Threads",
+      "role": "korean_topik",
+      "display_name": "Seoul TOPIK",
+      "handle": "seoul_topik",
+      "url": "https://www.threads.com/@seoul_topik",
+      "account_exists": true,
+      "identity_verified": false,
       "publish_connected": false,
-      "note": "2026-10-01 directly opened managed SIS Language Center Facebook page. Japanese editorial role is not independently verified; page includes German and other languages. API write permission unverified.",
-      "profile_id": "61593057083167",
-      "page_asset_id": "1236641259534475",
-      "current_public_name": "서울국제대학교 SIS - Language Center"
+      "note": "Owner-designated five-account structure (2026-11-06). Public identity must be rechecked; API write authorization and publication receipt are not yet verified."
+    },
+    {
+      "platform": "Threads",
+      "role": "travel_shop",
+      "display_name": "서울 라이프365",
+      "handle": "seoul_life365",
+      "url": "https://www.threads.com/@seoul_life365",
+      "account_exists": true,
+      "identity_verified": true,
+      "publish_connected": false
     },
     {
       "platform": "Facebook",
@@ -241,16 +424,6 @@
     },
     {
       "platform": "Facebook",
-      "role": "travel_shop",
-      "display_name": "Seoul Travel365 Shop",
-      "handle": "",
-      "url": "",
-      "account_exists": false,
-      "identity_verified": false,
-      "publish_connected": false
-    },
-    {
-      "platform": "Facebook",
       "role": "hot_item_shop",
       "display_name": "Seoul Jisoo",
       "handle": "",
@@ -261,66 +434,41 @@
       "note": "Owner confirmed fourth active role is Seoul Jisoo shopping. No matching page in Jungyoon Huh or Chris Huh managed-page lists on 2026-10-01; creation/ownership unverified."
     },
     {
-      "platform": "Threads",
-      "role": "korean_topik",
-      "display_name": "Seoul TOPIK",
-      "handle": "seoultopik",
-      "url": "https://www.threads.com/@seoultopik",
-      "account_exists": true,
-      "identity_verified": true,
-      "publish_connected": false
-    },
-    {
-      "platform": "Threads",
+      "platform": "Facebook",
       "role": "japanese",
       "display_name": "Japanese Survival",
       "handle": "",
-      "url": "",
-      "account_exists": false,
-      "identity_verified": false,
-      "publish_connected": false
-    },
-    {
-      "platform": "Threads",
-      "role": "english",
-      "display_name": "English Survival",
-      "handle": "english_survival_1",
-      "url": "https://www.threads.com/@english_survival_1",
+      "url": "https://www.facebook.com/profile.php?id=61593057083167",
       "account_exists": true,
       "identity_verified": true,
       "publish_connected": false,
-      "note": "2026-09-29 브라우저 공개 게시 영수증 있음. 현재 CONTROL 자동 게시 권한은 미검증."
+      "note": "2026-10-01 directly opened managed SIS Language Center Facebook page. Japanese editorial role is not independently verified; page includes German and other languages. API write permission unverified.",
+      "profile_id": "61593057083167",
+      "page_asset_id": "1236641259534475",
+      "current_public_name": "서울국제대학교 SIS - Language Center"
     },
     {
-      "platform": "Threads",
-      "role": "health_shop",
-      "display_name": "서울 헬스365",
-      "handle": "seoul_health365",
-      "url": "https://www.threads.com/@seoul_health365",
+      "platform": "Facebook",
+      "role": "korean_topik",
+      "display_name": "서울국제대학 SIS - TOPIK Center",
+      "handle": "",
+      "url": "https://www.facebook.com/profile.php?id=61588777439380",
       "account_exists": true,
       "identity_verified": true,
-      "publish_connected": false
+      "publish_connected": false,
+      "note": "과거 공식 게시 영수증 있음. 현재 VPS Meta 쓰기 자격 증명은 없어 CONTROL 자동 게시 권한 미확인.",
+      "profile_id": "61588777439380",
+      "page_asset_id": "1128119143729384"
     },
     {
-      "platform": "Threads",
+      "platform": "Facebook",
       "role": "travel_shop",
-      "display_name": "서울 라이프365",
-      "handle": "seoul_life365",
-      "url": "https://www.threads.com/@seoul_life365",
-      "account_exists": true,
-      "identity_verified": true,
-      "publish_connected": false
-    },
-    {
-      "platform": "Threads",
-      "role": "hot_item_shop",
-      "display_name": "Seoul Jisoo",
+      "display_name": "Seoul Travel365 Shop",
       "handle": "",
       "url": "",
       "account_exists": false,
       "identity_verified": false,
-      "publish_connected": false,
-      "note": "2026-10-01 Meta Accounts Center showed only @english_survival_1 and @seoultopik Threads. Old @seoul_item365 and new @seoul_jisoo direct URLs led to login; shopping identity remains unverified."
+      "publish_connected": false
     }
   ],
   "content_rules": {
@@ -332,7 +480,16 @@
     "health_no_diagnosis_or_guaranteed_effect": true,
     "travel_price_and_availability_require_current_source": true,
     "duplicate_guard_by_platform_account_date": true,
-    "public_publish_requires_verified_account_and_publish_auth": true
+    "public_publish_requires_verified_account_and_publish_auth": true,
+    "entertainment_first_not_product_first": true,
+    "daily_trend_research_naver_and_news": true,
+    "politics_fact_opinion_separation": true,
+    "sports_scores_and_fixtures_must_be_currently_verified": true,
+    "affiliate_link_only_when_contextually_relevant": true,
+    "affiliate_disclosure_required": true,
+    "no_forced_product_link": true,
+    "instagram_threads_platform_native_copy": true,
+    "preserve_account_identity_and_write_auth_gates": true
   },
   "browser_session_checkpoint": {
     "as_of": "2026-09-25",
