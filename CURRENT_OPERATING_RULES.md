@@ -48,3 +48,13 @@
 - Detailed editorial guide: `docs/SEOUL_JISOO_CHRIS_EDITORIAL_POLICY_2026-11-06.md`.
 - Public dashboard: `docs/index.html`.
 - Historical documents may be retained for audit and recovery, but any conflicting VPS-era or older cadence instruction is superseded by this file for current operations.
+
+
+## 7. Five-brand Facebook / Instagram / Threads update (2026-11-07)
+- Target brands: `seoul_topik`, `seoul_chris`, `seoul_jisoo`, `english_pick`, `japanese_pick`.
+- The shared content strategy and proposed Facebook Page rename mapping are documented in `config/meta_five_brand_social_strategy.json` and `docs/META_FIVE_BRAND_CONTENT_WORKFLOW_2026-11-07.md`.
+- All five brands may feature K-beauty, skincare, cosmetics, and health functional foods when relevant. Use politics, sports, society, economy, international news, entertainment, and timely topics for reach, with factual verification and clear separation of fact, allegation, and opinion.
+- Keep editorial value primary (80–90%); contextual commerce should not exceed 20%. Never force unrelated products into news posts. Use only verified affiliate links with disclosure.
+- Proposed Facebook Page renames follow the order in the owner's screenshot and are not applied. Confirm the row-by-row mapping before renaming.
+- Instagram currently shows `english_pick1`, while the requested brand is `english_pick`. Do not alter the API identity, user ID, token, or secret key until the owner confirms the actual username change.
+- The existing Meta preflight checks Instagram and Threads credential presence only. Facebook Page IDs, Page tokens, and write scopes must be verified separately. No actual publishing is enabled by this policy update.
