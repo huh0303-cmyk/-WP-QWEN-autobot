@@ -33,5 +33,6 @@ def main():
         print('SELF_TEST=PASS; five exact handles mapped to Instagram and Threads'); return
     print(json.dumps(r,ensure_ascii=False,indent=2))
     print('STATUS=BLOCKED_AUTH; no publishing attempted' if r['ready_connections'] != 10 else 'STATUS=AUTH_READY_CONTENT_QUEUE_AND_PUBLISHER_STILL_REQUIRED')
-if __name__=='__main__': main()
+    return 1 if r['ready_connections'] != 10 else 0
+if __name__=='__main__': raise SystemExit(main())
 

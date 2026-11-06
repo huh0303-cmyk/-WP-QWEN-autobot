@@ -128,7 +128,9 @@ function drawBloggerRanking(){
   return '<tr class="platform-blogspot"><td>'+rank+'위</td><td>'+platformCell('blogspot')+'</td><td style="text-align:left"><a href="'+esc(r.url||'')+'" target="_blank" rel="noopener">'+esc(r.display_name||r.site||r.url)+'</a></td><td>'+total+'</td><td>'+metricNumber(r.content,'글')+'</td><td>'+metricDay(r.latest_publish_date)+'</td><td style="text-align:left">'+esc(v.status||'미수집')+'</td></tr>';
  }).join('');
  var meta=document.getElementById('blogger-pageviews-meta');
- if(meta)meta.textContent='등록 '+rows.length+'개 · 기준 '+String(J.blogger_pageviews&&J.blogger_pageviews.generated_at||J.generated_at||'').slice(0,16).replace('T',' ')+' · 누적 페이지뷰 기준 내림차순';
+ var viewsChecked=String(J.blogger_pageviews&&J.blogger_pageviews.generated_at||J.generated_at||'').slice(0,16).replace('T',' ');
+ var postsChecked=String(J.blogspot_content_metadata_checked_at||'').slice(0,16).replace('T',' ');
+ if(meta)meta.textContent='등록 '+rows.length+'개 · 페이지뷰 기준 '+viewsChecked+' · 게시물 정보 확인 '+(postsChecked||'미확인');
 }
 function updateAllPlatformSummary(){
  var el=document.getElementById('all-platform-summary');if(!el)return;
@@ -151,6 +153,7 @@ function drawBlogTabs(){
 }
 function draw(){
   if(!J)return;
+  updateAllPlatformSummary();
   drawBlogTabs();
   drawBloggerRanking();
   var rows=(J.rows||[]).filter(function(r){return blogPlatformOf(r)===blogPlatform}).slice().sort(function(a,b){
