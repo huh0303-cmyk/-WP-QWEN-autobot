@@ -1,0 +1,85 @@
+{
+  "date_kst": "2026-11-06",
+  "scope": "Instagram daily automation: four brands only",
+  "excluded": [
+    "Seoul TOPIK",
+    "sis_topik1",
+    "TOPIK video/content workflows"
+  ],
+  "brands": [
+    {
+      "key": "ENGLISH_PICK",
+      "name": "English Pick",
+      "handle": "english_pick1",
+      "profile_url": "https://www.instagram.com/english_pick1/",
+      "identity_status": "owner_confirmed_in_chat",
+      "content": "Beginner English conversation; daily progressive lesson; exactly 3 useful expressions; native audio; each expression repeated 5 times; fun, practical examples.",
+      "affiliate": {
+        "enabled": true,
+        "placement": "relevant Korean daily-life/product recommendations via profile link hub and Stories link sticker; caption disclosure",
+        "selection": "only verified product-specific Coupang Partners tracking URLs from account-approved catalog",
+        "block_if_missing": true
+      }
+    },
+    {
+      "key": "JAPANESE_SPEAK",
+      "name": "Japanese Speak",
+      "handle": "japanese_survival1",
+      "profile_url": "https://www.instagram.com/japanese_survival1/",
+      "identity_status": "repository_inventory_confirmed_pending_live_reauth",
+      "content": "Beginner Japanese conversation; daily progressive lesson; exactly 3 useful expressions; native audio; each expression repeated 5 times; fun, practical examples.",
+      "affiliate": {
+        "enabled": true,
+        "placement": "relevant Korean daily-life/product recommendations via profile link hub and Stories link sticker; caption disclosure",
+        "selection": "only verified product-specific Coupang Partners tracking URLs from account-approved catalog",
+        "block_if_missing": true
+      }
+    },
+    {
+      "key": "SEOUL_JISOO",
+      "name": "Seoul Jisoo",
+      "handle": "seoul_jisoo",
+      "profile_url": "https://www.instagram.com/seoul_jisoo/",
+      "identity_status": "repository_inventory_confirmed_pending_live_reauth",
+      "content": "Korean shopping, beauty, fashion, lifestyle, useful products and timely consumer trends.",
+      "affiliate": {
+        "enabled": true,
+        "placement": "product-focused Reels/carousels; profile link hub and Stories link sticker; caption disclosure",
+        "selection": "only verified product-specific Coupang Partners tracking URLs from account-approved catalog",
+        "block_if_missing": true
+      }
+    },
+    {
+      "key": "SEOUL_CHRIS",
+      "name": "Seoul Chris",
+      "handle": "seoul_chris1",
+      "profile_url": "https://www.instagram.com/seoul_chris1/",
+      "identity_status": "owner_confirmed_in_chat",
+      "content": "Korean current affairs, sports, entertainment and social topics; concise explainers and discussion prompts.",
+      "affiliate": {
+        "enabled": true,
+        "placement": "only when a product is genuinely relevant; profile link hub and Stories link sticker; caption disclosure",
+        "selection": "only verified product-specific Coupang Partners tracking URLs from account-approved catalog",
+        "block_if_missing": true
+      }
+    }
+  ],
+  "global_rules": {
+    "daily_schedule_timezone": "Asia/Seoul",
+    "affiliate_priority": "highest",
+    "never_invent_or_rewrite_tracking_urls": true,
+    "never_replace_missing_tracking_url_with_generic_coupang_url": true,
+    "require_product_id_title_affiliate_url_and_verified_status": true,
+    "require_coupang_disclosure": "이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.",
+    "instagram_clickable_link_rule": "Do not rely on URLs in captions being clickable. Use profile link hub and Stories link sticker; keep the exact original tracking URL.",
+    "publish_gate": "Do not publish if account-specific Meta credentials, media URL, or eligible verified affiliate links are missing. Record as blocked, not successful.",
+    "credentials": "Separate account-specific Meta user IDs and access tokens in GitHub Actions secrets; never reuse another brand's token.",
+    "audio_source_priority": [
+      "synced repository audio assets",
+      "verified public HTTPS audio assets",
+      "approved free TTS provider"
+    ],
+    "language_audio_repeat_count": 5,
+    "seoul_topik_untouched": true
+  }
+}
