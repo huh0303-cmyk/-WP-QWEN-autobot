@@ -33,7 +33,8 @@ jobs:
             python scripts/seoul_journal_slot_gate.py
           else
             case "$SELECTED_SLOT" in
-              morning|evening) CATEGORY=politics ;;
+              morning) CATEGORY=politics ;;
+              evening) CATEGORY=hot_issue ;;
               midday) CATEGORY=sports ;;
               *) exit 1 ;;
             esac
