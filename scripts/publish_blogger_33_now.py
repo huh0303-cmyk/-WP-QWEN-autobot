@@ -19,6 +19,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 from blogger_free_text import blogger_generate_with_fallback  # noqa: E402
 from automation_hub.blogger_search_description import build_search_description, validate_search_description
 from automation_hub.editorial_language_policy import body_cliches, language_mismatch_fields, title_cliches
+from automation_hub.kinvest_title_guard import kinvest_title_issues
 from review_sheet import append_review_rows
 from repair_blogger_images import stabilize_html_images
 from blogger_free_image import pick_image, insert_image
@@ -79,6 +80,7 @@ Language: {site['language']}. Return JSON only with title, content_html, labels,
 {rules_for(site['language'], site['theme'])}
 Cautious source-aware wording and no invented facts.
 Never start titles with generic gerunds such as Understanding, Navigating, Managing, Preparing, Exploring, Discovering, Learning, Choosing, Building, Improving, Protecting, Avoiding, Comparing, Using, Making, Handling, Planning, Creating, Developing, Evaluating, Addressing, Maintaining, Reducing, Preventing, Traveling, Living, Working, Investing, Saving, Applying, or Starting. Lead with the concrete subject, finding, decision, or reader outcome. Vary headline structures across articles.
+{'For Korea Invest 365 only: never begin the title with “South Korean” or “Korean”. Put the actual market instrument, company, event, data point, or investor decision first. Mention Korea later only when genuinely needed to distinguish the subject. Use varied, specific headline structures.' if site['key'] == 'kinvest365' else ''}
 Recent titles from this blog that must not be reused or lightly reworded:
 {chr(10).join("- " + x for x in (recent_titles or [])[:40]) or "- none available"}
 Write in a natural editorial voice with varied sentence structure. Never mention AI, language models,
@@ -101,6 +103,10 @@ Provide 1-3 short, highly relevant labels only.{hint}"""
         import re
         data = json.loads(re.sub(r'\\(?!["\\/bfnrtu])', r'\\\\', raw))
     title, body = str(data["title"]).strip(), str(data["content_html"]).strip()
+    if site["key"] == "kinvest365":
+        prefix_issues = kinvest_title_issues(title)
+        if prefix_issues:
+            raise RuntimeError("title quality gate: " + "; ".join(prefix_issues) + "; regenerate with the concrete subject first")
     labels = [str(x).strip()[:80] for x in data["labels"] if str(x).strip()][:3]
     if str(site["language"]).lower().startswith("en"):
         title, body = strip_hangul_parentheticals(title), strip_hangul_parentheticals(body)
