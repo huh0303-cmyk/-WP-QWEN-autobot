@@ -1,0 +1,84 @@
+name: Seoul Journal randomized daily three Shorts
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+    inputs:
+      slot:
+        type: choice
+        options: [morning, midday, evening]
+        default: morning
+      upload:
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: seoul-journal-random-shorts
+  cancel-in-progress: false
+jobs:
+  pick:
+    runs-on: ubuntu-latest
+    outputs:
+      slot: ${{ steps.slot.outputs.slot }}
+      category: ${{ steps.slot.outputs.category }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: slot
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          SELECTED_SLOT: ${{ inputs.slot }}
+        run: |
+          if [ "$EVENT_NAME" = "schedule" ]; then
+            python scripts/seoul_journal_slot_gate.py
+          else
+            case "$SELECTED_SLOT" in
+              morning|evening) CATEGORY=politics ;;
+              midday) CATEGORY=sports ;;
+              *) exit 1 ;;
+            esac
+            echo "slot=$SELECTED_SLOT" >> "$GITHUB_OUTPUT"
+            echo "category=$CATEGORY" >> "$GITHUB_OUTPUT"
+          fi
+  publish:
+    needs: pick
+    if: ${{ needs.pick.outputs.slot != 'none' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: youtube-channels
+    env:
+      YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
+      YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+      SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN }}
+      SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID }}
+      SEOUL_JOURNAL_SHORTS_LIVE: ${{ vars.SEOUL_JOURNAL_SHORTS_LIVE }}
+      SLOT: ${{ needs.pick.outputs.slot }}
+      CATEGORY: ${{ needs.pick.outputs.category }}
+      EVENT_NAME: ${{ github.event_name }}
+      INPUT_UPLOAD: ${{ inputs.upload }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install free video runtime
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-nanum
+          python -m pip install --disable-pip-version-check pillow edge-tts google-api-python-client google-auth
+      - name: Generate and conditionally upload news Short
+        run: |
+          set -euo pipefail
+          args=(--slot "$SLOT" --category "$CATEGORY")
+          if [ "${SEOUL_JOURNAL_SHORTS_LIVE,,}" = "true" ] && { [ "$EVENT_NAME" = "schedule" ] || [ "$INPUT_UPLOAD" = "true" ]; }; then
+            args+=(--upload)
+          fi
+          python scripts/seoul_journal_news_shorts.py "${args[@]}"
+      - name: Keep production receipt and preview
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: seoul-journal-random-${{ github.run_id }}
+          path: artifacts/seoul-journal-news-shorts/
+          retention-days: 7
+          if-no-files-found: warn
