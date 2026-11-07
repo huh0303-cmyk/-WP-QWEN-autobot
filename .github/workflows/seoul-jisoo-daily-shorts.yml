@@ -1,0 +1,89 @@
+name: Seoul Jisoo daily politics sports Shorts
+on:
+  schedule:
+    - cron: "17 1 * * *"
+    - cron: "47 9 * * *"
+  workflow_dispatch:
+    inputs:
+      category:
+        required: true
+        type: choice
+        options: [politics, sports]
+        default: sports
+      upload:
+        description: Publish when Seoul Jisoo live gate is enabled
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: seoul-jisoo-news-shorts
+  cancel-in-progress: false
+jobs:
+  make-short:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: youtube-channels
+    env:
+      YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
+      YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_SHOPPING_SEOUL_JISOO1: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_SHOPPING_SEOUL_JISOO1 }}
+      SEOUL_JISOO_SHORTS_LIVE: ${{ vars.SEOUL_JISOO_SHORTS_LIVE }}
+      SEOUL_JISOO_COUPANG_HEALTH_URL: ${{ secrets.SEOUL_JISOO_COUPANG_HEALTH_URL }}
+      SEOUL_JISOO_COUPANG_BEAUTY_URL: ${{ secrets.SEOUL_JISOO_COUPANG_BEAUTY_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install free video dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-nanum
+          python -m pip install --disable-pip-version-check pillow edge-tts google-api-python-client google-auth
+      - name: Resolve category and publishing mode
+        id: mode
+        env:
+          EVENT: ${{ github.event_name }}
+          SCHEDULE: ${{ github.event.schedule }}
+          INPUT_CATEGORY: ${{ inputs.category }}
+          INPUT_UPLOAD: ${{ inputs.upload }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT" = "schedule" ]; then
+            case "$SCHEDULE" in
+              '17 1 * * *') CATEGORY=politics ;;
+              '47 9 * * *') CATEGORY=sports ;;
+              *) echo "::error::Unrecognized schedule"; exit 1 ;;
+            esac
+            REQUEST_UPLOAD=true
+          else
+            CATEGORY="$INPUT_CATEGORY"
+            REQUEST_UPLOAD="$INPUT_UPLOAD"
+          fi
+          echo "category=$CATEGORY" >> "$GITHUB_OUTPUT"
+          if [ "${SEOUL_JISOO_SHORTS_LIVE,,}" = "true" ] && [ "$REQUEST_UPLOAD" = "true" ]; then
+            echo "upload=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "upload=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Create sourced original short and optionally upload
+        env:
+          CATEGORY: ${{ steps.mode.outputs.category }}
+          UPLOAD: ${{ steps.mode.outputs.upload }}
+        run: |
+          set -euo pipefail
+          args=(--category "$CATEGORY")
+          if [ "$UPLOAD" = "true" ]; then args+=(--upload); fi
+          python scripts/seoul_jisoo_news_shorts.py "${args[@]}"
+      - name: Preserve manifest and sample
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: seoul-jisoo-short-${{ github.run_id }}
+          path: |
+            artifacts/seoul-jisoo-shorts/**/manifest.json
+            artifacts/seoul-jisoo-shorts/**/cover.jpg
+            artifacts/seoul-jisoo-shorts/**/short.mp4
+          retention-days: 7
+          if-no-files-found: warn
