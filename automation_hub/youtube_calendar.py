@@ -131,6 +131,29 @@ def read_calendar(service, spreadsheet_id):
         chunk = service.spreadsheets().values().get(spreadsheetId=spreadsheet_id,
                   range=f"'{TAB}'!A{start}:O{end}").execute().get("values", [])
         values.extend(chunk + [[]] * (end - start + 1 - len(chunk)))
+    # Keep physical Sheet row indices intact. Only quarantine exact duplicate
+    # *unclaimed* YouTube plans in the in-memory view. Conflicting/claimed
+    # duplicate IDs still fail closed via parse_calendar.
+    seen = {}
+    for idx, raw in enumerate(values[1:], 2):
+        if len(raw) < 4 or not str(raw[2]).startswith("YouTube") or not str(raw[0]).strip():
+            continue
+        sid = str(raw[0]).strip()
+        padded = [str(x or "") for x in raw] + [""] * max(0, 15 - len(raw))
+        if sid in seen:
+            first_idx, first = seen[sid]
+            critical = (1, 2, 3, 7, 12, 13)
+            truly_identical = all(padded[c] == first[c] for c in critical)
+            unclaimed = (padded[12] == READY and first[12] == READY
+                         and not padded[13] and not first[13]
+                         and "[yt-calendar:" not in padded[14]
+                         and "[yt-calendar:" not in first[14])
+            if truly_identical and unclaimed:
+                print(f"CALENDAR_DUPLICATE_UNCLAIMED_QUARANTINED id={sid} row={idx} first_row={first_idx}")
+                values[idx - 1] = []  # preserve exact physical row positions
+                continue
+            raise ValueError(f"Conflicting/claimed duplicate calendar identity at row {idx} and {first_idx}")
+        seen[sid] = (idx, padded)
     return parse_calendar(values)
 
 
