@@ -60,7 +60,7 @@
       "K-beauty"
     ],
     "tracking": "REQUIRE_USER_APPROVED_PRODUCT_SPECIFIC_TRACKING_URL",
-    "status": "Awaiting actual confirmed Coupang health+beauty tracking URLs in the dedicated Seoul_Jisoo Secrets; no fabricated URLs",
+    "status": "Health product portal-generated URL reused from the existing owner-authored KHealth pilot, stored in youtube-channels Secret; K-beauty URL not found and not fabricated",
     "link_rules": [
       "Only exact approved Coupang Partners tracking URLs with user's code",
       "Never use generic storefront as affiliate link or manufacture tracking code",
@@ -70,10 +70,12 @@
       "Context-match each product and independently verify availability"
     ],
     "missing": [
-      "verified Coupang tracking URL catalog for Seoul_Jisoo1",
-      "publishing implementation for politics/sports Shorts",
-      "end-to-end public video receipt"
-    ]
+      "verified product-specific Coupang K-beauty tracking URL for Seoul_Jisoo1"
+    ],
+    "health_secret": "SEOUL_JISOO_COUPANG_HEALTH_URL",
+    "beauty_secret": "SEOUL_JISOO_COUPANG_BEAUTY_URL",
+    "product_example_health": "고려은단 멀티비타민 올인원",
+    "source_record": "docs/khealth365-affiliate-pilot-README.md"
   },
   "scope": "Additional Seoul_Jisoo1 shopping/news channel, do not silently expand or modify the user's 10+5+5 YouTube core classification"
 }
