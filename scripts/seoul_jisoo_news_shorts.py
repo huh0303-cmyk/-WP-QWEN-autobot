@@ -28,7 +28,7 @@ TRUSTED_SOURCES = {
     "뉴스1","뉴시스","BBC News 코리아","Reuters","AP News","스포츠조선",
     "스포츠서울","스포티비뉴스","OSEN","연합뉴스TV","YTN",
 }
-AD_DISCLOSURE = "이 설명에 제휴 링크가 포함된 경우 구매 시 수수료를 받을 수 있습니다."
+AD_DISCLOSURE = "이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다."
 FONT_PATHS = [
     "/usr/share/fonts/truetype/nanum/NanumGothicBold.ttf",
     "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
@@ -174,7 +174,7 @@ def upload(video, news, category, svc):
             "\n원문: "+news["link"]+"\n\n출처를 밝힌 뉴스 제목 요약이며 독자적인 사실 확인이나 지지를 의미하지 않습니다.")
     links = affiliate_urls()
     if links:
-        desc += "\n\n[광고·제휴 안내]\n"+AD_DISCLOSURE
+        desc += "\n\n[뉴스와 별개인 쇼핑 추천 · 광고·제휴 안내]\n"+AD_DISCLOSURE
         desc += "".join("\n"+label+": "+url for label,url in links)
     body = {"snippet":{"title":title,"description":desc,"categoryId":"25" if category=="politics" else "17",
                        "defaultLanguage":"ko","tags":["SeoulJisoo",category,"Shorts"]},
