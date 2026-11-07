@@ -727,3 +727,15 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 
 - Threads seoultopik saved-password login attempt returned password error. Browser left on exact login page for owner credential entry; invitation remains pending. No token or public post created.
 
+
+
+## meta-token-registration-20261107
+
+- task_id: `meta-token-registration-20261107`; target GitHub environment: `META-SOCIAL`.
+- Owner directed that `seoul_chris1` be deferred while all other accounts proceed. No Chris token or profile mutation was attempted after that directive.
+- Instagram verified connections: `seoul_topik`, `seoul_jisoo`, `english_pick1`, `japanese_pick`. Fresh long-lived Instagram Login tokens were generated for `seoul_topik` and `seoul_jisoo`, exact `/me` usernames were verified, and account-specific token/user-ID pairs were stored as GitHub environment secrets. Existing `english_pick1` and `japanese_pick` tokens remained valid and exact-identity verified.
+- Threads verified connections: `seoultopik` (actual Threads handle has no underscore), `seoul_jisoo`, and `english_pick1`. Tester acceptance, token generation, exact `/me` identity verification, and account-specific GitHub environment secret storage were completed.
+- Read-only GitHub Actions verification run `42366598475` resolved seven exact identities. It failed by design because three token connections remain absent: Instagram `seoul_chris1`, Threads `seoul_chris1`, and Threads `japanese_pick`.
+- `https://www.threads.com/@japanese_pick` returned a not-found page. The web signup/SSO path repeatedly returned to the existing `seoultopik` Threads profile even when `japanese_pick` was the active Instagram profile. A real `japanese_pick` Threads profile must first be created from the mobile Threads profile-add flow; tester invitation and API token generation can follow only after that profile exists.
+- No public Instagram or Threads post was made. Write scope/publication receipts remain unverified. Daily public publishing must remain blocked until the required target profile/token set and a canary public URL are verified.
+- Temporary local OAuth exchange scripts, encrypted payloads, and the temporary RSA private key were deleted after GitHub Secret storage.
