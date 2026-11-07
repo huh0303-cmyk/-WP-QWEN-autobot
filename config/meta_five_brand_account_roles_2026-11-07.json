@@ -36,7 +36,8 @@
         "하루 3회, 서로 다른 실용 회화 주제",
         "일본어 원문·가나·한국어 뜻·자연스러운 예문 포함",
         "초급자도 바로 따라 말할 수 있는 짧은 구성"
-      ]
+      ],
+      "cadence": "OWNER_CONFIRMED_THREE_DAILY_2026-11-07"
     },
     {
       "key": "english_pick1",
@@ -58,7 +59,8 @@
         "하루 3회, 서로 다른 실용 회화 주제",
         "영어 원문·자연스러운 발음 안내·한국어 뜻·예문 포함",
         "초급자도 바로 따라 말할 수 있는 짧은 구성"
-      ]
+      ],
+      "cadence": "OWNER_CONFIRMED_THREE_DAILY_2026-11-07"
     },
     {
       "key": "seoul_jisoo",
@@ -77,7 +79,7 @@
       "languages": [
         "ko"
       ],
-      "daily_posts_per_platform": null,
+      "daily_posts_per_platform": 3,
       "editorial_rules": [
         "재미있고 재치 있는 한국어",
         "정치·시사 사실은 신뢰할 수 있는 최신 출처 2개 이상 교차 확인",
@@ -85,7 +87,7 @@
         "K-뷰티·상품 가격은 게시 전 확인",
         "계정별 고유 문구와 이미지 사용"
       ],
-      "cadence": "OWNER_CONFIRMATION_REQUIRED"
+      "cadence": "OWNER_CONFIRMED_THREE_DAILY_2026-11-07"
     },
     {
       "key": "seoul_chris",
@@ -105,7 +107,7 @@
       "languages": [
         "ko"
       ],
-      "daily_posts_per_platform": null,
+      "daily_posts_per_platform": 3,
       "editorial_rules": [
         "서울지수 계정과 같은 주제군이더라도 소재·관점·카피를 중복하지 않음",
         "재미있고 재치 있는 한국어",
@@ -113,7 +115,7 @@
         "건강기능식품 효능 과장 및 질병 치료 표현 금지"
       ],
       "rename_gate": "Do not change OAuth keys, user IDs, or secrets from seoul_chris1 to seoul_chris until Instagram and Threads /me endpoints both verify the new exact handle.",
-      "cadence": "OWNER_CONFIRMATION_REQUIRED"
+      "cadence": "OWNER_CONFIRMED_THREE_DAILY_2026-11-07"
     },
     {
       "key": "seoul_topik",
@@ -135,7 +137,7 @@
         "ko",
         "en"
       ],
-      "daily_posts_per_platform": null,
+      "daily_posts_per_platform": 3,
       "youtube_primary_channel": {
         "channel_name": "서울국제대학-TOPIK센터",
         "channel_id": "UCdA24IuR-JE7qButWv5jLqA",
@@ -147,7 +149,7 @@
         "YouTube 메인 영상과 관련 Shorts·퀴즈로 연결",
         "영상 링크는 실제 게시된 공식 URL만 사용"
       ],
-      "cadence": "OWNER_CONFIRMATION_REQUIRED"
+      "cadence": "OWNER_CONFIRMED_THREE_DAILY_2026-11-07"
     }
   ],
   "scheduling": {
@@ -157,7 +159,7 @@
       "english_pick1"
     ],
     "language_accounts_daily_posts_per_platform": 3,
-    "other_accounts_daily_posts_per_platform": "OWNER_CONFIRMATION_REQUIRED",
+    "other_accounts_daily_posts_per_platform": 3,
     "stagger_posts_across_day": true,
     "no_duplicate_topics_within_same_day": true,
     "no_verbatim_cross_platform_copy": true

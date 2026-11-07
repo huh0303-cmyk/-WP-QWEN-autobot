@@ -1,0 +1,130 @@
+{
+  "account_count": 5,
+  "platform_count": 2,
+  "expected_connections": 10,
+  "identity_verified_connections": 3,
+  "ready_connections": 3,
+  "publish_enabled": false,
+  "publication_performed": false,
+  "write_scope_verified": false,
+  "missing_secret_names": [
+    "META_INSTAGRAM_SEOUL_TOPIK_ACCESS_TOKEN",
+    "META_INSTAGRAM_SEOUL_JISOO_ACCESS_TOKEN",
+    "META_INSTAGRAM_SEOUL_CHRIS_ACCESS_TOKEN",
+    "META_THREADS_SEOUL_TOPIK_ACCESS_TOKEN",
+    "META_THREADS_SEOUL_CHRIS_ACCESS_TOKEN",
+    "META_THREADS_ENGLISH_PICK1_ACCESS_TOKEN",
+    "META_THREADS_JAPANESE_PICK_ACCESS_TOKEN"
+  ],
+  "connections": [
+    {
+      "platform": "instagram",
+      "handle": "seoul_topik",
+      "token_env_name": "META_INSTAGRAM_SEOUL_TOPIK_ACCESS_TOKEN",
+      "token_present": false,
+      "configured_user_id_present": false,
+      "publish_enabled": false,
+      "publication_performed": false,
+      "status": "MISSING_ACCESS_TOKEN"
+    },
+    {
+      "platform": "instagram",
+      "handle": "seoul_jisoo",
+      "token_env_name": "META_INSTAGRAM_SEOUL_JISOO_ACCESS_TOKEN",
+      "token_present": false,
+      "configured_user_id_present": false,
+      "publish_enabled": false,
+      "publication_performed": false,
+      "status": "MISSING_ACCESS_TOKEN"
+    },
+    {
+      "platform": "instagram",
+      "handle": "seoul_chris",
+      "token_env_name": "META_INSTAGRAM_SEOUL_CHRIS_ACCESS_TOKEN",
+      "token_present": false,
+      "configured_user_id_present": false,
+      "publish_enabled": false,
+      "publication_performed": false,
+      "status": "MISSING_ACCESS_TOKEN"
+    },
+    {
+      "platform": "instagram",
+      "handle": "english_pick1",
+      "token_env_name": "META_INSTAGRAM_ENGLISH_PICK1_ACCESS_TOKEN",
+      "token_present": true,
+      "configured_user_id_present": true,
+      "publish_enabled": false,
+      "publication_performed": false,
+      "status": "IDENTITY_VERIFIED_WRITE_SCOPE_UNCONFIRMED",
+      "http_status": 200,
+      "resolved_user_id": "17841441355349874",
+      "resolved_username": "english_pick1"
+    },
+    {
+      "platform": "instagram",
+      "handle": "japanese_pick",
+      "token_env_name": "META_INSTAGRAM_JAPANESE_PICK_ACCESS_TOKEN",
+      "token_present": true,
+      "configured_user_id_present": true,
+      "publish_enabled": false,
+      "publication_performed": false,
+      "status": "IDENTITY_VERIFIED_WRITE_SCOPE_UNCONFIRMED",
+      "http_status": 200,
+      "resolved_user_id": "17841411813216531",
+      "resolved_username": "japanese_pick"
+    },
+    {
+      "platform": "threads",
+      "handle": "seoul_topik",
+      "token_env_name": "META_THREADS_SEOUL_TOPIK_ACCESS_TOKEN",
+      "token_present": false,
+      "configured_user_id_present": false,
+      "publish_enabled": false,
+      "publication_performed": false,
+      "status": "MISSING_ACCESS_TOKEN"
+    },
+    {
+      "platform": "threads",
+      "handle": "seoul_jisoo",
+      "token_env_name": "META_THREADS_SEOUL_JISOO_ACCESS_TOKEN",
+      "token_present": true,
+      "configured_user_id_present": false,
+      "publish_enabled": false,
+      "publication_performed": false,
+      "status": "IDENTITY_VERIFIED_WRITE_SCOPE_UNCONFIRMED",
+      "http_status": 200,
+      "resolved_user_id": "29598479706425784",
+      "resolved_username": "seoul_jisoo"
+    },
+    {
+      "platform": "threads",
+      "handle": "seoul_chris",
+      "token_env_name": "META_THREADS_SEOUL_CHRIS_ACCESS_TOKEN",
+      "token_present": false,
+      "configured_user_id_present": false,
+      "publish_enabled": false,
+      "publication_performed": false,
+      "status": "MISSING_ACCESS_TOKEN"
+    },
+    {
+      "platform": "threads",
+      "handle": "english_pick1",
+      "token_env_name": "META_THREADS_ENGLISH_PICK1_ACCESS_TOKEN",
+      "token_present": false,
+      "configured_user_id_present": false,
+      "publish_enabled": false,
+      "publication_performed": false,
+      "status": "MISSING_ACCESS_TOKEN"
+    },
+    {
+      "platform": "threads",
+      "handle": "japanese_pick",
+      "token_env_name": "META_THREADS_JAPANESE_PICK_ACCESS_TOKEN",
+      "token_present": false,
+      "configured_user_id_present": false,
+      "publish_enabled": false,
+      "publication_performed": false,
+      "status": "MISSING_ACCESS_TOKEN"
+    }
+  ]
+}

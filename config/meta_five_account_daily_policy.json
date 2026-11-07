@@ -1,4 +1,4 @@
-﻿{
+{
   "schema_version": 1,
   "effective_at_kst": "2026-11-06",
   "owner_confirmation": "2026-11-06: user confirmed same five handles on Instagram and Threads",
@@ -8,13 +8,14 @@
     "threads"
   ],
   "daily_cadence": {
-    "target_per_account_per_platform": 1,
+    "target_per_account_per_platform": 3,
     "random_window_kst": {
       "start": "08:10",
       "end": "22:50"
     },
     "minimum_gap_minutes": 15,
-    "publish_only_after_account_auth_and_content_review": true
+    "publish_only_after_account_auth_and_content_review": true,
+    "owner_confirmation": "2026-11-07: all ten account-platform connections, three posts daily at randomized KST times"
   },
   "accounts": [
     {
@@ -134,7 +135,8 @@
     "no_publish_without_platform_specific_write_scope": true,
     "no_tokens_in_logs_or_git": true,
     "require_public_post_url_for_success": true,
-    "no_duplicate_account_platform_local_date": true,
-    "no_cross_platform_verbatim_copy": true
+    "no_duplicate_account_platform_local_date": false,
+    "no_cross_platform_verbatim_copy": true,
+    "no_duplicate_account_platform_local_date_slot": true
   }
 }

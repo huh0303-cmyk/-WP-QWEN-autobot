@@ -715,3 +715,7 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - Safety state: publish_enabled=false. No Meta OAuth was completed, no account-specific token/user ID or write scope was verified, no content queue/publisher was wired to this five-account mapping, and no public post was attempted. The scheduled workflow is a readiness check only and will not publish. GitHub scheduled workflows execute from the default branch; the schedule is not live until this branch is reviewed and merged into main.
 - Remaining: owner must approve each account's Meta OAuth consent and platform-specific publish scopes; store resulting account-specific token/user-ID pairs as GitHub Actions environment secrets using names in the policy; then implement/verify the daily content queue and publisher against each account before enabling public posting.
 
+
+## meta-ten-3daily-20261107
+Owner confirmed all ten connections three posts/day. Verified three existing tokens via GitHub run 42342979215; seven missing. Added cadence correction, 30-slot plan workflow, exact-identity secret registration helper and 3 passing schedule tests (4 existing policy tests pass). OAuth seoul_topik popup requires owner login. No public publishing performed. Full checkpoint: docs/META_TEN_EXECUTION_2026-11-07.md.
+
