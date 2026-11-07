@@ -28,7 +28,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: pip install beautifulsoup4 requests -q
+      - run: pip install beautifulsoup4 requests pytest -q
       - name: Compile changed publishing paths
         run: python -m py_compile automation_hub/article_metadata_guard.py automation_hub/original_writer.py automation_hub/repetition_guard.py automation_hub/kinvest_title_guard.py scripts/publish_blogger_33_now.py scripts/auto_write_and_draft.py scripts/london_four_agent_pipeline.py scripts/repair_khealth_tags_keywords.py
       - name: Run editorial guard tests
