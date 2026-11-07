@@ -1,0 +1,173 @@
+{
+  "schema_version": 1,
+  "effective_at_kst": "2026-11-07",
+  "owner_confirmation": "The owner confirmed these five brand handles, content roles, and cadence in chat on 2026-11-07.",
+  "timezone": "Asia/Seoul",
+  "platforms": [
+    "instagram",
+    "threads"
+  ],
+  "publishing_enabled": false,
+  "account_identity_policy": {
+    "exact_handle_required": true,
+    "do_not_substitute_similar_handles": true,
+    "preserve_existing_platform_user_ids_until_live_identity_reverified": true,
+    "facebook_personal_profile_name_is_separate_from_brand_handles": true,
+    "no_facebook_personal_profile_rename_without_explicit_exact_display_name_confirmation": true
+  },
+  "accounts": [
+    {
+      "key": "japanese_pick",
+      "instagram_handle": "japanese_pick",
+      "threads_handle": "japanese_pick",
+      "brand_name_ko": "일본어필수기초회화-하루3번",
+      "topics": [
+        "일본어 필수 기초회화",
+        "초급 일본어",
+        "생활 일본어",
+        "상황별 짧은 회화"
+      ],
+      "languages": [
+        "ja",
+        "ko"
+      ],
+      "daily_posts_per_platform": 3,
+      "editorial_rules": [
+        "하루 3회, 서로 다른 실용 회화 주제",
+        "일본어 원문·가나·한국어 뜻·자연스러운 예문 포함",
+        "초급자도 바로 따라 말할 수 있는 짧은 구성"
+      ]
+    },
+    {
+      "key": "english_pick1",
+      "instagram_handle": "english_pick1",
+      "threads_handle": "english_pick1",
+      "brand_name_ko": "영어필수기초회화-하루3번",
+      "topics": [
+        "영어 필수 기초회화",
+        "초급 영어",
+        "생활 영어",
+        "상황별 짧은 회화"
+      ],
+      "languages": [
+        "en",
+        "ko"
+      ],
+      "daily_posts_per_platform": 3,
+      "editorial_rules": [
+        "하루 3회, 서로 다른 실용 회화 주제",
+        "영어 원문·자연스러운 발음 안내·한국어 뜻·예문 포함",
+        "초급자도 바로 따라 말할 수 있는 짧은 구성"
+      ]
+    },
+    {
+      "key": "seoul_jisoo",
+      "instagram_handle": "seoul_jisoo",
+      "threads_handle": "seoul_jisoo",
+      "brand_name_ko": "서울지수",
+      "topics": [
+        "핫이슈",
+        "정치·사회·경제",
+        "스포츠",
+        "연예·대중문화",
+        "바이럴 이슈",
+        "K-뷰티",
+        "건강기능식품"
+      ],
+      "languages": [
+        "ko"
+      ],
+      "daily_posts_per_platform": 3,
+      "editorial_rules": [
+        "재미있고 재치 있는 한국어",
+        "정치·시사 사실은 신뢰할 수 있는 최신 출처 2개 이상 교차 확인",
+        "건강기능식품 효능 과장 및 질병 치료 표현 금지",
+        "K-뷰티·상품 가격은 게시 전 확인",
+        "계정별 고유 문구와 이미지 사용"
+      ]
+    },
+    {
+      "key": "seoul_chris",
+      "instagram_handle": "seoul_chris",
+      "threads_handle": "seoul_chris",
+      "current_username_needing_live_rename_verification": "seoul_chris1",
+      "brand_name_ko": "서울크리스",
+      "topics": [
+        "핫이슈",
+        "정치·사회·경제",
+        "스포츠",
+        "연예·대중문화",
+        "바이럴 이슈",
+        "K-뷰티",
+        "건강기능식품"
+      ],
+      "languages": [
+        "ko"
+      ],
+      "daily_posts_per_platform": 3,
+      "editorial_rules": [
+        "서울지수 계정과 같은 주제군이더라도 소재·관점·카피를 중복하지 않음",
+        "재미있고 재치 있는 한국어",
+        "시사·건강·상업 정보는 최신 근거 확인",
+        "건강기능식품 효능 과장 및 질병 치료 표현 금지"
+      ],
+      "rename_gate": "Do not change OAuth keys, user IDs, or secrets from seoul_chris1 to seoul_chris until Instagram and Threads /me endpoints both verify the new exact handle."
+    },
+    {
+      "key": "seoul_topik",
+      "instagram_handle": "seoul_topik",
+      "threads_handle": "seoul_topik",
+      "brand_name_ko": "서울토픽",
+      "topics": [
+        "한국어 TOPIK 시험 준비",
+        "TOPIK I",
+        "TOPIK II",
+        "어휘",
+        "문법",
+        "읽기",
+        "듣기",
+        "쓰기",
+        "한국 유학"
+      ],
+      "languages": [
+        "ko",
+        "en"
+      ],
+      "daily_posts_per_platform": 3,
+      "youtube_primary_channel": {
+        "channel_name": "서울국제대학-TOPIK센터",
+        "channel_id": "UCdA24IuR-JE7qButWv5jLqA",
+        "relationship": "Main YouTube destination for TOPIK lessons; verify channel identity before linking"
+      },
+      "editorial_rules": [
+        "TOPIK 급수별 난이도 구분",
+        "정답·해설·예문 검수",
+        "YouTube 메인 영상과 관련 Shorts·퀴즈로 연결",
+        "영상 링크는 실제 게시된 공식 URL만 사용"
+      ]
+    }
+  ],
+  "scheduling": {
+    "default_timezone": "Asia/Seoul",
+    "language_accounts_daily_posts_per_platform": 3,
+    "hot_issue_accounts_daily_posts_per_platform": 3,
+    "minimum_gap_minutes": 120,
+    "stagger_posts_across_day": true,
+    "no_duplicate_topics_within_same_day": true,
+    "no_verbatim_cross_platform_copy": true
+  },
+  "authentication": {
+    "meta_app_id": "1383946033947009",
+    "state": "PENDING_PER_ACCOUNT_TESTER_ACCEPTANCE_OAUTH_AND_WRITE_SCOPE_VERIFICATION",
+    "required_secret_pattern": "META_{PLATFORM}_{ACCOUNT_KEY}_ACCESS_TOKEN",
+    "tokens_must_not_be_committed": true
+  },
+  "safety": {
+    "public_publishing_remains_disabled": true,
+    "require_exact_account_identity_match": true,
+    "require_platform_specific_write_scope": true,
+    "require_owner_authorization_before_publication": true,
+    "no_public_test_posts": true,
+    "youtube_cost_lock_remains_unchanged": true
+  }
+}
