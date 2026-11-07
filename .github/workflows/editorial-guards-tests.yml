@@ -35,3 +35,9 @@ jobs:
         run: python -m unittest discover -s tests -p "test_article_metadata_guard.py" -v
       - name: Run Korea Invest 365 title guard tests
         run: PYTHONPATH=. python -m unittest discover -s tests -p "test_kinvest_title_guard.py" -v
+      - name: Run shared title repetition tests
+        run: PYTHONPATH=. python -m unittest discover -s tests -p "test_title_repeat_guard.py" -v
+      - name: Run repetition guard tests
+        run: PYTHONPATH=. python -m pytest -q tests/test_repetition_guard.py
+      - name: Run editorial gate preflight
+        run: PYTHONPATH=. python scripts/editorial_gate_preflight.py
