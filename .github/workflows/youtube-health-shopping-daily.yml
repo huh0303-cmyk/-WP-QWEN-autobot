@@ -8,7 +8,6 @@ on:
   schedule:
     - cron: "37 3 * * *"   # 12:37 KST  Health Clinic USA (English)
     - cron: "23 5 * * *"   # 14:23 KST  Health_Clinic_Japan (Japanese)
-    - cron: "47 9 * * *"   # 18:47 KST  Seoul_Jisoo1 shopping (English)
   workflow_dispatch:
     inputs:
       channel:
@@ -101,7 +100,6 @@ jobs:
             case "$SCHEDULE" in
               "37 3 * * *") CH=health_usa ;;
               "23 5 * * *") CH=health_japan ;;
-              "47 9 * * *") CH=shopping ;;
               *) echo "unknown schedule $SCHEDULE"; exit 1 ;;
             esac
             echo "args=--channel $CH --upload --privacy private" >> "$GITHUB_OUTPUT"
