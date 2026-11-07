@@ -21,6 +21,7 @@
                      {
                          "key":  "seoul_topik",
                          "handle":  "seoul_topik",
+                         "platform_handles":  {"instagram": "seoul_topik", "threads": "seoultopik"},
                          "topics":  [
                                         "TOPIK education",
                                         "Korean vocabulary",
@@ -57,7 +58,8 @@
                      },
                      {
                          "key":  "seoul_chris",
-                         "handle":  "seoul_chris",
+                         "handle":  "seoul_chris1",
+                         "platform_handles":  {"instagram": "seoul_chris1", "threads": "seoul_chris1"},
                          "topics":  [
                                         "current issues",
                                         "politics",
@@ -108,7 +110,7 @@
                  ],
     "account_mapping":  {
                             "instagram":  "Each accounts[].handle is the exact owner-confirmed Instagram handle",
-                            "threads":  "Each accounts[].handle is the exact owner-confirmed Threads handle",
+                            "threads":  "Use accounts[].platform_handles.threads when present; seoul_topik maps to actual Threads handle seoultopik",
                             "rejected_third_party_handles":  [
                                                                  "english_pick_daily"
                                                              ],

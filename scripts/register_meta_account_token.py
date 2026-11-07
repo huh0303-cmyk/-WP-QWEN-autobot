@@ -3,7 +3,7 @@ import argparse
 import getpass
 import json
 import subprocess
-from meta_account_preflight import load_policy, verify_identity
+from meta_account_preflight import expected_handle, load_policy, verify_identity
 
 def main():
     p = argparse.ArgumentParser()
@@ -16,7 +16,7 @@ def main():
     identity = verify_identity(args.platform, token)
     if identity.get("status") != "IDENTITY_RESPONSE_OK":
         raise SystemExit("BLOCKED: token could not be verified")
-    if identity["resolved_username"].casefold() != account["handle"].casefold():
+    if identity["resolved_username"].casefold() != expected_handle(account, args.platform).casefold():
         raise SystemExit("BLOCKED: token belongs to a different account")
     repo = "huh0303-cmyk/-WP-QWEN-autobot"
     prefix = f"META_{args.platform.upper()}_{args.account.upper()}"

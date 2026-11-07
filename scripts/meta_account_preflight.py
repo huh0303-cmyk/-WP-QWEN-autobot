@@ -25,6 +25,10 @@ def load_policy():
     return data
 
 
+def expected_handle(account, platform):
+    return account.get("platform_handles", {}).get(platform, account["handle"])
+
+
 def verify_identity(platform: str, token: str) -> dict:
     if platform == "instagram":
         endpoint = "https://graph.instagram.com/v25.0/me"
@@ -99,7 +103,7 @@ def readiness(data):
 
             row = {
                 "platform": platform,
-                "handle": account["handle"],
+                "handle": expected_handle(account, platform),
                 "token_env_name": token_name,
                 "token_present": bool(token),
                 "configured_user_id_present": configured_user_id.isdigit(),
@@ -118,7 +122,7 @@ def readiness(data):
             resolved_handle = str(identity.get("resolved_username") or "")
             if identity.get("status") != "IDENTITY_RESPONSE_OK":
                 row["status"] = identity.get("status", "IDENTITY_CHECK_FAILED")
-            elif resolved_handle.casefold() != account["handle"].casefold():
+            elif resolved_handle.casefold() != expected_handle(account, platform).casefold():
                 row["status"] = "HANDLE_MISMATCH"
             elif configured_user_id and configured_user_id != resolved_id:
                 row["status"] = "USER_ID_MISMATCH"
@@ -155,7 +159,7 @@ def main():
         assert [x["handle"] for x in data["accounts"]] == [
             "seoul_topik",
             "seoul_jisoo",
-            "seoul_chris",
+            "seoul_chris1",
             "english_pick1",
             "japanese_pick",
         ]

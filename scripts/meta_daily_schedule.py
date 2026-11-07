@@ -20,7 +20,7 @@ def plan(day):
                 minute = rng.randint(start, end)
                 slots.append({"slot_id": f"{day}:{platform}:{key}:{index}",
                     "date_kst": day, "platform": platform, "account_key": key,
-                    "expected_handle": account["handle"],
+                    "expected_handle": account.get("platform_handles", {}).get(platform, account["handle"]),
                     "slot": index, "time_kst": f"{minute//60:02}:{minute%60:02}",
                     "status": "PLANNED_REQUIRES_VERIFIED_AUTH_AND_CONTENT"})
     return sorted(slots, key=lambda row: (row["time_kst"], row["slot_id"]))
