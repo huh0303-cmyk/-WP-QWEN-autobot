@@ -8,9 +8,9 @@ This document records the owner's latest confirmed five-brand operating specific
 |---|---|---|---|---:|
 | japanese_pick | japanese_pick | japanese_pick | 일본어 필수 기초회화 | 하루 3회 |
 | english_pick1 | english_pick1 | english_pick1 | 영어 필수 기초회화 | 하루 3회 |
-| seoul_jisoo | seoul_jisoo | seoul_jisoo | 핫이슈·K-뷰티·건강기능식품 | 하루 3회 |
-| seoul_chris | seoul_chris (rename verification pending) | seoul_chris (rename verification pending) | 핫이슈·K-뷰티·건강기능식품 | 하루 3회 |
-| seoul_topik | seoul_topik | seoul_topik | TOPIK 시험 준비; connect to the primary TOPIK YouTube channel | 하루 3회 |
+| seoul_jisoo | seoul_jisoo | seoul_jisoo | 핫이슈·K-뷰티·건강기능식품 | 주기 미확정 |
+| seoul_chris | seoul_chris (rename verification pending) | seoul_chris (rename verification pending) | 핫이슈·K-뷰티·건강기능식품 | 주기 미확정 |
+| seoul_topik | seoul_topik | seoul_topik | TOPIK 시험 준비; connect to the primary TOPIK YouTube channel | 주기 미확정 |
 
 ## Important identity distinctions
 
@@ -21,9 +21,9 @@ This document records the owner's latest confirmed five-brand operating specific
 
 ## Content and scheduling
 
-- Language accounts: three distinct beginner-friendly micro-lessons per day, per platform.
-- Seoul Jisoo and Seoul Chris: three distinct daily posts per platform, with hot issues, politics/society/economy, sports, entertainment/viral topics, K-beauty, and health functional foods. Keep the two accounts' angles and copy distinct.
-- Seoul TOPIK: TOPIK I/II preparation, vocabulary, grammar, reading, listening, writing, and study-in-Korea information. Link to the primary TOPIK YouTube channel only through verified public channel/video URLs.
+- Language accounts japanese_pick and english_pick1: three distinct beginner-friendly micro-lessons per day, per platform.
+- Seoul Jisoo and Seoul Chris: cover hot issues, politics/society/economy, sports, entertainment/viral topics, K-beauty, and health functional foods. Keep the two accounts' angles and copy distinct. Posting cadence is not yet specified.
+- Seoul TOPIK: TOPIK I/II preparation, vocabulary, grammar, reading, listening, writing, and study-in-Korea information. Link to the primary TOPIK YouTube channel only through verified public channel/video URLs. Posting cadence is not yet specified.
 - Use Asia/Seoul time. Stagger posts and avoid duplicate topics on the same day.
 - Create native, non-verbatim copy for Instagram and Threads.
 - Fact-check current affairs, sports, health, and commercial claims. Do not overstate supplement benefits.
