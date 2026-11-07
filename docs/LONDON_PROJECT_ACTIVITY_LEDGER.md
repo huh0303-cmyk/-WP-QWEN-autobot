@@ -719,3 +719,9 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 ## meta-ten-3daily-20261107
 Owner confirmed all ten connections three posts/day. Verified three existing tokens via GitHub run 42342979215; seven missing. Added cadence correction, 30-slot plan workflow, exact-identity secret registration helper and 3 passing schedule tests (4 existing policy tests pass). OAuth seoul_topik popup requires owner login. No public publishing performed. Full checkpoint: docs/META_TEN_EXECUTION_2026-11-07.md.
 
+
+## meta-account-correction-20261107
+- User corrected that english_pick_daily is not an owned account. It was removed from the Threads tester dialog before submission; no invitation or token was created for it.
+- Exact Instagram english handle remains english_pick1 and is protected by exact /me matching; no cross-account substitution is allowed.
+- Invited actual Threads account seoultopik as tester. Meta shows it as pending acceptance. Threads was logged out from seoul_jisoo and the seoul_topik Instagram-linked login screen is prepared for owner authentication.
+

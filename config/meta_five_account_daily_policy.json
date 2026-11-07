@@ -1,142 +1,146 @@
-{
-  "schema_version": 1,
-  "effective_at_kst": "2026-11-06",
-  "owner_confirmation": "2026-11-06: user confirmed same five handles on Instagram and Threads",
-  "timezone": "Asia/Seoul",
-  "platforms": [
-    "instagram",
-    "threads"
-  ],
-  "daily_cadence": {
-    "target_per_account_per_platform": 3,
-    "random_window_kst": {
-      "start": "08:10",
-      "end": "22:50"
-    },
-    "minimum_gap_minutes": 15,
-    "publish_only_after_account_auth_and_content_review": true,
-    "owner_confirmation": "2026-11-07: all ten account-platform connections, three posts daily at randomized KST times"
-  },
-  "accounts": [
-    {
-      "key": "seoul_topik",
-      "handle": "seoul_topik",
-      "topics": [
-        "TOPIK education",
-        "Korean vocabulary",
-        "Korean grammar",
-        "study in Korea"
-      ],
-      "content_language": [
-        "ko",
-        "en"
-      ],
-      "editorial_rules": [
-        "Educational accuracy; distinguish TOPIK levels; provide examples"
-      ]
-    },
-    {
-      "key": "seoul_jisoo",
-      "handle": "seoul_jisoo",
-      "topics": [
-        "current issues",
-        "politics",
-        "sports",
-        "health supplements",
-        "skincare products"
-      ],
-      "content_language": [
-        "ko"
-      ],
-      "editorial_rules": [
-        "Political/current-affairs claims require dated reliable sources and neutral framing",
-        "Sports results and schedules require current verification",
-        "Health and skincare claims require reliable evidence; no diagnosis or guaranteed effects",
-        "Commercial claims and prices require current source verification"
-      ]
-    },
-    {
-      "key": "seoul_chris",
-      "handle": "seoul_chris",
-      "topics": [
-        "current issues",
-        "politics",
-        "sports",
-        "health supplements",
-        "skincare products"
-      ],
-      "content_language": [
-        "ko"
-      ],
-      "editorial_rules": [
-        "Political/current-affairs claims require dated reliable sources and neutral framing",
-        "Sports results and schedules require current verification",
-        "Health and skincare claims require reliable evidence; no diagnosis or guaranteed effects",
-        "Commercial claims and prices require current source verification"
-      ]
-    },
-    {
-      "key": "english_pick1",
-      "handle": "english_pick1",
-      "topics": [
-        "English conversation from beginner to practical daily use"
-      ],
-      "content_language": [
-        "en",
-        "ko"
-      ],
-      "editorial_rules": [
-        "Teach beginner-to-practical English in short progressive lessons",
-        "Include natural example sentences and Korean explanations where useful"
-      ]
-    },
-    {
-      "key": "japanese_pick",
-      "handle": "japanese_pick",
-      "topics": [
-        "Japanese conversation from beginner to practical daily use"
-      ],
-      "content_language": [
-        "ja",
-        "ko"
-      ],
-      "editorial_rules": [
-        "Teach beginner-to-practical Japanese in short progressive lessons",
-        "Include kana, natural example sentences and Korean explanations where useful"
-      ]
-    }
-  ],
-  "account_mapping": {
-    "instagram": "Each accounts[].handle is the exact owner-confirmed Instagram handle",
-    "threads": "Each accounts[].handle is the exact owner-confirmed Threads handle"
-  },
-  "authentication": {
-    "meta_app_name": "SIS Center Publisher",
-    "meta_app_id": "1383946033947009",
-    "instagram_login_type": "instagram",
-    "instagram_identity_endpoint": "https://graph.instagram.com/v25.0/me?fields=user_id,username",
-    "threads_identity_endpoint": "https://graph.threads.net/v1.0/me?fields=id,username",
-    "required_env_pattern": "META_{PLATFORM}_{ACCOUNT_KEY}_ACCESS_TOKEN",
-    "user_id_storage": "Resolved by read-only platform /me identity verification; optional GitHub environment variable for publisher use",
-    "token_storage": "GitHub Actions environment secrets or local secret store only; never repository files",
-    "state": "PENDING_ACCOUNT_BY_ACCOUNT_OAUTH_AND_WRITE_PERMISSION_VERIFICATION",
-    "publish_enabled": false
-  },
-  "scheduler": {
-    "workflow": ".github/workflows/meta-five-account-daily-preflight.yml",
-    "cron_utc": "10 0 * * *",
-    "cron_kst": "09:10 daily",
-    "purpose": "Daily credential/readiness preflight only; does not publish content",
-    "publish_state": "BLOCKED_UNTIL_ALL_TEN_ACCOUNT_CREDENTIALS_AND_DAILY_CONTENT_QUEUE_READY"
-  },
-  "safety": {
-    "no_cross_account_substitution": true,
-    "no_publish_without_exact_account_identity_match": true,
-    "no_publish_without_platform_specific_write_scope": true,
-    "no_tokens_in_logs_or_git": true,
-    "require_public_post_url_for_success": true,
-    "no_duplicate_account_platform_local_date": false,
-    "no_cross_platform_verbatim_copy": true,
-    "no_duplicate_account_platform_local_date_slot": true
-  }
+﻿{
+    "schema_version":  1,
+    "effective_at_kst":  "2026-11-06",
+    "owner_confirmation":  "2026-11-06: user confirmed same five handles on Instagram and Threads",
+    "timezone":  "Asia/Seoul",
+    "platforms":  [
+                      "instagram",
+                      "threads"
+                  ],
+    "daily_cadence":  {
+                          "target_per_account_per_platform":  3,
+                          "random_window_kst":  {
+                                                    "start":  "08:10",
+                                                    "end":  "22:50"
+                                                },
+                          "minimum_gap_minutes":  15,
+                          "publish_only_after_account_auth_and_content_review":  true,
+                          "owner_confirmation":  "2026-11-07: all ten account-platform connections, three posts daily at randomized KST times"
+                      },
+    "accounts":  [
+                     {
+                         "key":  "seoul_topik",
+                         "handle":  "seoul_topik",
+                         "topics":  [
+                                        "TOPIK education",
+                                        "Korean vocabulary",
+                                        "Korean grammar",
+                                        "study in Korea"
+                                    ],
+                         "content_language":  [
+                                                  "ko",
+                                                  "en"
+                                              ],
+                         "editorial_rules":  [
+                                                 "Educational accuracy; distinguish TOPIK levels; provide examples"
+                                             ]
+                     },
+                     {
+                         "key":  "seoul_jisoo",
+                         "handle":  "seoul_jisoo",
+                         "topics":  [
+                                        "current issues",
+                                        "politics",
+                                        "sports",
+                                        "health supplements",
+                                        "skincare products"
+                                    ],
+                         "content_language":  [
+                                                  "ko"
+                                              ],
+                         "editorial_rules":  [
+                                                 "Political/current-affairs claims require dated reliable sources and neutral framing",
+                                                 "Sports results and schedules require current verification",
+                                                 "Health and skincare claims require reliable evidence; no diagnosis or guaranteed effects",
+                                                 "Commercial claims and prices require current source verification"
+                                             ]
+                     },
+                     {
+                         "key":  "seoul_chris",
+                         "handle":  "seoul_chris",
+                         "topics":  [
+                                        "current issues",
+                                        "politics",
+                                        "sports",
+                                        "health supplements",
+                                        "skincare products"
+                                    ],
+                         "content_language":  [
+                                                  "ko"
+                                              ],
+                         "editorial_rules":  [
+                                                 "Political/current-affairs claims require dated reliable sources and neutral framing",
+                                                 "Sports results and schedules require current verification",
+                                                 "Health and skincare claims require reliable evidence; no diagnosis or guaranteed effects",
+                                                 "Commercial claims and prices require current source verification"
+                                             ]
+                     },
+                     {
+                         "key":  "english_pick1",
+                         "handle":  "english_pick1",
+                         "topics":  [
+                                        "English conversation from beginner to practical daily use"
+                                    ],
+                         "content_language":  [
+                                                  "en",
+                                                  "ko"
+                                              ],
+                         "editorial_rules":  [
+                                                 "Teach beginner-to-practical English in short progressive lessons",
+                                                 "Include natural example sentences and Korean explanations where useful"
+                                             ]
+                     },
+                     {
+                         "key":  "japanese_pick",
+                         "handle":  "japanese_pick",
+                         "topics":  [
+                                        "Japanese conversation from beginner to practical daily use"
+                                    ],
+                         "content_language":  [
+                                                  "ja",
+                                                  "ko"
+                                              ],
+                         "editorial_rules":  [
+                                                 "Teach beginner-to-practical Japanese in short progressive lessons",
+                                                 "Include kana, natural example sentences and Korean explanations where useful"
+                                             ]
+                     }
+                 ],
+    "account_mapping":  {
+                            "instagram":  "Each accounts[].handle is the exact owner-confirmed Instagram handle",
+                            "threads":  "Each accounts[].handle is the exact owner-confirmed Threads handle",
+                            "rejected_third_party_handles":  [
+                                                                 "english_pick_daily"
+                                                             ],
+                            "exact_english_handle":  "english_pick1"
+                        },
+    "authentication":  {
+                           "meta_app_name":  "SIS Center Publisher",
+                           "meta_app_id":  "1383946033947009",
+                           "instagram_login_type":  "instagram",
+                           "instagram_identity_endpoint":  "https://graph.instagram.com/v25.0/me?fields=user_id,username",
+                           "threads_identity_endpoint":  "https://graph.threads.net/v1.0/me?fields=id,username",
+                           "required_env_pattern":  "META_{PLATFORM}_{ACCOUNT_KEY}_ACCESS_TOKEN",
+                           "user_id_storage":  "Resolved by read-only platform /me identity verification; optional GitHub environment variable for publisher use",
+                           "token_storage":  "GitHub Actions environment secrets or local secret store only; never repository files",
+                           "state":  "PENDING_ACCOUNT_BY_ACCOUNT_OAUTH_AND_WRITE_PERMISSION_VERIFICATION",
+                           "publish_enabled":  false
+                       },
+    "scheduler":  {
+                      "workflow":  ".github/workflows/meta-five-account-daily-preflight.yml",
+                      "cron_utc":  "10 0 * * *",
+                      "cron_kst":  "09:10 daily",
+                      "purpose":  "Daily credential/readiness preflight only; does not publish content",
+                      "publish_state":  "BLOCKED_UNTIL_ALL_TEN_ACCOUNT_CREDENTIALS_AND_DAILY_CONTENT_QUEUE_READY"
+                  },
+    "safety":  {
+                   "no_cross_account_substitution":  true,
+                   "no_publish_without_exact_account_identity_match":  true,
+                   "no_publish_without_platform_specific_write_scope":  true,
+                   "no_tokens_in_logs_or_git":  true,
+                   "require_public_post_url_for_success":  true,
+                   "no_duplicate_account_platform_local_date":  false,
+                   "no_cross_platform_verbatim_copy":  true,
+                   "no_duplicate_account_platform_local_date_slot":  true
+               }
 }

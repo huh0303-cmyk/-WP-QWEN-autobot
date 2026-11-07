@@ -30,3 +30,8 @@ Owner mandate: five Instagram plus five Threads connections; each connection thr
 5. Run actual per-account production canaries and verify public URLs before declaring KPI achieved.
 
 Status: PARTIAL. Authentication and daily publishing KPI are not complete. No public post was created in this session.
+
+## Account correction — 2026-11-07
+- `english_pick_daily` is not owned by the user. It was removed from the pending Threads tester dialog and was never invited, authorized, tokenized, or published through this workflow.
+- Do not confuse it with the separately listed exact Instagram handle `english_pick1`, which remains isolated by exact-handle verification. No token from `english_pick_daily` may be accepted.
+- The actual Threads handle `seoultopik` was invited as a Threads tester and is currently pending acceptance.
