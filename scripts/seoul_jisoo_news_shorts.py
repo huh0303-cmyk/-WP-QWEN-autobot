@@ -59,7 +59,7 @@ def fetch_news(category):
         if not link.startswith("https://") or len(title) < 15:
             continue
         headline = title.removesuffix(" - " + source).strip()
-        if any(x in headline for x in ("속보?", "소문", "카더라", "충격 예언")):
+        if any(x in headline for x in ("속보?", "소문", "카더라", "충격 예언", "주요일정", "오늘의 일정", "오늘의 포토", "[포토]", "[사설]", "[칼럼]")):
             continue
         result.append({"title":headline, "source":source, "link":link,
                        "published_at":stamp.isoformat()})
@@ -191,8 +191,11 @@ def upload(video, news, category, svc):
     check=svc.videos().list(part="snippet,status",id=video_id).execute().get("items",[])
     if len(check)!=1 or check[0]["snippet"]["channelId"]!=CHANNEL_ID:
         raise RuntimeError("Uploaded video channel identity not confirmed, do not retry")
+    actual_privacy=check[0]["status"]["privacyStatus"]
+    if actual_privacy != "public":
+        raise RuntimeError("Video uploaded but public status not confirmed; do not retry blindly")
     return {"video_id":video_id,"url":"https://www.youtube.com/shorts/"+video_id,
-            "privacy":check[0]["status"]["privacyStatus"],"source":news["source"],
+            "privacy":actual_privacy,"source":news["source"],
             "category":category}
 
 def main():
