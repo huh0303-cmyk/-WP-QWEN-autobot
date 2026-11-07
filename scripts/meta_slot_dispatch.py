@@ -111,9 +111,14 @@ def main():
             published=call("https://graph.threads.net/v1.0/"+uid+"/threads_publish",method="POST",token=token,payload={"creation_id":cid})
             pid=str(published.get("id",""))
             if not pid: raise RuntimeError("No published ID")
+            verification=call("https://graph.threads.net/v1.0/"+pid+"?fields=id,permalink", token=token)
+            url=str(verification.get("permalink",""))
+            if str(verification.get("id",""))!=pid or not url.startswith("https://"):
+                raise RuntimeError("Published ID exists but public URL not confirmed")
             state[slot_id]["status"]="PUBLISHED"
             state[slot_id]["id"]=pid
-            print("PUBLISHED_SLOT="+slot_id,flush=True)
+            state[slot_id]["public_url"]=url
+            print("PUBLISHED_SLOT="+slot_id+" URL="+url,flush=True)
         except Exception as e:
             if slot_id in state:
                 state[slot_id]["status"]="NEEDS_RECONCILIATION"
