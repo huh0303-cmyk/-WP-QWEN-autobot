@@ -1,0 +1,23 @@
+name: Seoul Journal exact YouTube OAuth preflight
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: Verify exact Seoul Journal YouTube identity and upload permissions
+        env:
+          PROFILE: SEOUL_JOURNAL
+          CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+          REFRESH_TOKEN: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN }}
+          EXPECTED_CHANNEL_ID: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID }}
+        run: python scripts/youtube_auth_preflight.py
