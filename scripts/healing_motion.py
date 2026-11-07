@@ -229,7 +229,24 @@ def render():
     history = _read_history(history_path)
     source_id = select_source(MODE, SEED, history)
     source = work / "source.mp4"
-    download(f"https://www.pexels.com/download/video/{source_id}/", source)
+    # Pexels site /download/video/ sometimes returns HTTP 403 to cloud runners.
+    # Resolve the official free Pexels video API file when configured, without
+    # guessing CDN asset paths or silently switching to unlicensed footage.
+    key = os.getenv("PEXELS_API_KEY", "").strip()
+    if key:
+        meta = requests.get(
+            f"https://api.pexels.com/videos/videos/{source_id}",
+            headers={"Authorization": key}, timeout=30)
+        meta.raise_for_status()
+        variants = [v for v in meta.json().get("video_files", [])
+                    if v.get("file_type") == "video/mp4" and v.get("link")]
+        variants.sort(key=lambda v: (v.get("height") or 0, v.get("width") or 0),
+                      reverse=True)
+        if not variants:
+            raise RuntimeError("Pexels video metadata has no MP4 source")
+        download(variants[0]["link"], source)
+    else:
+        download(f"https://www.pexels.com/download/video/{source_id}/", source)
 
     source_seconds = float(subprocess.check_output([
         "ffprobe", "-v", "error", "-show_entries", "format=duration",
