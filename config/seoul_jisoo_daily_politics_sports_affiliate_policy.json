@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "updated_at_kst": "2026-11-07",
+  "owner_request": "Seoul_Jisoo1 YouTube: daily politics/current-affairs Shorts and sports Shorts, with relevant health supplement and K-beauty Coupang Partners links",
+  "youtube": {
+    "channel_key": "shopping",
+    "title": "Seoul_Jisoo1",
+    "handle": "jisoopicks",
+    "channel_id": "UCAizx0tPkRSol8sIhanN_QQ",
+    "oauth_environment": "youtube-channels",
+    "refresh_secret": "YOUTUBE_OAUTH_REFRESH_TOKEN_SHOPPING_SEOUL_JISOO1",
+    "oauth_client_id_secret": "YOUTUBE_OAUTH_CLIENT_ID",
+    "oauth_client_secret_secret": "YOUTUBE_OAUTH_CLIENT_SECRET",
+    "verified_workflow": "seoul-jisoo-youtube-auth-preflight.yml",
+    "authentication": "EXACT_CHANNEL_OAUTH_VERIFIED_2026_11_07",
+    "token_action": "REUSE_EXISTING_SECRET_NO_ROTATION"
+  },
+  "publishing": {
+    "target": "daily",
+    "content_types": [
+      "neutral political news Shorts",
+      "fact-checked sports updates Shorts"
+    ],
+    "video_format": "vertical 9:16",
+    "public_release_enabled": false,
+    "reason": "New editorial format and disclosure + production/publishing pipeline have not yet been tested; existing workflow is daily private travel/shopping long-form, not these Shorts",
+    "requirements": [
+      "verify fresh dated original source and link each claim to evidence",
+      "avoid political persuasion or partisan promotion; accurate neutral summaries",
+      "verify sports results, match dates and image/video footage rights",
+      "use correct captions, attribution, thumbnails and content checks",
+      "validate YouTube upload identity and post-upload URL",
+      "only publish when daily topic and media are verified",
+      "do not silently replace existing Health Japan/USA or language channels"
+    ]
+  },
+  "affiliate": {
+    "provider": "Coupang Partners",
+    "categories": [
+      "health supplements",
+      "K-beauty"
+    ],
+    "tracking": "REQUIRE_USER_APPROVED_PRODUCT_SPECIFIC_TRACKING_URL",
+    "status": "NOT_VERIFIED_FOR_THIS_YOUTUBE_CHANNEL",
+    "link_rules": [
+      "Only exact approved Coupang Partners tracking URLs with user's code",
+      "Never use generic storefront as affiliate link or manufacture tracking code",
+      "Do not imply sports or political stories endorse unrelated products",
+      "Clearly disclose advertising/affiliate relationship",
+      "No unsupported health benefit or product efficacy claims",
+      "Context-match each product and independently verify availability"
+    ],
+    "missing": [
+      "verified Coupang tracking URL catalog for Seoul_Jisoo1",
+      "publishing implementation for politics/sports Shorts",
+      "end-to-end public video receipt"
+    ]
+  },
+  "scope": "Additional Seoul_Jisoo1 shopping/news channel, do not silently expand or modify the user's 10+5+5 YouTube core classification"
+}
