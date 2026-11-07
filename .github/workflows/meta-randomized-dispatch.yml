@@ -1,0 +1,57 @@
+name: Meta randomized slot live dispatcher
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: meta-randomized-dispatch
+  cancel-in-progress: false
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    environment: META-SOCIAL
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Set Git author
+        run: |
+          git config user.name "london-meta-bot"
+          git config user.email "actions@users.noreply.github.com"
+      - name: Dispatch eligible verified slots
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          META_LIVE_PUBLISH: ${{ vars.META_LIVE_PUBLISH }}
+          META_GEMINI_FREE_MODEL: ${{ vars.META_GEMINI_FREE_MODEL }}
+          META_THREADS_SEOUL_TOPIK_ACCESS_TOKEN: ${{ secrets.META_THREADS_SEOUL_TOPIK_ACCESS_TOKEN }}
+          META_THREADS_SEOUL_TOPIK_USER_ID: ${{ vars.META_THREADS_SEOUL_TOPIK_USER_ID }}
+          META_THREADS_SEOUL_JISOO_ACCESS_TOKEN: ${{ secrets.META_THREADS_SEOUL_JISOO_ACCESS_TOKEN }}
+          META_THREADS_SEOUL_JISOO_USER_ID: ${{ vars.META_THREADS_SEOUL_JISOO_USER_ID }}
+          META_THREADS_SEOUL_CHRIS_ACCESS_TOKEN: ${{ secrets.META_THREADS_SEOUL_CHRIS_ACCESS_TOKEN }}
+          META_THREADS_SEOUL_CHRIS_USER_ID: ${{ vars.META_THREADS_SEOUL_CHRIS_USER_ID }}
+          META_THREADS_ENGLISH_PICK1_ACCESS_TOKEN: ${{ secrets.META_THREADS_ENGLISH_PICK1_ACCESS_TOKEN }}
+          META_THREADS_ENGLISH_PICK1_USER_ID: ${{ vars.META_THREADS_ENGLISH_PICK1_USER_ID }}
+          META_THREADS_JAPANESE_PICK_ACCESS_TOKEN: ${{ secrets.META_THREADS_JAPANESE_PICK_ACCESS_TOKEN }}
+          META_THREADS_JAPANESE_PICK_USER_ID: ${{ vars.META_THREADS_JAPANESE_PICK_USER_ID }}
+        run: python scripts/meta_slot_dispatch.py
+      - name: Save receipt changes
+        if: always()
+        run: |
+          git add data/meta_publishing_receipts.json 2>/dev/null || true
+          if ! git diff --cached --quiet; then
+            git commit -m "meta: record slot result"
+            git push origin HEAD:main
+          fi
+      - name: Upload dispatch receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: meta-dispatch-${{ github.run_id }}
+          path: data/meta_publishing_receipts.json
+          if-no-files-found: ignore
