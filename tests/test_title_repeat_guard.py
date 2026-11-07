@@ -21,6 +21,14 @@ class TitleRepeatGuard(unittest.TestCase):
             self.assertTrue(title_cliches(title), title)
             self.assertFalse(R.valid(title, "Korea Tax Rules Explained", [], set()), title)
 
+    def test_generic_south_korean_opening_blocked_network_wide(self):
+        for title in ("South Korean Equity Market Dividend Rules", "  SOUTH   KOREAN Bond Market Outlook"):
+            self.assertTrue(title_self_issues(title), title)
+            self.assertTrue(title_cliches(title), title)
+            self.assertTrue(repetition_issues(title, "<p>Specific article body.</p>", []), title)
+        self.assertEqual(title_self_issues("Dividend Tax Rules for Overseas Investors"), [])
+        self.assertEqual(title_self_issues("Korean Ramen vs Japanese Ramen"), [])
+
     def test_generic_gerund_openings_blocked(self):
         for title in ("Understanding Korea Rental Deposits", "Navigating Health Insurance Options", "Managing Tax Obligations", "Preparing for University Applications"):
             self.assertTrue(title_self_issues(title), title)
