@@ -17,4 +17,7 @@ print({"sheet_row":2593,"schedule_id":rid,"date":row[1] if len(row)>1 else "",
 "platform":row[2] if len(row)>2 else "","channel":row[3] if len(row)>3 else "",
 "status":row[12] if len(row)>12 else "","duplicate_id_rows":duplicates[:20],
 "total_rows":len(rows)})
-\nfor i in duplicates:\n    v=rows[i-2]\n    print({"row":i,"id":v[0],"date":v[1],"channel":v[3],"status":v[12] if len(v)>12 else "","topic":v[7][:100] if len(v)>7 else ""})\n
+
+for i in duplicates:
+    v=rows[i-2]
+    print({"row":i,"id":v[0],"date":v[1],"channel":v[3],"status":v[12] if len(v)>12 else "","topic":v[7][:100] if len(v)>7 else ""})
