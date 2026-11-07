@@ -77,14 +77,15 @@
       "languages": [
         "ko"
       ],
-      "daily_posts_per_platform": 3,
+      "daily_posts_per_platform": null,
       "editorial_rules": [
         "재미있고 재치 있는 한국어",
         "정치·시사 사실은 신뢰할 수 있는 최신 출처 2개 이상 교차 확인",
         "건강기능식품 효능 과장 및 질병 치료 표현 금지",
         "K-뷰티·상품 가격은 게시 전 확인",
         "계정별 고유 문구와 이미지 사용"
-      ]
+      ],
+      "cadence": "OWNER_CONFIRMATION_REQUIRED"
     },
     {
       "key": "seoul_chris",
@@ -104,14 +105,15 @@
       "languages": [
         "ko"
       ],
-      "daily_posts_per_platform": 3,
+      "daily_posts_per_platform": null,
       "editorial_rules": [
         "서울지수 계정과 같은 주제군이더라도 소재·관점·카피를 중복하지 않음",
         "재미있고 재치 있는 한국어",
         "시사·건강·상업 정보는 최신 근거 확인",
         "건강기능식품 효능 과장 및 질병 치료 표현 금지"
       ],
-      "rename_gate": "Do not change OAuth keys, user IDs, or secrets from seoul_chris1 to seoul_chris until Instagram and Threads /me endpoints both verify the new exact handle."
+      "rename_gate": "Do not change OAuth keys, user IDs, or secrets from seoul_chris1 to seoul_chris until Instagram and Threads /me endpoints both verify the new exact handle.",
+      "cadence": "OWNER_CONFIRMATION_REQUIRED"
     },
     {
       "key": "seoul_topik",
@@ -133,7 +135,7 @@
         "ko",
         "en"
       ],
-      "daily_posts_per_platform": 3,
+      "daily_posts_per_platform": null,
       "youtube_primary_channel": {
         "channel_name": "서울국제대학-TOPIK센터",
         "channel_id": "UCdA24IuR-JE7qButWv5jLqA",
@@ -144,14 +146,18 @@
         "정답·해설·예문 검수",
         "YouTube 메인 영상과 관련 Shorts·퀴즈로 연결",
         "영상 링크는 실제 게시된 공식 URL만 사용"
-      ]
+      ],
+      "cadence": "OWNER_CONFIRMATION_REQUIRED"
     }
   ],
   "scheduling": {
     "default_timezone": "Asia/Seoul",
+    "language_accounts": [
+      "japanese_pick",
+      "english_pick1"
+    ],
     "language_accounts_daily_posts_per_platform": 3,
-    "hot_issue_accounts_daily_posts_per_platform": 3,
-    "minimum_gap_minutes": 120,
+    "other_accounts_daily_posts_per_platform": "OWNER_CONFIRMATION_REQUIRED",
     "stagger_posts_across_day": true,
     "no_duplicate_topics_within_same_day": true,
     "no_verbatim_cross_platform_copy": true
