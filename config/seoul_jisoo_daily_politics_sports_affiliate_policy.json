@@ -22,8 +22,8 @@
       "fact-checked sports updates Shorts"
     ],
     "video_format": "vertical 9:16",
-    "public_release_enabled": false,
-    "reason": "New editorial format and disclosure + production/publishing pipeline have not yet been tested; existing workflow is daily private travel/shopping long-form, not these Shorts",
+    "public_release_enabled": true,
+    "reason": "Separate workflow seoul-jisoo-daily-shorts.yml live-tested with exact channel ID and confirmed PUBLIC 2026-11-07; obsolete Seoul_Jisoo travel-longform schedule removed",
     "requirements": [
       "verify fresh dated original source and link each claim to evidence",
       "avoid political persuasion or partisan promotion; accurate neutral summaries",
@@ -32,7 +32,26 @@
       "validate YouTube upload identity and post-upload URL",
       "only publish when daily topic and media are verified",
       "do not silently replace existing Health Japan/USA or language channels"
-    ]
+    ],
+    "workflow": "seoul-jisoo-daily-shorts.yml",
+    "daily_time_kst": {
+      "politics": "10:17",
+      "sports": "18:47"
+    },
+    "dry_runs": {
+      "sports": "42366659964",
+      "politics": "42366750309"
+    },
+    "verified_public_uploads": {
+      "sports": {
+        "run": "42366903961",
+        "video_id": "yyS-QWHMDRU"
+      },
+      "politics": {
+        "run": "42367013171",
+        "video_id": "_B6brUuA7uA"
+      }
+    }
   },
   "affiliate": {
     "provider": "Coupang Partners",
@@ -41,7 +60,7 @@
       "K-beauty"
     ],
     "tracking": "REQUIRE_USER_APPROVED_PRODUCT_SPECIFIC_TRACKING_URL",
-    "status": "NOT_VERIFIED_FOR_THIS_YOUTUBE_CHANNEL",
+    "status": "Awaiting actual confirmed Coupang health+beauty tracking URLs in the dedicated Seoul_Jisoo Secrets; no fabricated URLs",
     "link_rules": [
       "Only exact approved Coupang Partners tracking URLs with user's code",
       "Never use generic storefront as affiliate link or manufacture tracking code",
