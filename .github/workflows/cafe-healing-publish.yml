@@ -97,6 +97,7 @@ jobs:
           YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_HEALING }}
           YOUTUBE_EXPECTED_CHANNEL_ID: UC7yEsLM-HoXudngrD-4FIqg
           HEALING_VARIANT: random
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
           GITHUB_RUN_ID: ${{ github.run_id }}
           GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
           HEALING_SAMPLE_ID: cafe-healing-${{ github.run_id }}
