@@ -725,3 +725,5 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - Exact Instagram english handle remains english_pick1 and is protected by exact /me matching; no cross-account substitution is allowed.
 - Invited actual Threads account seoultopik as tester. Meta shows it as pending acceptance. Threads was logged out from seoul_jisoo and the seoul_topik Instagram-linked login screen is prepared for owner authentication.
 
+- Threads seoultopik saved-password login attempt returned password error. Browser left on exact login page for owner credential entry; invitation remains pending. No token or public post created.
+

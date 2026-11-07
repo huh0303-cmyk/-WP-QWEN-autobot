@@ -35,3 +35,6 @@ Status: PARTIAL. Authentication and daily publishing KPI are not complete. No pu
 - `english_pick_daily` is not owned by the user. It was removed from the pending Threads tester dialog and was never invited, authorized, tokenized, or published through this workflow.
 - Do not confuse it with the separately listed exact Instagram handle `english_pick1`, which remains isolated by exact-handle verification. No token from `english_pick_daily` may be accepted.
 - The actual Threads handle `seoultopik` was invited as a Threads tester and is currently pending acceptance.
+
+- Threads seoultopik login handoff: the browser's saved password was rejected by Threads. The login page is open with the exact Instagram username; owner must enter the current password. No password was read, logged, or committed.
+
