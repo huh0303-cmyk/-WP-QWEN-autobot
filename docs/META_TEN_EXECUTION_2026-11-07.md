@@ -38,3 +38,27 @@ Status: PARTIAL. Authentication and daily publishing KPI are not complete. No pu
 
 - Threads seoultopik login handoff: the browser's saved password was rejected by Threads. The login page is open with the exact Instagram username; owner must enter the current password. No password was read, logged, or committed.
 
+
+
+## Token registration checkpoint — 2026-11-07
+
+Current exact-identity result: 7/10 connections verified by workflow run `42366598475`.
+
+| Platform | Account | Result |
+|---|---|---|
+| Instagram | seoul_topik | Long-lived token and token-scoped user ID stored; `/me` exact match |
+| Instagram | seoul_jisoo | Long-lived token and token-scoped user ID stored; `/me` exact match |
+| Instagram | english_pick1 | Existing token exact match verified |
+| Instagram | japanese_pick | Existing token exact match verified |
+| Instagram | seoul_chris1 | Deferred by owner |
+| Threads | seoultopik | Tester accepted; token/user ID stored; exact match verified |
+| Threads | seoul_jisoo | Token/user ID stored; exact match verified |
+| Threads | english_pick1 | Tester accepted; token/user ID stored; exact match verified |
+| Threads | japanese_pick | BLOCKED: Threads profile does not exist; public profile URL returns not found |
+| Threads | seoul_chris1 | Deferred by owner |
+
+The current Threads handle for the TOPIK account is `seoultopik` (no underscore), while the Instagram handle is `seoul_topik`. Secret logical keys remain `SEOUL_TOPIK`.
+
+The web Threads signup/SSO route cannot create `japanese_pick` in the current Accounts Center session and repeatedly returns to `seoultopik`. Create the missing `japanese_pick` profile once in the mobile Threads add-profile flow, then accept the tester invitation and generate its API token.
+
+No public publishing was attempted. The readiness workflow remains a non-publishing check; enablement still requires the remaining required profile/token connections, write-scope verification, and a canary public URL receipt.
