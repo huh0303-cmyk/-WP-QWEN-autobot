@@ -3,7 +3,7 @@
 from datetime import datetime,timedelta,timezone
 import hashlib,json,os
 KST=timezone(timedelta(hours=9))
-WINDOWS=[("morning","politics",8*60,10*60),("midday","sports",13*60,15*60),("evening","politics",19*60,22*60)]
+WINDOWS=[("morning","politics",8*60,10*60),("midday","sports",13*60,15*60),("evening","hot_issue",19*60,22*60)]
 def due(now):
     day=now.strftime("%Y-%m-%d")
     minute=now.hour*60+now.minute
