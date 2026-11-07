@@ -80,7 +80,7 @@ Language: {site['language']}. Return JSON only with title, content_html, labels,
 {rules_for(site['language'], site['theme'])}
 Cautious source-aware wording and no invented facts.
 Never start titles with generic gerunds such as Understanding, Navigating, Managing, Preparing, Exploring, Discovering, Learning, Choosing, Building, Improving, Protecting, Avoiding, Comparing, Using, Making, Handling, Planning, Creating, Developing, Evaluating, Addressing, Maintaining, Reducing, Preventing, Traveling, Living, Working, Investing, Saving, Applying, or Starting. Lead with the concrete subject, finding, decision, or reader outcome. Vary headline structures across articles.
-{'For Korea Invest 365 only: never begin the title with “South Korean” or “Korean”. Put the actual market instrument, company, event, data point, or investor decision first. Mention Korea later only when genuinely needed to distinguish the subject. Use varied, specific headline structures.' if site['key'] == 'kinvest365' else ''}
+Never begin any English title with the generic country-first phrase “South Korean”. Lead with the actual company, market instrument, policy, event, data point, or reader decision; mention South Korea later only when it adds necessary context.
 Recent titles from this blog that must not be reused or lightly reworded:
 {chr(10).join("- " + x for x in (recent_titles or [])[:40]) or "- none available"}
 Write in a natural editorial voice with varied sentence structure. Never mention AI, language models,
