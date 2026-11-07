@@ -93,11 +93,13 @@ def main():
             STATE.parent.mkdir(parents=True,exist_ok=True)
             STATE.write_text(json.dumps(state,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
             print("RESERVED_SLOT="+slot_id,flush=True)
-            os.system('git add data/meta_publishing_receipts.json && git commit -m "meta: reserve post slot" >/dev/null && git push origin HEAD:main >/dev/null')
-            # If marker could not persist remotely, do not risk publishing.
-            remote = __import__("subprocess").run(["git","status","--porcelain"],capture_output=True,text=True)
-            if remote.returncode != 0 or remote.stdout.strip():
-                raise RuntimeError("Reserve not safely persisted")
+            import subprocess
+            for cmd in (["git","add","data/meta_publishing_receipts.json"],
+                        ["git","commit","-m","meta: reserve post slot"],
+                        ["git","push","origin","HEAD:main"]):
+                check = subprocess.run(cmd, capture_output=True, text=True)
+                if check.returncode:
+                    raise RuntimeError("Reserve not safely persisted: "+cmd[1])
             if os.getenv("META_LIVE_PUBLISH","false").lower()!="true":
                 state[slot_id]["status"]="PREPARED_ONLY"
                 continue
