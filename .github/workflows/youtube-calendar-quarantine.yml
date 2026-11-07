@@ -1,0 +1,35 @@
+name: YouTube calendar duplicate safe quarantine
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        type: boolean
+        default: false
+permissions:
+  contents: read
+jobs:
+  quarantine:
+    runs-on: ubuntu-latest
+    environment: youtube-channels
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -q google-api-python-client google-auth google-auth-oauthlib
+      - name: Quarantine only exactly matched duplicate rows
+        env:
+          APPLY: ${{ inputs.apply }}
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+        run: python scripts/youtube_calendar_quarantine.py
+      - name: Retain full prior row backup
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: youtube-calendar-dupe-backup-${{ github.run_id }}
+          path: artifacts/youtube-calendar-quarantine-backup.json
+          if-no-files-found: warn
+          retention-days: 90
