@@ -21,7 +21,9 @@ FEEDS = {
     "politics": "https://news.google.com/rss/search?" + urlencode(
         {"q":"한국 정치 국회 정부 when:1d","hl":"ko","gl":"KR","ceid":"KR:ko"}),
     "sports": "https://news.google.com/rss/search?" + urlencode(
-        {"q":"한국 스포츠 경기 선수 when:1d","hl":"ko","gl":"KR","ceid":"KR:ko"}),
+        {"q":"KBO 프로야구 한국시리즈 야구 경기 when:1d","hl":"ko","gl":"KR","ceid":"KR:ko"}),
+    "hot_issue": "https://news.google.com/rss/search?" + urlencode(
+        {"q":"한국 오늘 화제 사회 시사 핫이슈 when:1d","hl":"ko","gl":"KR","ceid":"KR:ko"}),
 }
 TRUSTED_SOURCES = {
     "연합뉴스","KBS뉴스","KBS","MBC","SBS","SBS 뉴스","JTBC",
@@ -36,7 +38,7 @@ FONT_PATHS = [
 
 def fetch_news(category):
     url = FEEDS[category]
-    req = urllib.request.Request(url, headers={"User-Agent":"SeoulJisooNewsShorts/1.0"})
+    req = urllib.request.Request(url, headers={"User-Agent":"SeoulJournalNewsShorts/1.0"})
     with urllib.request.urlopen(req, timeout=22) as res:
         root = ET.fromstring(res.read())
     now = dt.datetime.now(dt.timezone.utc)
@@ -90,7 +92,7 @@ def render(headline, source, category, out_dir):
     if not font_path:
         raise RuntimeError("Korean font unavailable")
     out_dir.mkdir(parents=True, exist_ok=True)
-    kind = "오늘의 정치 뉴스" if category == "politics" else "오늘의 스포츠 뉴스"
+    kind = {"politics":"오늘의 정치·시사", "sports":"오늘의 프로야구", "hot_issue":"오늘의 핫이슈"}[category]
     date = dt.datetime.now(KST).strftime("%Y.%m.%d")
     narration = f"{date}, {kind}입니다. {source}의 보도 제목을 전합니다. {headline}. 자세한 내용은 영상 설명의 원문에서 확인해 주세요."
     audio = out_dir / "voice.mp3"
@@ -175,7 +177,7 @@ def upload(video, news, category, svc, slot):
     if links:
         desc += "\n\n[뉴스와 별개인 쇼핑 추천 · 광고·제휴 안내]\n"+AD_DISCLOSURE
         desc += "".join("\n"+label+": "+url for label,url in links)
-    body = {"snippet":{"title":title,"description":desc,"categoryId":"25" if category=="politics" else "17",
+    body = {"snippet":{"title":title,"description":desc,"categoryId":"17" if category=="sports" else "25",
                        "defaultLanguage":"ko","tags":["서울저널",category,"Shorts"]},
             "status":{"privacyStatus":"public","selfDeclaredMadeForKids":False}}
     media = MediaFileUpload(str(video),mimetype="video/mp4",resumable=True,chunksize=8*1024*1024)
