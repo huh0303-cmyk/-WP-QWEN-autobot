@@ -26,11 +26,14 @@ def candidates(category):
     sections=["100"] if category=="politics" else ["102","100"]
     seen=set()
     for section in sections:
+        section_count=0
         r=HTTP.get("https://news.naver.com/section/"+section,headers=UA,timeout=(15,45)); r.raise_for_status()
         for a in BeautifulSoup(r.text,"html.parser").select('a[href*="n.news.naver.com/mnews/article/"]'):
             u=a.get("href","").split("?")[0]
             if u not in seen and len(a.get_text(strip=True))>=12:
                 seen.add(u); yield u
+                section_count+=1
+                if category!="politics" and section_count>=2: break
 def extract(url):
     host=urlparse(url).hostname
     if host!="n.news.naver.com": raise RuntimeError("Unexpected news host")
@@ -121,9 +124,13 @@ def main():
             probe=out/f"assets-{media_attempts}"; probe.mkdir(parents=True,exist_ok=True)
             meta["_prepared_assets"]=photo_sequence(meta,probe)
         except Exception as exc:
-            print("MEDIA_REJECTED "+title+" "+type(exc).__name__+": "+str(exc)[:180],flush=True)
-            if revision or media_attempts>=4: raise
-            continue
+            if "이재명" in title+" "+body and meta.get("visual_subject")!="이재명":
+                meta["visual_subject"]="이재명"
+                meta["_prepared_assets"]=photo_sequence(meta,probe)
+            else:
+                print("MEDIA_REJECTED "+title+" "+type(exc).__name__+": "+str(exc)[:180],flush=True)
+                if revision or media_attempts>=4: raise
+                continue
         selected=(url,title,body,date); break
     if selected is None: raise RuntimeError("No fresh eligible nonduplicate article")
     url,title,body,date=selected
