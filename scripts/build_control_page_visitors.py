@@ -61,6 +61,26 @@ def main() -> None:
 
     if not sites:
         raise SystemExit("No verified visitor metrics available; refusing to publish an empty snapshot")
+    # Preserve verified daily observations across runs for 30-day trend charts.
+    target = ROOT / "docs" / "visitor_metrics.json"
+    previous = {}
+    if target.exists():
+        try:
+            previous = json.loads(target.read_text(encoding="utf-8")).get("sites", {})
+        except (OSError, ValueError, TypeError):
+            previous = {}
+    for domain, entry in sites.items():
+        old = previous.get(domain, {})
+        history = {}
+        for item in old.get("daily_history", []):
+            if isinstance(item, dict) and isinstance(item.get("date"), str) and isinstance(item.get("visitors"), int) and item["visitors"] >= 0:
+                history[item["date"]] = item["visitors"]
+        if entry.get("reference_date"):
+            history[str(entry["reference_date"])] = entry["yesterday_visitors"]
+        entry["daily_history"] = [
+            {"date": date, "visitors": history[date]}
+            for date in sorted(history)[-30:]
+        ]
     output = {
         "generated_at": checked_at,
         "reference_date": max(dates) if dates else "",
