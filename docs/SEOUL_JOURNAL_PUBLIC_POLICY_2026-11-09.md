@@ -47,3 +47,6 @@ Public vidIQ research during this session used 20 credits across four searches.
 - Public privacy confirmed by YouTube API after insert. Custom thumbnail API did not apply (HttpError); embedded first-frame art exists. This is not proof that YouTube selected that frame as the Shorts cover.
 - Replaced none; earlier private prototype LAwSW_CIjlg remains private.
 - Auth fix used valid client 886253028121… and matching token in FISH_AUDIO_API_KEY environment, dedicated SEOUL_JOURNAL_* names. The open shorts-client 21786518147… was not changed; no raw credential in git.
+
+## Runtime verification
+PR #273 merged (1a39cba65feebe5f682518afbea3130eee67970f). Full no-extra-publication Actions run https://github.com/huh0303-cmyk/-WP-QWEN-autobot/actions/runs/42498013145 succeeded: fresh article -> Gemini draft -> Fish Audio -> 1.2x render -> 9 captions -> artifact, 36.643 seconds. Scheduled end-to-end public insert has not occurred yet; direct public insert/readback succeeded for the first release.

@@ -1,3 +1,5 @@
+> Current operating authority (2026-11-09): [Public daily-three policy](SEOUL_JOURNAL_PUBLIC_POLICY_2026-11-09.md). Prior conflicting private-only, cadence, TTS and OAuth-blocker statements below are historical.
+
 # SEOUL JOURNAL — visual identity v1.0
 Date: 2026-11-07 KST
 

@@ -1,3 +1,5 @@
+> Current operating authority (2026-11-09): [Public daily-three policy](SEOUL_JOURNAL_PUBLIC_POLICY_2026-11-09.md). Prior conflicting private-only, cadence, TTS and OAuth-blocker statements below are historical.
+
 # Seoul Journal Daily Shorts workflow
 
 This workflow prepares a seven-item editorial queue; it does not publish automatically unless a verified Seoul Journal upload credential is configured in a future upload stage.

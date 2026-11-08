@@ -1,3 +1,5 @@
+> Current operating authority (2026-11-09): [Public daily-three policy](SEOUL_JOURNAL_PUBLIC_POLICY_2026-11-09.md). Prior conflicting private-only, cadence, TTS and OAuth-blocker statements below are historical.
+
 # Seoul Journal — Daily 3 Shorts / 500K+ benchmark editorial policy
 Date: 2026-11-07 KST
 Channel locked ID: UChRUdHZlXSjftAqBtdDNEWA (verify against actual OAuth identity before any upload)

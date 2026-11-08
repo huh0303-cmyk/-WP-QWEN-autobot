@@ -862,3 +862,10 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - Restored KSA's registry enabled flag, legacy active membership and authenticated audit credential mapping. Removed KSA retirement metadata. SIS and KI remain retired. KSA metadata and hosted files were never deleted.
 - Domain use and WordPress publishing readiness are separate. Fresh Windows DNS lookup still returns NXDOMAIN; curl cannot resolve ksa-korea.org. Hostinger previously displays domain not connected. A landing page's absence of WordPress REST is not itself a retirement reason, and no DNS or landing-page change was made.
 - K-Trip verification remains: homepage/latest article/public REST HTTP 200, same-session authenticated publish permission true; fleet scheduler disabled. No new K-Trip post was created during this check.
+
+
+## seoul-journal-public-runtime-verified-20261109
+- PR #273 merged to main as 1a39cba65feebe5f682518afbea3130eee67970f. GitHub policy file readback SHA 379966193c587ba8b651911450f51ee107c6169f. Random public workflow is active.
+- Full verification-only Actions run 42498013145 SUCCESS: fresh-source selection, Gemini-only draft, Fish Audio narration, 1.2x render, 9 caption cards, 36.643s MP4 and artifacts; DRY_RUN_READY, no second public upload. That candidate had no cleared registry portrait and correctly used original graphics.
+- First public release oEZaFVnqKR0 processing succeeded, public, HD, PT52S; hasCustomThumbnail false.
+- Affiliate policy preflight run 42497945679 failed on pre-existing affiliate-engine/validate_config.py assertion shared[version] == 9. No affiliate configuration changed in this PR; do not claim all repository checks passed.
