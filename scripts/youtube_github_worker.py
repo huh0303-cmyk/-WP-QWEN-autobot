@@ -71,7 +71,11 @@ def _claim(job: dict) -> tuple[object, str]:
     selector = select_next_ready if job.get("run_now") and requested else select_due
     selected, _ = selector(rows, dt.datetime.now(KST), enabled, 1)
     if not selected:
-        raise RuntimeError(f"No eligible calendar row for {requested or 'current due channels'}")
+        raise RuntimeError(
+            f"CALENDAR_NOT_READY: No eligible calendar row for {requested or 'current due channels'}. "
+            "Create/enable a channel calendar entry with a unique topic, valid date, "
+            "and READY status before retrying. Do not publish an old episode."
+        )
     row = selected[0]
     token = uuid.uuid4().hex
     marker = f"[yt-calendar:{row['id']}:{token}]"
