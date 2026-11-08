@@ -759,3 +759,10 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - Verification: SeoulMall widget tests and Meta account-policy/preflight tests passed; Python compilation and `git diff --check` passed. Existing `tests/test_social_affiliate_queue.py` has two unrelated stale expectations (mixed Coupang/OliveYoung/Trip/Agoda allocation and an obsolete `build_job` signature) that conflict with the current locked Coupang-only-10 policy; no test was weakened and no publication was attempted.
 - Meta credential state remains blocked for complete 5+5 operation: durable record `meta-token-registration-20261107` verifies 4 Instagram and 3 Threads connections. Missing exact connections are Instagram `seoul_chris1`, Threads `seoul_chris1`, and Threads `japanese_pick`; the last profile is not yet created/verified. No passwords, tokens, or token values were written to this repository.
 - Next action: owner completes the missing Meta login/consent/profile creation on the authorized Windows PC; then run account-specific identity and write-scope preflight plus a one-post canary receipt before enabling any public publisher.
+
+
+## owner-instruction-precedence-20261108
+
+- The owner directed that the newest instruction given in the active conversation supersedes conflicting existing London Project policy. Clear, bounded conflicts must be removed or replaced rather than retained as active legacy policy.
+- Confirmation is required only for conflicts with material public-publishing, cost, credential/security, account-ownership, legal/compliance, or destructive live-data impact. The responsible agent must present the exact conflict before proceeding in those cases.
+- `CODEX.md` now records this precedence rule as standing PM instruction. Historical records remain as audit evidence but cannot override a newer owner directive.

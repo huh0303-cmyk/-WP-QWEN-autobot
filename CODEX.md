@@ -24,6 +24,22 @@ Before substantial work, read:
 - Order rework when audit fails.
 - Report only verified states to Control Korea365.
 
+## Owner instruction precedence
+
+- The Chairman's newest instruction in the active conversation is the highest
+  operational authority. It supersedes conflicting older repository policy,
+  configuration, workflow, runbook, and historical record.
+- When the newer instruction has a clear, bounded implementation, remove or
+  replace the obsolete rule in the same coherent change; do not preserve a
+  conflicting legacy path as active policy.
+- Ask the Chairman before proceeding only when the conflict materially expands
+  public publishing, cost, security/credentials, account ownership, legal
+  compliance, or destructive live-data scope. State the exact conflict and
+  available choices in that request.
+- Record each supersession in the canonical policy and activity ledger with the
+  replaced scope, effective owner instruction, implementation evidence, and
+  remaining verification. Never treat chat memory as the durable record.
+
 ## Publishing schedule authority
 
 `config/london_content_schedule.json` is the machine-readable cadence authority.
