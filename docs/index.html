@@ -87,12 +87,13 @@ var SOCIAL_DATA=null;
 var SOCIAL_METRICS=null;
 function metricNumber(v,unit){return v===null||v===undefined||!Number.isFinite(Number(v))?'<span class="na">미수집</span>':'<b>'+f(Number(v))+'</b>'+(unit?' <span class="na">'+unit+'</span>':'');}
 function metricDay(v, isPublishDate){
- if(!v)return '<span class="na">\uBBF8\uD655\uC778</span>';
+ if(!v)return '<span class="na">미확인</span>';
  var day=String(v).slice(0,10);
  var today=new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Seoul'});
  var ageDays=Math.floor((Date.parse(today+'T00:00:00Z')-Date.parse(day+'T00:00:00Z'))/86400000);
- var label=esc(day);
- return isPublishDate && ageDays>=3?'<span style="color:#b45309;font-weight:700">'+label+' | '+ageDays+'\uC77C+ \uBBF8\uBC1C\uD589</span>':label;
+ if(!Number.isFinite(ageDays))return '<span class="na">미확인</span>';
+ var label=ageDays<0?'발행 예정':ageDays===0?'오늘':ageDays===1?'어제':ageDays+'일 전';
+ return '<span title="'+esc(day)+'">'+label+'</span>';
 }
 function metricKey(a){var h=String(a.handle||'').replace(/^@/,'').trim().toLowerCase();return String(a.platform||'').toLowerCase()+'|'+(h||String(a.url||'').trim().toLowerCase());}
 function f(v){return Number(v).toLocaleString()}
@@ -374,7 +375,7 @@ function drawSocialPlatform(data){
   if(metric&&metric.latest_content_comments!==null&&metric.latest_content_comments!==undefined)recentParts.push('댓글/답글 '+f(metric.latest_content_comments));
   var recentImpact=recentParts.length?esc(recentParts.join(' · ')):'<span class="na">미수집</span>';
   var created=metric&&metric.account_created_at?metricDay(metric.account_created_at):'<span class="na" title="'+esc(metric&&metric.creation_date_note||'공식 API 또는 인증 정보에서 개설일을 확인하지 못함')+'">공식 API 미제공/미확인</span>';
-  var recent=metric&&metric.last_publish?metricDay(metric.last_publish,true):esc(a.last_publish||'미확인');
+  var recent=metricDay(lastDate,true);
   var checked=metric?metricDay(metric.last_successful_at||metric.last_stats_checked_at):'<span class="na">수집 전</span>';
   var apiStatus=metric?({ok:'API 확인됨',stale:'이전 수치(갱신 실패)',auth_needed:'인증 필요',api_error:'API 오류',not_created_or_unverified:'계정 미생성/미확인',not_checked:'미수집',unsupported:'미지원'})[metric.status]||metric.status:'수집 전';
   if(metric&&metric.error)apiStatus+=' · '+metric.error;
