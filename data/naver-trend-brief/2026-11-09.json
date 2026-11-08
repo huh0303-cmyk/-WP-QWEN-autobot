@@ -1,0 +1,500 @@
+{
+  "date": "2026-11-09",
+  "timezone": "Asia/Seoul",
+  "research_started_kst": "2026-11-09T07:07:00+09:00",
+  "research_completed_kst": "2026-11-09T07:50:00+09:00",
+  "candidate_count": 30,
+  "candidates": [
+    {
+      "cluster": "시장변동·주요 일정",
+      "site_id": "naver_n1",
+      "query": "코스피 11월 6일 급락 이후 확인할 지표",
+      "same_day_signal": "STRONG_CURRENT_NEWS_AND_OFFICIAL_SCHEDULES",
+      "evidence": "2026-11-06 KOSPI close reported 5,059.68, down 6.02%; BLS official schedule lists Oct CPI on Nov 10; MSCI official release confirms Nov review announcement Nov 11. Explain facts and uncertainty, no investment recommendation.",
+      "source_urls": [
+        "https://markets.hankyung.com/indices/kospi",
+        "https://www.bls.gov/schedule/news_release/cpi.htm",
+        "https://ir.msci.com/news-releases/news-release-details/msci-november-index-review-announcement-scheduled-november-11"
+      ],
+      "naver_datalab_relative_index": null,
+      "google_trends_direction": null,
+      "measured_search_volume": null,
+      "status": "CANDIDATE_REQUIRES_EDITORIAL_CHECK"
+    },
+    {
+      "cluster": "시장변동·주요 일정",
+      "site_id": "naver_n1",
+      "query": "미국 CPI 2026년 11월 발표 일정 한국시간",
+      "same_day_signal": "STRONG_CURRENT_NEWS_AND_OFFICIAL_SCHEDULES",
+      "evidence": "2026-11-06 KOSPI close reported 5,059.68, down 6.02%; BLS official schedule lists Oct CPI on Nov 10; MSCI official release confirms Nov review announcement Nov 11. Explain facts and uncertainty, no investment recommendation.",
+      "source_urls": [
+        "https://markets.hankyung.com/indices/kospi",
+        "https://www.bls.gov/schedule/news_release/cpi.htm",
+        "https://ir.msci.com/news-releases/news-release-details/msci-november-index-review-announcement-scheduled-november-11"
+      ],
+      "naver_datalab_relative_index": null,
+      "google_trends_direction": null,
+      "measured_search_volume": null,
+      "status": "CANDIDATE_REQUIRES_EDITORIAL_CHECK"
+    },
+    {
+      "cluster": "시장변동·주요 일정",
+      "site_id": "naver_n1",
+      "query": "MSCI 2026년 11월 정기변경 발표 일정",
+      "same_day_signal": "STRONG_CURRENT_NEWS_AND_OFFICIAL_SCHEDULES",
+      "evidence": "2026-11-06 KOSPI close reported 5,059.68, down 6.02%; BLS official schedule lists Oct CPI on Nov 10; MSCI official release confirms Nov review announcement Nov 11. Explain facts and uncertainty, no investment recommendation.",
+      "source_urls": [
+        "https://markets.hankyung.com/indices/kospi",
+        "https://www.bls.gov/schedule/news_release/cpi.htm",
+        "https://ir.msci.com/news-releases/news-release-details/msci-november-index-review-announcement-scheduled-november-11"
+      ],
+      "naver_datalab_relative_index": null,
+      "google_trends_direction": null,
+      "measured_search_volume": null,
+      "status": "CANDIDATE_REQUIRES_EDITORIAL_CHECK"
+    },
+    {
+      "cluster": "에너지바우처·동절기 지원",
+      "site_id": "naver_n3",
+      "query": "2026 에너지바우처 신청대상 확인",
+      "same_day_signal": "MEDIUM_CURRENT_OFFICIAL_SEASONAL",
+      "evidence": "Official 2026 application window runs through Dec 31; winter use begins in October, official balance lookup route is described. Do not repeat third-party search-volume estimates.",
+      "source_urls": [
+        "https://www.energyv.or.kr/info/support_info.do",
+        "https://www.energyv.or.kr/info/coal_balance_inquiry.do"
+      ],
+      "naver_datalab_relative_index": null,
+      "google_trends_direction": null,
+      "measured_search_volume": null,
+      "status": "CANDIDATE_REQUIRES_EDITORIAL_CHECK"
+    },
+    {
+      "cluster": "에너지바우처·동절기 지원",
+      "site_id": "naver_n3",
+      "query": "2026 에너지바우처 잔액조회 사용기간",
+      "same_day_signal": "MEDIUM_CURRENT_OFFICIAL_SEASONAL",
+      "evidence": "Official 2026 application window runs through Dec 31; winter use begins in October, official balance lookup route is described. Do not repeat third-party search-volume estimates.",
+      "source_urls": [
+        "https://www.energyv.or.kr/info/support_info.do",
+        "https://www.energyv.or.kr/info/coal_balance_inquiry.do"
+      ],
+      "naver_datalab_relative_index": null,
+      "google_trends_direction": null,
+      "measured_search_volume": null,
+      "status": "CANDIDATE_REQUIRES_EDITORIAL_CHECK"
+    },
+    {
+      "cluster": "에너지바우처·동절기 지원",
+      "site_id": "naver_n3",
+      "query": "에너지바우처 신청 방법 복지로 주민센터",
+      "same_day_signal": "MEDIUM_CURRENT_OFFICIAL_SEASONAL",
+      "evidence": "Official 2026 application window runs through Dec 31; winter use begins in October, official balance lookup route is described. Do not repeat third-party search-volume estimates.",
+      "source_urls": [
+        "https://www.energyv.or.kr/info/support_info.do",
+        "https://www.energyv.or.kr/info/coal_balance_inquiry.do"
+      ],
+      "naver_datalab_relative_index": null,
+      "google_trends_direction": null,
+      "measured_search_volume": null,
+      "status": "CANDIDATE_REQUIRES_EDITORIAL_CHECK"
+    },
+    {
+      "cluster": "기상청 단기예보·출근생활",
+      "site_id": "naver_n3",
+      "query": "11월 9일 서울 날씨 기온 출근길",
+      "same_day_signal": "STRONG_SAME_DAY_OFFICIAL_FORECAST",
+      "evidence": "KMA 2026-11-09 05:00 forecast says temperatures low through Nov 10-12; only use for the referenced Seoul station and recheck before publication.",
+      "source_urls": [
+        "https://www.weather.go.kr/w/forecast/overall/short-term.do?stnId=109"
+      ],
+      "naver_datalab_relative_index": null,
+      "google_trends_direction": null,
+      "measured_search_volume": null,
+      "status": "CANDIDATE_REQUIRES_EDITORIAL_CHECK"
+    },
+    {
+      "cluster": "기상청 단기예보·출근생활",
+      "site_id": "naver_n3",
+      "query": "11월 10일 전국 날씨 아침 기온",
+      "same_day_signal": "STRONG_SAME_DAY_OFFICIAL_FORECAST",
+      "evidence": "KMA 2026-11-09 05:00 forecast says temperatures low through Nov 10-12; only use for the referenced Seoul station and recheck before publication.",
+      "source_urls": [
+        "https://www.weather.go.kr/w/forecast/overall/short-term.do?stnId=109"
+      ],
+      "naver_datalab_relative_index": null,
+      "google_trends_direction": null,
+      "measured_search_volume": null,
+      "status": "CANDIDATE_REQUIRES_EDITORIAL_CHECK"
+    },
+    {
+      "cluster": "기상청 단기예보·출근생활",
+      "site_id": "naver_n3",
+      "query": "11월 기온 낮아 추울 때 옷차림",
+      "same_day_signal": "STRONG_SAME_DAY_OFFICIAL_FORECAST",
+      "evidence": "KMA 2026-11-09 05:00 forecast says temperatures low through Nov 10-12; only use for the referenced Seoul station and recheck before publication.",
+      "source_urls": [
+        "https://www.weather.go.kr/w/forecast/overall/short-term.do?stnId=109"
+      ],
+      "naver_datalab_relative_index": null,
+      "google_trends_direction": null,
+      "measured_search_volume": null,
+      "status": "CANDIDATE_REQUIRES_EDITORIAL_CHECK"
+    },
+    {
+      "cluster": "2026-2027 독감접종",
+      "site_id": "naver_n2",
+      "query": "2026-2027 독감 무료 예방접종 대상",
+      "same_day_signal": "MEDIUM_CURRENT_OFFICIAL_SEASONAL",
+      "evidence": "KDCA lists 2026-2027 national vaccination targets and dates; avoid clinical advice, direct users to official clinic lookup.",
+      "source_urls": [
+        "https://www.kdca.go.kr/bbs/kdca/55/310104/download.do",
+        "https://nip.kdca.go.kr/"
+      ],
+      "naver_datalab_relative_index": null,
+      "google_trends_direction": null,
+      "measured_search_volume": null,
+      "status": "CANDIDATE_REQUIRES_EDITORIAL_CHECK"
+    },
+    {
+      "cluster": "2026-2027 독감접종",
+      "site_id": "naver_n2",
+      "query": "독감 예방접종 65세 이상 접종기간 2026",
+      "same_day_signal": "MEDIUM_CURRENT_OFFICIAL_SEASONAL",
+      "evidence": "KDCA lists 2026-2027 national vaccination targets and dates; avoid clinical advice, direct users to official clinic lookup.",
+      "source_urls": [
+        "https://www.kdca.go.kr/bbs/kdca/55/310104/download.do",
+        "https://nip.kdca.go.kr/"
+      ],
+      "naver_datalab_relative_index": null,
+      "google_trends_direction": null,
+      "measured_search_volume": null,
+      "status": "CANDIDATE_REQUIRES_EDITORIAL_CHECK"
+    },
+    {
+      "cluster": "2026-2027 독감접종",
+      "site_id": "naver_n2",
+      "query": "예방접종도우미 위탁의료기관 찾기 독감",
+      "same_day_signal": "MEDIUM_CURRENT_OFFICIAL_SEASONAL",
+      "evidence": "KDCA lists 2026-2027 national vaccination targets and dates; avoid clinical advice, direct users to official clinic lookup.",
+      "source_urls": [
+        "https://www.kdca.go.kr/bbs/kdca/55/310104/download.do",
+        "https://nip.kdca.go.kr/"
+      ],
+      "naver_datalab_relative_index": null,
+      "google_trends_direction": null,
+      "measured_search_volume": null,
+      "status": "CANDIDATE_REQUIRES_EDITORIAL_CHECK"
+    },
+    {
+      "cluster": "연말정산 미리보기",
+      "site_id": "naver_n1",
+      "query": "2026년 귀속 연말정산 미리보기 개통일",
+      "same_day_signal": "HOLD_OFFICIAL_OPENING_DATE_UNCONFIRMED",
+      "evidence": "No current-year official 2026 opening date was confirmed in this run; older annual guidance is not enough to state a date.",
+      "source_urls": [
+        "https://www.nts.go.kr/"
+      ],
+      "naver_datalab_relative_index": null,
+      "google_trends_direction": null,
+      "measured_search_volume": null,
+      "status": "CANDIDATE_REQUIRES_EDITORIAL_CHECK"
+    },
+    {
+      "cluster": "연말정산 미리보기",
+      "site_id": "naver_n1",
+      "query": "2026 연말정산 신용카드 공제 확인",
+      "same_day_signal": "HOLD_OFFICIAL_OPENING_DATE_UNCONFIRMED",
+      "evidence": "No current-year official 2026 opening date was confirmed in this run; older annual guidance is not enough to state a date.",
+      "source_urls": [
+        "https://www.nts.go.kr/"
+      ],
+      "naver_datalab_relative_index": null,
+      "google_trends_direction": null,
+      "measured_search_volume": null,
+      "status": "CANDIDATE_REQUIRES_EDITORIAL_CHECK"
+    },
+    {
+      "cluster": "연말정산 미리보기",
+      "site_id": "naver_n1",
+      "query": "홈택스 연말정산 미리보기 사용법",
+      "same_day_signal": "HOLD_OFFICIAL_OPENING_DATE_UNCONFIRMED",
+      "evidence": "No current-year official 2026 opening date was confirmed in this run; older annual guidance is not enough to state a date.",
+      "source_urls": [
+        "https://www.nts.go.kr/"
+      ],
+      "naver_datalab_relative_index": null,
+      "google_trends_direction": null,
+      "measured_search_volume": null,
+      "status": "CANDIDATE_REQUIRES_EDITORIAL_CHECK"
+    },
+    {
+      "cluster": "연탄전환 에너지바우처",
+      "site_id": "naver_n3",
+      "query": "2026 연탄전환 에너지바우처 신청 대상",
+      "same_day_signal": "MEDIUM_CURRENT_OFFICIAL_PROGRAM",
+      "evidence": "Official program pages specify 2026 application period, eligibility, evidence and card-only use; needs duplicate distinction from general voucher post.",
+      "source_urls": [
+        "https://www.energyv.or.kr/info/coal_apl_info.do",
+        "https://www.energyv.or.kr/info/coal_support_info.do"
+      ],
+      "naver_datalab_relative_index": null,
+      "google_trends_direction": null,
+      "measured_search_volume": null,
+      "status": "CANDIDATE_REQUIRES_EDITORIAL_CHECK"
+    },
+    {
+      "cluster": "연탄전환 에너지바우처",
+      "site_id": "naver_n3",
+      "query": "연탄전환 에너지바우처 신청기간 2026",
+      "same_day_signal": "MEDIUM_CURRENT_OFFICIAL_PROGRAM",
+      "evidence": "Official program pages specify 2026 application period, eligibility, evidence and card-only use; needs duplicate distinction from general voucher post.",
+      "source_urls": [
+        "https://www.energyv.or.kr/info/coal_apl_info.do",
+        "https://www.energyv.or.kr/info/coal_support_info.do"
+      ],
+      "naver_datalab_relative_index": null,
+      "google_trends_direction": null,
+      "measured_search_volume": null,
+      "status": "CANDIDATE_REQUIRES_EDITORIAL_CHECK"
+    },
+    {
+      "cluster": "연탄전환 에너지바우처",
+      "site_id": "naver_n3",
+      "query": "연탄전환 에너지바우처 국민행복카드 사용",
+      "same_day_signal": "MEDIUM_CURRENT_OFFICIAL_PROGRAM",
+      "evidence": "Official program pages specify 2026 application period, eligibility, evidence and card-only use; needs duplicate distinction from general voucher post.",
+      "source_urls": [
+        "https://www.energyv.or.kr/info/coal_apl_info.do",
+        "https://www.energyv.or.kr/info/coal_support_info.do"
+      ],
+      "naver_datalab_relative_index": null,
+      "google_trends_direction": null,
+      "measured_search_volume": null,
+      "status": "CANDIDATE_REQUIRES_EDITORIAL_CHECK"
+    },
+    {
+      "cluster": "난방·에너지 비용",
+      "site_id": "naver_n3",
+      "query": "2026 난방비 지원 대상 공식 확인",
+      "same_day_signal": "MEDIUM_SEASONAL_OFFICIAL",
+      "evidence": "Official winter energy-voucher window is active; broader support eligibility varies and must be checked per current notice.",
+      "source_urls": [
+        "https://www.energyv.or.kr/info/support_info.do",
+        "https://www.gov.kr/portal/rcvfvrSvc/main/nonLogin"
+      ],
+      "naver_datalab_relative_index": null,
+      "google_trends_direction": null,
+      "measured_search_volume": null,
+      "status": "CANDIDATE_REQUIRES_EDITORIAL_CHECK"
+    },
+    {
+      "cluster": "난방·에너지 비용",
+      "site_id": "naver_n3",
+      "query": "에너지바우처 동절기 요금차감 기간",
+      "same_day_signal": "MEDIUM_SEASONAL_OFFICIAL",
+      "evidence": "Official winter energy-voucher window is active; broader support eligibility varies and must be checked per current notice.",
+      "source_urls": [
+        "https://www.energyv.or.kr/info/support_info.do",
+        "https://www.gov.kr/portal/rcvfvrSvc/main/nonLogin"
+      ],
+      "naver_datalab_relative_index": null,
+      "google_trends_direction": null,
+      "measured_search_volume": null,
+      "status": "CANDIDATE_REQUIRES_EDITORIAL_CHECK"
+    },
+    {
+      "cluster": "난방·에너지 비용",
+      "site_id": "naver_n3",
+      "query": "2026 겨울 에너지 지원 공식 신청처",
+      "same_day_signal": "MEDIUM_SEASONAL_OFFICIAL",
+      "evidence": "Official winter energy-voucher window is active; broader support eligibility varies and must be checked per current notice.",
+      "source_urls": [
+        "https://www.energyv.or.kr/info/support_info.do",
+        "https://www.gov.kr/portal/rcvfvrSvc/main/nonLogin"
+      ],
+      "naver_datalab_relative_index": null,
+      "google_trends_direction": null,
+      "measured_search_volume": null,
+      "status": "CANDIDATE_REQUIRES_EDITORIAL_CHECK"
+    },
+    {
+      "cluster": "지자체 생활지원",
+      "site_id": "naver_n3",
+      "query": "11월 지역 난방비 지원 공고 확인",
+      "same_day_signal": "HOLD_NO_SPECIFIC_CURRENT_LOCAL_NOTICE",
+      "evidence": "No specific local announcement was independently identified; publish only after selecting a municipality and confirming its primary notice.",
+      "source_urls": [
+        "https://www.gov.kr/portal/rcvfvrSvc/main/nonLogin",
+        "https://www.bokjiro.go.kr"
+      ],
+      "naver_datalab_relative_index": null,
+      "google_trends_direction": null,
+      "measured_search_volume": null,
+      "status": "CANDIDATE_REQUIRES_EDITORIAL_CHECK"
+    },
+    {
+      "cluster": "지자체 생활지원",
+      "site_id": "naver_n3",
+      "query": "보조금24 11월 내 혜택 조회",
+      "same_day_signal": "HOLD_NO_SPECIFIC_CURRENT_LOCAL_NOTICE",
+      "evidence": "No specific local announcement was independently identified; publish only after selecting a municipality and confirming its primary notice.",
+      "source_urls": [
+        "https://www.gov.kr/portal/rcvfvrSvc/main/nonLogin",
+        "https://www.bokjiro.go.kr"
+      ],
+      "naver_datalab_relative_index": null,
+      "google_trends_direction": null,
+      "measured_search_volume": null,
+      "status": "CANDIDATE_REQUIRES_EDITORIAL_CHECK"
+    },
+    {
+      "cluster": "지자체 생활지원",
+      "site_id": "naver_n3",
+      "query": "지자체 겨울철 복지지원 공고 검색",
+      "same_day_signal": "HOLD_NO_SPECIFIC_CURRENT_LOCAL_NOTICE",
+      "evidence": "No specific local announcement was independently identified; publish only after selecting a municipality and confirming its primary notice.",
+      "source_urls": [
+        "https://www.gov.kr/portal/rcvfvrSvc/main/nonLogin",
+        "https://www.bokjiro.go.kr"
+      ],
+      "naver_datalab_relative_index": null,
+      "google_trends_direction": null,
+      "measured_search_volume": null,
+      "status": "CANDIDATE_REQUIRES_EDITORIAL_CHECK"
+    },
+    {
+      "cluster": "KTX/철도시간표",
+      "site_id": "naver_n3",
+      "query": "2026년 11월 KTX 예매 취소표 확인",
+      "same_day_signal": "HOLD_NO_CURRENT_SERVICE_CHANGE",
+      "evidence": "No same-day timetable/service change found; only use route/date exact lookup if concrete query demand appears.",
+      "source_urls": [
+        "https://www.letskorail.com"
+      ],
+      "naver_datalab_relative_index": null,
+      "google_trends_direction": null,
+      "measured_search_volume": null,
+      "status": "CANDIDATE_REQUIRES_EDITORIAL_CHECK"
+    },
+    {
+      "cluster": "KTX/철도시간표",
+      "site_id": "naver_n3",
+      "query": "수능일 전후 KTX 시간표 코레일",
+      "same_day_signal": "HOLD_NO_CURRENT_SERVICE_CHANGE",
+      "evidence": "No same-day timetable/service change found; only use route/date exact lookup if concrete query demand appears.",
+      "source_urls": [
+        "https://www.letskorail.com"
+      ],
+      "naver_datalab_relative_index": null,
+      "google_trends_direction": null,
+      "measured_search_volume": null,
+      "status": "CANDIDATE_REQUIRES_EDITORIAL_CHECK"
+    },
+    {
+      "cluster": "KTX/철도시간표",
+      "site_id": "naver_n3",
+      "query": "겨울철 서울역 KTX 시간표 확인",
+      "same_day_signal": "HOLD_NO_CURRENT_SERVICE_CHANGE",
+      "evidence": "No same-day timetable/service change found; only use route/date exact lookup if concrete query demand appears.",
+      "source_urls": [
+        "https://www.letskorail.com"
+      ],
+      "naver_datalab_relative_index": null,
+      "google_trends_direction": null,
+      "measured_search_volume": null,
+      "status": "CANDIDATE_REQUIRES_EDITORIAL_CHECK"
+    },
+    {
+      "cluster": "공항버스·공항이동",
+      "site_id": "naver_n3",
+      "query": "2026년 인천공항 버스 시간표 공식 확인",
+      "same_day_signal": "HOLD_NO_CURRENT_SERVICE_CHANGE",
+      "evidence": "No same-day service change found; precise stop and timetable must be checked on operator source before a post.",
+      "source_urls": [
+        "https://www.airport.kr"
+      ],
+      "naver_datalab_relative_index": null,
+      "google_trends_direction": null,
+      "measured_search_volume": null,
+      "status": "CANDIDATE_REQUIRES_EDITORIAL_CHECK"
+    },
+    {
+      "cluster": "공항버스·공항이동",
+      "site_id": "naver_n3",
+      "query": "서울역 공항버스 첫차 막차 공식시간",
+      "same_day_signal": "HOLD_NO_CURRENT_SERVICE_CHANGE",
+      "evidence": "No same-day service change found; precise stop and timetable must be checked on operator source before a post.",
+      "source_urls": [
+        "https://www.airport.kr"
+      ],
+      "naver_datalab_relative_index": null,
+      "google_trends_direction": null,
+      "measured_search_volume": null,
+      "status": "CANDIDATE_REQUIRES_EDITORIAL_CHECK"
+    },
+    {
+      "cluster": "공항버스·공항이동",
+      "site_id": "naver_n3",
+      "query": "공항버스 겨울 운행 변경 확인",
+      "same_day_signal": "HOLD_NO_CURRENT_SERVICE_CHANGE",
+      "evidence": "No same-day service change found; precise stop and timetable must be checked on operator source before a post.",
+      "source_urls": [
+        "https://www.airport.kr"
+      ],
+      "naver_datalab_relative_index": null,
+      "google_trends_direction": null,
+      "measured_search_volume": null,
+      "status": "CANDIDATE_REQUIRES_EDITORIAL_CHECK"
+    }
+  ],
+  "methodology": {
+    "naver_datalab": "Not directly queried; no relative interest values recorded.",
+    "naver_news": "Fresh publisher coverage was checked via web search. Direct Naver News result pages could not be inspected in this environment, so Naver-specific repetition/ranking is unverified.",
+    "naver_search_intent": "Candidate search links were generated; direct Naver result pages were blocked/unavailable for inspection.",
+    "google_trends_korea": "Google Trends page failed to load in the research connector; no directional claim recorded.",
+    "recent_public_post_check": {
+      "naver_n1": "RSS newest 2026-10-10, government benefits/refund query; last 8 titles reviewed for duplicate intent.",
+      "naver_n2": "RSS newest 2026-10-07, chondroitin; last 8 titles reviewed.",
+      "naver_n3": "RSS newest 2026-10-08, current politics/legal topic; last 8 titles reviewed."
+    },
+    "absolute_search_volume_claims": false
+  },
+  "decision": {
+    "replacements": [
+      {
+        "site_id": "naver_n1",
+        "topic": "Kospi volatility with Nov 10 US CPI and Nov 11 MSCI review calendar",
+        "reason": "Fresh coverage of the Nov 6 sharp market decline plus official BLS and MSCI dates."
+      },
+      {
+        "site_id": "naver_n2",
+        "topic": "2026-2027 flu vaccination eligible groups and official lookup",
+        "reason": "Current season schedule verified from KDCA; avoids unsupported November insurance-ceiling query."
+      },
+      {
+        "site_id": "naver_n3",
+        "topic": "2026 winter energy voucher dates/balance and KMA near-term temperature drop",
+        "reason": "Official active voucher period and same-day KMA forecast verified."
+      }
+    ],
+    "held_topics": [
+      "year-end tax preview opening date",
+      "unverified local grants",
+      "unverified rail and airport-bus service changes"
+    ],
+    "daily_post_count_target": 4,
+    "publish_status": "BLOCKED_LOGIN_IDENTITY_NOT_VERIFIED"
+  },
+  "sources_checked": [
+    "https://www.energyv.or.kr/info/support_info.do",
+    "https://www.energyv.or.kr/info/coal_balance_inquiry.do",
+    "https://www.weather.go.kr/w/forecast/overall/short-term.do?stnId=109",
+    "https://www.kdca.go.kr/bbs/kdca/55/310104/download.do",
+    "https://nip.kdca.go.kr/",
+    "https://www.bls.gov/schedule/news_release/cpi.htm",
+    "https://ir.msci.com/news-releases/news-release-details/msci-november-index-review-announcement-scheduled-november-11",
+    "https://markets.hankyung.com/indices/kospi",
+    "https://www.nts.go.kr/",
+    "https://www.gov.kr/portal/rcvfvrSvc/main/nonLogin"
+  ]
+}
