@@ -820,3 +820,10 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - Confirmed live REST HTTP 403 Hostinger browser challenge. Existing fleet publishers are disabled_manually. Hostinger control tool and API credentials are unavailable, so no CDN setting was changed.
 - Eight unit tests, workflow YAML parsing and whitespace validation passed. Initial test run lacked requests; isolated virtual environment resolved the test dependency.
 - Live GitHub dispatch and final result will be recorded separately; no live publication success is claimed by this code deployment. See docs/KVISA_DAILY_RECOVERY_2026-11-09.md.
+
+
+## kvisa-one-daily-live-result-20261109
+
+- Deployed and read back commit f4ef26594a2cf9b2fbc80ff2be257a291768e634 on main. Dedicated kvisa-one-daily.yml is active, scheduled 09:17 Asia/Seoul, other fleet publishing workflows stay disabled.
+- Manual run 42493565274 / job 128770892312 completed preflight with HOSTINGER_BROWSER_CHALLENGE: HTTP 403 (users/me). KVISA365COM is available to the job (masked), but CDN intercepts the authenticated request. No generation or public publication was attempted. Artifact 13622755912 preserves the blocked preflight.
+- Hostinger plugin discovery found only Hostinger Mail, which cannot manage hosting/CDN. No callable local Browser JS or cloud desktop control tool is exposed. Remaining blocker is authenticated Hostinger control to configure the narrow REST browser-challenge exception while preserving WordPress authentication. No publication success is claimed.

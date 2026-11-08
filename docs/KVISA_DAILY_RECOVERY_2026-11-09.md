@@ -22,3 +22,11 @@ Owner instruction: repair K-Visa365 publication and automatically publish one ar
 ## Outstanding live repair
 
 Authenticated GitHub execution must verify secret availability and live access. If the same Hostinger challenge remains, the hosting owner must provide a callable authenticated Hostinger control surface or configure the path-specific CDN challenge exception. Preserve WordPress authentication and TLS verification. Do not disable CDN or security site-wide, bypass through origin IPs, or claim a public URL until a receipt is verified.
+
+## Live execution result
+
+Deployment commit: f4ef26594a2cf9b2fbc80ff2be257a291768e634, verified on main. Workflow state: active.
+
+Run https://github.com/huh0303-cmyk/-WP-QWEN-autobot/actions/runs/42493565274 failed at authenticated preflight with HOSTINGER_BROWSER_CHALLENGE: HTTP 403 (users/me). The WordPress secret was present and masked. Article generation, publishing and public verification were correctly skipped. Artifact ID: 13622755912. No post ID or public publication URL was obtained.
+
+Automatic daily polling is installed, but successful daily publication remains blocked until the Hostinger challenge exception is configured. Connected Hostinger Mail is not a hosting/CDN management substitute.
