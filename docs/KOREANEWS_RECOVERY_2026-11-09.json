@@ -1,0 +1,27 @@
+{
+  "run_id": 42500305946,
+  "status": "in_progress",
+  "public_posts": [
+    {
+      "id": 7173,
+      "date": "2026-11-09T01:37:52",
+      "link": "https://koreanews365.com/%eb%aa%ac%ed%85%8c%eb%84%a4%ea%b7%b8%eb%a1%9c-%ec%8b%9c%eb%af%bc%eb%93%a4-eu-%ec%a7%80%ec%b9%a8-%eb%a7%9e%ec%b6%98-%ed%8f%90%ea%b8%b0%eb%ac%bc-%ea%b4%80%eb%a6%ac-%ec%86%8d-%ec%9e%90%eb%b0%9c%ec%a0%81/",
+      "title": {
+        "rendered": "몬테네그로 시민들, EU 지침 맞춘 폐기물 관리 속 자발적 정화 나서"
+      },
+      "featured_media": 7172
+    },
+    {
+      "id": 7171,
+      "date": "2026-11-09T01:34:44",
+      "link": "https://koreanews365.com/%eb%8f%84%eb%af%b8%eb%8b%88%ec%b9%b4%ea%b3%b5%ed%99%94%ea%b5%ad-%ea%b5%ad%ec%a0%9c%ed%95%b4%ec%a0%80%ea%b8%b0%ea%b5%ac%ec%97%90-%ec%8b%ac%ed%95%b4-%ea%b4%91%ec%97%85-%ea%b7%9c%ec%a0%9c-%ed%94%84/",
+      "title": {
+        "rendered": "도미니카공화국, 국제해저기구에 심해 광업 규제 프레임워크 완성 촉구"
+      },
+      "featured_media": 7170
+    }
+  ],
+  "quota_tests": "2 passed",
+  "schedule": "09:17,12:17,15:17,18:17,21:17 Asia/Seoul +0..120s",
+  "daily_total_cap": 5
+}

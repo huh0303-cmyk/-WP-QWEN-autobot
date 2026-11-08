@@ -888,3 +888,5 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - Owner requests immediate photo-backed Korean articles and five total daily across existing desks. Latest homepage posts 2026-10-31. Workflow disabled_manually. Run 42177197507 failed with missing strip_title_duplicate_lead_image; shared fix already on main.
 - Restored free Gemini routing, five scheduled slots 09:17/12:17/15:17/18:17/21:17 KST with <=120s jitter and no manual delay. Removed 30-minute jitter vs 20-minute timeout conflict.
 - Added serialized authenticated five-public-post KST daily cap and bounded recovery attempts with receipt artifacts. Source, rights, duplicate and editorial gates retained. Syntax compilation passed; live result pending.
+
+- Live run 42500305946 has published and independently verified two public posts (7171,7173), both with featured_media (7170,7172). Browser confirms first article, source attribution and actual photo. Two mocked quota-boundary tests passed. Five-total target remains in progress; do not report five complete yet. Subsequent schedules rotate suggested desks across ten menu categories, with eligible-source fallback.
