@@ -42,6 +42,8 @@ def find_due_channel(channel_filter: str = "") -> str:
         if len(row) >= 7 and row[6] in {"ON", "TRUE", "1"}
     }
     enabled = set(channels) & sheet_enabled
+    from seed_knowledge_calendar import seed
+    seed(service, spreadsheet_id, enabled)
     if channel_filter:
         if channel_filter not in channels:
             raise ValueError(f"Unknown YouTube channel key: {channel_filter}")
