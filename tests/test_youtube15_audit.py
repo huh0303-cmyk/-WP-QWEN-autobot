@@ -5,7 +5,6 @@ class AuditTest(unittest.TestCase):
  def test_scope(self):
   self.assertEqual(len(PLAYLISTS),5)
   self.assertEqual(len(LANGUAGES),10)
- def test_missing_workflow_is_detected(self):
-  problems=audit()
-  self.assertTrue(any('registered workflow missing' in p for p in problems),problems)
+ def test_workflow_mapping_is_valid(self):
+  self.assertEqual(audit(),[])
 if __name__=='__main__': unittest.main()
