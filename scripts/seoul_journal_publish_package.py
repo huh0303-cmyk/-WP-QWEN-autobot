@@ -78,7 +78,9 @@ def main():
     (folder/"public_upload_receipt.json").write_text(json.dumps(receipt,ensure_ascii=False,indent=2),encoding="utf-8")
     print("PUBLIC_UPLOAD_READBACK "+json.dumps(receipt,ensure_ascii=True),flush=True)
     if schedule:
-        if saved["status"].get("publishAt") is None: raise RuntimeError("YouTube schedule not confirmed")
+        actual=saved["status"].get("publishAt")
+        if not actual or datetime.datetime.fromisoformat(actual.replace("Z","+00:00"))!=datetime.datetime.fromisoformat(schedule):
+            raise RuntimeError("YouTube scheduled time readback mismatch")
         receipt["confirmed_publish_at"]=saved["status"]["publishAt"]
         (folder/"public_upload_receipt.json").write_text(json.dumps(receipt,ensure_ascii=False,indent=2),encoding="utf-8")
     elif receipt["privacy"]!="public": raise RuntimeError("YouTube did not permit public visibility; receipt saved")
