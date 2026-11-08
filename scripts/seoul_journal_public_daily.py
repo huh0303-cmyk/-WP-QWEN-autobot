@@ -3,17 +3,22 @@ import datetime,json,os,re
 from pathlib import Path
 from urllib.parse import urlparse
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 from bs4 import BeautifulSoup
 from seoul_journal_publish_package import youtube,recent,main as publish
 from seoul_journal_presentation import make
 KST=datetime.timezone(datetime.timedelta(hours=9))
 UA={"User-Agent":"Mozilla/5.0 SeoulJournalEditorial/1.0"}
+HTTP=requests.Session()
+HTTP.headers.update(UA)
+HTTP.mount("https://",HTTPAdapter(max_retries=Retry(total=2,backoff_factor=1,status_forcelist=[429,500,502,503,504])))
 def candidates(category):
     if category=="sports":
         # Search only dated Naver news reports; unsupported sports-page layouts fail visibly.
-        r=requests.get("https://search.naver.com/search.naver",params={
+        r=HTTP.get("https://search.naver.com/search.naver",params={
             "where":"news","query":"한국시리즈 OR 프로야구 OR 프로축구 OR 배드민턴","sort":1},
-            headers=UA,timeout=25)
+            headers=UA,timeout=(15,45))
         r.raise_for_status()
         for a in BeautifulSoup(r.text,"html.parser").select('a[href*="n.news.naver.com/mnews/article/"]'):
             yield a["href"].split("?")[0]
@@ -21,7 +26,7 @@ def candidates(category):
     sections=["100"] if category=="politics" else ["102","100"]
     seen=set()
     for section in sections:
-        r=requests.get("https://news.naver.com/section/"+section,headers=UA,timeout=25); r.raise_for_status()
+        r=HTTP.get("https://news.naver.com/section/"+section,headers=UA,timeout=(15,45)); r.raise_for_status()
         for a in BeautifulSoup(r.text,"html.parser").select('a[href*="n.news.naver.com/mnews/article/"]'):
             u=a.get("href","").split("?")[0]
             if u not in seen and len(a.get_text(strip=True))>=12:
@@ -29,7 +34,7 @@ def candidates(category):
 def extract(url):
     host=urlparse(url).hostname
     if host!="n.news.naver.com": raise RuntimeError("Unexpected news host")
-    r=requests.get(url,headers=UA,timeout=25); r.raise_for_status()
+    r=HTTP.get(url,headers=UA,timeout=(15,45)); r.raise_for_status()
     soup=BeautifulSoup(r.text,"html.parser")
     title=soup.select_one("#title_area"); body=soup.select_one("#dic_area")
     date=soup.select_one("[data-date-time]")
@@ -60,7 +65,7 @@ SOURCE TITLE: """+title+"\nSOURCE BODY:\n"+body[:14000]
     errors=[]
     for key in filter(None,keys):
         try:
-            models=requests.get("https://generativelanguage.googleapis.com/v1beta/models",
+            models=HTTP.get("https://generativelanguage.googleapis.com/v1beta/models",
                 headers={"x-goog-api-key":key},timeout=25); models.raise_for_status()
             available=[m["name"] for m in models.json().get("models",[])
                        if "flash" in m["name"] and "generateContent" in m.get("supportedGenerationMethods",[])
