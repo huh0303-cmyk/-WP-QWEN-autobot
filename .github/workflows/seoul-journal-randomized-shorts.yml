@@ -9,6 +9,14 @@ on:
         type: choice
         options: [morning, midday, evening]
         default: morning
+      revise_video:
+        description: "Rebuild authorized first Lee Jae-myung Short (enter oEZaFVnqKR0)"
+        type: string
+        default: ""
+      publish_at:
+        description: "Optional ISO8601 scheduled publish time with timezone"
+        type: string
+        default: ""
       verify_only:
         description: "Run full production without another public upload"
         type: boolean
@@ -57,6 +65,10 @@ jobs:
       GEMINI_API_KEY_2: ${{ secrets.GEMINI_API_KEY_2 }}
       GEMINI_API_KEY_3: ${{ secrets.GEMINI_API_KEY_3 }}
       FISH_AUDIO_API_KEY: ${{ secrets.FISH_AUDIO_API_KEY }}
+      REVISE_VIDEO: ${{ inputs.revise_video }}
+      PUBLISH_AT: ${{ inputs.publish_at }}
+      SJ_FISH_MALE_ANCHOR: ${{ secrets.SJ_FISH_MALE_ANCHOR }}
+      SJ_FISH_FEMALE_ANCHOR: ${{ secrets.SJ_FISH_FEMALE_ANCHOR }}
       VERIFY_ONLY: ${{ inputs.verify_only }}
       SLOT: ${{ needs.pick.outputs.slot }}
       CATEGORY: ${{ needs.pick.outputs.category }}
