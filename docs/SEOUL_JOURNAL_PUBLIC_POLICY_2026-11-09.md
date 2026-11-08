@@ -6,15 +6,15 @@ Channel: 서울저널 @seouljournal1 / UChRUdHZlXSjftAqBtdDNEWA.
 - Target three PUBLIC Shorts/day, KST morning 08:00–10:00, midday 13:00–15:00, evening 19:00–22:00.
 - Existing deterministic date/slot random gate selects a 10-minute-grid time. Actions can run late; public slot marker prevents repeated publication.
 - Morning politics, midday social hot issues, evening current affairs/hot issues. Politics can fill a weak social news queue.
-- Sports is strictly 한국시리즈 only. Do not force unrelated regular-season baseball, international sports or fabricated current games into the feed.
+- Sports includes 한국시리즈, 프로야구/KBO, 프로축구/K리그 and 배드민턴. Use verified current reports; never invent games or results. Every other evening prioritizes sports.
 - No suitable fresh supported story: fail visibly rather than invent or replay old news. Three is the daily target, not guaranteed output when dependencies fail.
 
 ## Presentation and voice
 - Approved concept: original Seoul Journal navy/yellow/white/red, large real subject photograph, short specific headline and changing captions.
 - Use only relevant licensed/PD photographs. Label archival photos and record source, author, date, license and edits. Never publish concept-generated politician images as real news photographs.
-- Narration speed exactly 1.2x through FFmpeg atempo. Central priority Fish Audio -> local Qwen3-TTS -> Edge-TTS.
+- Narration speed exactly 1.2x through FFmpeg atempo. Central priority Fish Audio -> local Qwen3-TTS -> Edge-TTS. Per-story stable random choice: male InJoon -12Hz or female SunHi -8Hz for Edge. Fish uses SJ_FISH_MALE_ANCHOR / SJ_FISH_FEMALE_ANCHOR only when configured; no claim that selected Fish voices were auditioned. A generic Qwen adapter still requires voice-specific setup.
 - Qwen requires an installed model and QWEN3_TTS_COMMAND. Without that configured adapter, proceed to Edge and record the reason. No claim that Qwen is installed.
-- Current portrait registry covers 이재명 only; other subjects use original graphics until their assets are individually cleared.
+- Minimum three distinct cleared subject photos per Short, target 3–5. Alternate 1.00–1.10 zoom in/out with stationary transparent text overlay. No single-photo still fallback. 이재명 photos are discovered by exact named Commons titles with license records; other subjects require reviewed photo_files. Missing assets stop production visibly.
 - Gemini-only automatic drafts. Manual first release is independently written and source-reviewed; no GPT/Claude draft used.
 - Hook in first sentence; concrete factual title/question. Attribute allegations, material rebuttals and uncertainties. Never imply a hypothetical clash, invented quote or proven guilt.
 - Thumbnail JPEG is generated plus matching vertical cover embedded. YouTube may reject API custom thumbnails for this channel/Shorts; log that separately and do not misreport thumbnail application.
@@ -32,7 +32,7 @@ Public vidIQ research during this session used 20 credits across four searches.
 ## Workflow and verification
 1. Check exact OAuth channel and previous 100 uploads.
 2. Check public day-slot marker and source URL before generation.
-3. Select a Naver report with article timestamp <=36h and sufficient body; reject stale, opinion, ad and non-Korean-Series sports.
+3. Select a Naver report with article timestamp <=36h and sufficient body; reject stale, opinion, ad and out-of-scope sports.
 4. Generate original Gemini summary with claims/rebuttals, title and 6–10 caption beats.
 5. Clear portrait -> central TTS -> 1.2x audio -> 9:16 MP4 + JPEG.
 6. Recheck public source/slot duplicates before insert; serialize public workflows.
@@ -50,3 +50,8 @@ Public vidIQ research during this session used 20 credits across four searches.
 
 ## Runtime verification
 PR #273 merged (1a39cba65feebe5f682518afbea3130eee67970f). Full no-extra-publication Actions run https://github.com/huh0303-cmyk/-WP-QWEN-autobot/actions/runs/42498013145 succeeded: fresh article -> Gemini draft -> Fish Audio -> 1.2x render -> 9 captions -> artifact, 36.643 seconds. Scheduled end-to-end public insert has not occurred yet; direct public insert/readback succeeded for the first release.
+
+## 2026-11-09 presentation revision
+- Shorts-first channel: full-frame real photos, colored yellow/white outlined text on transparent background, face clear, category below portrait focal area. 16:9 is a separate thumbnail composition.
+- Public revision of oEZaFVnqKR0 authorized; allow exactly its motion-v2 marker, preserve all other source/slot duplicate guards. Old public video is not automatically deleted.
+- Native YouTube scheduling accepts explicit future ISO8601 timestamp, uploads private with publishAt, then requires schedule readback. Saving workflow settings alone does not prove a scheduled video exists.
