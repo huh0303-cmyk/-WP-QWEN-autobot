@@ -66,13 +66,26 @@ TOPICS = [
 
 
 def pick_topic():
-    state = {"last_idx": -1}
+    """Rotate NASA topics without falling back to Apollo 11 on ephemeral runners.
+
+    GITHUB_RUN_NUMBER advances across Actions executions even when state files
+    are not committed. A persisted index takes precedence when available.
+    """
+    state = {}
     if os.path.exists(STATE_PATH):
-        with open(STATE_PATH, encoding="utf-8") as f:
-            state = json.load(f)
-    idx = (state.get("last_idx", -1) + 1) % len(TOPICS)
+        try:
+            with open(STATE_PATH, encoding="utf-8") as f:
+                state = json.load(f)
+        except (OSError, ValueError):
+            state = {}
+    run_number = os.environ.get("GITHUB_RUN_NUMBER", "")
+    if run_number.isdigit():
+        idx = (int(run_number) - 1) % len(TOPICS)
+    else:
+        idx = (int(state.get("last_idx", -1)) + 1) % len(TOPICS)
+    os.makedirs(DATA_DIR, exist_ok=True)
     with open(STATE_PATH, "w", encoding="utf-8") as f:
-        json.dump({"last_idx": idx}, f)
+        json.dump({"last_idx": idx, "last_topic": TOPICS[idx]}, f)
     return TOPICS[idx]
 
 
