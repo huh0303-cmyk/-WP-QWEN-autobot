@@ -766,3 +766,14 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - The owner directed that the newest instruction given in the active conversation supersedes conflicting existing London Project policy. Clear, bounded conflicts must be removed or replaced rather than retained as active legacy policy.
 - Confirmation is required only for conflicts with material public-publishing, cost, credential/security, account-ownership, legal/compliance, or destructive live-data impact. The responsible agent must present the exact conflict before proceeding in those cases.
 - `CODEX.md` now records this precedence rule as standing PM instruction. Historical records remain as audit evidence but cannot override a newer owner directive.
+
+
+## meta-five-plus-five-status-check-20261108
+
+- task_id: `meta-five-plus-five-status-check-20261108`; owner requested current status through first successful daily scheduled content publication.
+- Canonical account map: Instagram `seoul_topik`, `seoul_jisoo`, `seoul_chris1`, `english_pick1`, `japanese_pick`; Threads `seoultopik`, `seoul_jisoo`, `seoul_chris1`, `english_pick1`, `japanese_pick`. `seoultopik` is the verified Threads handle for the TOPIK logical account; no underscore substitution is permitted.
+- Latest exact-identity Actions run was `42366598475` (2026-11-07 20:04 KST). Its Meta preflight job failed as designed because three required connections are absent; the separate Facebook read-only preflight succeeded. This run is a credential check only and did not publish.
+- Identity token/user-ID verification evidence exists for Instagram `seoul_topik`, `seoul_jisoo`, `english_pick1`, `japanese_pick`, and Threads `seoultopik`, `seoul_jisoo`, `english_pick1`. Missing: Instagram `seoul_chris1`, Threads `seoul_chris1`, Threads `japanese_pick`.
+- Meta Center progression known from durable evidence: Threads `seoultopik` and `english_pick1` tester invitations were accepted; their tokens were generated and exact identities verified. Threads `japanese_pick` cannot be invited/accepted/tokenized because its profile is not yet created; its public profile check returned not found. Chris was previously deferred and has no recorded invitation, acceptance, or token flow. Token values are not present in this repository.
+- No platform-specific write scope, content-publishing permission, scheduled content queue, or public canary URL is verified for any of the ten connections. The daily 09:10 KST workflow remains readiness-only; it is not a publisher.
+- KPI path to first receipt: complete the three missing account/profile/token steps on the authorized owner PC; run exact-identity and write-scope preflight; create one reviewed native post per verified platform-account canary; save returned public URL/post ID; only then connect the daily schedule and enable each destination independently.
