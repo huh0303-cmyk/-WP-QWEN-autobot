@@ -119,8 +119,7 @@ function blogPlatformOf(r){return String(r.platform||'').toLowerCase()==='newsro
 function visitorFor(r){var key=String(r.site||'').toLowerCase().replace(/^https?:\/\//,'').replace(/\/$/,'');return VISITOR_DATA&&VISITOR_DATA.sites?VISITOR_DATA.sites[key]||null:null}
 function drawBloggerRanking(){
  var tbody=document.getElementById('blogger-pageviews-rows');
- // The legacy Blogger detail widgets are optional; never block the main dashboard.
- if(!meta||!select||!totalEl||!dailyEl||!chart||!tbody)return;
+ // This ranking only requires its table body; optional detail widgets must not block it.
  if(!tbody||!J)return;
  var visitorRows=(J.blogger_pageviews&&J.blogger_pageviews.blogs)||[];
  var byUrl={};visitorRows.forEach(function(v){byUrl[String(v.url||'').replace(/\/$/,'').toLowerCase()]=v;});
