@@ -101,6 +101,8 @@ ANCHOR_VOICES = (
 )
 def photo_sequence(meta,out):
     """Use reviewed Commons file titles, or the exact registered subject's named photos."""
+    session=requests.Session()
+    session.headers.update({"User-Agent":"SeoulJournalEditorial/2.0 (https://github.com/huh0303-cmyk/-WP-QWEN-autobot; news asset attribution)"})
     files=meta.get("photo_files", [])
     evidence=meta.get("source_title","")+" "+meta["youtube_title"]+" "+meta["narration"]
     proposed=meta.get("visual_subject","").strip()
@@ -108,17 +110,17 @@ def photo_sequence(meta,out):
     english="Lee Jae-myung" if subject=="이재명" else None
     if subject and not english:
         # Resolve the exact Korean label before searching named Commons images.
-        response=requests.get("https://www.wikidata.org/w/api.php",params={
+        response=session.get("https://www.wikidata.org/w/api.php",params={
             "action":"wbsearchentities","search":subject,"language":"ko","limit":5,"format":"json"},timeout=30)
         response.raise_for_status()
         matches=[x for x in response.json().get("search",[]) if x.get("label")==subject]
         if len(matches)==1:
-            response=requests.get("https://www.wikidata.org/w/api.php",params={
+            response=session.get("https://www.wikidata.org/w/api.php",params={
                 "action":"wbgetentities","ids":matches[0]["id"],"props":"labels","languages":"en","format":"json"},timeout=30)
             response.raise_for_status()
             english=response.json()["entities"][matches[0]["id"]].get("labels",{}).get("en",{}).get("value")
     if not files and english:
-        response=requests.get("https://commons.wikimedia.org/w/api.php",params={
+        response=session.get("https://commons.wikimedia.org/w/api.php",params={
             "action":"query","list":"search","srsearch":'intitle:"'+english+'" filetype:bitmap',
             "srnamespace":6,"srlimit":20,"format":"json"},timeout=30)
         response.raise_for_status()
@@ -126,7 +128,7 @@ def photo_sequence(meta,out):
             if english.lower() in x["title"].lower()]
     assets=[]; hashes=set()
     for title in dict.fromkeys(files):
-        response=requests.get("https://commons.wikimedia.org/w/api.php",params={
+        response=session.get("https://commons.wikimedia.org/w/api.php",params={
             "action":"query","titles":title,"prop":"imageinfo","iiprop":"url|extmetadata|sha1",
             "iiurlwidth":1600,"format":"json"},timeout=30)
         response.raise_for_status()
@@ -136,7 +138,7 @@ def photo_sequence(meta,out):
         license_name=md.get("LicenseShortName",{}).get("value","")
         if license_name not in ("Public domain","CC0","CC BY 4.0","CC BY-SA 4.0","CC BY 3.0","CC BY-SA 3.0"): continue
         if info.get("sha1") in hashes: continue
-        image=requests.get(info.get("thumburl",info["url"]),timeout=45); image.raise_for_status()
+        image=session.get(info.get("thumburl",info["url"]),timeout=45); image.raise_for_status()
         digest=hashlib.sha256(image.content).hexdigest()
         if digest in hashes: continue
         path=out/f"photo-{len(assets):02d}.jpg"
