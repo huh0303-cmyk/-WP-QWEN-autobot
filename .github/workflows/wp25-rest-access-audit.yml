@@ -1,0 +1,77 @@
+name: WordPress 25 authenticated read-only REST audit
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: Inspect public and authenticated REST without writes
+        env:
+          KOREA365ORG: ${{ secrets.KOREA365ORG }}
+          KSTUDY365COM: ${{ secrets.KSTUDY365COM }}
+          OLIVEYOUNGKOREACOM: ${{ secrets.OLIVEYOUNGKOREACOM }}
+          JOBKOREA365COM: ${{ secrets.JOBKOREA365COM }}
+          KVISA365COM: ${{ secrets.KVISA365COM }}
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+          KSKIN365COM: ${{ secrets.KSKIN365COM }}
+          KTRIP365COM: ${{ secrets.KTRIP365COM }}
+          KFINANCE365COM: ${{ secrets.KFINANCE365COM }}
+          KOREAINSURANCE365COM: ${{ secrets.KOREAINSURANCE365COM }}
+          KOREATAXNLAWCOM: ${{ secrets.KOREATAXNLAWCOM }}
+          KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
+          STUDYINKOREA365COM: ${{ secrets.STUDYINKOREA365COM }}
+          JOBINKOREA365COM: ${{ secrets.JOBINKOREA365COM }}
+          KWORLD365COM: ${{ secrets.KWORLD365COM }}
+          KOREAWEDDING365COM: ${{ secrets.KOREAWEDDING365COM }}
+          JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
+          KOREAINVEST365COM: ${{ secrets.KOREAINVEST365COM }}
+          KREALESTATE365COM: ${{ secrets.KREALESTATE365COM }}
+          KOREACRYPTO365COM: ${{ secrets.KOREACRYPTO365COM }}
+          KTECH365COM: ${{ secrets.KTECH365COM }}
+          KIECAKOREAORG: ${{ secrets.KIECAKOREAORG }}
+          KSAKOREAORG: ${{ secrets.KSAKOREAORG }}
+          SISKOREACOM: ${{ secrets.SISKOREACOM }}
+          KIKOREACOM: ${{ secrets.KIKOREACOM }}
+        run: |
+          python - <<'PY'
+          import os,json,concurrent.futures,requests,datetime
+          from pathlib import Path
+          sites=json.loads(Path("config/automation_hub_sites.json").read_text())["sites"]
+          sites=[s for s in sites if s["platform"]=="wordpress" and s["url"].split("//")[-1] not in ("koreanews365.com","theseouljournal.com")]
+          def inspect(s):
+              row={"site":s["url"],"secret_name":s["secret_name"]}
+              for kind,path in (("public","posts?per_page=1&_fields=id,date,link"),("authenticated","users/me?context=edit&_fields=id,capabilities")):
+                  pw=os.environ.get(s["secret_name"],"")
+                  if kind=="authenticated" and not pw:
+                      row[kind]={"result":"MISSING_CREDENTIAL"};continue
+                  try:
+                      r=requests.get(s["url"]+"/wp-json/wp/v2/"+path,auth=("huh0303@gmail.com",pw) if kind=="authenticated" else None,timeout=20)
+                      challenge=r.status_code==403 and any(x in r.text.lower() for x in ("hcdn-cgi/jschallenge","checking your browser"))
+                      v={"http":r.status_code,"result":"HOSTINGER_BROWSER_CHALLENGE" if challenge else "OK" if r.status_code==200 else "HTTP_ERROR"}
+                      if r.status_code==200:
+                          data=r.json()
+                          if kind=="public":v["latest"]=data
+                          else:v["can_publish"]=bool(data.get("capabilities",{}).get("publish_posts"))
+                      row[kind]=v
+                  except Exception as e:row[kind]={"result":"CONNECTION_ERROR","error_type":type(e).__name__}
+              return row
+          with concurrent.futures.ThreadPoolExecutor(max_workers=5) as pool:rows=list(pool.map(inspect,sites))
+          report={"task_id":"wp25-cdn-recovery-20261109","checked_at":datetime.datetime.now(datetime.timezone.utc).isoformat(),"sites":rows}
+          Path("artifacts").mkdir(exist_ok=True)
+          Path("artifacts/wp25-rest-audit.json").write_text(json.dumps(report,indent=2))
+          for row in rows:print(json.dumps(row))
+          
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: wp25-rest-audit
+          path: artifacts/wp25-rest-audit.json
