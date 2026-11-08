@@ -3085,7 +3085,7 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
     # KoreaWedding365 renders featured_media above the title. Remove a second
     # image-only lead block even when it is a different file/photo; preserve
     # images after the opening text.
-    if "koreawedding365.com" in url.lower():
+    if any(domain in url.lower() for domain in ("koreawedding365.com", "k-visa365.com")):
         body_html = strip_leading_inline_image_block(body_html)
     try:
         repeat_errors = repetition_issues(title, body_html, fetch_wp_history(requests, url, (WP_USER, pw)))
@@ -3153,6 +3153,10 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
         from scripts.khealth365_sitewide_coupang_10 import load_products as load_khealth_fixed_products
         load_khealth_fixed_products()
     final = apply_footer(final, title, site.get("site_id", url), site.get("lang", "ko"))
+    # Append the SeoulMall store CTA once, after editorial and affiliate sections.
+    if url.rstrip("/").lower() == "https://k-visa365.com":
+        from automation_hub.seoulmall_widget import append_widget
+        final = append_widget(final)
 
 
     # Hard reader-visible provenance gate. Stock provider/license details belong
