@@ -7,7 +7,7 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 from bs4 import BeautifulSoup
 from seoul_journal_publish_package import youtube,recent,main as publish
-from seoul_journal_presentation import make
+from seoul_journal_presentation import make,photo_sequence
 KST=datetime.timezone(datetime.timedelta(hours=9))
 UA={"User-Agent":"Mozilla/5.0 SeoulJournalEditorial/1.0"}
 HTTP=requests.Session()
@@ -103,7 +103,8 @@ def main():
     if any(marker in v["snippet"].get("description","") for v in old):
         print("SLOT_ALREADY_EXISTS "+marker); return
     used="\n".join(v["snippet"].get("description","") for v in old if v["status"]["privacyStatus"]=="public")
-    selected=None
+    out=Path("artifacts/seoul-journal-public")/day/slot; out.mkdir(parents=True,exist_ok=True)
+    selected=None; media_attempts=0
     source_override="https://n.news.naver.com/mnews/article/028/0002831263" if revision=="oEZaFVnqKR0" else None
     if revision and not source_override: raise RuntimeError("Unknown revision target")
     for i,url in enumerate([source_override] if source_override else candidates(category)):
@@ -112,9 +113,20 @@ def main():
         try: title,body,date=extract(url)
         except Exception as exc:
             print("SOURCE_REJECTED "+type(exc).__name__); continue
+        meta=draft(title,body)
+        meta["source_title"]=title
+        if revision: meta["visual_subject"]="이재명"
+        media_attempts+=1
+        try:
+            probe=out/f"assets-{media_attempts}"; probe.mkdir(parents=True,exist_ok=True)
+            meta["_prepared_assets"]=photo_sequence(meta,probe)
+        except Exception as exc:
+            print("MEDIA_REJECTED "+title+" "+type(exc).__name__+": "+str(exc)[:180],flush=True)
+            if revision or media_attempts>=4: raise
+            continue
         selected=(url,title,body,date); break
     if selected is None: raise RuntimeError("No fresh eligible nonduplicate article")
-    url,title,body,date=selected; meta=draft(title,body)
+    url,title,body,date=selected
     meta.update(source_url=url,source_title=title,source_date_kst=date,
                 display_category="스포츠" if category=="sports" else "정치·시사")
     if category=="sports" and not any(x in title for x in ("한국시리즈","프로야구","KBO","프로축구","K리그","배드민턴")):
