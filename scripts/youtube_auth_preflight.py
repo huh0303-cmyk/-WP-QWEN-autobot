@@ -13,7 +13,16 @@ def main():
         'client_id': fields['CLIENT_ID'], 'client_secret': fields['CLIENT_SECRET'],
         'refresh_token': fields['REFRESH_TOKEN'], 'grant_type': 'refresh_token'}, timeout=30)
     if not response.ok:
-        raise RuntimeError(f"{profile}: refresh rejected: {response.json().get('error', response.status_code)}")
+        try:
+            error = response.json().get('error', str(response.status_code))
+        except ValueError:
+            error = str(response.status_code)
+        guidance = {
+            'unauthorized_client': 'OAuth client is not authorized for this refresh grant. Verify CLIENT_ID and CLIENT_SECRET belong to the same OAuth client that issued REFRESH_TOKEN; check Google Cloud OAuth client type/status and re-authorize that exact YouTube channel if necessary.',
+            'invalid_grant': 'Refresh token expired, revoked, or issued for another client. Re-authorize the expected YouTube channel and replace REFRESH_TOKEN.',
+            'invalid_client': 'OAuth client ID or secret rejected. Verify the matching Google Cloud OAuth client credentials.',
+        }.get(error, 'Inspect Google OAuth client configuration and granted YouTube scopes.')
+        raise RuntimeError(f'{profile}: OAUTH_PREFLIGHT_FAILED [{error}]. {guidance} Publishing blocked before generation.')
     data = response.json()
     scopes = set(data.get('scope', '').split())
     allowed = {'https://www.googleapis.com/auth/youtube', 'https://www.googleapis.com/auth/youtube.upload', 'https://www.googleapis.com/auth/youtube.force-ssl'}
