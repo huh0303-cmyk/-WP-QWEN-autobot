@@ -143,9 +143,11 @@
     }
   ],
   "daily_research": {
-    "status": "RESEARCH_IN_PROGRESS",
+    "status": "COMPLETE_WITH_SIGNAL_LIMITATIONS",
     "started_kst": "2026-11-09T07:07:00+09:00",
-    "deadline_kst": "2026-11-09T07:50:00+09:00",
-    "note": "Daily topics adjusted only where current news or official-source evidence was stronger; Naver DataLab/Google Trends absolute or relative values were not asserted."
+    "completed_kst": "2026-11-09T07:11:02.000+09:00",
+    "brief_path": "data/naver-trend-brief/2026-11-09.json",
+    "candidate_count": 30,
+    "notes": "Naver DataLab relative indices and Google Trends directional data were not available in this environment; no values were invented. Candidate ranking uses verified current news and official sources only."
   }
 }
