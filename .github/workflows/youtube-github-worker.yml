@@ -166,6 +166,21 @@ jobs:
             echo "::error::Publishing blocked. Other channels remain held until owner-approved cost review."
             exit 1
           fi
+      - name: Preflight selected channel credentials
+        env:
+          CHANNEL: ${{ inputs.channel }}
+        run: |
+          python - <<'PY'
+          import os, sys
+          channel = os.environ['CHANNEL']
+          if channel == 'nasa':
+              required = ['SHEET_ID', 'GEMINI_API_KEY', 'YOUTUBE_OAUTH_REFRESH_TOKEN_NASA_SPACE_TIMES']
+              missing = [key for key in required if not os.environ.get(key, '').strip()]
+              if missing:
+                  print('::error::NASA preflight missing secrets: ' + ', '.join(missing))
+                  sys.exit(1)
+              print('NASA secrets present (values hidden); calendar eligibility checked by worker.')
+          PY
       - name: Execute selected channel on GitHub-hosted runner
         env:
           CHANNEL: ${{ inputs.channel }}
