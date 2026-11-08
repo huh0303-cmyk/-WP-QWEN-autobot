@@ -54,6 +54,19 @@ class BloggerPublisher:
                     message="Blogger idempotency preflight failed; draft creation was not attempted",
                 )
             if existing.status_code == 200:
+                # Never publish an exact normalized title duplicate. This protects
+                # new content; existing published duplicates require a separate
+                # authenticated editorial correction, not silent deletion.
+                def title_key(value: str) -> str:
+                    return re.sub(r"[^\\w]+", "", html.unescape(value).casefold())
+                candidate_title = title_key(job.title)
+                for item in existing.json().get("items", []):
+                    if title_key(str(item.get("title", ""))) == candidate_title and marker not in str(item.get("content", "")):
+                        return PublishResult(
+                            False, "blogger", self.site_id, job.job_id, "failed",
+                            error_code="duplicate_title_blocked",
+                            message="Existing Blogger post has the same normalized title; regenerate a distinct title before publishing",
+                        )
                 for item in existing.json().get("items", []):
                     if marker not in str(item.get("content", "")):
                         continue
