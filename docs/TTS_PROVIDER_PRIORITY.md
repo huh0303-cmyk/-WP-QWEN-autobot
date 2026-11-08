@@ -27,3 +27,13 @@ This policy is intended to be shared by all London Project video pipelines: YouT
 `scripts/tts_provider_priority.py`
 
 The helper accepts provider adapters so each provider integration can be tested independently. Fish Audio must use model `s2.1-pro-free`; Qwen is a local adapter; Edge TTS is the next fallback. If no free adapter succeeds, the helper must fail closed rather than call a paid service.
+
+## Final owner instruction — 2026-11-08
+
+This supersedes ALL older London Project TTS order instructions, including old ElevenLabs-first, Fish-to-Edge-only, or fourth-provider fallback instructions. Exactly three engines are permitted in this order for every TTS-dependent workflow (language, knowledge, Seoul Journal, news, health, long-form and Shorts):
+
+1. Fish Audio `s2.1-pro-free` (only when the free tier is available and allowed)
+2. Qwen3-TTS locally installed and verified for the target language
+3. Microsoft Edge-TTS free voice
+
+On each failed or unavailable provider, record a non-secret failure reason and try the next. If all three fail, abort publishing; never upload silent or placeholder audio and never use a paid or fourth provider. Legacy documents mentioning ElevenLabs or other ordering are historical, not policy. Each actual video producer must be migrated and test-rendered; this document alone does not prove complete migration. Before publishing, verify channel OAuth identity, private/public setting, non-duplicate content, and successful audio generation. A private test upload is the default safe validation mode.
