@@ -3080,7 +3080,9 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
 
     from automation_hub.repetition_guard import fetch_wp_history, repetition_issues, clean_opening, opening
     body_html = clean_opening(title, body_html)
-    # If the generator embedded the title hero inline, remove only that first image;\n    # the theme will render featured_media and all later editorial/product images stay intact.\n    from editorial_image_guard import strip_title_duplicate_lead_image, strip_leading_inline_image_block
+    # If the generator embedded the title hero inline, remove only that first image;
+    # the theme will render featured_media and all later editorial/product images stay intact.
+    from editorial_image_guard import strip_title_duplicate_lead_image, strip_leading_inline_image_block
     body_html = strip_title_duplicate_lead_image(body_html, title)
     # KoreaWedding365 renders featured_media above the title. Remove a second
     # image-only lead block even when it is a different file/photo; preserve
