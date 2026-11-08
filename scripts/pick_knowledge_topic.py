@@ -23,8 +23,11 @@ def history_events(now: dt.datetime) -> list[dict]:
         candidates.append({"year": event["year"], "text": event["text"], "sources": [s for s in sources if s], "coverage": len(event["pages"])})
     if len(candidates) < 2:
         raise RuntimeError("Fewer than two sourced events for today's date")
-    # Coverage selects research leads; presentation is always reverse chronology.
-    selected = sorted(candidates, key=lambda e: e['coverage'], reverse=True)[:2]
+    # Rotate among well-sourced events across years; don't always repeat the same top two.
+    pool = sorted(candidates, key=lambda e: (-e['coverage'], -e['year']))[:min(12, len(candidates))]
+    seed = now.date().isoformat()
+    rng = random.Random(seed)
+    selected = rng.sample(pool, 2)
     return sorted(selected, key=lambda e: e['year'], reverse=True)
 
 
