@@ -785,3 +785,10 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - Result: Meta account preflight failed; Facebook read-only preflight succeeded. The Meta job reached setup/checkout/runtime successfully and failed only at exact Instagram/Threads credential identity verification. No Meta create-media or publish endpoint was called, and no post was created.
 - The known blockers remain account-specific, not transient runner errors: Instagram `seoul_chris1` access token/user ID; Threads `seoul_chris1` access token/user ID; and creation plus authorization of a real Threads `japanese_pick` profile. Existing tokens must never be cross-used to impersonate these destinations.
 - Public first-post KPI is therefore blocked on owner-side Meta authentication/consent/profile creation. Once those exact credentials are supplied through the authorized Windows-PC Meta flow and saved only as environment secrets, rerun preflight, verify write scopes, then dispatch one reviewed canary per account and record returned post IDs/permalinks.
+
+
+## meta-secret-user-id-compatibility-fix-20261108
+
+- Authorized Windows-PC Desktop Commander inspection found seven verified Meta user IDs are held as GitHub environment secrets, while Meta workflows had read only same-named environment variables. This could silently omit valid user IDs from runtime despite a matching account token.
+- Updated both the read-only preflight and Threads dispatcher to resolve each user ID from the environment secret first, with existing environment variable as compatibility fallback. No secret value is printed, committed, or copied.
+- YAML parsing and whitespace validation passed. The change does not enable missing accounts or publish a post; it makes future verified connections available to the intended workflow.
