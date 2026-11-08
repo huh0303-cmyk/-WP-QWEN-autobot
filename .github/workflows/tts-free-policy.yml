@@ -80,8 +80,11 @@ jobs:
           assert 'environment: FISH_AUDIO_API_KEY' in workflow
           assert 'environment: youtube-channels' in workflow
           assert 'needs: build' in workflow
-          assert 'Add it as a repository Actions secret' in worker
-          print('PASS: Fish rendering and YouTube publishing use their correct secret scopes; knowledge worker fails closed without Fish key.')
+          assert 'def _knowledge(env: dict[str, str], log_handle) -> str:' in worker
+          assert 'Fish is preferred, not mandatory' in worker
+          assert 'falls' in worker and 'Edge TTS' in worker
+          assert 'api.elevenlabs.io/v1/text-to-speech' not in worker.lower()
+          print('PASS: Fish rendering and YouTube publishing use their correct secret scopes; knowledge worker retains free-provider fallback without paid TTS.')
           PY
       - name: Verify Seoul Journal Shorts uses free-only TTS
         run: |
@@ -153,8 +156,11 @@ jobs:
           spec = importlib.util.spec_from_file_location('tts_provider_priority', 'scripts/tts_provider_priority.py')
           module = importlib.util.module_from_spec(spec)
           spec.loader.exec_module(module)
-          expected = ('fish_audio', 'qwen3_tts', 'edge_tts', 'additional_free')
+          expected = ('fish_audio', 'qwen3_tts', 'edge_tts')
           assert module.TTS_PRIORITY == expected, module.TTS_PRIORITY
+          assert callable(module.local_qwen3_tts)
+          assert 'QWEN3_TTS_COMMAND' in source
+          assert 'subprocess.run(args, check=True, timeout=180, capture_output=True)' in source
           assert 'elevenlabs_generator' not in source.lower()
           assert 's2.1-pro-free' in source
           policy = Path('docs/TTS_PROVIDER_PRIORITY.md').read_text(encoding='utf-8')

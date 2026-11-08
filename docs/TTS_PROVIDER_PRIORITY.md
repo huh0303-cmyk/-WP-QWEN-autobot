@@ -7,7 +7,8 @@
 1. **Fish Audio S2.1 Pro Free** — model `s2.1-pro-free`, primary provider while the provider's free offer remains available and its terms permit the workload. The currently announced free period is understood to run through **2026-11-30**; re-check official terms before and after that date.
 2. **Alibaba Qwen3-TTS (local)** — use only when installed, the target language is supported, and a language-specific quality test has passed. Local inference avoids per-character API charges but still uses local compute/electricity.
 3. **Microsoft Edge TTS** — free fallback when the requested language/voice is available and generation succeeds.
-4. **Another verified free provider** — only after confirming its pricing, terms, target-language support, and output quality.
+
+**Qwen3 local setup:** Set `QWEN3_TTS_COMMAND` to an installed local inference command with `{text_file}`, `{output_file}`, and `{language}` placeholders. Without this command Qwen3 is unavailable and the helper proceeds to Edge TTS. Never point this command at a paid cloud API. On GitHub-hosted runners, a local model and its dependencies must be installed in the job before Qwen3 can run; configuring the order alone does not install the model.
 
 ## Hard cost guard
 
