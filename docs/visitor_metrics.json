@@ -1,161 +1,161 @@
 {
-  "generated_at": "2026-11-07 10:46:02",
-  "reference_date": "2026-11-06",
+  "generated_at": "2026-11-08 10:15:47",
+  "reference_date": "2026-11-07",
   "source": "verified previous-day site counters; stale platform snapshots are excluded",
   "sites": {
     "k-health365.com": {
-      "yesterday_visitors": 138,
-      "yesterday_delta": 40,
-      "reference_date": "2026-11-06",
+      "yesterday_visitors": 260,
+      "yesterday_delta": 122,
+      "reference_date": "2026-11-07",
       "source": "verified site visitor counter",
-      "checked_at": "2026-11-07 10:46:02"
+      "checked_at": "2026-11-08 10:15:47"
     },
     "koreamedicaltour.com": {
-      "yesterday_visitors": 315,
-      "yesterday_delta": -245,
-      "reference_date": "2026-11-06",
+      "yesterday_visitors": 193,
+      "yesterday_delta": -122,
+      "reference_date": "2026-11-07",
       "source": "verified site visitor counter",
-      "checked_at": "2026-11-07 10:46:02"
+      "checked_at": "2026-11-08 10:15:47"
     },
     "koreainvest365.com": {
-      "yesterday_visitors": 533,
-      "yesterday_delta": -1143,
-      "reference_date": "2026-11-06",
+      "yesterday_visitors": 177,
+      "yesterday_delta": -356,
+      "reference_date": "2026-11-07",
       "source": "verified site visitor counter",
-      "checked_at": "2026-11-07 10:46:02"
+      "checked_at": "2026-11-08 10:15:47"
     },
     "koreainsurance365.com": {
-      "yesterday_visitors": 661,
-      "yesterday_delta": 317,
-      "reference_date": "2026-11-06",
+      "yesterday_visitors": 458,
+      "yesterday_delta": -203,
+      "reference_date": "2026-11-07",
       "source": "verified site visitor counter",
-      "checked_at": "2026-11-07 10:46:02"
+      "checked_at": "2026-11-08 10:15:47"
     },
     "kfinance365.com": {
-      "yesterday_visitors": 1391,
-      "yesterday_delta": 739,
-      "reference_date": "2026-11-06",
+      "yesterday_visitors": 271,
+      "yesterday_delta": -1120,
+      "reference_date": "2026-11-07",
       "source": "verified site visitor counter",
-      "checked_at": "2026-11-07 10:46:02"
+      "checked_at": "2026-11-08 10:15:47"
     },
     "koreataxnlaw.com": {
-      "yesterday_visitors": 427,
-      "yesterday_delta": 126,
-      "reference_date": "2026-11-06",
+      "yesterday_visitors": 152,
+      "yesterday_delta": -275,
+      "reference_date": "2026-11-07",
       "source": "verified site visitor counter",
-      "checked_at": "2026-11-07 10:46:02"
+      "checked_at": "2026-11-08 10:15:47"
     },
     "koreacrypto365.com": {
-      "yesterday_visitors": 474,
-      "yesterday_delta": -21,
-      "reference_date": "2026-11-06",
+      "yesterday_visitors": 351,
+      "yesterday_delta": -123,
+      "reference_date": "2026-11-07",
       "source": "verified site visitor counter",
-      "checked_at": "2026-11-07 10:46:02"
+      "checked_at": "2026-11-08 10:15:47"
     },
     "krealestate365.com": {
-      "yesterday_visitors": 459,
-      "yesterday_delta": -586,
-      "reference_date": "2026-11-06",
+      "yesterday_visitors": 233,
+      "yesterday_delta": -226,
+      "reference_date": "2026-11-07",
       "source": "verified site visitor counter",
-      "checked_at": "2026-11-07 10:46:02"
+      "checked_at": "2026-11-08 10:15:47"
     },
     "ktech365.com": {
-      "yesterday_visitors": 493,
-      "yesterday_delta": -464,
-      "reference_date": "2026-11-06",
+      "yesterday_visitors": 532,
+      "yesterday_delta": 39,
+      "reference_date": "2026-11-07",
       "source": "verified site visitor counter",
-      "checked_at": "2026-11-07 10:46:02"
+      "checked_at": "2026-11-08 10:15:47"
     },
     "kskin365.com": {
-      "yesterday_visitors": 293,
-      "yesterday_delta": -992,
-      "reference_date": "2026-11-06",
+      "yesterday_visitors": 282,
+      "yesterday_delta": -11,
+      "reference_date": "2026-11-07",
       "source": "verified site visitor counter",
-      "checked_at": "2026-11-07 10:46:02"
+      "checked_at": "2026-11-08 10:15:47"
     },
     "oliveyoungkorea.com": {
-      "yesterday_visitors": 1003,
-      "yesterday_delta": -132,
-      "reference_date": "2026-11-06",
+      "yesterday_visitors": 208,
+      "yesterday_delta": -795,
+      "reference_date": "2026-11-07",
       "source": "verified site visitor counter",
-      "checked_at": "2026-11-07 10:46:02"
+      "checked_at": "2026-11-08 10:15:47"
     },
     "kworld365.com": {
-      "yesterday_visitors": 512,
-      "yesterday_delta": -1013,
-      "reference_date": "2026-11-06",
+      "yesterday_visitors": 209,
+      "yesterday_delta": -303,
+      "reference_date": "2026-11-07",
       "source": "verified site visitor counter",
-      "checked_at": "2026-11-07 10:46:02"
+      "checked_at": "2026-11-08 10:15:47"
     },
     "k-trip365.com": {
-      "yesterday_visitors": 255,
-      "yesterday_delta": 7,
-      "reference_date": "2026-11-06",
+      "yesterday_visitors": 231,
+      "yesterday_delta": -24,
+      "reference_date": "2026-11-07",
       "source": "verified site visitor counter",
-      "checked_at": "2026-11-07 10:46:02"
+      "checked_at": "2026-11-08 10:15:47"
     },
     "koreawedding365.com": {
-      "yesterday_visitors": 461,
-      "yesterday_delta": -622,
-      "reference_date": "2026-11-06",
+      "yesterday_visitors": 455,
+      "yesterday_delta": -6,
+      "reference_date": "2026-11-07",
       "source": "verified site visitor counter",
-      "checked_at": "2026-11-07 10:46:02"
+      "checked_at": "2026-11-08 10:15:47"
     },
     "kstudy365.com": {
-      "yesterday_visitors": 167,
-      "yesterday_delta": -864,
-      "reference_date": "2026-11-06",
+      "yesterday_visitors": 234,
+      "yesterday_delta": 67,
+      "reference_date": "2026-11-07",
       "source": "verified site visitor counter",
-      "checked_at": "2026-11-07 10:46:02"
+      "checked_at": "2026-11-08 10:15:47"
     },
     "studyinkorea365.com": {
-      "yesterday_visitors": 266,
-      "yesterday_delta": 42,
-      "reference_date": "2026-11-06",
+      "yesterday_visitors": 275,
+      "yesterday_delta": 9,
+      "reference_date": "2026-11-07",
       "source": "verified site visitor counter",
-      "checked_at": "2026-11-07 10:46:02"
+      "checked_at": "2026-11-08 10:15:47"
     },
     "kieca-korea.org": {
-      "yesterday_visitors": 403,
-      "yesterday_delta": -223,
-      "reference_date": "2026-11-06",
+      "yesterday_visitors": 198,
+      "yesterday_delta": -205,
+      "reference_date": "2026-11-07",
       "source": "verified site visitor counter",
-      "checked_at": "2026-11-07 10:46:02"
+      "checked_at": "2026-11-08 10:15:47"
     },
     "jobkorea365.com": {
-      "yesterday_visitors": 184,
-      "yesterday_delta": -738,
-      "reference_date": "2026-11-06",
+      "yesterday_visitors": 193,
+      "yesterday_delta": 9,
+      "reference_date": "2026-11-07",
       "source": "verified site visitor counter",
-      "checked_at": "2026-11-07 10:46:02"
+      "checked_at": "2026-11-08 10:15:47"
     },
     "jobinkorea365.com": {
-      "yesterday_visitors": 85,
-      "yesterday_delta": -32,
-      "reference_date": "2026-11-06",
+      "yesterday_visitors": 66,
+      "yesterday_delta": -19,
+      "reference_date": "2026-11-07",
       "source": "verified site visitor counter",
-      "checked_at": "2026-11-07 10:46:02"
+      "checked_at": "2026-11-08 10:15:47"
     },
     "jobkoreaglobal.com": {
-      "yesterday_visitors": 479,
-      "yesterday_delta": -524,
-      "reference_date": "2026-11-06",
+      "yesterday_visitors": 276,
+      "yesterday_delta": -203,
+      "reference_date": "2026-11-07",
       "source": "verified site visitor counter",
-      "checked_at": "2026-11-07 10:46:02"
+      "checked_at": "2026-11-08 10:15:47"
     },
     "korea365.org": {
-      "yesterday_visitors": 691,
-      "yesterday_delta": 195,
-      "reference_date": "2026-11-06",
+      "yesterday_visitors": 435,
+      "yesterday_delta": -256,
+      "reference_date": "2026-11-07",
       "source": "verified site visitor counter",
-      "checked_at": "2026-11-07 10:46:02"
+      "checked_at": "2026-11-08 10:15:47"
     },
     "koreanews365.com": {
-      "yesterday_visitors": 106,
-      "yesterday_delta": 1,
-      "reference_date": "2026-11-06",
+      "yesterday_visitors": 152,
+      "yesterday_delta": 46,
+      "reference_date": "2026-11-07",
       "source": "verified site visitor counter",
-      "checked_at": "2026-11-07 10:46:02"
+      "checked_at": "2026-11-08 10:15:47"
     }
   }
 }
