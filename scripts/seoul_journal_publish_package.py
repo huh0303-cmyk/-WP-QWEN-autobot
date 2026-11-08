@@ -39,14 +39,23 @@ def main():
     if not args.publish: raise RuntimeError("Public publishing requires --publish")
     yt,playlist=youtube(args.credentials_file)
     marker=os.getenv("SEOUL_JOURNAL_SLOT_MARKER","")
+    schedule=meta.get("publish_at")
+    revision=meta.get("revision_of")
+    if revision and (revision!="oEZaFVnqKR0" or marker!="SJ_REVISION:oEZaFVnqKR0:motion-v2"):
+        raise RuntimeError("Unapproved revision target")
+    if schedule and datetime.datetime.fromisoformat(schedule)<=datetime.datetime.now(datetime.timezone.utc):
+        raise RuntimeError("Scheduled time must be future")
+    def duplicate(old,desc):
+        if marker and marker in desc: return True
+        return meta["source_url"] in desc and old["id"]!=revision
     for old in recent(yt,playlist):
         desc=old["snippet"].get("description","")
-        if old["status"]["privacyStatus"]=="public" and (meta["source_url"] in desc or (marker and marker in desc)):
+        if duplicate(old,desc):
             print("PUBLIC_DUPLICATE_SKIPPED "+old["id"]); return
     description=meta["description"]+("\n"+marker if marker else "")
     body={"snippet":{"title":meta["youtube_title"][:100],"description":description[:4900],
-                     "categoryId":"25","defaultLanguage":"ko","tags":["서울저널","정치시사","Shorts"]},
-          "status":{"privacyStatus":"public","selfDeclaredMadeForKids":False}}
+                     "categoryId":"17" if meta.get("display_category")=="스포츠" else "25","defaultLanguage":"ko","tags":["서울저널","정치시사","Shorts"]},
+          "status":{"privacyStatus":"private" if schedule else "public","selfDeclaredMadeForKids":False,**({"publishAt":schedule} if schedule else {})}}
     request=yt.videos().insert(part="snippet,status",body=body,
         media_body=MediaFileUpload(str(folder/"seoul-journal-short.mp4"),mimetype="video/mp4",resumable=True))
     response=None
@@ -54,7 +63,7 @@ def main():
     video_id=response["id"]; thumbnail_status="not_set"
     receipt={"video_id":video_id,"url":"https://www.youtube.com/shorts/"+video_id,
              "channel_id":CHANNEL,"source_url":meta["source_url"],"slot_marker":marker,
-             "uploaded_at_utc":datetime.datetime.now(datetime.timezone.utc).isoformat()}
+             "publish_at":schedule,"revision_of":revision,"uploaded_at_utc":datetime.datetime.now(datetime.timezone.utc).isoformat()}
     # Save insert receipt immediately so retries can investigate a partial result.
     (folder/"public_upload_receipt.json").write_text(json.dumps(receipt,indent=2),encoding="utf-8")
     try:
@@ -68,5 +77,9 @@ def main():
     if saved["snippet"]["channelId"]!=CHANNEL: raise RuntimeError("Readback channel mismatch")
     (folder/"public_upload_receipt.json").write_text(json.dumps(receipt,ensure_ascii=False,indent=2),encoding="utf-8")
     print("PUBLIC_UPLOAD_READBACK "+json.dumps(receipt,ensure_ascii=True),flush=True)
-    if receipt["privacy"]!="public": raise RuntimeError("YouTube did not permit public visibility; receipt saved")
+    if schedule:
+        if saved["status"].get("publishAt") is None: raise RuntimeError("YouTube schedule not confirmed")
+        receipt["confirmed_publish_at"]=saved["status"]["publishAt"]
+        (folder/"public_upload_receipt.json").write_text(json.dumps(receipt,ensure_ascii=False,indent=2),encoding="utf-8")
+    elif receipt["privacy"]!="public": raise RuntimeError("YouTube did not permit public visibility; receipt saved")
 if __name__=="__main__": main()
