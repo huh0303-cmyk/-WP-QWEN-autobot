@@ -5,7 +5,7 @@ on:
   # Four daily attempts for the sole active newsroom. UTC 00:17, 06:17, 12:17, 18:17 = KST 09:17, 15:17, 21:17, 03:17.
   # Each attempt still requires a fresh eligible source and passes verification/deduplication.
   schedule:
-    - cron: '17 0,6,12,18 * * *'
+    - cron: '17 0,3,6,9,12 * * *'
   workflow_dispatch:
     inputs:
       preferred_category:
@@ -38,7 +38,7 @@ concurrency:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 55
     steps:
       - uses: actions/checkout@v4
       - uses: actions/cache@v4
@@ -64,9 +64,10 @@ jobs:
           echo "category=$CATEGORY" >> "$GITHUB_OUTPUT"
           echo "Selected newsroom=$KEY suggested category=$CATEGORY"
       - name: Randomize publication time within this slot
+        if: github.event_name == 'schedule'
         shell: bash
         run: |
-          DELAY="$(shuf -i 0-1800 -n 1)"
+          DELAY="$(shuf -i 0-120 -n 1)"
           echo "Waiting $DELAY seconds to avoid fixed-minute publishing patterns."
           sleep "$DELAY"
       # Historical category maintenance must not block a new verified edition.
@@ -80,10 +81,10 @@ jobs:
           WP_POST_STATUS: "publish"
           WP_PUBLICATION_APPROVED: "true"
           AUTOMATION_HUB_SOURCE: "sheets"
-          AI_TEXT_PROVIDER: "openai"
+          AI_TEXT_PROVIDER: "gemini"
           GH_TOKEN: ${{ github.token }}
-          # Newsroom writing uses GPT-5 mini. Gemini is not used for newsroom text.
-          OPENAI_ENABLED: "true"
+          # Free Gemini writer; paid text stays disabled.
+          OPENAI_ENABLED: "false"
           NEWSROOM_PAID_TEXT_APPROVED: "false"
           CLAUDE_ENABLED: "false"
           REPLICATE_API_TOKEN: ""
@@ -106,6 +107,7 @@ jobs:
           CEREBRAS_API_KEY: ${{ secrets.CEREBRAS_API_KEY }}
           ARTICLE_GEMINI_MODEL: "gemini-2.5-flash"
           NEWSROOM_REQUIRE_PUBLICATION: "true"
+          KOREANEWS_RECOVERY_BATCH: ${{ github.event_name == 'workflow_dispatch' && '5' || '1' }}
           NEWSROOM_SOURCE_URL: ${{ inputs.source_url }}
           NEWSROOM_SOURCE_ITEM: ${{ inputs.source_item }}
           FORCE_SOURCE_IPV4: "true"
@@ -126,7 +128,7 @@ jobs:
           mkdir -p artifacts
           # One RSS event owns one publication attempt. Never regenerate the
           # same article three times just because a source/quality gate failed.
-          python scripts/autopost_current.py 2>&1 | tee artifacts/newsroom-attempt-1.log
+          python scripts/koreanews_daily_recovery.py 2>&1 | tee artifacts/newsroom-attempt-1.log
       - name: Save publication result
         if: always()
         uses: actions/upload-artifact@v4
@@ -135,6 +137,8 @@ jobs:
           path: |
             newsroom_publish_result.json
             artifacts/newsroom-attempt-*.log
+            artifacts/newsroom-result-*.json
+            artifacts/koreanews-daily-receipt.json
           if-no-files-found: warn
           retention-days: 7
 

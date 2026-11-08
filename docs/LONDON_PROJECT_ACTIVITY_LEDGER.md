@@ -882,3 +882,9 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - After reviewing confirmed registrar expiration and one-year renewal quote, owner explicitly instructed to abandon KSA-korea.org. This supersedes the earlier active-domain correction.
 - No renewal or payment is authorized. KSA WordPress destination disabled/retired again, removed from legacy active targets and audit credential mapping. Existing disabled/retired filters exclude it from control choices and audits.
 - SIS and KI remain retired; K-Trip stays active. Similar-name Blogger destinations and existing hosting content remain unchanged. No hosting deletion or automatic-renewal setting change was performed.
+
+
+## koreanews-five-daily-recovery-20261109
+- Owner requests immediate photo-backed Korean articles and five total daily across existing desks. Latest homepage posts 2026-10-31. Workflow disabled_manually. Run 42177197507 failed with missing strip_title_duplicate_lead_image; shared fix already on main.
+- Restored free Gemini routing, five scheduled slots 09:17/12:17/15:17/18:17/21:17 KST with <=120s jitter and no manual delay. Removed 30-minute jitter vs 20-minute timeout conflict.
+- Added serialized authenticated five-public-post KST daily cap and bounded recovery attempts with receipt artifacts. Source, rights, duplicate and editorial gates retained. Syntax compilation passed; live result pending.

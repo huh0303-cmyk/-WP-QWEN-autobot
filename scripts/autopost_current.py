@@ -26,9 +26,9 @@ if str(ROOT) not in sys.path:
 _NEWSROOM_URLS = {"https://koreanews365.com", "https://theseouljournal.com"}
 _TARGET_SITE = os.getenv("TARGET_SITE_URL", "").strip().rstrip("/")
 _IS_NEWSROOM = _TARGET_SITE in _NEWSROOM_URLS
-_TEXT_PROVIDER = "openai" if _IS_NEWSROOM else "gemini"
+_TEXT_PROVIDER = "gemini"
 os.environ["AI_TEXT_PROVIDER"] = _TEXT_PROVIDER
-os.environ["OPENAI_ENABLED"] = "true" if _IS_NEWSROOM else "false"
+os.environ["OPENAI_ENABLED"] = "false"
 os.environ["CHATGPT_SINGLE_MODEL_PIPELINE"] = "true"
 os.environ["PAID_IMAGE_GENERATION_ENABLED"] = "false"
 os.environ["OPENAI_IMAGE_ENABLED"] = "false"
