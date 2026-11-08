@@ -1,6 +1,6 @@
 {
-  "version": 9,
-  "name": "London Project affiliate footer standard v9 - three official company logos then Coupang cards",
+  "version": 10,
+  "name": "London Project affiliate footer standard v10 - logos, Coupang cards, then SeoulMall storefront",
   "platforms": [
     "wordpress",
     "blogger"
@@ -35,7 +35,8 @@
     "Every affiliate-eligible article ends with one footer module; never insert it at the top or between paragraphs.",
     "At the absolute end of every blog post, place three official company logo banners in one horizontal row: Coupang, OLIVE YOUNG, Trip.com.",
     "Each banner uses the destination's own approved affiliate tracking URL; the displayed image must be the official company logo asset.",
-    "Immediately below the three-logo row, show the ten verified Coupang Partners product cards with product images and account-generated tracking links. The three-logo row and all ten cards form one footer block at the very bottom of the post.",
+    "Immediately below the three-logo row, show the ten verified Coupang Partners product cards with product images and account-generated tracking links.",
+    "Immediately after the managed product-card block, append one idempotent SeoulMall storefront CTA using the verified public storefront URL. It is the exploration path for visitors who do not choose an individual product card.",
     "Use fewer than ten cards only when fewer verified destination-specific products are available; never fabricate links or images.",
     "Preserve article body, status, publication date, featured image and SEO metadata; update only the managed affiliate footer.",
     "Disclose affiliate relationships clearly and never promise commissions for every click or purchase."
@@ -57,6 +58,7 @@
       "trip_com"
     ],
     "product_cards_position": "immediately_below_footer_logo_banners",
+    "seoulmall_storefront_position": "after_managed_product_cards_at_absolute_end",
     "forbidden_positions": [
       "article_top",
       "inside_article_body",

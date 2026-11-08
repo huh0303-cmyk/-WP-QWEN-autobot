@@ -9,7 +9,7 @@ MARKER = "<!-- seoulmall-store-widget:v1 -->"
 
 def render_widget(store_url: str = STORE_URL) -> str:
     url = html.escape(store_url, quote=True)
-    return f\'''{MARKER}
+    return f'''{MARKER}
 <section class="seoulmall-widget" aria-label="SeoulMall shopping">
   <style>
     .seoulmall-widget{{box-sizing:border-box;max-width:960px;margin:32px auto;padding:clamp(18px,4vw,30px);border:1px solid #f0d9e8;border-radius:20px;background:linear-gradient(135deg,#fff 0%,#fff5fa 55%,#f5f1ff 100%);text-align:center;font-family:Arial,sans-serif;}}
@@ -33,7 +33,7 @@ def render_widget(store_url: str = STORE_URL) -> str:
   <a class="sm-button" href="{url}" target="_blank" rel="sponsored nofollow noopener">서울몰 전체 상품 보기 →</a>
   <p class="sm-note">쿠팡 파트너스 활동을 통해 일정액의 수수료를 제공받을 수 있습니다.</p>
 </section>
-\'''
+'''
 
 
 def append_widget(content: str, store_url: str = STORE_URL) -> str:

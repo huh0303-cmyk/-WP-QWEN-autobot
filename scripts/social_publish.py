@@ -38,6 +38,7 @@ GMAIL_USER = "huh0303@gmail.com"
 GMAIL_APP_PASSWORD = os.environ.get("GMAIL_APP_PASSWORD", "")
 
 GRAPH_VERSION = "v21.0"
+SEOULMALL_STORE_URL = "https://influencers.coupang.com/s/seoulshop"
 
 
 def log(msg):
@@ -87,7 +88,13 @@ def platform_copy(meta, platform, max_hashtags=8):
     tags = " ".join(f"#{h}" for h in native.get("hashtags", [])[:max_hashtags])
     parts = [native.get("hook", ""), native.get("caption", ""), native.get("cta", "")]
     caption = "\n".join(part.strip() for part in parts if part and part.strip())
-    return {"title": native.get("title", "").strip(), "caption": f"{caption}\n\n{tags}".strip()}
+    rendered = f"{caption}\n\n{tags}".strip()
+    # Social platforms do not support an HTML product-card footer.  Keep the
+    # storefront CTA explicit, once-only, and at the end of the native copy.
+    if SEOULMALL_STORE_URL not in rendered:
+        rendered = (rendered + "\n\n인기 상품 모아보기: " + SEOULMALL_STORE_URL +
+                    "\n쿠팡 파트너스 활동으로 일정액의 수수료를 받을 수 있습니다.").strip()
+    return {"title": native.get("title", "").strip(), "caption": rendered}
 
 
 def content_fingerprint(meta, platform):
@@ -166,6 +173,9 @@ def publish_youtube(video_path, meta):
 
     title = meta.get("youtube_title", "TOPIK Word Quiz")[:100]
     description = (meta.get("youtube_description", "") + "\n\n#Shorts").strip()
+    if SEOULMALL_STORE_URL not in description:
+        description += ("\n\n인기 상품 모아보기: " + SEOULMALL_STORE_URL +
+                        "\n쿠팡 파트너스 활동으로 일정액의 수수료를 받을 수 있습니다.")
 
     body = {
         "snippet": {"title": title, "description": description, "categoryId": "27"},  # Education

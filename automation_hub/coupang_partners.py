@@ -411,7 +411,13 @@ def _remove_legacy_provider_and_product_shelf(content):
     return content
 
 def apply_footer(content, title, site_id="", lang="en"):
-    """Keep article body intact; place the three official partner logos immediately above the ten product cards at the footer."""
+    """Render one idempotent commerce footer followed by the SeoulMall storefront CTA.
+
+    This is the shared final-content boundary for WordPress and Blogger.  Keeping
+    the storefront here (rather than in individual publishers) ensures that a
+    new post cannot receive its verified product cards while silently missing the
+    broader SeoulMall destination.
+    """
     content = _remove_managed_affiliate_blocks(content or "")
     content = _remove_legacy_single_product_modules(content)
     content = _remove_legacy_provider_and_product_shelf(content)
@@ -420,4 +426,6 @@ def apply_footer(content, title, site_id="", lang="en"):
     for old_start, old_end in marker_pairs:
         clean = re.sub(re.escape(old_start) + r".*?" + re.escape(old_end), "", clean, flags=re.S)
     footer = render_footer(title, clean, site_id, lang)
-    return clean.rstrip() + ("\n" if clean.strip() else "") + footer
+    from .seoulmall_widget import append_widget
+    rendered = clean.rstrip() + ("\n" if clean.strip() else "") + footer
+    return append_widget(rendered)

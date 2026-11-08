@@ -1,5 +1,6 @@
 import unittest
 from automation_hub.seoulmall_widget import MARKER, append_widget, has_widget, render_widget
+from automation_hub.coupang_partners import apply_footer
 
 class SeoulMallWidgetTests(unittest.TestCase):
     def test_appends_after_existing_content(self):
@@ -13,6 +14,13 @@ class SeoulMallWidgetTests(unittest.TestCase):
         self.assertEqual(once, append_widget(once))
     def test_empty_content(self):
         self.assertIn(MARKER, append_widget(""))
+
+    def test_shared_affiliate_footer_places_storefront_after_cards(self):
+        rendered = apply_footer("<p>Article body</p>", "Health routine", "khealth365", "en")
+        self.assertIn("LONDON-COUPANG-PARTNERS-START", rendered)
+        self.assertIn(MARKER, rendered)
+        self.assertGreater(rendered.index(MARKER), rendered.index("LONDON-COUPANG-PARTNERS-START"))
+        self.assertEqual(rendered, append_widget(rendered))
 
 if __name__ == "__main__":
     unittest.main()
