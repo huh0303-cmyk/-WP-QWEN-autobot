@@ -846,3 +846,10 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - K-Trip365 is retained as a priority active travel site. Fresh Windows/DC curl checks: homepage HTTP 200; REST latest-post read HTTP 200; latest article HTTP 200. Latest post ID 4859, dated 2026-11-07T12:32:00 (WordPress local date), https://k-trip365.com/managing-urban-mobility-with-seoul-climate-card-short-term-options-for-visitors/ . featured_media=0, so no featured image on that existing article.
 - Same-session authenticated GitHub audit 42496179482 verified K-Trip REST users/me HTTP 200 and publish_posts=true. No CDN challenge; its Hostinger CDN is inactive. Initial local timeout was transient and subsequent Windows and GitHub checks passed.
 - Fleet WordPress twice-daily workflow remains disabled_manually. This check does not claim K-Trip scheduled publishing is restored and did not create a new article. The user asked for verification and retirement; no fleet scheduler was re-enabled.
+
+
+## ksa-active-domain-owner-correction-20261109
+- Owner corrected the immediately preceding instruction: KSA-korea.org remains in use; it may be serving a landing page. This newer instruction supersedes KSA retirement in dbb3c1eae3cf18ceb940bbcbb77596f7d9bc669d.
+- Restored KSA's registry enabled flag, legacy active membership and authenticated audit credential mapping. Removed KSA retirement metadata. SIS and KI remain retired. KSA metadata and hosted files were never deleted.
+- Domain use and WordPress publishing readiness are separate. Fresh Windows DNS lookup still returns NXDOMAIN; curl cannot resolve ksa-korea.org. Hostinger previously displays domain not connected. A landing page's absence of WordPress REST is not itself a retirement reason, and no DNS or landing-page change was made.
+- K-Trip verification remains: homepage/latest article/public REST HTTP 200, same-session authenticated publish permission true; fleet scheduler disabled. No new K-Trip post was created during this check.

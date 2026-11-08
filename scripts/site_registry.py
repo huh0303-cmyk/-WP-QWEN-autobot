@@ -1,5 +1,6 @@
 """Canonical registry for the 27-site network."""
 SITES = [
+    ("https://ksa-korea.org", "KSAKOREAORG", "active"),
     ("https://k-health365.com", "KHEALTH365COM", "priority"),
     ("https://koreamedicaltour.com", "KOREAMEDICALTOURCOM", "active"),
     ("https://koreainvest365.com", "KOREAINVEST365COM", "active"),
@@ -27,7 +28,6 @@ SITES = [
 ]
 RETIRED_SITES = [
     ("https://ki-korea.com", "KIKOREACOM", "retired"),
-    ("https://ksa-korea.org", "KSAKOREAORG", "retired"),
     ("https://sis-korea.com", "SISKOREACOM", "retired"),
 ]
 ACTIVE_SITES = [row for row in SITES if row[2] != "retired"]
