@@ -156,7 +156,7 @@ jobs:
           spec = importlib.util.spec_from_file_location('tts_provider_priority', 'scripts/tts_provider_priority.py')
           module = importlib.util.module_from_spec(spec)
           spec.loader.exec_module(module)
-          expected = ('fish_audio', 'qwen3_tts', 'edge_tts', 'additional_free')
+          expected = ('fish_audio', 'qwen3_tts', 'edge_tts')
           assert module.TTS_PRIORITY == expected, module.TTS_PRIORITY
           assert 'elevenlabs_generator' not in source.lower()
           assert 's2.1-pro-free' in source
