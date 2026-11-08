@@ -1,0 +1,81 @@
+name: K-Visa365 - one post per KST day
+
+on:
+  schedule:
+    - cron: "17 0 * * *"  # 09:17 Asia/Seoul
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kvisa-one-daily
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      KVISA365COM: ${{ secrets.KVISA365COM }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests beautifulsoup4 lxml Pillow google-api-python-client google-auth google-genai -q
+      - name: Check authenticated REST access and today's posts
+        id: guard
+        run: python scripts/kvisa_daily_guard.py
+      - name: Select live visa keyword
+        if: steps.guard.outputs.should_publish == 'true'
+        id: viral
+        continue-on-error: true
+        run: python scripts/select_live_viral_keyword.py --site https://k-visa365.com
+      - name: Publish one article
+        if: steps.guard.outputs.should_publish == 'true'
+        env:
+          TARGET_SITE_URL: https://k-visa365.com
+          WP_AUTOPUBLISH_ENABLED: "true"
+          WP_POST_STATUS: publish
+          WP_PUBLICATION_APPROVED: "true"
+          NEWSROOM_REQUIRE_PUBLICATION: "true"
+          FORCE_SOURCE_IPV4: "true"
+          FORCE_KEYWORD: ${{ steps.viral.outputs.keyword }}
+          RUN_SLOT: "1"
+          MAX_REGEN: "1"
+          AI_TEXT_PROVIDER: gemini
+          CHATGPT_SINGLE_MODEL_PIPELINE: "true"
+          OPENAI_ENABLED: "false"
+          CLAUDE_ENABLED: "false"
+          GEMINI_EDITOR_ENABLED: "false"
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_API_KEY_2: ${{ secrets.GEMINI_API_KEY_2 }}
+          GEMINI_API_KEY_3: ${{ secrets.GEMINI_API_KEY_3 }}
+          LONDON_WRITER_MODEL: auto_free
+          LOCAL_TEXT_FALLBACK_ENABLED: "false"
+          RUNNER_OLLAMA_BOOTSTRAP: "false"
+          FREE_IMAGE_POLICY: auto_free
+          STOCK_IMAGES_ENABLED: "true"
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
+          OPENAI_IMAGE_ENABLED: "false"
+          PAID_IMAGE_GENERATION_ENABLED: "false"
+          GEMINI_IMAGE_GENERATION_ENABLED: "false"
+          AUTOMATED_IMAGE_PUBLISHING_ENABLED: "true"
+          WP_IMAGE_COUNT: "1"
+          GH_ASSET_TOKEN: ${{ secrets.GH_ASSET_TOKEN || github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        # Run once. An uncertain write is reconciled against WordPress before another run.
+        run: python scripts/autopost_current.py
+      - name: Verify public article and save receipt
+        if: ${{ !cancelled() && steps.guard.outcome == 'success' }}
+        run: python scripts/kvisa_daily_guard.py --verify
+      - name: Save preflight and publication receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kvisa-daily-${{ github.run_id }}
+          path: artifacts/kvisa-daily-*.json
+          if-no-files-found: warn
+          retention-days: 30

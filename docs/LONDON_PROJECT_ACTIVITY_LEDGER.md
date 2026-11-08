@@ -812,3 +812,11 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - Windows task `Tistory5개_일일자동발행` is Disabled; last run 2026-10-29 19:26 local, last result code `267014`. No local Tistory/Python runner process was active. The local clone has no 2026-11-08 slot/receipt or SQLite queue under its project data tree.
 - Because the persisted three-site selection is missing, no site was guessed, no public RSS target was added, and no public URL can be verified for today. No publication, retry, or task re-enable was attempted. Verified publication URLs: 0; target count could not be assigned safely without the required selection.
 - Required recovery: resolve the quality incident and restore the daily plan/selection generation before reactivating dispatch; then validate today's exact three selected rows, queue receipts, and public URLs. Do not replay missed slots.
+
+
+## kvisa-one-daily-recovery-20261109
+
+- Owner authorized repair of K-Visa365 and one automatic article per KST day. Dedicated site-only 09:17 KST workflow, authenticated daily inventory gate, and public receipt verification added. Other disabled fleet publishers remain disabled.
+- Confirmed live REST HTTP 403 Hostinger browser challenge. Existing fleet publishers are disabled_manually. Hostinger control tool and API credentials are unavailable, so no CDN setting was changed.
+- Eight unit tests, workflow YAML parsing and whitespace validation passed. Initial test run lacked requests; isolated virtual environment resolved the test dependency.
+- Live GitHub dispatch and final result will be recorded separately; no live publication success is claimed by this code deployment. See docs/KVISA_DAILY_RECOVERY_2026-11-09.md.
