@@ -54,6 +54,8 @@ def generate_tts(
     language: str = "en",
     fish_generator: Callable | None = None,
     qwen_generator: Callable | None = None,
+    edge_voice: str | None = None,
+    edge_pitch: str = "+0Hz",
 ) -> dict:
     """Generate audio using free providers only, in the policy order.
 
@@ -99,12 +101,12 @@ def generate_tts(
             "it": "it-IT-ElsaNeural",
             "th": "th-TH-PremwadeeNeural",
         }
-        voice = voices.get(base_language)
+        voice = edge_voice or voices.get(base_language)
         if not voice:
             errors.append(f"edge_tts: no configured voice for {base_language}")
         else:
             async def save_audio() -> None:
-                await edge_tts.Communicate(text, voice).save(str(out))
+                await edge_tts.Communicate(text, voice, pitch=edge_pitch).save(str(out))
 
             try:
                 asyncio.get_running_loop()
