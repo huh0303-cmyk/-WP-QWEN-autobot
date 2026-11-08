@@ -9,9 +9,12 @@
   "timezone": "Asia/Seoul",
   "objective": "네이버 검색·홈 추천에서 신뢰를 쌓아 장기 방문과 합법적 수익 기회를 늘리되 방문자·순위·수익을 보장하지 않는다",
   "cadence": {
-    "network_daily_min": 14,
-    "network_daily_max": 18,
-    "operating_window_kst": ["08:17", "23:17"],
+    "network_daily_min": 3,
+    "network_daily_max": 7,
+    "operating_window_kst": [
+      "08:17",
+      "23:17"
+    ],
     "random_non_round_minutes": true,
     "persist_daily_schedule_before_first_post": true,
     "never_bulk_publish": true,
@@ -47,9 +50,27 @@
     "all_candidates_require_same_day_validation": true
   },
   "per_site_cadence": {
-    "naver_n1": {"display_name": "부의정석", "blog_id": "k-insight-vietnam", "daily_min": 3, "daily_max": 4, "minimum_interval_minutes": 180},
-    "naver_n2": {"display_name": "헬스의정석", "blog_id": "health-standard", "daily_min": 3, "daily_max": 4, "minimum_interval_minutes": 180},
-    "naver_n3": {"display_name": "생활의정석", "blog_id": "sky-only", "daily_min": 8, "daily_max": 10, "minimum_interval_minutes": 75}
+    "naver_n1": {
+      "display_name": "부의정석",
+      "blog_id": "k-insight-vietnam",
+      "daily_min": 1,
+      "daily_max": 1,
+      "minimum_interval_minutes": 180
+    },
+    "naver_n2": {
+      "display_name": "헬스의정석",
+      "blog_id": "health-standard",
+      "daily_min": 1,
+      "daily_max": 1,
+      "minimum_interval_minutes": 180
+    },
+    "naver_n3": {
+      "display_name": "생활의정석",
+      "blog_id": "sky-only",
+      "daily_min": 1,
+      "daily_max": 5,
+      "minimum_interval_minutes": 75
+    }
   },
   "workflow": [
     "monthly_evergreen_keyword_rotation",
