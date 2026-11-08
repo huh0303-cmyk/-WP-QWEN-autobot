@@ -102,7 +102,7 @@ def main():
     # Public slot guard is checked before any generation and again immediately before insert.
     if any(marker in v["snippet"].get("description","") for v in old):
         print("SLOT_ALREADY_EXISTS "+marker); return
-    used="\n".join(v["snippet"].get("description","") for v in old if v["status"]["privacyStatus"]=="public")
+    used="\n".join(v["snippet"].get("description","") for v in old if v["status"]["privacyStatus"]=="public" or v["status"].get("publishAt"))
     out=Path("artifacts/seoul-journal-public")/day/slot; out.mkdir(parents=True,exist_ok=True)
     selected=None; media_attempts=0
     source_override="https://n.news.naver.com/mnews/article/028/0002831263" if revision=="oEZaFVnqKR0" else None
