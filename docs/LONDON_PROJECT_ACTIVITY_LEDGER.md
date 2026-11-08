@@ -827,3 +827,14 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - Deployed and read back commit f4ef26594a2cf9b2fbc80ff2be257a291768e634 on main. Dedicated kvisa-one-daily.yml is active, scheduled 09:17 Asia/Seoul, other fleet publishing workflows stay disabled.
 - Manual run 42493565274 / job 128770892312 completed preflight with HOSTINGER_BROWSER_CHALLENGE: HTTP 403 (users/me). KVISA365COM is available to the job (masked), but CDN intercepts the authenticated request. No generation or public publication was attempted. Artifact 13622755912 preserves the blocked preflight.
 - Hostinger plugin discovery found only Hostinger Mail, which cannot manage hosting/CDN. No callable local Browser JS or cloud desktop control tool is exposed. Remaining blocker is authenticated Hostinger control to configure the narrow REST browser-challenge exception while preserving WordPress authentication. No publication success is claimed.
+
+
+## seoul-journal-first-public-and-daily-three-20261109
+- Owner approved original navy/yellow politician thumbnail style, compelling factual hooks, TTS 1.2x, politics/current/social hot issues and sports ONLY Korean Series; public release and three random KST slots authorized.
+- Recovered valid exact Seoul Journal OAuth with dedicated environment secrets; public channel ID UChRUdHZlXSjftAqBtdDNEWA verified. Earlier private test run 42494893138 succeeded.
+- Public release https://www.youtube.com/shorts/oEZaFVnqKR0 uploaded and read back PUBLIC, processed, HD, PT52S. Original report-based script; public-domain White House archival Lee portrait; 8 caption cards; central TTS priority attempted with Edge fallback; audio atempo=1.2.
+- Custom thumbnail endpoint failed (HttpError); YouTube readback hasCustomThumbnail=false. Do not claim the landscape thumbnail is applied. Embedded designed first frame exists, selected platform cover unverified.
+- Replaced randomized prototype workflow with public Gemini-only generation, dedicated matching environment OAuth, exact channel guard, recent-source/public-slot dedupe, serialized inserts, dated <=36h article gate and Korean-Series-only sports rejection.
+- Date-specific random slots: 08–10 / 13–15 / 19–22 KST. Morning politics, midday social, evening hot issues. Three target; source/API/quality failures must remain visible and are not counted as publications.
+- Added docs/SEOUL_JOURNAL_PUBLIC_POLICY_2026-11-09.md, reusable presentation/public publishing/daily production scripts, reviewed first-release package, public receipt report and regression tests.
+- Validation: four unit tests PASS (28-day three-slot uniqueness, cross-host rejection, non-Series sports rejection, Series eligibility); Python compile and git diff whitespace checks PASS. Full first scheduled Gemini run still requires runtime validation; first live release was source-reviewed locally.
