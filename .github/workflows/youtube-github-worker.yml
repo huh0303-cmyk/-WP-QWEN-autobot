@@ -28,7 +28,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: youtube-github-publisher
+  group: youtube-publish-${{ inputs.channel }}
   cancel-in-progress: false
 
 jobs:
