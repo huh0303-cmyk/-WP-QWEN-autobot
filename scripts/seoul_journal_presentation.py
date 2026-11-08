@@ -116,9 +116,12 @@ def photo_sequence(meta,out):
         matches=[x for x in response.json().get("search",[]) if x.get("label")==subject]
         if len(matches)==1:
             response=session.get("https://www.wikidata.org/w/api.php",params={
-                "action":"wbgetentities","ids":matches[0]["id"],"props":"labels","languages":"en","format":"json"},timeout=30)
+                "action":"wbgetentities","ids":matches[0]["id"],"props":"labels|claims","languages":"en","format":"json"},timeout=30)
             response.raise_for_status()
-            english=response.json()["entities"][matches[0]["id"]].get("labels",{}).get("en",{}).get("value")
+            entity=response.json()["entities"][matches[0]["id"]]
+            kinds=[x.get("mainsnak",{}).get("datavalue",{}).get("value",{}).get("id") for x in entity.get("claims",{}).get("P31",[])]
+            if "Q5" in kinds:
+                english=entity.get("labels",{}).get("en",{}).get("value")
     if not files and english:
         response=session.get("https://commons.wikimedia.org/w/api.php",params={
             "action":"query","list":"search","srsearch":'intitle:"'+english+'" filetype:bitmap',
@@ -175,7 +178,7 @@ def fish(text,path,language,reference_id=None):
     Path(path).write_bytes(r.content); return True
 def make(meta,out):
     out=Path(out); out.mkdir(parents=True,exist_ok=True)
-    assets=photo_sequence(meta,out)
+    assets=meta.pop("_prepared_assets",None) or photo_sequence(meta,out)
     photo,rights=assets[0]
     voice=anchor(meta)
     def anchor_fish(text,path,language):
