@@ -62,7 +62,7 @@ tr.platform-youtube{background:#fff7f7}tr.platform-tiktok{background:#f2fcfd}tr.
 <div class="bar"><span>블로그 순위 기준: 확인된 전일 방문자 수</span><span class="na">7일 방문 추세는 일별 기록이 7일 이상 축적된 경우에만 표시합니다. 검색 성과는 SEO 상세 분석에서 확인합니다.</span></div>
 
 <div class="sub" style="padding:7px 9px;background:#fff7ed;border-left:3px solid #d97706">발행 관리는 기존 발행 화면을 엽니다. 예약 스케줄과 격리된 즉시 발행은 아직 검증되지 않았으므로, 이 화면에서는 자동 실행하지 않습니다. 신규 GA4·Rank Math 컬럼은 인증 수집이 연결될 때까지 미수집으로 표시합니다. SEO 건강도는 공개 글의 제목·대표이미지·본문을 점검한 편집 품질 신호등이며 Rank Math 공식 점수가 아닙니다. 데이터가 없으면 회색으로 표시합니다.</div><div class="sub" id="blog-ranking-meta">플랫폼별로 순위를 따로 표시합니다.</div>
-<div class="table-wrap"><table><thead><tr><th>순위</th><th>구분</th><th>사이트</th><th>일일방문자 (증감)</th><th>최근 7일 방문</th><th>전주 대비</th><th>콘텐츠 수(증감)</th><th>최근 발행일</th><th>GSC 색인 확인</th><th>GitHub 발행주기</th><th>GA4 7일 사용자</th><th>GA4 전주 증감</th><th>Rank Math 평균점수</th><th>SEO 70점 미만</th><th>제목 중복</th><th>이미지 재사용</th><th>SEO 건강도</th><th>발행 관리</th></tr></thead>
+<div class="table-wrap"><table><thead><tr><th>순위</th><th>구분</th><th>사이트</th><th>일일방문자 (증감)</th><th>최근 7일 방문</th><th>전주 대비</th><th>콘텐츠 수(증감)</th><th>최근 발행일</th><th>Blogger 7일 발행</th><th>Blogger 발행 지연</th><th>Blogger 제목 중복</th><th>GSC 색인 확인</th><th>GitHub 발행주기</th><th>GA4 7일 사용자</th><th>GA4 전주 증감</th><th>Rank Math 평균점수</th><th>SEO 70점 미만</th><th>제목 중복</th><th>이미지 재사용</th><th>SEO 건강도</th><th>발행 관리</th></tr></thead>
 <tbody id="b"></tbody></table></div>
 <section id="blogger-pageviews" style="margin:18px 0 10px;padding:12px;background:#fff;border:1px solid #cbd5e1;border-radius:8px">
 <h2 id="blogger-pageviews-title" style="margin:0 0 4px;font-size:1.05rem;color:#0f172a">Blogspot (33개) · 누적 페이지뷰 순위</h2>
@@ -118,7 +118,7 @@ function weeklyFor(r){
  var prior=previous.reduce(function(a,b){return a+b},0);
  return {total:total,delta:total-prior,percent:prior>0?((total-prior)/prior*100):null};
 }
-var CADENCE_DATA=null,HEALTH_DATA=null;
+var CADENCE_DATA=null,HEALTH_DATA=null,BLOGGER_HEALTH=null;
 function cadenceFor(r){
  var c=CADENCE_DATA&&CADENCE_DATA.cadence||{},p=blogPlatformOf(r);
  if(p==='wordpress'){var site=String(r.site||'').toLowerCase();var isNews=/koreanews365/.test(site);var rule=isNews?c.newsrooms:c.wordpress_general;return rule?'매일 1회 (설정 목표)':'설정 미수집';}
@@ -201,6 +201,10 @@ function draw(){
     var vis=ranked?'<b>'+f(visitor.yesterday_visitors)+'</b>'+d(visitor.yesterday_delta):'<span class="na">수집 전</span>';
     var week=weeklyFor(r);var weekCount=week?'<b>'+f(week.total)+'</b>':'<span class="na" title="일별 방문 기록 7일 필요">집계 대기</span>';var weekChange=week&&week.delta!==null?d(week.delta)+(week.percent===null?'':' <small>('+week.percent.toFixed(1)+'%)</small>'):'<span class="na">비교 대기</span>';
     var cadence=cadenceFor(r),health=seoHealthFor(r);
+    var bs=blogPlatformOf(r)==='blogspot',bh=bs&&BLOGGER_HEALTH&&BLOGGER_HEALTH.sites&&BLOGGER_HEALTH.sites[r.site];
+    var bloggerPosts=bs?(bh&&bh.status==='ok'?f(bh.posts_7d)+'건':'<span class="na">미수집</span>'):'<span class="na">—</span>';
+    var bloggerDelay=bs?(bh&&bh.status==='ok'?(bh.days_since_publish>=3?'<span style="color:#dc2626">🔴 '+bh.days_since_publish+'일</span>':bh.days_since_publish>=2?'<span style="color:#b45309">🟡 '+bh.days_since_publish+'일</span>':'🟢 정상'):'<span class="na">미확인</span>'):'<span class="na">—</span>';
+    var bloggerDuplicates=bs?(bh&&bh.status==='ok'?f(bh.duplicate_titles):'<span class="na">미수집</span>'):'<span class="na">—</span>';
     var audit=HEALTH_DATA&&HEALTH_DATA.sites&&HEALTH_DATA.sites[r.site]||null;
     var wp=blogPlatformOf(r)==='wordpress';
     var ga=wp&&r.ga4||null,rm=wp&&r.rank_math||null;
@@ -218,6 +222,7 @@ function draw(){
   }).join('');
 }
 document.getElementById('all-platform-summary').addEventListener('click',function(e){var b=e.target.closest('.platform-tab[data-kind="blog"]');if(!b)return;blogPlatform=b.dataset.platform;draw();});
+fetch('blogger_health.json?'+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw Error('not ready');return r.json()}).then(function(d){BLOGGER_HEALTH=d;draw();}).catch(function(){BLOGGER_HEALTH=null;draw();});
 fetch('wp_health.json?'+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw Error('not ready');return r.json()}).then(function(d){HEALTH_DATA=d;draw();}).catch(function(){HEALTH_DATA=null;draw();});
 fetch('london_content_schedule.json?'+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}).then(function(d){CADENCE_DATA=d;draw();}).catch(function(){CADENCE_DATA=null;draw();});
 fetch('visitor_metrics.json?'+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}).then(function(d){VISITOR_DATA=d;draw();}).catch(function(e){var el=document.getElementById('blog-ranking-meta');el.textContent+=' · 방문자 순위 데이터 미수집';});
