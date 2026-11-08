@@ -12,7 +12,7 @@ NEWSROOMS = {
         "language": "ko",
         "categories": ["속보", "정치", "경제", "사회", "국제", "군사", "스포츠"],
         "mode": "new_rss_item",
-        "daily_publication_limit": None,
+        "daily_publication_limit": 5,
         "weekly_original_ratio_min": 0.30,
         "theme_candidate": "Twenty Twenty-Five News Blog",
     },
