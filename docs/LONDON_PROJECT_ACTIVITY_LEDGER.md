@@ -876,3 +876,9 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - Gabia official no-login renewal UI independently lists KSA-KOREA.ORG expiration 2026-10-14 and offers renewal. Domain is not deleted. Current DNS NXDOMAIN stems from registrar hold, not WordPress/CDN/landing-page routing.
 - Opened official https://www.gabia.com/service/nologin/extend and selected only ksa-korea.org, 1-year renewal. Displayed price KRW 22,000 excluding VAT (KRW 24,200 with 10% VAT, final checkout to verify). No payment, legal acceptance or renewal submission performed. UI states service restart after expired-domain renewal can take 1-2 days.
 - Next: obtain owner authorization for this specific renewal cost, complete checkout within approved total, then verify hold removal, DNS, SSL and existing landing page. Hosting files, nameservers and redirects were not changed.
+
+
+## ksa-renewal-declined-final-retirement-20261109
+- After reviewing confirmed registrar expiration and one-year renewal quote, owner explicitly instructed to abandon KSA-korea.org. This supersedes the earlier active-domain correction.
+- No renewal or payment is authorized. KSA WordPress destination disabled/retired again, removed from legacy active targets and audit credential mapping. Existing disabled/retired filters exclude it from control choices and audits.
+- SIS and KI remain retired; K-Trip stays active. Similar-name Blogger destinations and existing hosting content remain unchanged. No hosting deletion or automatic-renewal setting change was performed.

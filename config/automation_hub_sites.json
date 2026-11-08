@@ -586,8 +586,10 @@
       "image_mode": "free_stock_ai",
       "image_min": 0,
       "image_max": 1,
-      "enabled": true,
-      "operating_note": "Owner confirmed domain is in use on 2026-11-09; possible landing-page destination. DNS and WordPress publishing readiness require verification; never retire based on REST/DNS failure."
+      "enabled": false,
+      "status": "retired",
+      "retired_at": "2026-11-09",
+      "retirement_reason": "Owner declined paid renewal and permanently discontinued domain on 2026-11-09."
     },
     {
       "site_id": "wp_sis",

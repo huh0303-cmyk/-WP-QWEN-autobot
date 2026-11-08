@@ -15,7 +15,6 @@ jobs:
       - run: pip install requests -q
       - name: Inspect public and authenticated REST without writes
         env:
-          KSAKOREAORG: ${{ secrets.KSAKOREAORG }}
           KOREA365ORG: ${{ secrets.KOREA365ORG }}
           KSTUDY365COM: ${{ secrets.KSTUDY365COM }}
           OLIVEYOUNGKOREACOM: ${{ secrets.OLIVEYOUNGKOREACOM }}
