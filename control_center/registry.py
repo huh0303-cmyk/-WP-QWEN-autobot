@@ -30,7 +30,7 @@ def load_wordpress_sites(path: Path = REGISTRY_PATH) -> list[WordPressSite]:
     raw = json.loads(path.read_text(encoding="utf-8"))
     sites: list[WordPressSite] = []
     for row in raw.get("sites", []):
-        if row.get("platform") != "wordpress":
+        if row.get("platform") != "wordpress" or row.get("enabled", True) is False or row.get("status") == "retired":
             continue
         sites.append(WordPressSite(
             site_id=row["site_id"],
@@ -47,9 +47,9 @@ def load_wordpress_sites(path: Path = REGISTRY_PATH) -> list[WordPressSite]:
             image_min=max(0, int(row.get("image_min", 0))),
             image_max=min(2, max(0, int(row.get("image_max", 2)))),
         ))
-    if len(sites) != 27:
-        raise RuntimeError(f"WordPress registry must contain exactly 27 sites; found {len(sites)}")
-    if len({site.site_id for site in sites}) != 27 or len({site.url for site in sites}) != 27:
+    if not sites:
+        raise RuntimeError("WordPress registry contains no active sites")
+    if len({site.site_id for site in sites}) != len(sites) or len({site.url for site in sites}) != len(sites):
         raise RuntimeError("WordPress registry contains duplicate site_id or URL")
     return sites
 

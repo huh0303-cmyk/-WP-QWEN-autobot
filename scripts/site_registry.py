@@ -3,7 +3,6 @@ SITES = [
     ("https://k-health365.com", "KHEALTH365COM", "priority"),
     ("https://koreamedicaltour.com", "KOREAMEDICALTOURCOM", "active"),
     ("https://koreainvest365.com", "KOREAINVEST365COM", "active"),
-    ("https://ki-korea.com", "KIKOREACOM", "active"),
     ("https://koreainsurance365.com", "KOREAINSURANCE365COM", "active"),
     ("https://kfinance365.com", "KFINANCE365COM", "active"),
     ("https://koreataxnlaw.com", "KOREATAXNLAWCOM", "active"),
@@ -19,13 +18,16 @@ SITES = [
     ("https://kstudy365.com", "KSTUDY365COM", "active"),
     ("https://studyinkorea365.com", "STUDYINKOREA365COM", "active"),
     ("https://kieca-korea.org", "KIECAKOREAORG", "active"),
-    ("https://ksa-korea.org", "KSAKOREAORG", "active"),
-    ("https://sis-korea.com", "SISKOREACOM", "active"),
     ("https://jobkorea365.com", "JOBKOREA365COM", "active"),
     ("https://jobinkorea365.com", "JOBINKOREA365COM", "active"),
     ("https://jobkoreaglobal.com", "JOBKOREAGLOBALCOM", "review"),
     ("https://korea365.org", "KOREA365ORG", "active"),
     ("https://koreanews365.com", "KOREANEWS365COM", "active"),
     ("https://theseouljournal.com", "THESEOULJOURNALCOM", "active"),
+]
+RETIRED_SITES = [
+    ("https://ki-korea.com", "KIKOREACOM", "retired"),
+    ("https://ksa-korea.org", "KSAKOREAORG", "retired"),
+    ("https://sis-korea.com", "SISKOREACOM", "retired"),
 ]
 ACTIVE_SITES = [row for row in SITES if row[2] != "retired"]

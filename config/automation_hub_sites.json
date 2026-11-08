@@ -585,7 +585,11 @@
       "daily_max": 1,
       "image_mode": "free_stock_ai",
       "image_min": 0,
-      "image_max": 1
+      "image_max": 1,
+      "enabled": false,
+      "status": "retired",
+      "retired_at": "2026-11-09",
+      "retirement_reason": "Owner permanently discontinued this domain; exclude publishing, audits and recovery."
     },
     {
       "site_id": "wp_sis",
@@ -608,7 +612,11 @@
       "daily_max": 1,
       "image_mode": "free_stock_ai",
       "image_min": 0,
-      "image_max": 1
+      "image_max": 1,
+      "enabled": false,
+      "status": "retired",
+      "retired_at": "2026-11-09",
+      "retirement_reason": "Owner permanently discontinued this domain; exclude publishing, audits and recovery."
     },
     {
       "site_id": "wp_kikorea",
@@ -631,7 +639,11 @@
       "daily_max": 1,
       "image_mode": "free_stock_ai",
       "image_min": 0,
-      "image_max": 1
+      "image_max": 1,
+      "enabled": false,
+      "status": "retired",
+      "retired_at": "2026-11-09",
+      "retirement_reason": "Owner permanently discontinued this domain; exclude publishing, audits and recovery."
     },
     {
       "site_id": "wp_koreanews",

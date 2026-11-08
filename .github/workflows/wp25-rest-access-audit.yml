@@ -1,4 +1,4 @@
-name: WordPress 25 authenticated read-only REST audit
+name: Active WordPress authenticated read-only REST audit
 on:
   workflow_dispatch:
 permissions:
@@ -37,15 +37,12 @@ jobs:
           KOREACRYPTO365COM: ${{ secrets.KOREACRYPTO365COM }}
           KTECH365COM: ${{ secrets.KTECH365COM }}
           KIECAKOREAORG: ${{ secrets.KIECAKOREAORG }}
-          KSAKOREAORG: ${{ secrets.KSAKOREAORG }}
-          SISKOREACOM: ${{ secrets.SISKOREACOM }}
-          KIKOREACOM: ${{ secrets.KIKOREACOM }}
         run: |
           python - <<'PY'
           import os,json,concurrent.futures,requests,datetime
           from pathlib import Path
           sites=json.loads(Path("config/automation_hub_sites.json").read_text())["sites"]
-          sites=[s for s in sites if s["platform"]=="wordpress" and s["url"].split("//")[-1] not in ("koreanews365.com","theseouljournal.com")]
+          sites=[s for s in sites if s["platform"]=="wordpress" and s.get("enabled",True) and s.get("status")!="retired" and s["url"].split("//")[-1] not in ("koreanews365.com","theseouljournal.com")]
           def inspect(s):
               row={"site":s["url"],"secret_name":s["secret_name"]}
               for kind,path in (("public","posts?per_page=1&_fields=id,date,link"),("authenticated","users/me?context=edit&_fields=id,capabilities")):
