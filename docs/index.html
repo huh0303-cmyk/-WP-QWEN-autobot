@@ -68,7 +68,7 @@ tr.platform-youtube{background:#fff7f7}tr.platform-tiktok{background:#f2fcfd}tr.
 <h2 id="blogger-pageviews-title" style="margin:0 0 4px;font-size:1.05rem;color:#0f172a">Blogspot (33개) · 누적 페이지뷰 순위</h2>
 <div class="sub" id="blogger-pageviews-meta">33개 블로그 방문자·게시물 정보를 수집 중...</div>
 <div class="bar"><span>정렬 기준: 누적 방문자 수 내림차순</span><span class="na">방문자 수를 확인할 수 없는 블로그는 아래쪽에 표시</span></div>
-<div class="table-wrap"><table><thead><tr><th>순위</th><th>플랫폼</th><th>블로그</th><th>누적 페이지뷰(증감)</th><th>콘텐츠 수(증감)</th><th>최근 발행일</th><th>페이지뷰 수집 상태</th></tr></thead><tbody id="blogger-pageviews-rows"><tr><td colspan="7" class="na">데이터 수집 전</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>순위</th><th>플랫폼</th><th>블로그</th><th>누적 페이지뷰(증감)</th><th>콘텐츠 수(증감)</th><th>최근 발행일</th><th>7일 발행</th><th>발행 경과</th><th>제목 중복</th><th>조회수 확인</th></tr></thead><tbody id="blogger-pageviews-rows"><tr><td colspan="10" class="na">데이터 수집 전</td></tr></tbody></table></div>
 </section>
 <h2 id="social-title" style="margin:18px 0 5px;font-size:1.05rem;color:#0f172a">SNS 계정별 플랫폼 순위</h2>
 <div class="sub" id="social-meta">계정 등록부를 불러오는 중...</div>
@@ -149,8 +149,15 @@ function drawBloggerRanking(){
  tbody.innerHTML=rows.map(function(x){
   var r=x.r,v=x.v;rank++;
   var delta=v.daily_pageviews===null||v.daily_pageviews===undefined?'<span class="na">증감 미확인</span>':d(v.daily_pageviews);
-  var total=x.total===null?'<span class="na">미수집</span>':'<b>'+f(x.total)+'</b> '+delta;
-  return '<tr class="platform-blogspot"><td>'+rank+'위</td><td>'+platformCell('blogspot')+'</td><td style="text-align:left"><a href="'+esc(r.url||'')+'" target="_blank" rel="noopener">'+esc(r.display_name||r.site||r.url)+'</a></td><td>'+total+'</td><td>'+metricNumber(r.content,'글')+'</td><td>'+metricDay(r.latest_publish_date)+'</td><td style="text-align:left">'+esc(v.status||'미수집')+'</td></tr>';
+  var total=x.total===null?'<span class="na">확인 불가</span>':'<b>'+f(x.total)+'</b> '+delta;
+  var bh=BLOGGER_HEALTH&&BLOGGER_HEALTH.sites&&BLOGGER_HEALTH.sites[r.site];
+  var verified=bh&&bh.status==='ok';
+  var count7=verified?f(bh.posts_7d)+'건':'<span class="na">확인 중</span>';
+  var lag=verified?(bh.days_since_publish>=3?'🔴 '+bh.days_since_publish+'일 경과':bh.days_since_publish>=2?'🟡 '+bh.days_since_publish+'일 경과':'🟢 정상'):'<span class="na">확인 중</span>';
+  var duplicates=verified?f(bh.duplicate_titles)+'건':'<span class="na">확인 중</span>';
+  var verifiedAt=v.checked_at||v.last_attempt_at||'';
+  var viewsState=x.total!==null?'🟢 확인됨':v.status==='TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND'?'⚪ 위젯 없음':v.status==='HTTP_429'?'🟡 재시도 대기':'⚪ 미확인';
+  return '<tr class="platform-blogspot"><td>'+rank+'위</td><td>'+platformCell('blogspot')+'</td><td style="text-align:left"><a href="'+esc(r.url||'')+'" target="_blank" rel="noopener">'+esc(r.display_name||r.site||r.url)+'</a></td><td>'+total+'</td><td>'+metricNumber(r.content,'글')+'</td><td>'+metricDay(r.latest_publish_date)+'</td><td>'+count7+'</td><td>'+lag+'</td><td>'+duplicates+'</td><td title="'+esc(String(verifiedAt).slice(0,16))+'">'+viewsState+'</td></tr>';
  }).join('');
  var meta=document.getElementById('blogger-pageviews-meta');
  var viewsChecked=String(J.blogger_pageviews&&J.blogger_pageviews.generated_at||J.generated_at||'').slice(0,16).replace('T',' ');
