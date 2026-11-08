@@ -196,6 +196,8 @@ function drawBloggerPageviews(payload){
  var dailyEl=document.getElementById('blogger-pageviews-daily');
  var chart=document.getElementById('blogger-pageviews-chart');
  var tbody=document.getElementById('blogger-pageviews-rows');
+ // Optional legacy detail widgets are absent in the current dashboard layout.
+ if(!meta||!select||!totalEl||!dailyEl||!chart||!tbody)return;
  if(!payload||!Array.isArray(payload.blogs)){meta.textContent='Blogger 페이지뷰 데이터가 아직 없습니다.';return;}
  var blogs=payload.blogs.slice().sort(function(a,b){
   var av=Number.isFinite(a.total_pageviews)?a.total_pageviews:-1;
