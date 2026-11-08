@@ -9,6 +9,10 @@ on:
         type: choice
         options: [morning, midday, evening]
         default: morning
+      reuse_run:
+        description: "Reuse rendered artifacts from an authorized earlier run"
+        type: string
+        default: ""
       revise_video:
         description: "Rebuild authorized first Lee Jae-myung Short (enter oEZaFVnqKR0)"
         type: string
@@ -23,6 +27,7 @@ on:
         default: false
 permissions:
   contents: read
+  actions: read
 concurrency:
   group: seoul-journal-public-upload
   cancel-in-progress: false
@@ -84,12 +89,38 @@ jobs:
           sudo apt-get install -y -qq ffmpeg fonts-noto-cjk
           python -m pip install requests beautifulsoup4 Pillow edge-tts google-api-python-client google-auth google-auth-httplib2
       - name: Generate original story and publish once per KST slot
+        if: ${{ inputs.reuse_run == '' }}
         run: python scripts/seoul_journal_public_daily.py
+      - name: Restore rendered authorized revision
+        if: ${{ inputs.reuse_run != '' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: seoul-journal-public-${{ inputs.reuse_run }}
+          run-id: ${{ inputs.reuse_run }}
+          github-token: ${{ github.token }}
+          path: artifacts/seoul-journal-reuse/
+      - name: Publish restored revision
+        if: ${{ inputs.reuse_run != '' }}
+        env:
+          SEOUL_JOURNAL_SLOT_MARKER: SJ_REVISION:oEZaFVnqKR0:motion-v2
+        run: |
+          python - <<'PY'
+          import sys
+          from pathlib import Path
+          sys.path.insert(0, "scripts")
+          from seoul_journal_publish_package import main
+          folders=list(Path("artifacts/seoul-journal-reuse").rglob("package.json"))
+          if len(folders)!=1: raise RuntimeError("Expected exactly one rendered package")
+          sys.argv=["publish","--package",str(folders[0].parent),"--publish"]
+          main()
+          PY
       - name: Preserve source, rights, presentation and public receipt
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: seoul-journal-public-${{ github.run_id }}
-          path: artifacts/seoul-journal-public/
+          path: |
+            artifacts/seoul-journal-public/
+            artifacts/seoul-journal-reuse/
           if-no-files-found: warn
           retention-days: 14
