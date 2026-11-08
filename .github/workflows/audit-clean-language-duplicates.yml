@@ -1,5 +1,7 @@
 name: Audit and clean duplicate language Shorts
 on:
+  schedule:
+    - cron: '41 1 * * 1' # weekly full ten-channel audit (UTC)
   workflow_dispatch:
     inputs:
       apply:
