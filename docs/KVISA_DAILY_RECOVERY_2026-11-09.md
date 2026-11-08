@@ -29,4 +29,4 @@ Deployment commit: f4ef26594a2cf9b2fbc80ff2be257a291768e634, verified on main. W
 
 Run https://github.com/huh0303-cmyk/-WP-QWEN-autobot/actions/runs/42493565274 failed at authenticated preflight with HOSTINGER_BROWSER_CHALLENGE: HTTP 403 (users/me). The WordPress secret was present and masked. Article generation, publishing and public verification were correctly skipped. Artifact ID: 13622755912. No post ID or public publication URL was obtained.
 
-Automatic daily polling is installed, but successful daily publication remains blocked until the Hostinger challenge exception is configured. Connected Hostinger Mail is not a hosting/CDN management substitute.
+Automatic daily polling is installed, but successful daily publication remains blocked until the Hostinger challenge exception is configured. The discovered Hostinger Mail plugin cannot manage hosting/CDN settings and was not connected for this task.
