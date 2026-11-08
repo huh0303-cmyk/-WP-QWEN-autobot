@@ -1,0 +1,498 @@
+{
+  "task_id": "wp25-cdn-recovery-20261109",
+  "date_kst": "2026-11-09",
+  "scope": 25,
+  "cdn_change": {
+    "site": "https://k-visa365.com",
+    "from": "under_attack",
+    "to": "minimum",
+    "owner_approved": true
+  },
+  "audit_run": 42496179482,
+  "publication": {
+    "site": "https://k-visa365.com",
+    "id": 3452,
+    "url": "https://k-visa365.com/korea-top-tier-visa-eligibility-standards-and-long-term-residence-qualification-protocols/",
+    "run_id": 42496098537,
+    "http": 200,
+    "verified": true
+  },
+  "sites": [
+    {
+      "site": "https://korea365.org",
+      "secret_name": "KOREA365ORG",
+      "public": {
+        "http": 200,
+        "result": "OK",
+        "latest": [
+          {
+            "id": 3011,
+            "date": "2026-11-08T06:47:00",
+            "link": "https://korea365.org/managing-official-leave-requests-and-administrative-absences-in-korea/"
+          }
+        ]
+      },
+      "authenticated": {
+        "http": 200,
+        "result": "OK",
+        "can_publish": true
+      }
+    },
+    {
+      "site": "https://kstudy365.com",
+      "secret_name": "KSTUDY365COM",
+      "public": {
+        "http": 200,
+        "result": "OK",
+        "latest": [
+          {
+            "id": 1469,
+            "date": "2026-11-08T10:31:00",
+            "link": "https://kstudy365.com/academic-admission-requirements-and-enrollment-procedures-for-international-students-in-south-korea/"
+          }
+        ]
+      },
+      "authenticated": {
+        "http": 200,
+        "result": "OK",
+        "can_publish": true
+      }
+    },
+    {
+      "site": "https://oliveyoungkorea.com",
+      "secret_name": "OLIVEYOUNGKOREACOM",
+      "public": {
+        "http": 200,
+        "result": "OK",
+        "latest": [
+          {
+            "id": 1084,
+            "date": "2026-11-08T09:27:00",
+            "link": "https://oliveyoungkorea.com/sourcing-calming-skincare-routines-for-high-stress-environments/"
+          }
+        ]
+      },
+      "authenticated": {
+        "http": 200,
+        "result": "OK",
+        "can_publish": true
+      }
+    },
+    {
+      "site": "https://jobkorea365.com",
+      "secret_name": "JOBKOREA365COM",
+      "public": {
+        "http": 200,
+        "result": "OK",
+        "latest": [
+          {
+            "id": 1337,
+            "date": "2026-11-08T07:16:00",
+            "link": "https://jobkorea365.com/professional-pathways-and-regulatory-compliance-for-foreign-engineer-jobs-korea-2026/"
+          }
+        ]
+      },
+      "authenticated": {
+        "http": 200,
+        "result": "OK",
+        "can_publish": true
+      }
+    },
+    {
+      "site": "https://k-visa365.com",
+      "secret_name": "KVISA365COM",
+      "public": {
+        "http": 200,
+        "result": "OK",
+        "latest": [
+          {
+            "id": 3449,
+            "date": "2026-10-07T09:46:04",
+            "link": "https://k-visa365.com/criteria-and-regulatory-framework-for-korea-top-tier-visa-eligibility-2026/"
+          }
+        ]
+      },
+      "authenticated": {
+        "http": 200,
+        "result": "OK",
+        "can_publish": true
+      }
+    },
+    {
+      "site": "https://k-health365.com",
+      "secret_name": "KHEALTH365COM",
+      "public": {
+        "http": 200,
+        "result": "OK",
+        "latest": [
+          {
+            "id": 7317,
+            "date": "2026-11-06T08:36:00",
+            "link": "https://k-health365.com/integrative-medicine-expo-evidence-safety/"
+          }
+        ]
+      },
+      "authenticated": {
+        "http": 200,
+        "result": "OK",
+        "can_publish": true
+      }
+    },
+    {
+      "site": "https://kskin365.com",
+      "secret_name": "KSKIN365COM",
+      "public": {
+        "http": 200,
+        "result": "OK",
+        "latest": [
+          {
+            "id": 2939,
+            "date": "2026-11-08T16:52:00",
+            "link": "https://kskin365.com/manufacturing-standards-and-quality-oversight-in-korean-cosmetic-production/"
+          }
+        ]
+      },
+      "authenticated": {
+        "http": 200,
+        "result": "OK",
+        "can_publish": true
+      }
+    },
+    {
+      "site": "https://k-trip365.com",
+      "secret_name": "KTRIP365COM",
+      "public": {
+        "http": 200,
+        "result": "OK",
+        "latest": [
+          {
+            "id": 4859,
+            "date": "2026-11-07T12:32:00",
+            "link": "https://k-trip365.com/managing-urban-mobility-with-seoul-climate-card-short-term-options-for-visitors/"
+          }
+        ]
+      },
+      "authenticated": {
+        "http": 200,
+        "result": "OK",
+        "can_publish": true
+      }
+    },
+    {
+      "site": "https://kfinance365.com",
+      "secret_name": "KFINANCE365COM",
+      "public": {
+        "http": 200,
+        "result": "OK",
+        "latest": [
+          {
+            "id": 4148,
+            "date": "2026-11-08T08:55:00",
+            "link": "https://kfinance365.com/economic-policy-direction-and-regulatory-oversight-for-foreign-residents-in-korea/"
+          }
+        ]
+      },
+      "authenticated": {
+        "http": 200,
+        "result": "OK",
+        "can_publish": true
+      }
+    },
+    {
+      "site": "https://koreainsurance365.com",
+      "secret_name": "KOREAINSURANCE365COM",
+      "public": {
+        "http": 200,
+        "result": "OK",
+        "latest": [
+          {
+            "id": 3890,
+            "date": "2026-11-07T14:11:00",
+            "link": "https://koreainsurance365.com/calculating-nhis-regional-insurance-premiums-for-self-employed-foreigners-in-korea/"
+          }
+        ]
+      },
+      "authenticated": {
+        "http": 200,
+        "result": "OK",
+        "can_publish": true
+      }
+    },
+    {
+      "site": "https://koreataxnlaw.com",
+      "secret_name": "KOREATAXNLAWCOM",
+      "public": {
+        "http": 200,
+        "result": "OK",
+        "latest": [
+          {
+            "id": 4098,
+            "date": "2026-11-08T04:35:00",
+            "link": "https://koreataxnlaw.com/compliance-obligations-for-foreign-entities-operating-in-korea-under-current-russia-sanctions/"
+          }
+        ]
+      },
+      "authenticated": {
+        "http": 200,
+        "result": "OK",
+        "can_publish": true
+      }
+    },
+    {
+      "site": "https://koreamedicaltour.com",
+      "secret_name": "KOREAMEDICALTOURCOM",
+      "public": {
+        "http": 200,
+        "result": "OK",
+        "latest": [
+          {
+            "id": 1843,
+            "date": "2026-11-08T04:19:00",
+            "link": "https://koreamedicaltour.com/navigating-medical-travel-pathways-for-complex-chronic-care-in-south-korea/"
+          }
+        ]
+      },
+      "authenticated": {
+        "http": 200,
+        "result": "OK",
+        "can_publish": true
+      }
+    },
+    {
+      "site": "https://studyinkorea365.com",
+      "secret_name": "STUDYINKOREA365COM",
+      "public": {
+        "http": 200,
+        "result": "OK",
+        "latest": [
+          {
+            "id": 3269,
+            "date": "2026-11-07T14:38:00",
+            "link": "https://studyinkorea365.com/practical-management-of-housing-budgeting-and-administrative-procedures-for-new-students-in-korea/"
+          }
+        ]
+      },
+      "authenticated": {
+        "http": 200,
+        "result": "OK",
+        "can_publish": true
+      }
+    },
+    {
+      "site": "https://jobinkorea365.com",
+      "secret_name": "JOBINKOREA365COM",
+      "public": {
+        "http": 200,
+        "result": "OK",
+        "latest": [
+          {
+            "id": 1214,
+            "date": "2026-11-01T11:07:40",
+            "link": "https://jobinkorea365.com/strategic-job-search-paths-for-international-tech-talent-in-korea/"
+          }
+        ]
+      },
+      "authenticated": {
+        "http": 200,
+        "result": "OK",
+        "can_publish": true
+      }
+    },
+    {
+      "site": "https://kworld365.com",
+      "secret_name": "KWORLD365COM",
+      "public": {
+        "http": 200,
+        "result": "OK",
+        "latest": [
+          {
+            "id": 1011,
+            "date": "2026-11-08T15:11:00",
+            "link": "https://kworld365.com/official-guidelines-for-2026-k-pop-stadium-tour-logistics-and-agency-verification/"
+          }
+        ]
+      },
+      "authenticated": {
+        "http": 200,
+        "result": "OK",
+        "can_publish": true
+      }
+    },
+    {
+      "site": "https://koreawedding365.com",
+      "secret_name": "KOREAWEDDING365COM",
+      "public": {
+        "http": 200,
+        "result": "OK",
+        "latest": [
+          {
+            "id": 1184,
+            "date": "2026-11-08T14:28:00",
+            "link": "https://koreawedding365.com/2026/11/08/safety-considerations-and-administrative-coordination-for-cross-cultural-weddings-in-korea/"
+          }
+        ]
+      },
+      "authenticated": {
+        "http": 200,
+        "result": "OK",
+        "can_publish": true
+      }
+    },
+    {
+      "site": "https://jobkoreaglobal.com",
+      "secret_name": "JOBKOREAGLOBALCOM",
+      "public": {
+        "http": 200,
+        "result": "OK",
+        "latest": [
+          {
+            "id": 1699,
+            "date": "2026-11-07T23:43:00",
+            "link": "https://jobkoreaglobal.com/strategic-integration-of-e-7-4-skilled-worker-hiring-rules-in-corporate-workforce-planning/"
+          }
+        ]
+      },
+      "authenticated": {
+        "http": 200,
+        "result": "OK",
+        "can_publish": true
+      }
+    },
+    {
+      "site": "https://koreainvest365.com",
+      "secret_name": "KOREAINVEST365COM",
+      "public": {
+        "http": 200,
+        "result": "OK",
+        "latest": [
+          {
+            "id": 3549,
+            "date": "2026-11-08T16:21:00",
+            "link": "https://koreainvest365.com/strategic-considerations-for-niche-market-sentiment-and-volatility-patterns-in-korean-equities/"
+          }
+        ]
+      },
+      "authenticated": {
+        "http": 200,
+        "result": "OK",
+        "can_publish": true
+      }
+    },
+    {
+      "site": "https://krealestate365.com",
+      "secret_name": "KREALESTATE365COM",
+      "public": {
+        "http": 200,
+        "result": "OK",
+        "latest": [
+          {
+            "id": 738,
+            "date": "2026-11-08T14:32:00",
+            "link": "https://krealestate365.com/procedures-for-navigating-land-transaction-permits-in-designated-korean-residential-zones/"
+          }
+        ]
+      },
+      "authenticated": {
+        "http": 200,
+        "result": "OK",
+        "can_publish": true
+      }
+    },
+    {
+      "site": "https://koreacrypto365.com",
+      "secret_name": "KOREACRYPTO365COM",
+      "public": {
+        "http": 200,
+        "result": "OK",
+        "latest": [
+          {
+            "id": 3490,
+            "date": "2026-11-08T02:23:00",
+            "link": "https://koreacrypto365.com/strategic-regulatory-alignment-and-the-pope-leo-oversight-framework-in-korea/"
+          }
+        ]
+      },
+      "authenticated": {
+        "http": 200,
+        "result": "OK",
+        "can_publish": true
+      }
+    },
+    {
+      "site": "https://ktech365.com",
+      "secret_name": "KTECH365COM",
+      "public": {
+        "http": 200,
+        "result": "OK",
+        "latest": [
+          {
+            "id": 4812,
+            "date": "2026-11-07T08:46:00",
+            "link": "https://ktech365.com/%eb%89%b4%ec%9a%95%ec%a6%9d%ec%8b%9c-fluctuations-and-their-direct-transmission-channels-to-korean-technology-sectors/"
+          }
+        ]
+      },
+      "authenticated": {
+        "http": 200,
+        "result": "OK",
+        "can_publish": true
+      }
+    },
+    {
+      "site": "https://kieca-korea.org",
+      "secret_name": "KIECAKOREAORG",
+      "public": {
+        "http": 200,
+        "result": "OK",
+        "latest": [
+          {
+            "id": 1227,
+            "date": "2026-11-08T00:59:00",
+            "link": "https://kieca-korea.org/%ed%95%9c%ea%b5%ad-%eb%8c%80%ed%95%99%ec%9d%84-%ec%9c%84%ed%95%9c-%ec%99%b8%ea%b5%ad%ec%9d%b8-%ec%9c%a0%ed%95%99%ec%83%9d-%ec%9c%a0%ec%b9%98%ec%99%80-%ea%b8%80%eb%a1%9c%eb%b2%8c-%ed%98%91%eb%a0%a5/"
+          }
+        ]
+      },
+      "authenticated": {
+        "http": 200,
+        "result": "OK",
+        "can_publish": true
+      }
+    },
+    {
+      "site": "https://ksa-korea.org",
+      "secret_name": "KSAKOREAORG",
+      "public": {
+        "result": "CONNECTION_ERROR",
+        "error_type": "ConnectionError"
+      },
+      "authenticated": {
+        "result": "CONNECTION_ERROR",
+        "error_type": "ConnectionError"
+      }
+    },
+    {
+      "site": "https://sis-korea.com",
+      "secret_name": "SISKOREACOM",
+      "public": {
+        "result": "CONNECTION_ERROR",
+        "error_type": "SSLError"
+      },
+      "authenticated": {
+        "result": "CONNECTION_ERROR",
+        "error_type": "SSLError"
+      }
+    },
+    {
+      "site": "https://ki-korea.com",
+      "secret_name": "KIKOREACOM",
+      "public": {
+        "result": "CONNECTION_ERROR",
+        "error_type": "SSLError"
+      },
+      "authenticated": {
+        "result": "CONNECTION_ERROR",
+        "error_type": "SSLError"
+      }
+    }
+  ]
+}
