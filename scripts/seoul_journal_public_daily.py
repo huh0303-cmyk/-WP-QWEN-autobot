@@ -116,9 +116,12 @@ def main():
         raise RuntimeError("Sports search returned unrelated report")
     meta["description"]+="\n\n보도 출처: "+url+"\n서울저널 자체 요약 / AI 내레이션, 1.2배속\n#서울저널 #Shorts"
     out=Path("artifacts/seoul-journal-public")/day/slot; out.mkdir(parents=True,exist_ok=True)
+    if revision: meta["visual_subject"]="이재명"
     _,audit=make(meta,out)
     if scheduled: meta["publish_at"]=scheduled
-    if revision: meta["revision_of"]=revision
+    if revision:
+        meta["revision_of"]=revision
+        meta["visual_subject"]="이재명"
     for p in audit.get("photos", [audit["photo"]] if audit["photo"] else []):
         meta["description"]+="\n자료사진: "+p["subject"]+" / "+p["date"]+" / "+p["credit"]+" / "+p["license"]+"\n"+p["source"]+"\n현재 사건 현장 사진이 아닙니다."
     (out/"package.json").write_text(json.dumps(meta,ensure_ascii=False,indent=2),encoding="utf-8")
