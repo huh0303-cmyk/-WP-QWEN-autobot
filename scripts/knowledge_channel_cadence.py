@@ -14,7 +14,7 @@ def slots(channel, day):
     seed = int.from_bytes(hashlib.sha256(f'{channel}:{monday.isoformat()}'.encode()).digest()[:8], 'big')
     rng = random.Random(seed)
     days = range(7) if channel in DAILY else sorted(rng.sample(range(7), 3))
-    return [dt.datetime.combine(monday + dt.timedelta(days=d), dt.time(rng.randrange(10, 22), rng.randrange(60)), KST) for d in days]
+    return [dt.datetime.combine(monday + dt.timedelta(days=d), dt.time(rng.randrange(10, 22), 0), KST) for d in days]
 
 def due_channels(now):
     local = now.astimezone(KST)
