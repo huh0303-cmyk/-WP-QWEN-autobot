@@ -2,7 +2,7 @@ name: "한국신문 Koreanews365 — Breaking News Publisher"
 run-name: "한국신문 Koreanews365 · 속보 발행 · ${{ github.event_name }}"
 
 on:
-  # Four daily attempts for the sole active newsroom. UTC 00:17, 06:17, 12:17, 18:17 = KST 09:17, 15:17, 21:17, 03:17.
+  # Five daily KST slots: 09:17, 12:17, 15:17, 18:17, 21:17.
   # Each attempt still requires a fresh eligible source and passes verification/deduplication.
   schedule:
     - cron: '17 0,3,6,9,12 * * *'
