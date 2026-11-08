@@ -154,14 +154,18 @@ function drawBloggerRanking(){
  tbody.innerHTML=rows.map(function(x){
   var r=x.r,v=x.v;rank++;
   var delta=v.daily_pageviews===null||v.daily_pageviews===undefined?'<span class="na">증감 미확인</span>':d(v.daily_pageviews);
-  var total=x.total===null?'<span class="na">확인 불가</span>':'<b>'+f(x.total)+'</b> '+delta;
+  var history=(v.history||[]).filter(function(h){return Number.isFinite(h.total_pageviews)&&h.date;}).sort(function(a,b){return String(b.date).localeCompare(String(a.date));});
+  var previous=history.length?history[0]:null;
+  var historical=x.total===null?(Number.isFinite(v.last_verified_total_pageviews)?v.last_verified_total_pageviews:previous&&previous.total_pageviews):null;
+  var historicalDate=previous?previous.date:String(v.checked_at||'').slice(0,10);
+  var total=x.total!==null?'<b>'+f(x.total)+'</b> '+delta:Number.isFinite(historical)?'<b style="color:#92400e">'+f(historical)+'</b> <span style="font-size:11px;color:#92400e" title="현재 조회수가 아닌 마지막 확인값">이전 확인 · '+esc(historicalDate)+'</span>':'<span class="na">확인 불가</span>';
   var bh=BLOGGER_HEALTH&&BLOGGER_HEALTH.sites&&BLOGGER_HEALTH.sites[r.site];
   var verified=bh&&bh.status==='ok';
   var count7=verified?f(bh.posts_7d)+'건':'<span class="na">확인 중</span>';
   var lag=verified?(bh.days_since_publish>=3?'🔴 '+bh.days_since_publish+'일 경과':bh.days_since_publish>=2?'🟡 '+bh.days_since_publish+'일 경과':'🟢 정상'):'<span class="na">확인 중</span>';
   var duplicates=verified?f(bh.duplicate_titles)+'건':'<span class="na">확인 중</span>';
   var verifiedAt=v.checked_at||v.last_attempt_at||'';
-  var viewsState=x.total!==null?'🟢 확인됨':v.status==='TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND'?'⚪ 위젯 없음':v.status==='HTTP_429'?'🟡 재시도 대기':'⚪ 미확인';
+  var viewsState=x.total!==null?'🟢 확인됨':Number.isFinite(historical)?'🟡 과거 수치':v.status==='TOTAL_PAGEVIEWS_COUNTER_NOT_FOUND'?'⚪ 위젯 없음':v.status==='HTTP_429'?'🟡 재시도 대기':'⚪ 미확인';
   return '<tr class="platform-blogspot"><td>'+rank+'위</td><td>'+platformCell('blogspot')+'</td><td style="text-align:left"><a href="'+esc(r.url||'')+'" target="_blank" rel="noopener">'+esc(r.display_name||r.site||r.url)+'</a></td><td>'+total+'</td><td>'+metricNumber(r.content,'글')+'</td><td>'+metricDay(r.latest_publish_date)+'</td><td>'+count7+'</td><td>'+lag+'</td><td>'+duplicates+'</td><td title="'+esc(String(verifiedAt).slice(0,16))+'">'+viewsState+'</td></tr>';
  }).join('');
  var meta=document.getElementById('blogger-pageviews-meta');
