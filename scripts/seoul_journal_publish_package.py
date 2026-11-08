@@ -47,7 +47,7 @@ def main():
         raise RuntimeError("Scheduled time must be future")
     def duplicate(old,desc):
         if marker and marker in desc: return True
-        return meta["source_url"] in desc and old["id"]!=revision
+        return (old["status"]["privacyStatus"]=="public" or old["status"].get("publishAt")) and meta["source_url"] in desc and old["id"]!=revision
     for old in recent(yt,playlist):
         desc=old["snippet"].get("description","")
         if duplicate(old,desc):
