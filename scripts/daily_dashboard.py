@@ -60,29 +60,8 @@ def prop_for(url, props):
 
 
 def indexed_sitemap_count(h, prop):
-    """Sum indexed URL counts reported by the Search Console Sitemaps API.
-
-    These are sitemap-reported indexed counts (not a guarantee of all indexed
-    URLs). Return None when access/API data is unavailable; never invent zero.
-    """
-    endpoint = "https://www.googleapis.com/webmasters/v3/sites/" + quote(prop, safe="") + "/sitemaps"
-    try:
-        response = requests.get(endpoint, headers=h, timeout=25)
-        if response.status_code != 200:
-            return None
-        entries = response.json().get("sitemap", [])
-        counts = []
-        for item in entries:
-            for content in item.get("contents", []):
-                indexed = content.get("indexed")
-                if indexed is not None:
-                    try:
-                        counts.append(int(indexed))
-                    except (TypeError, ValueError):
-                        pass
-        return sum(counts) if counts else None
-    except (requests.RequestException, ValueError, TypeError):
-        return None
+    """Deprecated GSC sitemap indexed field is not a reliable index count."""
+    return None
 
 def content_metadata(url, platform):
     """Return published content count and latest publish date using lightweight public endpoints."""
@@ -354,7 +333,7 @@ def one(h, props, platform, url, display_name, ref, prev_hist):
     row["impressions_delta"] = int(im[day] - im.get(before, 0)) if has_day else None
     row["cumulative_impressions"] = int(sum(r.get("impressions", 0) for r in tot)) if tot is not None else None
     row["google_indexed"] = indexed_sitemap_count(h, prop)
-    row["google_indexed_status"] = "OK" if row["google_indexed"] is not None else "GSC_INDEX_COUNT_UNAVAILABLE"
+    row["google_indexed_status"] = "URL_INSPECTION_REQUIRED"
     previous_indexed = p.get("google_indexed", p.get("google_pages"))
     if row["google_indexed"] is not None and previous_indexed is not None:
         row["google_indexed_delta"] = row["google_indexed"] - previous_indexed
