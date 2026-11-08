@@ -62,7 +62,7 @@ tr.platform-youtube{background:#fff7f7}tr.platform-tiktok{background:#f2fcfd}tr.
 <div class="bar"><span>블로그 순위 기준: 확인된 전일 방문자 수</span><span class="na">7일 방문 추세는 일별 기록이 7일 이상 축적된 경우에만 표시합니다. 검색 성과는 SEO 상세 분석에서 확인합니다.</span></div>
 
 <div class="sub" style="padding:7px 9px;background:#fff7ed;border-left:3px solid #d97706">발행 관리는 기존 발행 화면을 엽니다. 예약 스케줄과 격리된 즉시 발행은 아직 검증되지 않았으므로, 이 화면에서는 자동 실행하지 않습니다. 신규 GA4·Rank Math 컬럼은 인증 수집이 연결될 때까지 미수집으로 표시합니다. SEO 건강도는 공개 글의 제목·대표이미지·본문을 점검한 편집 품질 신호등이며 Rank Math 공식 점수가 아닙니다. 데이터가 없으면 회색으로 표시합니다.</div><div class="sub" id="blog-ranking-meta">플랫폼별로 순위를 따로 표시합니다.</div>
-<div class="table-wrap"><table><thead><tr><th>순위</th><th>구분</th><th>사이트</th><th>일일방문자 (증감)</th><th>최근 7일 방문</th><th>전주 대비</th><th>콘텐츠 수(증감)</th><th>최근 발행일</th><th>Blogger 7일 발행</th><th>Blogger 발행 지연</th><th>Blogger 제목 중복</th><th>GSC 색인 확인</th><th>GitHub 발행주기</th><th>GA4 7일 사용자</th><th>GA4 전주 증감</th><th>Rank Math 평균점수</th><th>SEO 70점 미만</th><th>제목 중복</th><th>이미지 재사용</th><th>SEO 건강도</th><th>발행 관리</th></tr></thead>
+<div class="table-wrap"><table><thead><tr><th>순위</th><th>구분</th><th>사이트</th><th>일일방문자 (증감)</th><th>방문 추세 (14일)</th><th>최근 7일 방문</th><th>전주 대비</th><th>콘텐츠 수(증감)</th><th>최근 발행일</th><th>Blogger 7일 발행</th><th>Blogger 발행 지연</th><th>Blogger 제목 중복</th><th>GSC 색인 확인</th><th>GitHub 발행주기</th><th>GA4 7일 사용자</th><th>GA4 전주 증감</th><th>Rank Math 평균점수</th><th>SEO 70점 미만</th><th>제목 중복</th><th>이미지 재사용</th><th>SEO 건강도</th><th>발행 관리</th></tr></thead>
 <tbody id="b"></tbody></table></div>
 <section id="blogger-pageviews" style="margin:18px 0 10px;padding:12px;background:#fff;border:1px solid #cbd5e1;border-radius:8px">
 <h2 id="blogger-pageviews-title" style="margin:0 0 4px;font-size:1.05rem;color:#0f172a">Blogspot (33개) · 누적 페이지뷰 순위</h2>
@@ -110,6 +110,23 @@ function visitorFor(r){var key=String(r.site||'').toLowerCase().replace(/^https?
 
 // Seven-day values are only shown when seven distinct daily observations exist.
 // Never infer weekly traffic from a single day or from GSC impressions.
+function trafficTrendFor(r){
+ var v=visitorFor(r),samples=v&&v.daily_history;
+ if(!Array.isArray(samples))return '<span class="na">기록 축적 중</span>';
+ var points=samples.filter(function(x){return x&&/^\\d{4}-\\d{2}-\\d{2}$/.test(x.date)&&Number.isFinite(x.visitors)&&x.visitors>=0;}).sort(function(a,b){return a.date.localeCompare(b.date);}).slice(-14);
+ if(points.length<5)return '<span class="na" title="실제 방문자 기록 5일 이상 필요">기록 '+points.length+'/5일</span>';
+ var first=new Date(points[0].date+'T00:00:00Z').getTime(),last=new Date(points[points.length-1].date+'T00:00:00Z').getTime();
+ if((last-first)/86400000>20)return '<span class="na">기록 불연속</span>';
+ var values=points.map(function(p){return p.visitors}),min=Math.min.apply(null,values),max=Math.max.apply(null,values);
+ var n=points.length,sx=0,sy=0,sxx=0,sxy=0;
+ points.forEach(function(p,i){var x=(new Date(p.date+'T00:00:00Z').getTime()-first)/86400000;sx+=x;sy+=p.visitors;sxx+=x*x;sxy+=x*p.visitors;});
+ var slope=(n*sxy-sx*sy)/(n*sxx-sx*sx||1),mean=sy/n,change=mean>0?slope*7/mean:0;
+ var direction=change>0.05?'↗ 상승':change< -0.05?'↘ 하락':'→ 보합';
+ var color=change>0.05?'#15803d':change< -0.05?'#dc2626':'#64748b';
+ var coords=values.map(function(y,i){return (3+i*74/(n-1)).toFixed(1)+','+(22-(max===min?0:(y-min)/(max-min)*18)).toFixed(1);}).join(' ');
+ var info=points[0].date+' ~ '+points[n-1].date+' · 실제 '+n+'일 기록 · 주간 기울기 '+(change*100).toFixed(1)+'%';
+ return '<span title="'+esc(info)+'" style="white-space:nowrap;color:'+color+';font-weight:700"><svg width="82" height="25" viewBox="0 0 82 25" style="vertical-align:middle" aria-hidden="true"><polyline points="'+coords+'" fill="none" stroke="'+color+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> '+direction+'</span>';
+}
 function weeklyFor(r){
  var v=visitorFor(r);if(!v)return null;
  var samples=Array.isArray(v.daily_history)?v.daily_history:Array.isArray(v.history)?v.history:[];
