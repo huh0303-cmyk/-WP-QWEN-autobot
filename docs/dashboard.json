@@ -1,7 +1,7 @@
 {
- "generated_at": "2026-11-08T20:50:25.024877+09:00",
+ "generated_at": "2026-11-08T20:54:15.224798+09:00",
  "reference_date": "2026-11-05",
- "blogspot_content_metadata_checked_at": "2026-11-08T20:50:25.024877+09:00",
+ "blogspot_content_metadata_checked_at": "2026-11-08T20:54:15.224798+09:00",
  "blogger_pageviews": {
   "generated_at": "2026-11-08T10:26:39.189510+09:00",
   "source": "Rendered public Blogger Total Pageviews widget; approximate dashboard signal, not analytics-grade",
@@ -1301,9 +1301,9 @@
    "impressions": 4,
    "impressions_delta": 2,
    "cumulative_impressions": 436,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 1
   },
   {
@@ -1323,9 +1323,9 @@
    "impressions": 25,
    "impressions_delta": -18,
    "cumulative_impressions": 1172,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 2
   },
   {
@@ -1345,9 +1345,9 @@
    "impressions": 18,
    "impressions_delta": 12,
    "cumulative_impressions": 3027,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 3
   },
   {
@@ -1367,9 +1367,9 @@
    "impressions": 15,
    "impressions_delta": -3,
    "cumulative_impressions": 2053,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 4
   },
   {
@@ -1389,9 +1389,9 @@
    "impressions": 10,
    "impressions_delta": -7,
    "cumulative_impressions": 2786,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 5
   },
   {
@@ -1411,9 +1411,9 @@
    "impressions": 9,
    "impressions_delta": 3,
    "cumulative_impressions": 1310,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 6
   },
   {
@@ -1433,9 +1433,9 @@
    "impressions": 8,
    "impressions_delta": 0,
    "cumulative_impressions": 6071,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 7
   },
   {
@@ -1455,9 +1455,9 @@
    "impressions": 4,
    "impressions_delta": -2,
    "cumulative_impressions": 948,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 8
   },
   {
@@ -1478,9 +1478,9 @@
    "impressions": 3,
    "impressions_delta": 3,
    "cumulative_impressions": 4,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 9
   },
   {
@@ -1500,9 +1500,9 @@
    "impressions": 3,
    "impressions_delta": 3,
    "cumulative_impressions": 230,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 10
   },
   {
@@ -1522,9 +1522,9 @@
    "impressions": 2,
    "impressions_delta": -7,
    "cumulative_impressions": 1419,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 11
   },
   {
@@ -1544,9 +1544,9 @@
    "impressions": 2,
    "impressions_delta": -1,
    "cumulative_impressions": 1291,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 12
   },
   {
@@ -1568,7 +1568,7 @@
    "impressions_delta": 2,
    "cumulative_impressions": 5,
    "google_indexed": null,
-   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
    "google_indexed_delta": null,
    "rank": 13
   },
@@ -1590,9 +1590,9 @@
    "impressions": 1,
    "impressions_delta": 1,
    "cumulative_impressions": 1,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 14
   },
   {
@@ -1612,9 +1612,9 @@
    "impressions": 1,
    "impressions_delta": 1,
    "cumulative_impressions": 277,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 15
   },
   {
@@ -1635,9 +1635,9 @@
    "impressions": 1,
    "impressions_delta": 1,
    "cumulative_impressions": 64,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 16
   },
   {
@@ -1658,9 +1658,9 @@
    "impressions": 0,
    "impressions_delta": 0,
    "cumulative_impressions": 0,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 17
   },
   {
@@ -1681,9 +1681,9 @@
    "impressions": 0,
    "impressions_delta": 0,
    "cumulative_impressions": 0,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 18
   },
   {
@@ -1704,9 +1704,9 @@
    "impressions": 0,
    "impressions_delta": 0,
    "cumulative_impressions": 43,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 19
   },
   {
@@ -1727,9 +1727,9 @@
    "impressions": 0,
    "impressions_delta": 0,
    "cumulative_impressions": 0,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 20
   },
   {
@@ -1750,9 +1750,9 @@
    "impressions": 0,
    "impressions_delta": 0,
    "cumulative_impressions": 8,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 21
   },
   {
@@ -1773,9 +1773,9 @@
    "impressions": 0,
    "impressions_delta": 0,
    "cumulative_impressions": 0,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 22
   },
   {
@@ -1795,9 +1795,9 @@
    "impressions": 0,
    "impressions_delta": 0,
    "cumulative_impressions": 829,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 23
   },
   {
@@ -1818,9 +1818,9 @@
    "impressions": 0,
    "impressions_delta": 0,
    "cumulative_impressions": 14,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 24
   },
   {
@@ -1840,9 +1840,9 @@
    "impressions": 0,
    "impressions_delta": -3,
    "cumulative_impressions": 290,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 25
   },
   {
@@ -1864,7 +1864,7 @@
    "impressions_delta": -1,
    "cumulative_impressions": 28,
    "google_indexed": null,
-   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
    "google_indexed_delta": null,
    "rank": 26
   },
@@ -1885,9 +1885,9 @@
    "impressions": 0,
    "impressions_delta": 0,
    "cumulative_impressions": 1137,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 27
   },
   {
@@ -1907,9 +1907,9 @@
    "impressions": 0,
    "impressions_delta": 0,
    "cumulative_impressions": 1010,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 28
   },
   {
@@ -1930,9 +1930,9 @@
    "impressions": 0,
    "impressions_delta": 0,
    "cumulative_impressions": 13,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 29
   },
   {
@@ -1953,9 +1953,9 @@
    "impressions": 0,
    "impressions_delta": 0,
    "cumulative_impressions": 0,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 30
   },
   {
@@ -1976,9 +1976,9 @@
    "impressions": 0,
    "impressions_delta": 0,
    "cumulative_impressions": 0,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 31
   },
   {
@@ -1999,9 +1999,9 @@
    "impressions": 0,
    "impressions_delta": 0,
    "cumulative_impressions": 0,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 32
   },
   {
@@ -2022,9 +2022,9 @@
    "impressions": 0,
    "impressions_delta": 0,
    "cumulative_impressions": 22,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 33
   },
   {
@@ -2045,9 +2045,9 @@
    "impressions": 0,
    "impressions_delta": 0,
    "cumulative_impressions": 27,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 34
   },
   {
@@ -2068,9 +2068,9 @@
    "impressions": 0,
    "impressions_delta": 0,
    "cumulative_impressions": 0,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 35
   },
   {
@@ -2090,9 +2090,9 @@
    "impressions": 0,
    "impressions_delta": 0,
    "cumulative_impressions": 51,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 36
   },
   {
@@ -2112,9 +2112,9 @@
    "impressions": 0,
    "impressions_delta": 0,
    "cumulative_impressions": 1185,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 37
   },
   {
@@ -2135,9 +2135,9 @@
    "impressions": 0,
    "impressions_delta": 0,
    "cumulative_impressions": 0,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 38
   },
   {
@@ -2158,9 +2158,9 @@
    "impressions": 0,
    "impressions_delta": 0,
    "cumulative_impressions": 0,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 39
   },
   {
@@ -2180,9 +2180,9 @@
    "impressions": 0,
    "impressions_delta": 0,
    "cumulative_impressions": 40,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 40
   },
   {
@@ -2203,9 +2203,9 @@
    "impressions": 0,
    "impressions_delta": 0,
    "cumulative_impressions": 0,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 41
   },
   {
@@ -2226,9 +2226,9 @@
    "impressions": 0,
    "impressions_delta": 0,
    "cumulative_impressions": 1,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 42
   },
   {
@@ -2248,9 +2248,9 @@
    "impressions": 0,
    "impressions_delta": -3,
    "cumulative_impressions": 544,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 43
   },
   {
@@ -2271,9 +2271,9 @@
    "impressions": 0,
    "impressions_delta": 0,
    "cumulative_impressions": 10,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 44
   },
   {
@@ -2294,9 +2294,9 @@
    "impressions": 0,
    "impressions_delta": 0,
    "cumulative_impressions": 4,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 45
   },
   {
@@ -2317,9 +2317,9 @@
    "impressions": 0,
    "impressions_delta": 0,
    "cumulative_impressions": 1,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 46
   },
   {
@@ -2339,9 +2339,9 @@
    "impressions": 0,
    "impressions_delta": 0,
    "cumulative_impressions": 68,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 47
   },
   {
@@ -2362,9 +2362,9 @@
    "impressions": 0,
    "impressions_delta": 0,
    "cumulative_impressions": 0,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 48
   },
   {
@@ -2384,9 +2384,9 @@
    "impressions": 0,
    "impressions_delta": 0,
    "cumulative_impressions": 1785,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 49
   },
   {
@@ -2407,9 +2407,9 @@
    "impressions": 0,
    "impressions_delta": 0,
    "cumulative_impressions": 0,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 50
   },
   {
@@ -2430,9 +2430,9 @@
    "impressions": 0,
    "impressions_delta": 0,
    "cumulative_impressions": 31,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 51
   },
   {
@@ -2453,9 +2453,9 @@
    "impressions": 0,
    "impressions_delta": 0,
    "cumulative_impressions": 19,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 52
   },
   {
@@ -2476,9 +2476,9 @@
    "impressions": 0,
    "impressions_delta": 0,
    "cumulative_impressions": 31,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 53
   },
   {
@@ -2499,9 +2499,9 @@
    "impressions": 0,
    "impressions_delta": 0,
    "cumulative_impressions": 0,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 54
   },
   {
@@ -2522,9 +2522,9 @@
    "impressions": 0,
    "impressions_delta": 0,
    "cumulative_impressions": 0,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 55
   },
   {
@@ -2545,9 +2545,9 @@
    "impressions": 0,
    "impressions_delta": 0,
    "cumulative_impressions": 0,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 56
   },
   {
@@ -2568,9 +2568,9 @@
    "impressions": 0,
    "impressions_delta": -1,
    "cumulative_impressions": 3,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 57
   },
   {
@@ -2590,9 +2590,9 @@
    "impressions": 0,
    "impressions_delta": 0,
    "cumulative_impressions": 87,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": 0,
+   "google_indexed": null,
+   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_delta": null,
    "rank": 58
   },
   {
