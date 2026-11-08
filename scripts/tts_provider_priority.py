@@ -6,6 +6,9 @@ Paid providers are intentionally unsupported.
 from __future__ import annotations
 
 import asyncio
+import os
+import shlex
+import subprocess
 from pathlib import Path
 from typing import Callable
 
@@ -14,6 +17,34 @@ TTS_PRIORITY = ("fish_audio", "qwen3_tts", "edge_tts")
 
 def _valid_audio(path: Path) -> bool:
     return path.exists() and path.is_file() and path.stat().st_size > 0
+
+
+def local_qwen3_tts(text: str, output_path: str | Path, language: str) -> bool:
+    """Optional local Qwen3-TTS adapter. Disabled unless a command is configured.
+
+    QWEN3_TTS_COMMAND is an executable plus arguments; placeholders:
+    {text_file}, {output_file}, {language}. No shell is invoked.
+    The command must use a locally installed model, not a paid API.
+    """
+    command = os.getenv("QWEN3_TTS_COMMAND", "").strip()
+    if not command:
+        return False
+    out = Path(output_path)
+    source = out.with_suffix(out.suffix + ".qwen-input.txt")
+    source.write_text(text, encoding="utf-8")
+    try:
+        args = [
+            part.replace("{text_file}", str(source))
+                .replace("{output_file}", str(out))
+                .replace("{language}", language)
+            for part in shlex.split(command)
+        ]
+        if not args:
+            return False
+        subprocess.run(args, check=True, timeout=180, capture_output=True)
+        return _valid_audio(out)
+    finally:
+        source.unlink(missing_ok=True)
 
 
 def generate_tts(
@@ -34,6 +65,8 @@ def generate_tts(
     """
     out = Path(output_path)
     out.parent.mkdir(parents=True, exist_ok=True)
+    if qwen_generator is None:
+        qwen_generator = local_qwen3_tts
     errors: list[str] = []
 
     for name, generator in (
