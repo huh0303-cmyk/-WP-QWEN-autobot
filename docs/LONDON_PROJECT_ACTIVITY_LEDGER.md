@@ -869,3 +869,10 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - Full verification-only Actions run 42498013145 SUCCESS: fresh-source selection, Gemini-only draft, Fish Audio narration, 1.2x render, 9 caption cards, 36.643s MP4 and artifacts; DRY_RUN_READY, no second public upload. That candidate had no cleared registry portrait and correctly used original graphics.
 - First public release oEZaFVnqKR0 processing succeeded, public, HD, PT52S; hasCustomThumbnail false.
 - Affiliate policy preflight run 42497945679 failed on pre-existing affiliate-engine/validate_config.py assertion shared[version] == 9. No affiliate configuration changed in this PR; do not claim all repository checks passed.
+
+
+## ksa-registrar-expiration-diagnosis-20261109
+- Owner requested actual KSA-korea.org diagnosis and repair. PIR RDAP and registrar Gabia RDAP both report client hold + auto renew period. Gabia registrar expiration is 2026-10-14 KST; registry expiration 2027-10-13 reflects auto-renew-period registry state and must not be misreported as paid renewal.
+- Gabia official no-login renewal UI independently lists KSA-KOREA.ORG expiration 2026-10-14 and offers renewal. Domain is not deleted. Current DNS NXDOMAIN stems from registrar hold, not WordPress/CDN/landing-page routing.
+- Opened official https://www.gabia.com/service/nologin/extend and selected only ksa-korea.org, 1-year renewal. Displayed price KRW 22,000 excluding VAT (KRW 24,200 with 10% VAT, final checkout to verify). No payment, legal acceptance or renewal submission performed. UI states service restart after expired-domain renewal can take 1-2 days.
+- Next: obtain owner authorization for this specific renewal cost, complete checkout within approved total, then verify hold removal, DNS, SSL and existing landing page. Hosting files, nameservers and redirects were not changed.
