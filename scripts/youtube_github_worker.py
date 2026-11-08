@@ -128,6 +128,14 @@ def _knowledge(env: dict[str, str], log_handle) -> str:
     # Fish is preferred, not mandatory: the shared free TTS engine falls
     # through to locally configured Qwen3 and finally Edge TTS.
     channel = env["CHANNEL_KEY"]
+    if channel == "history":
+        import datetime as _dt
+        from pick_knowledge_topic import history_today, KST
+        today = _dt.datetime.now(KST)
+        if env.get("EPISODE_DATE") != today.date().isoformat():
+            raise RuntimeError("HISTORY_DATE_MISMATCH: History Today must publish an event for today's KST date; do not reuse a past episode")
+        env["TOPIC"] = history_today(today)
+        env["TOPIC_KEYWORD"] = env["TOPIC"]
     output = ROOT / "curio_longform_output" / channel / "en"
     if output.exists():
         shutil.rmtree(output)
