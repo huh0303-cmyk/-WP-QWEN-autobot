@@ -58,6 +58,25 @@ jobs:
           print(f"TARGET_OK {site}")
           PY
 
+      - name: Check target WordPress API is not blocked by Hostinger CDN
+        env:
+          TARGET_SITE_URL: https://${{ inputs.site }}
+        run: |
+          python - <<'PY'
+          import os, sys, requests
+          url = os.environ["TARGET_SITE_URL"].rstrip("/") + "/wp-json/wp/v2/posts?per_page=1"
+          try:
+              response = requests.get(url, timeout=25)
+          except requests.RequestException as exc:
+              raise SystemExit(f"WORDPRESS_API_UNREACHABLE: {type(exc).__name__}: {exc}")
+          body = response.text[:4000].lower()
+          if response.status_code == 403 and ("hcdn-cgi/jschallenge" in body or "checking your browser before accessing" in body):
+              raise SystemExit("HOSTINGER_CDN_JS_CHALLENGE_403: Disable the Hostinger browser challenge for this site's WordPress REST API through hPanel security settings, or configure a narrow authenticated API exception. Publication is blocked before WordPress; do not retry or bypass the challenge.")
+          if response.status_code != 200:
+              raise SystemExit(f"WORDPRESS_API_PREFLIGHT_FAILED: HTTP {response.status_code}; check site firewall/CDN and WordPress REST settings")
+          print("WORDPRESS_API_PUBLIC_READ_OK")
+          PY
+
       - name: Run existing GitHub-native publisher
         env:
           TARGET_SITE_URL: https://${{ inputs.site }}
