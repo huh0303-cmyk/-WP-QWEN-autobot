@@ -67,7 +67,7 @@ def card(headline,caption,photo,credit,index=0,landscape=False,zoom=1.0,overlay_
         d.text((x,y),value,font=font(size),fill=color,
                stroke_width=max(2,size//15),stroke_fill=stroke)
     text(35,20,"서울저널",38 if landscape else 48)
-    label=(credit["subject"]+" · 자료사진("+credit.get("date","2025")[:4]+")") if credit else "서울저널 자체 제작 그래픽"
+    label=(credit["subject"]+" · 자료사진("+(re.search(r"(?:19|20)\d{2}",credit.get("date","")) or ["촬영일 미상"])[0]+")") if credit else "서울저널 자체 제작 그래픽"
     if landscape:
         size=78
         while size>42 and len(wrap(headline,size,570))>4: size-=2
@@ -102,14 +102,28 @@ ANCHOR_VOICES = (
 def photo_sequence(meta,out):
     """Use reviewed Commons file titles, or the exact registered subject's named photos."""
     files=meta.get("photo_files", [])
-    subject=next((n for n in PORTRAITS if n in meta["youtube_title"]+" "+meta["narration"]),None)
-    if not files and subject=="이재명":
+    evidence=meta.get("source_title","")+" "+meta["youtube_title"]+" "+meta["narration"]
+    proposed=meta.get("visual_subject","").strip()
+    subject=proposed if proposed and len(proposed)<=30 and proposed in evidence else next((n for n in PORTRAITS if n in evidence),None)
+    english="Lee Jae-myung" if subject=="이재명" else None
+    if subject and not english:
+        # Resolve the exact Korean label before searching named Commons images.
+        response=requests.get("https://www.wikidata.org/w/api.php",params={
+            "action":"wbsearchentities","search":subject,"language":"ko","limit":5,"format":"json"},timeout=30)
+        response.raise_for_status()
+        matches=[x for x in response.json().get("search",[]) if x.get("label")==subject]
+        if len(matches)==1:
+            response=requests.get("https://www.wikidata.org/w/api.php",params={
+                "action":"wbgetentities","ids":matches[0]["id"],"props":"labels","languages":"en","format":"json"},timeout=30)
+            response.raise_for_status()
+            english=response.json()["entities"][matches[0]["id"]].get("labels",{}).get("en",{}).get("value")
+    if not files and english:
         response=requests.get("https://commons.wikimedia.org/w/api.php",params={
-            "action":"query","list":"search","srsearch":'intitle:"Lee Jae-myung" filetype:bitmap',
+            "action":"query","list":"search","srsearch":'intitle:"'+english+'" filetype:bitmap',
             "srnamespace":6,"srlimit":20,"format":"json"},timeout=30)
         response.raise_for_status()
-        files=[PORTRAITS[subject]]+[x["title"] for x in response.json()["query"]["search"]
-            if "lee jae-myung" in x["title"].lower()]
+        files=([PORTRAITS[subject]] if subject in PORTRAITS else [])+[x["title"] for x in response.json()["query"]["search"]
+            if english.lower() in x["title"].lower()]
     assets=[]; hashes=set()
     for title in dict.fromkeys(files):
         response=requests.get("https://commons.wikimedia.org/w/api.php",params={
