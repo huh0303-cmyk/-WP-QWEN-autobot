@@ -1,0 +1,263 @@
+{
+  "project": "london-project",
+  "timezone": "Asia/Seoul",
+  "schedule_policy": {
+    "cadence_lock": "youtube_23_each_channel_daily_tistory_network_3_random_daily_other_enabled_sites_and_accounts_1_per_day",
+    "cost_lock": "free_only_no_paid_fallback",
+    "planned_jitter_minutes": 60,
+    "forbid_exact_hour": true,
+    "avoid_regular_minute_multiples": [
+      0,
+      5,
+      10,
+      15,
+      20,
+      25,
+      30,
+      35,
+      40,
+      45,
+      50,
+      55
+    ],
+    "minimum_same_platform_gap_minutes": 30,
+    "avoid_repeating_same_day_time_pattern": true,
+    "spread_targets_across_distinct_minutes": true,
+    "no_same_slot_for_parallel_channels": true
+  },
+  "cadence": {
+    "wordpress_general": {
+      "scope": "each_enabled_general_wordpress_site",
+      "target": "1_per_day",
+      "weekly_target": 7,
+      "randomized_time": true,
+      "approved_center": "k-health365.com",
+      "operating_total": 25,
+      "includes_khealth": true,
+      "adsense_growth_targets_excluding_khealth": 24
+    },
+    "newsrooms": {
+      "sites": [
+        "The Seoul Journal",
+        "Koreanews365"
+      ],
+      "target": "1_per_day_per_newsroom",
+      "weekly_target_per_newsroom": 7,
+      "source_mode": "rss_and_breaking_news_event_driven",
+      "minimum_requires_verified_source_leads": true,
+      "never_invent_to_fill_minimum": true,
+      "daily_max": 1,
+      "separate_from_general_wordpress": true,
+      "daily_min": 1,
+      "randomized_time": true
+    },
+    "blogspot": {
+      "target": "1_public_post_per_enabled_destination_per_day",
+      "weekly_target_per_destination": 7,
+      "randomized_time": true,
+      "review_gated": false,
+      "no_wordpress_copy_paste": true
+    },
+    "tistory": {
+      "site_count": 5,
+      "target": "3_public_posts_per_day_across_three_randomly_selected_distinct_sites",
+      "network_daily_total": 3,
+      "daily_max_per_site": 1,
+      "selection_is_persisted_before_dispatch": true,
+      "minimum_network_gap_minutes": 90,
+      "randomized_time": true,
+      "public_requires_local_write_verification": true
+    },
+    "youtube_playlist": {
+      "channel_count": 5,
+      "weekly_min": 7,
+      "weekly_max": 7,
+      "target": "1_public_production_per_channel_per_day_after_exact_auth",
+      "randomize_weekly_days": false,
+      "upload_default": "public",
+      "human_review_before_public": false,
+      "avoid_channel_time_collisions": true
+    },
+    "youtube_knowledge": {
+      "channel_count": 5,
+      "weekly_min": 7,
+      "weekly_max": 7,
+      "target": "1_public_production_per_channel_per_day_after_exact_auth",
+      "randomize_weekly_days": false,
+      "upload_default": "public",
+      "human_review_before_public": false,
+      "avoid_channel_time_collisions": true
+    },
+    "survival_10_language": {
+      "enabled": true,
+      "status": "daily_adjective_short_generator_active_exact_channel_auth_verified",
+      "target_enabled": true,
+      "languages": [
+        "Korean/TOPIK",
+        "English",
+        "Japanese",
+        "Chinese",
+        "Vietnamese",
+        "Spanish",
+        "French",
+        "German",
+        "Italian",
+        "Portuguese"
+      ],
+      "lessons_per_language": 50,
+      "total_lessons": 500,
+      "completed_through_lesson": 2,
+      "next_lesson": 3,
+      "weekly_min": 7,
+      "weekly_max": 7,
+      "target": "1_public_production_per_verified_language_channel_per_day",
+      "randomize_weekly_days": false,
+      "upload_default": "public_after_exact_channel_auth",
+      "require_verified_private_before_review": false,
+      "require_chairman_approval_before_public": false,
+      "avoid_language_time_collisions": true,
+      "spread_languages_across_distinct_slots": true,
+      "public_requires_verified_channel_id": true,
+      "public_requires_write_auth": true,
+      "missing_channel_ids": [],
+      "daily_content_format": "one antonym adjective pair per Short",
+      "pronunciation_repetitions_per_word": 5,
+      "voice_policy": "dedicated native-locale neural voice; block production if the configured language voice fails",
+      "generator": "scripts/survival_adjective_short.py",
+      "pair_catalog": "config/survival_adjective_pairs.json"
+    },
+    "instagram": {
+      "target": "1_public_post_per_verified_account_per_day",
+      "weekly_target": 7,
+      "randomized_time": true
+    },
+    "threads": {
+      "target": "1_public_post_per_verified_account_per_day",
+      "weekly_target": 7,
+      "randomized_time": true,
+      "content_direction": "mirror_instagram_topic_not_verbatim_copy"
+    },
+    "tiktok": {
+      "target": "1_public_post_per_verified_account_per_day",
+      "weekly_target": 7,
+      "randomized_time": true
+    },
+    "facebook": {
+      "target": "1_public_post_per_verified_account_per_day",
+      "weekly_target": 7,
+      "randomized_time": true
+    },
+    "naver": {
+      "active_site_ids": ["naver_n1", "naver_n2", "naver_n3"],
+      "target": "naver_n1_and_n2_three_to_four_each_daily_plus_naver_n3_eight_to_ten_reviewed_public_posts_daily",
+      "network_daily_min": 14,
+      "network_daily_max": 18,
+      "weekly_target_min": 98,
+      "weekly_target_max": 126,
+      "per_site_minimum_interval_minutes": {"naver_n1": 180, "naver_n2": 180, "naver_n3": 75},
+      "randomized_time": true,
+      "public_requires_local_write_verification": true,
+      "official_source_required_for_policy_posts": true,
+      "copyright_safe_original_image_required": true,
+      "monthly_keyword_calendar": "config/naver_monthly_keyword_calendar.json",
+      "monthly_keyword_catalog": "config/naver_monthly_keyword_100.json",
+      "monthly_keyword_candidates": 100,
+      "morning_trend_research_start_kst": "07:07",
+      "morning_trend_research_deadline_kst": "07:50",
+      "publishing_window_kst": ["08:17", "23:17"],
+      "google_indexing_api_for_general_posts": false,
+      "never_bulk_publish": true
+    },
+    "youtube_daily_additional": {
+      "channel_count": 3,
+      "channels": [
+        {
+          "name": "Seoul_Jisoo1",
+          "channel_id": "UCAizx0tPkRSol8sIhanN_QQ",
+          "role": "shopping_booking"
+        },
+        {
+          "name": "Health Clinic USA",
+          "channel_id": "UC91BpNSb4nUwD6jrpthK7FQ",
+          "role": "health_english_usa"
+        },
+        {
+          "name": "Health_Clinic_Japan",
+          "channel_id": "UCC_PcHMv-Uxpr00Pjw_J2Wg",
+          "role": "health_japanese"
+        }
+      ],
+      "weekly_min": 7,
+      "weekly_max": 7,
+      "target": "1_public_production_per_connected_channel_per_day",
+      "randomize_weekly_days": false,
+      "upload_default": "public_after_exact_channel_auth",
+      "public_requires_write_auth": true
+    }
+  },
+  "image_policy": {
+    "copyright_safe_first": true,
+    "order": [
+      "pexels",
+      "pixabay",
+      "wikimedia_commons_cc0_public_domain",
+      "pass_without_image"
+    ],
+    "relevance_check_required": true,
+    "news_use_source_or_licensed_image_only": true,
+    "never_copy_unlicensed_news_photo": true
+  },
+  "approval": {
+    "youtube_upload_state": "PUBLIC_VERIFY_REQUIRED",
+    "human_review_state": "OWNER_POLICY_APPROVED_IMMEDIATE_PUBLIC",
+    "public_state_after_api_verification": "VERIFIED_COMPLETE",
+    "youtube_immediate_public_owner_approved": true
+  },
+  "activity_ledger": {
+    "policy_file": "config/london_activity_policy.json",
+    "every_task_must_be_recorded": true,
+    "record_success_failure_retry_failover_and_evidence": true
+  },
+  "failover": {
+    "plan_a": "codex_primary_pm",
+    "plan_b": "claude_acting_pm",
+    "plan_c": "gemini_continuity",
+    "safe_hold": "preserve_queue_stop_new_generation_and_unapproved_publication"
+  },
+  "business_objective": {
+    "primary_goal": "maximize_verified_net_revenue",
+    "phase_order": [
+      "blog_adsense_approval_then_visitor_growth",
+      "youtube_and_social_visitor_subscriber_growth",
+      "shopping_and_affiliate_conversion_growth"
+    ],
+    "commerce_targets": [
+      "shopping_channels",
+      "coupang_partners",
+      "other_verified_affiliate_programs"
+    ],
+    "measurement_rule": "actual_connected_source_data_only_never_infer_or_fabricate",
+    "approved_center": "k-health365.com",
+    "approved_center_status": "sole currently approved AdSense site and operating benchmark",
+    "adsense_growth_scope": {
+      "regular_wordpress_total": 25,
+      "approved_center": "k-health365.com",
+      "additional_adsense_approval_targets": 24,
+      "newsrooms_separate": 2,
+      "blogger_targets": 33
+    },
+    "operating_counts": {
+      "regular_wordpress_total": 25,
+      "regular_wordpress_includes": "k-health365.com",
+      "newsrooms": 2,
+      "blogger": 33
+    },
+    "primary_kpis": [
+      "daily_visitors",
+      "pageviews",
+      "google_indexed_urls",
+      "adsense_approval_status",
+      "adsense_revenue"
+    ]
+  }
+}
