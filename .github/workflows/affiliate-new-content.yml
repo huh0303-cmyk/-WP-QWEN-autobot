@@ -97,10 +97,12 @@ jobs:
             PLATFORM="${{ inputs.platform || 'all' }}"
             SCOPE="${{ inputs.scope || 'new' }}"
           fi
+          if [ "$PLATFORM" != "all" ] && [ "$PLATFORM" != "${{ matrix.platform }}" ]; then exit 0; fi
+          PLATFORM="${{ matrix.platform }}"
           PYTHONPATH="$GITHUB_WORKSPACE${PYTHONPATH:+:$PYTHONPATH}" python affiliate-engine/runner.py --platform "$PLATFORM" --scope "$SCOPE" --since-hours 168 --batch-size 100 $WRITE
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: affiliate-new-content-report-${{ github.run_id }}
+          name: affiliate-new-content-report-${{ matrix.platform }}-${{ github.run_id }}
           path: affiliate-engine/reports/latest-*-run.json
           if-no-files-found: warn
