@@ -32,6 +32,7 @@ jobs:
     outputs:
       slot: ${{ steps.gate.outputs.slot }}
       category: ${{ steps.gate.outputs.category }}
+      publish_at: ${{ steps.gate.outputs.publish_at }}
     steps:
       - uses: actions/checkout@v4
       - id: gate
@@ -66,7 +67,7 @@ jobs:
       GEMINI_API_KEY_3: ${{ secrets.GEMINI_API_KEY_3 }}
       FISH_AUDIO_API_KEY: ${{ secrets.FISH_AUDIO_API_KEY }}
       REVISE_VIDEO: ${{ inputs.revise_video }}
-      PUBLISH_AT: ${{ inputs.publish_at }}
+      PUBLISH_AT: ${{ inputs.publish_at || needs.pick.outputs.publish_at }}
       SJ_FISH_MALE_ANCHOR: ${{ secrets.SJ_FISH_MALE_ANCHOR }}
       SJ_FISH_FEMALE_ANCHOR: ${{ secrets.SJ_FISH_FEMALE_ANCHOR }}
       VERIFY_ONLY: ${{ inputs.verify_only }}
