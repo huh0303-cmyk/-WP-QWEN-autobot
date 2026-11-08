@@ -552,7 +552,7 @@ def main():
                 clip['event_text'] = event['text']
                 clip['event_sources'] = event['sources']
             clips.extend(event_clips)
-        topic = f"{today.strftime('%B %d')} — Today in World History, newest to oldest"
+        topic = os.environ.get("TOPIC", "").strip() or topic
     else:
         clips = fetch_archive_clips(topic, channel_key, workdir)
         if not clips:
