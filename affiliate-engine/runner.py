@@ -194,7 +194,8 @@ def main():
     def block_for(title,content,site_key):
         # Reuse the canonical weekly catalog and shared footer renderer.
         # Product-card labels, descriptions and CTAs are always English.
-        return render_footer(title,content,site_key,"en")
+        from automation_hub.coupang_partners import apply_footer
+        return apply_footer("",title,site_key,"en")
     results=[]
     if args.platform in {"wordpress","all"}:
         for dest in load_destinations("wordpress"):

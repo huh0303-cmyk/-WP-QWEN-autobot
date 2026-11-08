@@ -17,7 +17,7 @@ COUPANG_TRADEMARK_NOTICE = "Coupang’s trademarks are used under license from C
 # Official company/partner logo artwork. Keep these as image assets; never
 # substitute text-only labels, emoji, or CSS-drawn wordmarks.
 LOGOS = {
-    "coupang_partners": "https://commons.wikimedia.org/wiki/Special:FilePath/Coupang_logo.svg",
+    "coupang_partners": "https://influencers.coupang.com/logo-black.png",
     "olive_young_global": "https://dist.oliveyoung.com/fo/fe126e9b35/resources/images/common/logo.svg",
     "trip_com": "https://commons.wikimedia.org/wiki/Special:FilePath/Trip.com_logo.svg",
 }
@@ -233,7 +233,7 @@ def render_header(site_id=""):
     ]
     cards = []
     for provider, item, default_logo, alt in partners:
-        logo = html.escape(item.get("logo_url") or default_logo, quote=True)
+        logo = html.escape(default_logo if provider in ("coupang_partners", "olive_young_global") else (item.get("logo_url") or default_logo), quote=True)
         url = html.escape(item["affiliate_url"], quote=True)
         cards.append(
             '<a class="london-partner-logo ' + provider + '" href="' + url

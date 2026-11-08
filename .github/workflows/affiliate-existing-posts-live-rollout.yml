@@ -44,7 +44,15 @@ jobs:
   backfill:
     if: ${{ github.event_name == 'push' || inputs.mode == 'preview' || inputs.confirm_apply == 'APPLY-ALL' }}
     runs-on: ubuntu-latest
-    environment: youtube-channels
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: wordpress
+            environment: youtube-channels
+          - platform: blogger
+            environment: blogger
+    environment: ${{ matrix.environment }}
     timeout-minutes: 360
     steps:
       - uses: actions/checkout@v4
@@ -55,7 +63,7 @@ jobs:
       - name: Update existing published posts with verified affiliate blocks
         env:
           MODE: ${{ github.event_name == 'push' && 'apply' || inputs.mode || 'preview' }}
-          PLATFORM: ${{ github.event_name == 'push' && 'all' || inputs.platform || 'all' }}
+          PLATFORM: ${{ matrix.platform }}
           SITE_ID: ${{ inputs.site_id || '' }}
           LIMIT_PER_SITE: "0"
           WP_USER: ${{ secrets.WP_USER || 'huh0303@gmail.com' }}
@@ -90,6 +98,7 @@ jobs:
           BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
           BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
         run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.platform }}" != "all" ] && [ "${{ inputs.platform }}" != "$PLATFORM" ]; then exit 0; fi
           ARGS=(--mode "$MODE" --platform "$PLATFORM" --limit-per-site "${LIMIT_PER_SITE:-0}")
           if [ -n "$SITE_ID" ]; then ARGS+=(--site-id "$SITE_ID"); fi
           if [ "$MODE" = "apply" ]; then ARGS+=(--confirm APPLY-ALL); fi
@@ -97,7 +106,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: affiliate-existing-posts-live-rollout-report
+          name: affiliate-existing-posts-live-rollout-report-${{ matrix.platform }}
           path: reports/coupang-existing-posts-backfill.json
           if-no-files-found: warn
           retention-days: 14
