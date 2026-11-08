@@ -161,7 +161,7 @@ Respond with JSON only, no explanation, no markdown fences:
 # 2. 무료 TTS (Fish Audio 우선, Edge TTS 폴백) + 문장 단위 캡션
 # ════════════════════════════════════════════════════════════
 def elevenlabs_tts_voice(text, out_path, voice_id=None, max_retries=3):
-    """Compatibility name; use free TTS only: Fish Audio S2.1 Pro Free, then Edge TTS.
+    """Compatibility name; use free TTS only: Fish Audio S2.1 Pro Free, local Qwen3-TTS, then Edge TTS.
 
     No paid provider is called. If all configured free providers fail, stop the
     production instead of silently substituting silence.
@@ -207,7 +207,6 @@ def elevenlabs_tts_voice(text, out_path, voice_id=None, max_retries=3):
         out_path,
         language="en",
         fish_generator=fish_audio_free,
-        qwen_generator=None,
     )
     log(f"   TTS engine: {result['engine']} (free-only)")
     return True
