@@ -46,37 +46,51 @@ def portrait(text,out):
     (out/"image_rights.json").write_text(json.dumps(record,ensure_ascii=False,indent=2),encoding="utf-8")
     return path,record
 def card(headline,caption,photo,credit,index=0,landscape=False):
+    """Full-frame portrait with transparent text overlays; no opaque news panels."""
     w,h=(1280,720) if landscape else (1080,1920)
     im=Image.new("RGB",(w,h),NAVY)
     if photo:
         source=Image.open(photo).convert("RGB")
-        box=(620,0,1280,720) if landscape else (0,150,1080,1120)
-        bw,bh=box[2]-box[0],box[3]-box[1]
-        crop=ImageOps.fit(source,(bw,bh),centering=(.5,.40 if index%2 else .48))
-        im.paste(crop,box[:2])
+        if landscape:
+            # Keep the full portrait visible on the right instead of stretching a Short.
+            background=ImageOps.fit(source,(w,h),centering=(.5,.4))
+            im.paste(Image.blend(background,Image.new("RGB",(w,h),NAVY),.65))
+            crop=ImageOps.fit(source,(690,h),centering=(.5,.4))
+            im.paste(crop,(590,0))
+        else:
+            im.paste(ImageOps.fit(source,(w,h),centering=(.5,.4)))
     d=ImageDraw.Draw(im)
-    d.rectangle((0,0,15,h),fill=RED)
-    d.rectangle((0,0,w,110 if landscape else 150),fill=NAVY)
-    d.text((38,20 if landscape else 42),"서울저널",font=font(48 if landscape else 64),fill=WHITE)
+    stroke=(0,0,0)
+    def text(x,y,value,size,color=WHITE):
+        d.text((x,y),value,font=font(size),fill=color,
+               stroke_width=max(2,size//15),stroke_fill=stroke)
+    text(35,20,"서울저널",38 if landscape else 48)
+    label=(credit["subject"]+" · 자료사진("+credit.get("date","2025")[:4]+")") if credit else "서울저널 자체 제작 그래픽"
     if landscape:
-        d.rectangle((35,140,615,650),fill=NAVY)
-        size=75
-        while size>42 and any(font(size).getlength(line)>560 for line in headline.splitlines()): size-=2
-        lines=wrap(headline,size,560)
-        for i,line in enumerate(lines[:4]):
-            d.text((40,175+i*100),line,font=font(size),fill=YELLOW if i%2==0 else WHITE,stroke_width=2,stroke_fill=(0,0,0))
-        d.rectangle((40,635,600,646),fill=RED)
-        d.text((660,665),"이재명 · 자료사진(2025)",font=font(25),fill=WHITE,stroke_width=1,stroke_fill=NAVY)
+        size=78
+        while size>42 and len(wrap(headline,size,570))>4: size-=2
+        lines=wrap(headline,size,570)
+        if len(lines)>4: raise ValueError("Landscape headline too long")
+        for i,line in enumerate(lines):
+            text(35,175+i*(size+18),line,size,YELLOW if i==0 else WHITE)
+        text(35,640,"정치·시사 | 쟁점과 반박",25,YELLOW)
+        text(720,668,label,22)
     else:
-        d.rectangle((40,980,1040,1130),fill=NAVY)
-        d.text((65,1014),"정치·시사  |  쟁점과 반박",font=font(42),fill=YELLOW)
-        for i,line in enumerate(wrap(headline,82,950)[:3]):
-            d.text((58,1175+i*106),line,font=font(82),fill=YELLOW if i==0 else WHITE,stroke_width=2,stroke_fill=(0,0,0))
-        d.rectangle((55,1515,1025,1524),fill=RED)
-        for i,line in enumerate(wrap(caption,49,920)[:3]):
-            d.text((65,1570+i*69),line,font=font(49),fill=WHITE)
-        label=(credit["subject"]+" · 자료사진(2025)") if credit else "서울저널 자체 제작 그래픽"
-        d.text((55,1810),label,font=font(29),fill=(195,205,220),stroke_width=1,stroke_fill=NAVY)
+        # Reserve the bottom and right for YouTube controls; never cover the face.
+        text(55,1160,"정치·시사 | 쟁점과 반박",34,YELLOW)
+        size=82
+        while size>48 and len(wrap(headline,size,860))>3: size-=2
+        lines=wrap(headline,size,860)
+        if len(lines)>3: raise ValueError("Short headline too long")
+        for i,line in enumerate(lines):
+            text(55,1230+i*(size+18),line,size,YELLOW if i==0 else WHITE)
+        caption_size=46
+        while caption_size>28 and len(wrap(caption,caption_size,850))>3: caption_size-=2
+        caption_lines=wrap(caption,caption_size,850)
+        if len(caption_lines)>3: raise ValueError("Split caption into shorter segments")
+        for i,line in enumerate(caption_lines):
+            text(55,1550+i*(caption_size+15),line,caption_size)
+        text(55,1760,label,25)
     return im
 def fish(text,path,language):
     key=os.getenv("FISH_AUDIO_API_KEY","").strip()
