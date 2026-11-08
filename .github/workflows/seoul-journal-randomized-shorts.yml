@@ -9,6 +9,10 @@ on:
         type: choice
         options: [morning, midday, evening]
         default: morning
+      verify_only:
+        description: "Run full production without another public upload"
+        type: boolean
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -53,6 +57,7 @@ jobs:
       GEMINI_API_KEY_2: ${{ secrets.GEMINI_API_KEY_2 }}
       GEMINI_API_KEY_3: ${{ secrets.GEMINI_API_KEY_3 }}
       FISH_AUDIO_API_KEY: ${{ secrets.FISH_AUDIO_API_KEY }}
+      VERIFY_ONLY: ${{ inputs.verify_only }}
       SLOT: ${{ needs.pick.outputs.slot }}
       CATEGORY: ${{ needs.pick.outputs.category }}
     steps:

@@ -100,5 +100,7 @@ def main():
         p=audit["photo"]
         meta["description"]+="\n자료사진: "+p["subject"]+" / "+p["date"]+" / "+p["credit"]+" / "+p["license"]+"\n"+p["source"]+"\n현재 사건 현장 사진이 아닙니다."
     (out/"package.json").write_text(json.dumps(meta,ensure_ascii=False,indent=2),encoding="utf-8")
+    if os.getenv("VERIFY_ONLY","").lower()=="true":
+        print("DRY_RUN_READY "+str(out)); return
     sys.argv=[sys.argv[0],"--package",str(out),"--publish"]; publish()
 if __name__=="__main__": main()
