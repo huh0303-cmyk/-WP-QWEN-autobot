@@ -792,3 +792,12 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - Authorized Windows-PC Desktop Commander inspection found seven verified Meta user IDs are held as GitHub environment secrets, while Meta workflows had read only same-named environment variables. This could silently omit valid user IDs from runtime despite a matching account token.
 - Updated both the read-only preflight and Threads dispatcher to resolve each user ID from the environment secret first, with existing environment variable as compatibility fallback. No secret value is printed, committed, or copied.
 - YAML parsing and whitespace validation passed. The change does not enable missing accounts or publish a post; it makes future verified connections available to the intended workflow.
+
+
+## meta-seven-identity-verification-and-pc-handoff-20261108
+
+- Fresh run `42439111205` exposed two stale Instagram configured user IDs despite valid exact-account tokens: `seoul_topik` and `seoul_jisoo`. The API `/me` response returned each exact expected username and its current numeric user ID. The IDs were updated through the authorized Windows PC's GitHub CLI without reading token values.
+- Fresh follow-up run `42439266950` confirms seven exact identity tokens: Instagram `seoul_topik`, `seoul_jisoo`, `english_pick1`, `japanese_pick`; Threads `seoultopik`, `seoul_jisoo`, `english_pick1`. Each remains `IDENTITY_VERIFIED_WRITE_SCOPE_UNCONFIRMED`; this is not a publication receipt.
+- The only credential blockers are now Instagram `seoul_chris1`, Threads `seoul_chris1`, and Threads `japanese_pick`; each reports `MISSING_ACCESS_TOKEN`. The two Chris user-ID/secret paths are not interchangeable with another account. Japanese Threads still requires profile creation before OAuth.
+- Desktop Commander confirmed the authorized PC `ChrisHUH` is online. The local clone is on an older feature branch with extensive unrelated modified/untracked work, so it was not reset, merged, or overwritten. Local masked app-config check also found local Meta/Instagram/Threads app secret and redirect configuration absent; GitHub environment secrets remain the authorized runtime source.
+- To minimize owner effort, opened the SIS Center Publisher Meta app roles page and Threads login page on the authorized PC. Completion still requires account-owner authentication/consent or profile creation where Meta requires an interactive identity check; no password, session cookie, or token was accessed.
