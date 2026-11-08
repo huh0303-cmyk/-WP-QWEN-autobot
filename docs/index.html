@@ -62,7 +62,7 @@ tr.platform-youtube{background:#fff7f7}tr.platform-tiktok{background:#f2fcfd}tr.
 <div class="bar"><span>블로그 순위 기준: 확인된 전일 방문자 수</span><span class="na">7일 방문 추세는 일별 기록이 7일 이상 축적된 경우에만 표시합니다. 검색 성과는 SEO 상세 분석에서 확인합니다.</span></div>
 
 <div class="sub" style="padding:7px 9px;background:#fff7ed;border-left:3px solid #d97706">발행 관리는 기존 발행 화면을 엽니다. 예약 스케줄과 격리된 즉시 발행은 아직 검증되지 않았으므로, 이 화면에서는 자동 실행하지 않습니다. SEO 건강도는 공개 글의 제목·대표이미지·본문을 점검한 편집 품질 신호등이며 Rank Math 공식 점수가 아닙니다. 데이터가 없으면 회색으로 표시합니다.</div><div class="sub" id="blog-ranking-meta">플랫폼별로 순위를 따로 표시합니다.</div>
-<div class="table-wrap"><table><thead><tr><th>순위</th><th>구분</th><th>사이트</th><th>일일방문자 (증감)</th><th>최근 7일 방문</th><th>전주 대비</th><th>콘텐츠 수(증감)</th><th>최근 발행일</th><th>GSC 사이트맵 색인 수</th><th>GitHub 발행주기</th><th>SEO 건강도</th><th>발행 관리</th></tr></thead>
+<div class="table-wrap"><table><thead><tr><th>순위</th><th>구분</th><th>사이트</th><th>일일방문자 (증감)</th><th>최근 7일 방문</th><th>전주 대비</th><th>콘텐츠 수(증감)</th><th>최근 발행일</th><th>GSC 색인 확인</th><th>GitHub 발행주기</th><th>SEO 건강도</th><th>발행 관리</th></tr></thead>
 <tbody id="b"></tbody></table></div>
 <section id="blogger-pageviews" style="margin:18px 0 10px;padding:12px;background:#fff;border:1px solid #cbd5e1;border-radius:8px">
 <h2 id="blogger-pageviews-title" style="margin:0 0 4px;font-size:1.05rem;color:#0f172a">Blogspot (33개) · 누적 페이지뷰 순위</h2>
@@ -201,7 +201,7 @@ function draw(){
     var vis=ranked?'<b>'+f(visitor.yesterday_visitors)+'</b>'+d(visitor.yesterday_delta):'<span class="na">수집 전</span>';
     var week=weeklyFor(r);var weekCount=week?'<b>'+f(week.total)+'</b>':'<span class="na" title="일별 방문 기록 7일 필요">집계 대기</span>';var weekChange=week&&week.delta!==null?d(week.delta)+(week.percent===null?'':' <small>('+week.percent.toFixed(1)+'%)</small>'):'<span class="na">비교 대기</span>';
     var cadence=cadenceFor(r),health=seoHealthFor(r);
-    var publishUrl='https://blog.korea365.org/publish';
+    var publishUrl='https://blog.korea365.org/publish?site='+encodeURIComponent(r.site||'')+'&mode=manual';
     var p=blogPlatformOf(r);return '<tr class="platform-'+esc(p)+'"><td>'+(rankValue===null?'—':rankValue+'위')+'</td><td>'+platformCell(p)+'</td><td><a href="'+esc(safeUrl(r.url,r.site))+'" target="_blank" rel="noopener">'+esc(r.display_name||r.site)+'</a></td><td>'+vis+'</td><td>'+weekCount+'</td><td>'+weekChange+'</td><td>'+metricNumber(r.content,'글')+(r.content_delta===null||r.content_delta===undefined?' <span class="na">(증감 미수집)</span>':' '+d(r.content_delta))+'</td><td>'+metricDay(r.latest_publish_date)+'</td><td>'+n(r.google_indexed)+'</td><td>'+esc(st)+'</td><td><a class="publish-link" href="'+publishUrl+'" target="_blank" rel="noopener">발행 화면 ↗</a></td></tr>';
   }).join('');
 }
