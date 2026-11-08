@@ -4,6 +4,7 @@ import asyncio
 import datetime as dt
 import json
 import re
+import random
 from pathlib import Path
 from playwright.async_api import async_playwright
 
@@ -38,7 +39,7 @@ async def extract_widget_total(page):
 
     values = await read_counters()
     if not values:
-        await page.wait_for_timeout(2500)
+        await page.wait_for_timeout(6000)
         values = await read_counters()
     if len(values) == 1:
         return values[0]
@@ -57,14 +58,18 @@ async def collect_one(browser, blog, semaphore, checked_at):
         row["status"] = "BLOG_URL_MISSING"
         return row
     async with semaphore:
+        await asyncio.sleep(random.uniform(2.5, 6.0))
         page = await browser.new_page(user_agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36")
         try:
-            for attempt in range(3):
+            for attempt in range(4):
                 response = await page.goto(url + "/", wait_until="domcontentloaded", timeout=30000)
-                if response and response.status == 429 and attempt < 2:
-                    await page.wait_for_timeout(5000 * (attempt + 1))
-                    continue
-                await page.wait_for_timeout(1800)
+                if response and response.status == 429:
+                    row["status"] = "HTTP_429"
+                    if attempt < 3:
+                        await page.wait_for_timeout(min(90000, 15000 * (2 ** attempt)) + random.randint(1000, 6000))
+                        continue
+                    break
+                await page.wait_for_timeout(3500)
                 if response and response.status >= 400:
                     row["status"] = "HTTP_" + str(response.status)
                 else:
@@ -92,8 +97,11 @@ async def run():
             raise SystemExit("No Blogger portfolio entry matched PAGEVIEWS_SITE_KEY=" + selected_key)
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
-        semaphore = asyncio.Semaphore(2)
-        rows = await asyncio.gather(*(collect_one(browser, b, semaphore, checked_at) for b in channels))
+        semaphore = asyncio.Semaphore(1)
+        rows = []
+        for b in channels:
+            rows.append(await collect_one(browser, b, semaphore, checked_at))
+            await asyncio.sleep(random.uniform(4.0, 8.0))
         await browser.close()
     payload = {"generated_at": checked_at,
                "source": "Rendered public Blogger Total Pageviews widget; approximate dashboard signal, not analytics-grade",
@@ -137,6 +145,7 @@ async def run():
         else:
             # A stale or unverified total must never appear as a current pageview
             # value or participate in ranking. Keep history for audit, but fail closed.
+            target["last_verified_total_pageviews"] = target.get("total_pageviews") if target.get("total_pageviews") is not None else target.get("last_verified_total_pageviews")
             target["total_pageviews"] = None
             target["daily_pageviews"] = None
             target["last_attempt_at"] = checked_at
