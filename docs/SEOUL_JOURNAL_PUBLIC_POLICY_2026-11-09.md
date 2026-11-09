@@ -17,6 +17,7 @@ Channel: 서울저널 @seouljournal1 / UChRUdHZlXSjftAqBtdDNEWA.
 - Qwen requires an installed model and QWEN3_TTS_COMMAND. Without that configured adapter, proceed to Edge and record the reason. No claim that Qwen is installed.
 - Minimum three distinct cleared subject photos per Short, target 3–5. Alternate 1.00–1.10 zoom in/out with stationary transparent text overlay. No single-photo still fallback. 이재명 photos are discovered by exact named Commons titles with license records; other subjects require reviewed photo_files. Missing assets stop production visibly.
 - Gemini-only automatic drafts. Manual first release is independently written and source-reviewed; no GPT/Claude draft used.
+- YouTube descriptions: 2–4 natural Korean sentences, about 180–350 Korean characters, written for a human first. Place the named person and main issue naturally in the first sentence; add only 1–2 relevant search phrases, no keyword stuffing. Explain what happened, why it matters and the verified positions/rebuttals. Use lively, concrete wording without exaggeration. Append source URL and each actual photo's own attribution afterward. Never reuse another story's image credits. Do not include generic AI/production boilerplate or repeated stock endings.
 - Vary narration structure among factual hook, open question, exact attributed quote, scene-setting and claim/response contrast. Vary sentence length and pacing; no stock intro/outro. Hook in first sentence; attribute allegations, material rebuttals and uncertainties. Never imply a hypothetical clash, invented quote or proven guilt.
 - Subject matching/thumbnail/voice fixes committed to the production scripts on 2026-11-09; output receipt records the chosen style and voice.
 - Thumbnail JPEG is generated plus matching vertical cover embedded. YouTube may reject API custom thumbnails for this channel/Shorts; log that separately and do not misreport thumbnail application.
@@ -63,3 +64,9 @@ PR #273 merged (1a39cba65feebe5f682518afbea3130eee67970f). Full no-extra-publica
 - Oh Se-hoon: use only a verified Commons portrait with the corresponding license metadata.
 - Lee Yong-cheol: official DAPA portrait requires a confirmed KOGL Type 1 reuse mark or separate reuse authorization. Until confirmed, production stops with LICENSE_REVIEW_REQUIRED; never substitute Lee Jae-myung.
 - Retrofitting an already-public Short requires a newly rendered, reviewed package and a YouTube thumbnail update or replacement publication; a code commit alone does not change existing uploads.
+
+
+## Description copy standard
+- Write distinct searchable descriptions for each upload. Search terms are specific to the person and issue and belong in fluent sentences, never as a keyword dump.
+- Example structure: an engaging first sentence naming the person + issue; a second sentence on context and significance; a third that fairly includes the response/other position. Keep allegations explicitly attributed and unresolved matters uncertain.
+- Keep news outlet inspiration at the level of headline craft and information hierarchy across differing editorial viewpoints. Do not repeat partisan framing or copy any outlet's phrasing.
