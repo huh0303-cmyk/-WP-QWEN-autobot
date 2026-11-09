@@ -14,7 +14,15 @@ on:
         type: string
         default: ""
       revise_video:
-        description: "Rebuild authorized first Lee Jae-myung Short (enter oEZaFVnqKR0)"
+        description: "Legacy approved revision target"
+        type: string
+        default: ""
+      article_url:
+        description: "Use this exact eligible Naver article URL"
+        type: string
+        default: ""
+      rebuild_of:
+        description: "Existing video ID this new private review package replaces"
         type: string
         default: ""
       publish_at:
@@ -72,6 +80,8 @@ jobs:
       GEMINI_API_KEY_3: ${{ secrets.GEMINI_API_KEY_3 }}
       FISH_AUDIO_API_KEY: ${{ secrets.FISH_AUDIO_API_KEY }}
       REVISE_VIDEO: ${{ inputs.revise_video }}
+      INPUT_ARTICLE_URL: ${{ inputs.article_url }}
+      REBUILD_OF: ${{ inputs.rebuild_of }}
       PUBLISH_AT: ${{ inputs.publish_at || needs.pick.outputs.publish_at }}
       SJ_FISH_MALE_ANCHOR: ${{ secrets.SJ_FISH_MALE_ANCHOR }}
       SJ_FISH_FEMALE_ANCHOR: ${{ secrets.SJ_FISH_FEMALE_ANCHOR }}
@@ -99,8 +109,11 @@ jobs:
           run-id: ${{ inputs.reuse_run }}
           github-token: ${{ github.token }}
           path: artifacts/seoul-journal-reuse/
+      - name: Refresh restored review package
+        if: ${{ inputs.reuse_run != '' && inputs.verify_only == true }}
+        run: python scripts/seoul_journal_refresh_package.py artifacts/seoul-journal-reuse/
       - name: Publish restored revision
-        if: ${{ inputs.reuse_run != '' }}
+        if: ${{ inputs.reuse_run != '' && inputs.verify_only != true }}
         env:
           SEOUL_JOURNAL_SLOT_MARKER: SJ_REVISION:oEZaFVnqKR0:motion-v2
         run: |

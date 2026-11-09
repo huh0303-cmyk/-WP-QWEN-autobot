@@ -72,7 +72,7 @@ def card(headline,caption,photo,credit,index=0,landscape=False,zoom=1.0,overlay_
     def text(x,y,value,size,color=WHITE):
         d.text((x,y),value,font=font(size),fill=color,stroke_width=max(2,size//12),stroke_fill=stroke)
     style=style if style in THUMBNAIL_STYLES else "split_red"
-    label=(credit["subject"]+" · 자료사진("+(re.search(r"(?:19|20)\\d{2}",credit.get("date","")) or ["촬영일 미상"])[0]+")") if credit else "서울저널 자체 제작 그래픽"
+    label=(credit["subject"]+" · 자료사진("+(re.search(r"(?:19|20)\d{2}",credit.get("date","")) or ["촬영일 미상"])[0]+")") if credit else "서울저널 자체 제작 그래픽"
     if landscape:
         cfg={
           "split_red":((20,78,770,630),YELLOW,84,48,155),
@@ -115,9 +115,10 @@ def card(headline,caption,photo,credit,index=0,landscape=False,zoom=1.0,overlay_
     lines=wrap(headline,size,width)
     if len(lines)>3: raise ValueError("Short headline too long")
     for i,line in enumerate(lines): text(left,top+35+i*(size+12),line,size,color)
-    cap_size=40 if style in ("split_red","face_left") else 35
+    # Senior-viewer captions: high contrast, bold, and at least 44 px on 1080x1920.
+    cap_size=50
     cap=wrap(caption,cap_size,width)
-    if len(cap)>3: cap_size=29; cap=wrap(caption,cap_size,width)
+    if len(cap)>3: cap_size=44; cap=wrap(caption,cap_size,width)
     for i,line in enumerate(cap[:3]): text(left,top+330+i*(cap_size+12),line,cap_size,WHITE)
     text(left,1760,label,20)
     return im
@@ -153,6 +154,14 @@ def photo_sequence(meta,out):
                 english=entity.get("labels",{}).get("en",{}).get("value")
     if not files and subject=="이용철":
         raise RuntimeError("LICENSE_REVIEW_REQUIRED: 이용철 official portrait has no verified reuse mark")
+    if not files and subject=="오세훈":
+        response=session.get("https://commons.wikimedia.org/w/api.php",params={
+            "action":"query","list":"categorymembers","cmtitle":"Category:Oh Se-hoon",
+            "cmtype":"file","cmlimit":200,"format":"json"},timeout=30)
+        response.raise_for_status()
+        files=[x["title"] for x in response.json()["query"]["categorymembers"]]
+        # Prefer current official municipal portrait releases, then other exact-category archival images.
+        files.sort(key=lambda name:int((re.search(r"(20\d{2})",name) or ["", "0"])[1]),reverse=True)
     if not files and english:
         response=session.get("https://commons.wikimedia.org/w/api.php",params={
             "action":"query","list":"search","srsearch":'intitle:"'+english+'" filetype:bitmap',
@@ -170,7 +179,7 @@ def photo_sequence(meta,out):
         if not page.get("imageinfo"): continue
         info=page["imageinfo"][0]; md=info.get("extmetadata",{})
         license_name=md.get("LicenseShortName",{}).get("value","")
-        if license_name not in ("Public domain","CC0","CC BY 4.0","CC BY-SA 4.0","CC BY 3.0","CC BY-SA 3.0"): continue
+        if license_name not in ("Public domain","CC0","Attribution","CC BY 4.0","CC BY-SA 4.0","CC BY 3.0","CC BY-SA 3.0","KOGL Type 1","Korea Open Government License Type 1"): continue
         if info.get("sha1") in hashes: continue
         image=session.get(info.get("thumburl",info["url"]),timeout=45); image.raise_for_status()
         digest=hashlib.sha256(image.content).hexdigest()
