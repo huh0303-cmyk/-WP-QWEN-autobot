@@ -102,7 +102,9 @@ def draft(title, body):
     raise RuntimeError(f"Could not generate a sufficiently long fact-grounded narration after 3 attempts: {last_error}")
 
 
-EDGE_VOICES = [("ko-KR-SunHiNeural","female_news"),("ko-KR-JiMinNeural","female_documentary"),("ko-KR-HyunsuNeural","male_news"),("ko-KR-InJoonNeural","male_documentary")]\n\ndef tts(text):
+EDGE_VOICES = [("ko-KR-SunHiNeural","female_news"),("ko-KR-JiMinNeural","female_documentary"),("ko-KR-HyunsuNeural","male_news"),("ko-KR-InJoonNeural","male_documentary")]
+
+def tts(text):
     """Free-only narration: Fish Audio S2.1 Pro Free first, then Edge TTS.
     Never calls a paid endpoint. Secrets are never printed to logs.
     """
