@@ -51,7 +51,8 @@ def main() -> int:
                     params["pageToken"] = page_token
                 response = requests.get(f"https://www.googleapis.com/blogger/v3/blogs/{blog_id}/posts",
                                         headers=headers, params=params, timeout=30)
-                response.raise_for_status()
+                if not response.ok:
+                    raise RuntimeError(f"Blogger API {response.status_code}: {response.text[:1000]}")
                 payload = response.json()
                 for post in payload.get("items", []):
                     key = (blog_id, str(post.get("id")))
