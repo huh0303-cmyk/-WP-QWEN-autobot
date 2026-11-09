@@ -1,22 +1,28 @@
-# Seoul_Jisoo / 서울저널 쇼츠 시각·음성 제작 규격
+# Seoul_Jisoo Shorts Visual and Voice Standard
+Updated: 2026-11-09 KST. Operating details are defined by [the unified political Shorts standard](SEOUL_JOURNAL_JISOO_POLITICAL_SHORTS_STANDARD_2026-11-09.md).
 
-## 음성
-- M1 남성 뉴스앵커 중저음, M2 남성 다큐 저음, F1 여성 뉴스앵커, F2 여성 시사 다큐 진행자.
-- 영상별 무작위 선택, 직전 음색 반복 회피, 기본 속도 1.2x(자연스러움 우선).
-- 공급자 순서 Fish.audio → Qwen3-TTS → Edge-TTS. 실제 voice ID는 공급자별 음색 청취 검증 후 등록. 미확인 ID로 발행 금지.
+## Seoul_Jisoo channel application
+- Apply the same fast, sourced, visually varied, poll-ending Shorts format to Seoul_Jisoo.
+- Keep Seoul_Jisoo's broader topical identity: politics, social issues, economy, consumer trends, and sports. Political stories use Naver interest/exposure signals and compare Chosun Ilbo and Hankyoreh reporting.
+- Target 3–9 distinct timely Shorts/day according to verified story volume and working dependencies. This is a target, not a guarantee.
+- Never route Seoul_Jisoo material into Seoul Journal or vice versa. Confirm the exact destination channel before upload.
 
-## 시각
-- 뉴스 관련 실제 인물·선수 사진을 확보하고 라이선스 검증. 확보 실패 시 사실에 부합하는 경기장·국회·기록 그래픽으로 대체하며 타인의 사진을 오인 유발 목적으로 사용하지 않는다.
-- 정적인 동일 배경 카드 반복 금지. 2~5초마다 사진/카드/구도 전환, 움직임은 절제된 줌·패닝.
-- 안세영: 경기 사진, 배드민턴 코트, 발언 및 기록 카드. 노시환/한화: 선수 경기 사진, 주황색 구단 계열, 경기장/기록 카드. 정치: 해당 기사 관련 인물 사진, 실제 발언과 맥락 카드.
-- 9:16 1080x1920, 모바일 안전영역 준수, 2줄 이내 굵은 한글 헤드라인, 명확한 대비, 로고 일관성. 공식 로고 원본 자산 사용.
-- 사진은 매 쇼츠 중복 검색 및 지문 검사. 단순 이미지 슬라이드만으로 영상 구성 금지.
+## Visual standards
+- Five distinct 9:16 template families, high contrast and large Korean typography suitable for mobile; vary colors, type scale, caption placement, transitions, and scene rhythm.
+- Use topical cleared imagery and avoid misleading composites or unrelated portraits. Use movement/cuts and synchronized captions, not a static image slideshow.
+- Record selected template, palette, typography scale, and image attributions in the render receipt. Benchmark only exact individual Shorts with verified 500K+ views; borrow broad pacing/layout mechanics, never copy creative assets.
 
-## 기사 및 중복
-- 정치 시사 하루 3, 스포츠/연예/사회 2 편성은 서울저널 목표. Seoul_Jisoo는 별도 채널로 분리해 실제 운영 스케줄을 확인한 후 적용.
-- 원고 첫 2초 핵심, 이후 사실·맥락·쟁점·정리. 정치적 중립과 의혹/확정 사실 구분.
-- 사건 ID, 기사 URL, 원고 해시, 사진 지문으로 중복 방지.
+## Voice standards
+- Four narrator types: two male (news anchor and documentary), two female (news anchor and documentary). Random selection with immediate-repeat avoidance.
+- Fish Audio → Qwen3-TTS → Edge-TTS fallback; log actual provider and voice ID. Only use tested/configured IDs. Target 1.2x speed when natural.
+- No cloned/imitated political voices.
 
-## 배포 전 검증
-- 실제 음색 ID 4개 확인, 랜덤 선택 테스트, 이미지 라이선스·ALT/크레딧 확인, 썸네일 미리보기, 렌더링 검사, 공개 URL 확인.
-- 이 문서는 운영 사양이며 실제 발행 코드 반영이나 영상 교체를 뜻하지 않음.
+## Editorial and ending
+- First two seconds establish the key fact or question. Explain context, competing claims/response, and what is confirmed.
+- Clearly distinguish fact, allegation, quote, and opinion; cite dated sources.
+- Every Short ends with a neutral, issue-specific audience vote, spoken and shown on screen.
+- Deduplicate by event/source/script/image fingerprints.
+
+## Release checks
+- Verify sources, dates, rights, captions, poll ending, render, and exact channel identity before upload.
+- Report each production stage and exact blocker. This document is a standard, not evidence that code or authentication has already been wired or that publication succeeded.
