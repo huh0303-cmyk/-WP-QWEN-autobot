@@ -1,6 +1,13 @@
 name: Seoul Journal Political Shorts (private upload)
 
 on:
+  schedule:
+    - cron: "7 0 * * *"
+    - cron: "17 4 * * *"
+    - cron: "27 8 * * *"
+    - cron: "37 12 * * *"
+    - cron: "47 16 * * *"
+    - cron: "57 20 * * *"
   workflow_dispatch:
     inputs:
       article_url:
@@ -82,6 +89,7 @@ jobs:
           SEOUL_JOURNAL_CONTENT_SCOPE: politics
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           FISH_AUDIO_API_KEY: ${{ secrets.FISH_AUDIO_API_KEY }}
+          FISH_AUDIO_VOICE_IDS: ${{ secrets.FISH_AUDIO_VOICE_IDS }}
           YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_CLIENT_ID }}
           YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_CLIENT_SECRET }}
           SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN }}
