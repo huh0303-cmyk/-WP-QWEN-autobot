@@ -180,7 +180,7 @@
       "handle": "english_pick1",
       "url": "https://www.instagram.com/english_pick1/",
       "account_exists": true,
-      "identity_verified": false,
+      "identity_verified": true,
       "publish_connected": false,
       "note": "Owner-designated five-account structure (2026-11-06). Public identity must be rechecked; API write authorization and publication receipt are not yet verified."
     },
@@ -191,7 +191,7 @@
       "handle": "seoul_jisoo",
       "url": "https://www.instagram.com/seoul_jisoo/",
       "account_exists": true,
-      "identity_verified": false,
+      "identity_verified": true,
       "publish_connected": false,
       "note": "Owner-designated five-account structure (2026-11-06). Public identity must be rechecked; API write authorization and publication receipt are not yet verified."
     },
@@ -202,7 +202,7 @@
       "handle": "seoul_chris1",
       "url": "https://www.instagram.com/seoul_chris1/",
       "account_exists": true,
-      "identity_verified": false,
+      "identity_verified": true,
       "publish_connected": false,
       "note": "Owner-designated five-account structure (2026-11-06). Public identity must be rechecked; API write authorization and publication receipt are not yet verified."
     },
@@ -213,7 +213,7 @@
       "handle": "japanese_pick",
       "url": "https://www.instagram.com/japanese_pick/",
       "account_exists": true,
-      "identity_verified": false,
+      "identity_verified": true,
       "publish_connected": false,
       "note": "Owner-designated five-account structure (2026-11-06). Public identity must be rechecked; API write authorization and publication receipt are not yet verified."
     },
@@ -224,7 +224,7 @@
       "handle": "seoul_topik",
       "url": "https://www.instagram.com/seoul_topik/",
       "account_exists": true,
-      "identity_verified": false,
+      "identity_verified": true,
       "publish_connected": false,
       "note": "Owner-designated five-account structure (2026-11-06). Public identity must be rechecked; API write authorization and publication receipt are not yet verified."
     },
@@ -235,7 +235,7 @@
       "handle": "english_pick1",
       "url": "https://www.threads.com/@english_pick1",
       "account_exists": true,
-      "identity_verified": false,
+      "identity_verified": true,
       "publish_connected": false,
       "note": "Owner-designated five-account structure (2026-11-06). Public identity must be rechecked; API write authorization and publication receipt are not yet verified."
     },
@@ -257,7 +257,7 @@
       "handle": "seoul_chris1",
       "url": "https://www.threads.com/@seoul_chris1",
       "account_exists": true,
-      "identity_verified": false,
+      "identity_verified": true,
       "publish_connected": false,
       "note": "Owner-designated five-account structure (2026-11-06). Public identity must be rechecked; API write authorization and publication receipt are not yet verified."
     },
@@ -268,7 +268,7 @@
       "handle": "japanese_pick",
       "url": "https://www.threads.com/@japanese_pick",
       "account_exists": true,
-      "identity_verified": false,
+      "identity_verified": true,
       "publish_connected": false,
       "note": "Owner-designated five-account structure (2026-11-06). Public identity must be rechecked; API write authorization and publication receipt are not yet verified."
     },
@@ -279,7 +279,7 @@
       "handle": "seoul_topik",
       "url": "https://www.threads.com/@seoul_topik",
       "account_exists": true,
-      "identity_verified": false,
+      "identity_verified": true,
       "publish_connected": false,
       "note": "Owner-designated five-account structure (2026-11-06). Public identity must be rechecked; API write authorization and publication receipt are not yet verified."
     },
