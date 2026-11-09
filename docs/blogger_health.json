@@ -1,334 +1,334 @@
 {
-  "generated_at": "2026-11-08T12:41:15.563671+00:00",
+  "generated_at": "2026-11-09T01:44:54.294228+00:00",
   "source": "public Blogger Atom feed; last 200 posts",
   "sites": {
     "kfinance365.blogspot.com": {
-      "checked_at": "2026-11-08T12:40:43.639468+00:00",
+      "checked_at": "2026-11-09T01:44:24.652914+00:00",
       "status": "ok",
       "posts_checked": 60,
       "posts_7d": 3,
       "latest_publish_date": "2026-11-06",
-      "days_since_publish": 2,
+      "days_since_publish": 3,
       "duplicate_titles": 2,
       "duplicate_scope": "recent_200_posts"
     },
     "k-visa365.blogspot.com": {
-      "checked_at": "2026-11-08T12:40:44.536530+00:00",
+      "checked_at": "2026-11-09T01:44:25.474395+00:00",
       "status": "ok",
       "posts_checked": 59,
       "posts_7d": 3,
       "latest_publish_date": "2026-11-06",
-      "days_since_publish": 2,
-      "duplicate_titles": 1,
-      "duplicate_scope": "recent_200_posts"
-    },
-    "theseouljournal.blogspot.com": {
-      "checked_at": "2026-11-08T12:40:45.472511+00:00",
-      "status": "ok",
-      "posts_checked": 58,
-      "posts_7d": 3,
-      "latest_publish_date": "2026-11-06",
-      "days_since_publish": 2,
-      "duplicate_titles": 12,
-      "duplicate_scope": "recent_200_posts"
-    },
-    "glow.k-health365.com": {
-      "checked_at": "2026-11-08T12:40:46.500597+00:00",
-      "status": "ok",
-      "posts_checked": 62,
-      "posts_7d": 3,
-      "latest_publish_date": "2026-11-06",
-      "days_since_publish": 2,
-      "duplicate_titles": 0,
-      "duplicate_scope": "recent_200_posts"
-    },
-    "jobinkorea365.blogspot.com": {
-      "checked_at": "2026-11-08T12:40:47.561429+00:00",
-      "status": "ok",
-      "posts_checked": 61,
-      "posts_7d": 3,
-      "latest_publish_date": "2026-11-06",
-      "days_since_publish": 2,
-      "duplicate_titles": 2,
-      "duplicate_scope": "recent_200_posts"
-    },
-    "jobkorea365.blogspot.com": {
-      "checked_at": "2026-11-08T12:40:48.453710+00:00",
-      "status": "ok",
-      "posts_checked": 61,
-      "posts_7d": 3,
-      "latest_publish_date": "2026-11-06",
-      "days_since_publish": 2,
-      "duplicate_titles": 0,
-      "duplicate_scope": "recent_200_posts"
-    },
-    "jobkoreaglobal.blogspot.com": {
-      "checked_at": "2026-11-08T12:40:49.295206+00:00",
-      "status": "ok",
-      "posts_checked": 62,
-      "posts_7d": 3,
-      "latest_publish_date": "2026-11-06",
-      "days_since_publish": 2,
-      "duplicate_titles": 1,
-      "duplicate_scope": "recent_200_posts"
-    },
-    "k-health365-edu.blogspot.com": {
-      "checked_at": "2026-11-08T12:40:50.244328+00:00",
-      "status": "ok",
-      "posts_checked": 62,
-      "posts_7d": 3,
-      "latest_publish_date": "2026-11-06",
-      "days_since_publish": 2,
-      "duplicate_titles": 4,
-      "duplicate_scope": "recent_200_posts"
-    },
-    "k-health365.blogspot.com": {
-      "checked_at": "2026-11-08T12:40:51.548327+00:00",
-      "status": "ok",
-      "posts_checked": 63,
-      "posts_7d": 3,
-      "latest_publish_date": "2026-11-06",
-      "days_since_publish": 2,
-      "duplicate_titles": 0,
-      "duplicate_scope": "recent_200_posts"
-    },
-    "k-trip365.blogspot.com": {
-      "checked_at": "2026-11-08T12:40:52.739437+00:00",
-      "status": "ok",
-      "posts_checked": 67,
-      "posts_7d": 8,
-      "latest_publish_date": "2026-11-06",
-      "days_since_publish": 2,
-      "duplicate_titles": 2,
-      "duplicate_scope": "recent_200_posts"
-    },
-    "ki-korea.blogspot.com": {
-      "checked_at": "2026-11-08T12:40:53.668187+00:00",
-      "status": "ok",
-      "posts_checked": 60,
-      "posts_7d": 3,
-      "latest_publish_date": "2026-11-06",
-      "days_since_publish": 2,
-      "duplicate_titles": 4,
-      "duplicate_scope": "recent_200_posts"
-    },
-    "kieca-korea.blogspot.com": {
-      "checked_at": "2026-11-08T12:40:54.647906+00:00",
-      "status": "ok",
-      "posts_checked": 60,
-      "posts_7d": 3,
-      "latest_publish_date": "2026-11-06",
-      "days_since_publish": 2,
-      "duplicate_titles": 1,
-      "duplicate_scope": "recent_200_posts"
-    },
-    "korea-life-support365.blogspot.com": {
-      "checked_at": "2026-11-08T12:40:55.592901+00:00",
-      "status": "ok",
-      "posts_checked": 61,
-      "posts_7d": 3,
-      "latest_publish_date": "2026-11-06",
-      "days_since_publish": 2,
-      "duplicate_titles": 1,
-      "duplicate_scope": "recent_200_posts"
-    },
-    "korea365guide.blogspot.com": {
-      "checked_at": "2026-11-08T12:40:56.456199+00:00",
-      "status": "ok",
-      "posts_checked": 58,
-      "posts_7d": 3,
-      "latest_publish_date": "2026-11-06",
-      "days_since_publish": 2,
-      "duplicate_titles": 0,
-      "duplicate_scope": "recent_200_posts"
-    },
-    "koreacrypto365.blogspot.com": {
-      "checked_at": "2026-11-08T12:40:57.304574+00:00",
-      "status": "ok",
-      "posts_checked": 62,
-      "posts_7d": 3,
-      "latest_publish_date": "2026-11-06",
-      "days_since_publish": 2,
-      "duplicate_titles": 1,
-      "duplicate_scope": "recent_200_posts"
-    },
-    "koreainsurance365.blogspot.com": {
-      "checked_at": "2026-11-08T12:40:58.256385+00:00",
-      "status": "ok",
-      "posts_checked": 58,
-      "posts_7d": 3,
-      "latest_publish_date": "2026-11-06",
-      "days_since_publish": 2,
-      "duplicate_titles": 4,
-      "duplicate_scope": "recent_200_posts"
-    },
-    "koreainvest365.blogspot.com": {
-      "checked_at": "2026-11-08T12:40:59.171215+00:00",
-      "status": "ok",
-      "posts_checked": 64,
-      "posts_7d": 3,
-      "latest_publish_date": "2026-11-06",
-      "days_since_publish": 2,
-      "duplicate_titles": 2,
-      "duplicate_scope": "recent_200_posts"
-    },
-    "koreamedicaltour1.blogspot.com": {
-      "checked_at": "2026-11-08T12:41:00.018455+00:00",
-      "status": "ok",
-      "posts_checked": 58,
-      "posts_7d": 3,
-      "latest_publish_date": "2026-11-06",
-      "days_since_publish": 2,
-      "duplicate_titles": 3,
-      "duplicate_scope": "recent_200_posts"
-    },
-    "koreamedicaltour365.blogspot.com": {
-      "checked_at": "2026-11-08T12:41:01.001076+00:00",
-      "status": "ok",
-      "posts_checked": 60,
-      "posts_7d": 3,
-      "latest_publish_date": "2026-11-06",
-      "days_since_publish": 2,
-      "duplicate_titles": 5,
-      "duplicate_scope": "recent_200_posts"
-    },
-    "koreanews365daily.blogspot.com": {
-      "checked_at": "2026-11-08T12:41:02.175452+00:00",
-      "status": "ok",
-      "posts_checked": 58,
-      "posts_7d": 3,
-      "latest_publish_date": "2026-11-06",
-      "days_since_publish": 2,
-      "duplicate_titles": 9,
-      "duplicate_scope": "recent_200_posts"
-    },
-    "koreataxnlaw.blogspot.com": {
-      "checked_at": "2026-11-08T12:41:03.106456+00:00",
-      "status": "ok",
-      "posts_checked": 61,
-      "posts_7d": 3,
-      "latest_publish_date": "2026-11-06",
-      "days_since_publish": 2,
-      "duplicate_titles": 2,
-      "duplicate_scope": "recent_200_posts"
-    },
-    "koreawedding365.blogspot.com": {
-      "checked_at": "2026-11-08T12:41:04.065944+00:00",
-      "status": "ok",
-      "posts_checked": 63,
-      "posts_7d": 3,
-      "latest_publish_date": "2026-11-06",
-      "days_since_publish": 2,
-      "duplicate_titles": 8,
-      "duplicate_scope": "recent_200_posts"
-    },
-    "krealestate365.blogspot.com": {
-      "checked_at": "2026-11-08T12:41:04.992947+00:00",
-      "status": "ok",
-      "posts_checked": 62,
-      "posts_7d": 3,
-      "latest_publish_date": "2026-11-06",
-      "days_since_publish": 2,
-      "duplicate_titles": 2,
-      "duplicate_scope": "recent_200_posts"
-    },
-    "ksa-korea.blogspot.com": {
-      "checked_at": "2026-11-08T12:41:05.956293+00:00",
-      "status": "ok",
-      "posts_checked": 61,
-      "posts_7d": 3,
-      "latest_publish_date": "2026-11-06",
-      "days_since_publish": 2,
-      "duplicate_titles": 2,
-      "duplicate_scope": "recent_200_posts"
-    },
-    "kstudy365.blogspot.com": {
-      "checked_at": "2026-11-08T12:41:06.929791+00:00",
-      "status": "ok",
-      "posts_checked": 62,
-      "posts_7d": 3,
-      "latest_publish_date": "2026-11-06",
-      "days_since_publish": 2,
+      "days_since_publish": 3,
       "duplicate_titles": 1,
       "duplicate_scope": "recent_200_posts"
     },
     "ktech365.blogspot.com": {
-      "checked_at": "2026-11-08T12:41:07.876740+00:00",
+      "checked_at": "2026-11-09T01:44:26.374877+00:00",
       "status": "ok",
       "posts_checked": 63,
       "posts_7d": 3,
       "latest_publish_date": "2026-11-06",
-      "days_since_publish": 2,
-      "duplicate_titles": 1,
-      "duplicate_scope": "recent_200_posts"
-    },
-    "kworld365.blogspot.com": {
-      "checked_at": "2026-11-08T12:41:08.787900+00:00",
-      "status": "ok",
-      "posts_checked": 62,
-      "posts_7d": 3,
-      "latest_publish_date": "2026-11-06",
-      "days_since_publish": 2,
-      "duplicate_titles": 0,
-      "duplicate_scope": "recent_200_posts"
-    },
-    "kworld365seoul.blogspot.com": {
-      "checked_at": "2026-11-08T12:41:09.669128+00:00",
-      "status": "ok",
-      "posts_checked": 62,
-      "posts_7d": 3,
-      "latest_publish_date": "2026-11-06",
-      "days_since_publish": 2,
-      "duplicate_titles": 2,
-      "duplicate_scope": "recent_200_posts"
-    },
-    "oliveyoungkorea.blogspot.com": {
-      "checked_at": "2026-11-08T12:41:10.625151+00:00",
-      "status": "ok",
-      "posts_checked": 64,
-      "posts_7d": 7,
-      "latest_publish_date": "2026-11-06",
-      "days_since_publish": 2,
+      "days_since_publish": 3,
       "duplicate_titles": 1,
       "duplicate_scope": "recent_200_posts"
     },
     "seoulintlschoolguide.blogspot.com": {
-      "checked_at": "2026-11-08T12:41:11.924315+00:00",
+      "checked_at": "2026-11-09T01:44:27.135328+00:00",
       "status": "ok",
       "posts_checked": 61,
       "posts_7d": 3,
       "latest_publish_date": "2026-11-06",
-      "days_since_publish": 2,
+      "days_since_publish": 3,
       "duplicate_titles": 5,
       "duplicate_scope": "recent_200_posts"
     },
-    "sis-korea.blogspot.com": {
-      "checked_at": "2026-11-08T12:41:12.854028+00:00",
+    "jobinkorea365.blogspot.com": {
+      "checked_at": "2026-11-09T01:44:27.922639+00:00",
       "status": "ok",
-      "posts_checked": 59,
+      "posts_checked": 61,
       "posts_7d": 3,
       "latest_publish_date": "2026-11-06",
-      "days_since_publish": 2,
-      "duplicate_titles": 4,
+      "days_since_publish": 3,
+      "duplicate_titles": 2,
       "duplicate_scope": "recent_200_posts"
     },
-    "skin.k-health365.com": {
-      "checked_at": "2026-11-08T12:41:13.787877+00:00",
+    "jobkoreaglobal.blogspot.com": {
+      "checked_at": "2026-11-09T01:44:28.674853+00:00",
       "status": "ok",
-      "posts_checked": 68,
+      "posts_checked": 62,
+      "posts_7d": 3,
+      "latest_publish_date": "2026-11-06",
+      "days_since_publish": 3,
+      "duplicate_titles": 1,
+      "duplicate_scope": "recent_200_posts"
+    },
+    "k-trip365.blogspot.com": {
+      "checked_at": "2026-11-09T01:44:29.440125+00:00",
+      "status": "ok",
+      "posts_checked": 67,
       "posts_7d": 8,
       "latest_publish_date": "2026-11-06",
-      "days_since_publish": 2,
+      "days_since_publish": 3,
+      "duplicate_titles": 2,
+      "duplicate_scope": "recent_200_posts"
+    },
+    "koreataxnlaw.blogspot.com": {
+      "checked_at": "2026-11-09T01:44:30.398266+00:00",
+      "status": "ok",
+      "posts_checked": 61,
+      "posts_7d": 3,
+      "latest_publish_date": "2026-11-06",
+      "days_since_publish": 3,
+      "duplicate_titles": 2,
+      "duplicate_scope": "recent_200_posts"
+    },
+    "theseouljournal.blogspot.com": {
+      "checked_at": "2026-11-09T01:44:31.115100+00:00",
+      "status": "ok",
+      "posts_checked": 58,
+      "posts_7d": 3,
+      "latest_publish_date": "2026-11-06",
+      "days_since_publish": 3,
+      "duplicate_titles": 12,
+      "duplicate_scope": "recent_200_posts"
+    },
+    "glow.k-health365.com": {
+      "checked_at": "2026-11-09T01:44:32.155682+00:00",
+      "status": "ok",
+      "posts_checked": 62,
+      "posts_7d": 3,
+      "latest_publish_date": "2026-11-06",
+      "days_since_publish": 3,
       "duplicate_titles": 0,
       "duplicate_scope": "recent_200_posts"
     },
-    "studyinkorea365.blogspot.com": {
-      "checked_at": "2026-11-08T12:41:14.762247+00:00",
+    "jobkorea365.blogspot.com": {
+      "checked_at": "2026-11-09T01:44:33.050799+00:00",
+      "status": "ok",
+      "posts_checked": 61,
+      "posts_7d": 3,
+      "latest_publish_date": "2026-11-06",
+      "days_since_publish": 3,
+      "duplicate_titles": 0,
+      "duplicate_scope": "recent_200_posts"
+    },
+    "k-health365-edu.blogspot.com": {
+      "checked_at": "2026-11-09T01:44:34.010205+00:00",
+      "status": "ok",
+      "posts_checked": 62,
+      "posts_7d": 3,
+      "latest_publish_date": "2026-11-06",
+      "days_since_publish": 3,
+      "duplicate_titles": 4,
+      "duplicate_scope": "recent_200_posts"
+    },
+    "k-health365.blogspot.com": {
+      "checked_at": "2026-11-09T01:44:35.004812+00:00",
       "status": "ok",
       "posts_checked": 63,
       "posts_7d": 3,
       "latest_publish_date": "2026-11-06",
-      "days_since_publish": 2,
+      "days_since_publish": 3,
+      "duplicate_titles": 0,
+      "duplicate_scope": "recent_200_posts"
+    },
+    "ki-korea.blogspot.com": {
+      "checked_at": "2026-11-09T01:44:36.287803+00:00",
+      "status": "ok",
+      "posts_checked": 60,
+      "posts_7d": 3,
+      "latest_publish_date": "2026-11-06",
+      "days_since_publish": 3,
+      "duplicate_titles": 4,
+      "duplicate_scope": "recent_200_posts"
+    },
+    "kieca-korea.blogspot.com": {
+      "checked_at": "2026-11-09T01:44:37.122292+00:00",
+      "status": "ok",
+      "posts_checked": 60,
+      "posts_7d": 3,
+      "latest_publish_date": "2026-11-06",
+      "days_since_publish": 3,
+      "duplicate_titles": 1,
+      "duplicate_scope": "recent_200_posts"
+    },
+    "korea-life-support365.blogspot.com": {
+      "checked_at": "2026-11-09T01:44:38.006233+00:00",
+      "status": "ok",
+      "posts_checked": 61,
+      "posts_7d": 3,
+      "latest_publish_date": "2026-11-06",
+      "days_since_publish": 3,
+      "duplicate_titles": 1,
+      "duplicate_scope": "recent_200_posts"
+    },
+    "korea365guide.blogspot.com": {
+      "checked_at": "2026-11-09T01:44:38.924063+00:00",
+      "status": "ok",
+      "posts_checked": 58,
+      "posts_7d": 3,
+      "latest_publish_date": "2026-11-06",
+      "days_since_publish": 3,
+      "duplicate_titles": 0,
+      "duplicate_scope": "recent_200_posts"
+    },
+    "koreacrypto365.blogspot.com": {
+      "checked_at": "2026-11-09T01:44:39.712081+00:00",
+      "status": "ok",
+      "posts_checked": 62,
+      "posts_7d": 3,
+      "latest_publish_date": "2026-11-06",
+      "days_since_publish": 3,
+      "duplicate_titles": 1,
+      "duplicate_scope": "recent_200_posts"
+    },
+    "koreainsurance365.blogspot.com": {
+      "checked_at": "2026-11-09T01:44:40.558255+00:00",
+      "status": "ok",
+      "posts_checked": 58,
+      "posts_7d": 3,
+      "latest_publish_date": "2026-11-06",
+      "days_since_publish": 3,
+      "duplicate_titles": 4,
+      "duplicate_scope": "recent_200_posts"
+    },
+    "koreainvest365.blogspot.com": {
+      "checked_at": "2026-11-09T01:44:41.381469+00:00",
+      "status": "ok",
+      "posts_checked": 64,
+      "posts_7d": 3,
+      "latest_publish_date": "2026-11-06",
+      "days_since_publish": 3,
+      "duplicate_titles": 2,
+      "duplicate_scope": "recent_200_posts"
+    },
+    "koreamedicaltour1.blogspot.com": {
+      "checked_at": "2026-11-09T01:44:42.195328+00:00",
+      "status": "ok",
+      "posts_checked": 58,
+      "posts_7d": 3,
+      "latest_publish_date": "2026-11-06",
+      "days_since_publish": 3,
+      "duplicate_titles": 3,
+      "duplicate_scope": "recent_200_posts"
+    },
+    "koreamedicaltour365.blogspot.com": {
+      "checked_at": "2026-11-09T01:44:43.096455+00:00",
+      "status": "ok",
+      "posts_checked": 60,
+      "posts_7d": 3,
+      "latest_publish_date": "2026-11-06",
+      "days_since_publish": 3,
+      "duplicate_titles": 5,
+      "duplicate_scope": "recent_200_posts"
+    },
+    "koreanews365daily.blogspot.com": {
+      "checked_at": "2026-11-09T01:44:44.352709+00:00",
+      "status": "ok",
+      "posts_checked": 58,
+      "posts_7d": 3,
+      "latest_publish_date": "2026-11-06",
+      "days_since_publish": 3,
+      "duplicate_titles": 9,
+      "duplicate_scope": "recent_200_posts"
+    },
+    "koreawedding365.blogspot.com": {
+      "checked_at": "2026-11-09T01:44:45.280415+00:00",
+      "status": "ok",
+      "posts_checked": 63,
+      "posts_7d": 3,
+      "latest_publish_date": "2026-11-06",
+      "days_since_publish": 3,
+      "duplicate_titles": 8,
+      "duplicate_scope": "recent_200_posts"
+    },
+    "krealestate365.blogspot.com": {
+      "checked_at": "2026-11-09T01:44:46.189228+00:00",
+      "status": "ok",
+      "posts_checked": 62,
+      "posts_7d": 3,
+      "latest_publish_date": "2026-11-06",
+      "days_since_publish": 3,
+      "duplicate_titles": 2,
+      "duplicate_scope": "recent_200_posts"
+    },
+    "ksa-korea.blogspot.com": {
+      "checked_at": "2026-11-09T01:44:46.993921+00:00",
+      "status": "ok",
+      "posts_checked": 61,
+      "posts_7d": 3,
+      "latest_publish_date": "2026-11-06",
+      "days_since_publish": 3,
+      "duplicate_titles": 2,
+      "duplicate_scope": "recent_200_posts"
+    },
+    "kstudy365.blogspot.com": {
+      "checked_at": "2026-11-09T01:44:47.776313+00:00",
+      "status": "ok",
+      "posts_checked": 62,
+      "posts_7d": 3,
+      "latest_publish_date": "2026-11-06",
+      "days_since_publish": 3,
+      "duplicate_titles": 1,
+      "duplicate_scope": "recent_200_posts"
+    },
+    "kworld365.blogspot.com": {
+      "checked_at": "2026-11-09T01:44:48.751404+00:00",
+      "status": "ok",
+      "posts_checked": 63,
+      "posts_7d": 4,
+      "latest_publish_date": "2026-11-08",
+      "days_since_publish": 1,
+      "duplicate_titles": 1,
+      "duplicate_scope": "recent_200_posts"
+    },
+    "kworld365seoul.blogspot.com": {
+      "checked_at": "2026-11-09T01:44:49.566992+00:00",
+      "status": "ok",
+      "posts_checked": 62,
+      "posts_7d": 3,
+      "latest_publish_date": "2026-11-06",
+      "days_since_publish": 3,
+      "duplicate_titles": 2,
+      "duplicate_scope": "recent_200_posts"
+    },
+    "oliveyoungkorea.blogspot.com": {
+      "checked_at": "2026-11-09T01:44:50.388637+00:00",
+      "status": "ok",
+      "posts_checked": 64,
+      "posts_7d": 7,
+      "latest_publish_date": "2026-11-06",
+      "days_since_publish": 3,
+      "duplicate_titles": 1,
+      "duplicate_scope": "recent_200_posts"
+    },
+    "sis-korea.blogspot.com": {
+      "checked_at": "2026-11-09T01:44:51.577149+00:00",
+      "status": "ok",
+      "posts_checked": 59,
+      "posts_7d": 3,
+      "latest_publish_date": "2026-11-06",
+      "days_since_publish": 3,
+      "duplicate_titles": 4,
+      "duplicate_scope": "recent_200_posts"
+    },
+    "skin.k-health365.com": {
+      "checked_at": "2026-11-09T01:44:52.458122+00:00",
+      "status": "ok",
+      "posts_checked": 68,
+      "posts_7d": 7,
+      "latest_publish_date": "2026-11-06",
+      "days_since_publish": 3,
+      "duplicate_titles": 0,
+      "duplicate_scope": "recent_200_posts"
+    },
+    "studyinkorea365.blogspot.com": {
+      "checked_at": "2026-11-09T01:44:53.455548+00:00",
+      "status": "ok",
+      "posts_checked": 63,
+      "posts_7d": 3,
+      "latest_publish_date": "2026-11-06",
+      "days_since_publish": 3,
       "duplicate_titles": 8,
       "duplicate_scope": "recent_200_posts"
     }
