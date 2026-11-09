@@ -16,6 +16,7 @@ from automation_hub.repetition_guard import title_self_issues  # noqa: E402
 APPLY = os.environ.get("APPLY_CHANGES", "false").lower() == "true"
 WP_USER = "huh0303@gmail.com"
 KEEP_PER_PATTERN = 1
+NEAR_DUPLICATE_JACCARD = 0.58
 NEWSROOM_SITES = {"wp_koreanews", "blogger_koreanews", "blogger_seouljournal"}  # factual headlines: never LLM-rewritten
 OPEN_MIN, END_MIN = 4, 6
 HANGUL = re.compile(r"[가-힣]")
@@ -67,7 +68,7 @@ def flag(data):
             reason = f"ending:{e}"
         elif title_self_issues(t):
             reason = "self:" + title_self_issues(t)[0][:60]
-        elif any(_jac(t, o) >= 0.8 for o in seen_site[s]):
+        elif any(_jac(t, o) >= NEAR_DUPLICATE_JACCARD for o in seen_site[s]):
             reason = "near_duplicate"
         seen_site[s].append(t)
         seen_exact.add(ex); seen_open[o] += 1; seen_end[e] += 1
@@ -140,9 +141,24 @@ def main():
     cfg = json.loads((ROOT / "config/automation_hub_sites.json").read_text(encoding="utf-8"))
     cfg = cfg if isinstance(cfg, list) else cfg["sites"]
     wp = {s["site_id"]: s for s in cfg if s["platform"] == "wordpress" and s.get("enabled", True)}
+    target_key = os.environ.get("RETITLE_SITE_KEY", "").strip().lower()
+    target_site_id = ""
+    if target_key:
+        if scope != "wordpress":
+            raise ValueError("RETITLE_SITE_KEY requires RETITLE_SCOPE=wordpress")
+        matches = []
+        for sid, site in wp.items():
+            url = str(site.get("url") or "").strip().lower().rstrip("/")
+            identity = {sid.lower(), url, url.split("://", 1)[-1]}
+            if target_key in identity:
+                matches.append(sid)
+        if len(matches) != 1:
+            raise ValueError(f"RETITLE_SITE_KEY must match exactly one enabled WordPress site; matches={len(matches)}")
+        target_site_id = matches[0]
     data = {}
     if scope in {"all", "wordpress"}:
-        for sid, s in wp.items():
+        selected_wp = {target_site_id: wp[target_site_id]} if target_site_id else wp
+        for sid, s in selected_wp.items():
             try:
                 data[sid] = A.wp_titles(s["url"])
             except Exception as e:

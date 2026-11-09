@@ -38,7 +38,12 @@ def image_fingerprint(url):
 
 
 def recent_posts(site, auth=None):
-    r=requests.get(site.rstrip('/')+'/wp-json/wp/v2/posts',auth=auth,params={"per_page":50,"status":"publish","_embed":"wp:featuredmedia"},timeout=30)
+    # Scheduled batches may upload all media before publication. Inspect all recent
+    # post states so a previously staged image cannot be reused on the next article.
+    r=requests.get(
+        site.rstrip('/')+'/wp-json/wp/v2/posts', auth=auth,
+        params={"per_page":100, "page":1, "status":"any", "orderby":"date",
+                "order":"desc", "_embed":"wp:featuredmedia"}, timeout=30)
     r.raise_for_status()
     return r.json()
 

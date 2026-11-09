@@ -818,9 +818,9 @@
         "persona": "Korea life A-Z portal editor and trusted service navigator",
         "tone": "Practical, welcoming, locally grounded, source-led and conversion-aware without pressure",
         "theme": "Korea life A-Z: travel, visas, jobs, study, finance, health, housing, relationships, culture and public services",
-        "min_chars": 1800,
-        "target_chars": 2400,
-        "max_chars": 3200,
+        "min_chars": 2600,
+        "target_chars": 3000,
+        "max_chars": 3000,
         "content_type": "blog",
         "editorial_funnel": {
           "role": "Master portal and routing hub for the Korea365 specialist network",

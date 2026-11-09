@@ -15,7 +15,7 @@ on:
           - all
         default: blogger
       site_key:
-        description: Optional single Blogger site key, for example jobkorea365
+        description: Optional exact site ID/domain, e.g. wp_korea365 or https://korea365.org
         type: string
         default: ''
 permissions:

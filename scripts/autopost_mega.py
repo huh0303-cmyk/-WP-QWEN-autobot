@@ -1229,7 +1229,7 @@ SITE_PERSONA = {
             "Official service link",
             "Related next task"
         ],
-        "min_chars": (1900, 2500),
+        "min_chars": (2600, 3000),
         "tables": 1,
         "lang": "en",
         "cta": "Continue through the newcomer checklist"
