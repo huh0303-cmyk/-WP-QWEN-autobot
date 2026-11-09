@@ -1,0 +1,39 @@
+name: Seoul Journal Kim Jong-in full remake (private review artifact)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: seoul-journal-kimjongin-remake
+  cancel-in-progress: false
+jobs:
+  render-private-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    environment: FISH_AUDIO_API_KEY
+    env:
+      FISH_AUDIO_API_KEY: ${{ secrets.FISH_AUDIO_API_KEY }}
+      SJ_FISH_MALE_ANCHOR: ${{ secrets.SJ_FISH_MALE_ANCHOR }}
+      SJ_FISH_MALE_2: ${{ secrets.SJ_FISH_MALE_2 }}
+      SJ_FISH_FEMALE_ANCHOR: ${{ secrets.SJ_FISH_FEMALE_ANCHOR }}
+      SJ_FISH_FEMALE_2: ${{ secrets.SJ_FISH_FEMALE_2 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install video and font runtime
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-noto-cjk
+          python -m pip install --disable-pip-version-check requests Pillow edge-tts
+      - name: Render fresh story, cleared photos, captions and vote ending
+        run: python scripts/seoul_journal_kimjongin_remake_20261109.py
+      - name: Preserve MP4, source package, image rights and render receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: seoul-journal-kimjongin-full-remake-${{ github.run_id }}
+          path: artifacts/seoul-journal-kimjongin-remake-20261109/
+          if-no-files-found: warn
+          retention-days: 14
