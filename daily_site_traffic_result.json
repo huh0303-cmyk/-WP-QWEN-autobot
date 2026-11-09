@@ -1,10 +1,10 @@
 {
-  "checked_at": "2026-11-09 18:44:19",
+  "checked_at": "2026-11-09 19:09:56",
   "records": [
     {
       "domain": "k-health365.com",
       "date": "2026-11-09",
-      "weekday": "월",
+      "weekday": "\uc6d4",
       "daily_visitors": 145,
       "visitor_delta": 42,
       "total_visitors": 15534,
@@ -23,9 +23,9 @@
       "recent_index_increase": 0,
       "total_posts": 380,
       "gsc_property": "sc-domain:k-health365.com",
-      "status": "정상",
+      "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-09 18:44:19",
+      "checked_at": "2026-11-09 19:09:56",
       "total_delta": 145,
       "yesterday_visitors": 103,
       "day_before_yesterday_visitors": 260,
@@ -34,7 +34,7 @@
     {
       "domain": "koreamedicaltour.com",
       "date": "2026-11-09",
-      "weekday": "월",
+      "weekday": "\uc6d4",
       "daily_visitors": 763,
       "visitor_delta": 355,
       "total_visitors": 9652,
@@ -53,9 +53,9 @@
       "recent_index_increase": 0,
       "total_posts": 93,
       "gsc_property": "sc-domain:koreamedicaltour.com",
-      "status": "정상",
+      "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-09 18:44:19",
+      "checked_at": "2026-11-09 19:09:56",
       "total_delta": 763,
       "yesterday_visitors": 408,
       "day_before_yesterday_visitors": 193,
@@ -64,11 +64,11 @@
     {
       "domain": "koreainvest365.com",
       "date": "2026-11-09",
-      "weekday": "월",
-      "daily_visitors": 1291,
-      "visitor_delta": 687,
-      "total_visitors": 16984,
-      "today_live": 1291,
+      "weekday": "\uc6d4",
+      "daily_visitors": 1293,
+      "visitor_delta": 689,
+      "total_visitors": 16986,
+      "today_live": 1293,
       "gsc_clicks": 0,
       "clicks": 0,
       "impressions": 0,
@@ -83,10 +83,10 @@
       "recent_index_increase": 0,
       "total_posts": 136,
       "gsc_property": "sc-domain:koreainvest365.com",
-      "status": "정상",
+      "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-09 18:44:19",
-      "total_delta": 1291,
+      "checked_at": "2026-11-09 19:09:56",
+      "total_delta": 1293,
       "yesterday_visitors": 604,
       "day_before_yesterday_visitors": 177,
       "yesterday_delta": 427
@@ -113,23 +113,23 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "https://ki-korea.com/",
-      "status": "visitor API 예외: HTTPSConnectionPool(host='ki-korea.com', port=443): Max retries exceeded with url: /wp-json/site-stats/v1/visitors (Caused by SSLError(SSLCertVerificationError( | posts API 예외: HTTPSConnectionPool(host='ki-korea.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=1&_fields=id (Caused by SSLError(SSLCertVerific | GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://ki-korea.com/ | 사이트맵 목록 HTTP 403",
+      "status": "visitor API \uc608\uc678: HTTPSConnectionPool(host='ki-korea.com', port=443): Max retries exceeded with url: /wp-json/site-stats/v1/visitors (Caused by SSLError(SSLCertVerificationError( | posts API \uc608\uc678: HTTPSConnectionPool(host='ki-korea.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=1&_fields=id (Caused by SSLError(SSLCertVerific | GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://ki-korea.com/ | \uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403",
       "errors": [
-        "visitor API 예외: HTTPSConnectionPool(host='ki-korea.com', port=443): Max retries exceeded with url: /wp-json/site-stats/v1/visitors (Caused by SSLError(SSLCertVerificationError(",
-        "posts API 예외: HTTPSConnectionPool(host='ki-korea.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=1&_fields=id (Caused by SSLError(SSLCertVerific",
+        "visitor API \uc608\uc678: HTTPSConnectionPool(host='ki-korea.com', port=443): Max retries exceeded with url: /wp-json/site-stats/v1/visitors (Caused by SSLError(SSLCertVerificationError(",
+        "posts API \uc608\uc678: HTTPSConnectionPool(host='ki-korea.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=1&_fields=id (Caused by SSLError(SSLCertVerific",
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://ki-korea.com/",
-        "사이트맵 목록 HTTP 403"
+        "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     },
     {
       "domain": "koreainsurance365.com",
       "date": "2026-11-09",
-      "weekday": "월",
-      "daily_visitors": 520,
-      "visitor_delta": -51,
-      "total_visitors": 12066,
-      "today_live": 520,
+      "weekday": "\uc6d4",
+      "daily_visitors": 522,
+      "visitor_delta": -49,
+      "total_visitors": 12068,
+      "today_live": 522,
       "gsc_clicks": 0,
       "clicks": 0,
       "impressions": 4,
@@ -144,10 +144,10 @@
       "recent_index_increase": 0,
       "total_posts": 102,
       "gsc_property": "sc-domain:koreainsurance365.com",
-      "status": "정상",
+      "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-09 18:44:19",
-      "total_delta": 520,
+      "checked_at": "2026-11-09 19:09:56",
+      "total_delta": 522,
       "yesterday_visitors": 571,
       "day_before_yesterday_visitors": 458,
       "yesterday_delta": 113
@@ -155,11 +155,11 @@
     {
       "domain": "kfinance365.com",
       "date": "2026-11-09",
-      "weekday": "월",
-      "daily_visitors": 1246,
-      "visitor_delta": 683,
-      "total_visitors": 17493,
-      "today_live": 1246,
+      "weekday": "\uc6d4",
+      "daily_visitors": 1248,
+      "visitor_delta": 685,
+      "total_visitors": 17495,
+      "today_live": 1248,
       "gsc_clicks": 0,
       "clicks": 0,
       "impressions": 0,
@@ -174,10 +174,10 @@
       "recent_index_increase": 0,
       "total_posts": 105,
       "gsc_property": "sc-domain:kfinance365.com",
-      "status": "정상",
+      "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-09 18:44:19",
-      "total_delta": 1246,
+      "checked_at": "2026-11-09 19:09:56",
+      "total_delta": 1248,
       "yesterday_visitors": 563,
       "day_before_yesterday_visitors": 271,
       "yesterday_delta": 292
@@ -185,11 +185,11 @@
     {
       "domain": "koreataxnlaw.com",
       "date": "2026-11-09",
-      "weekday": "월",
-      "daily_visitors": 800,
-      "visitor_delta": 259,
-      "total_visitors": 8262,
-      "today_live": 800,
+      "weekday": "\uc6d4",
+      "daily_visitors": 801,
+      "visitor_delta": 260,
+      "total_visitors": 8263,
+      "today_live": 801,
       "gsc_clicks": 0,
       "clicks": 0,
       "impressions": 0,
@@ -204,10 +204,10 @@
       "recent_index_increase": 0,
       "total_posts": 70,
       "gsc_property": "sc-domain:koreataxnlaw.com",
-      "status": "정상",
+      "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-09 18:44:19",
-      "total_delta": 800,
+      "checked_at": "2026-11-09 19:09:56",
+      "total_delta": 801,
       "yesterday_visitors": 541,
       "day_before_yesterday_visitors": 152,
       "yesterday_delta": 389
@@ -215,7 +215,7 @@
     {
       "domain": "koreacrypto365.com",
       "date": "2026-11-09",
-      "weekday": "월",
+      "weekday": "\uc6d4",
       "daily_visitors": 1147,
       "visitor_delta": 730,
       "total_visitors": 10882,
@@ -234,9 +234,9 @@
       "recent_index_increase": 0,
       "total_posts": 94,
       "gsc_property": "sc-domain:koreacrypto365.com",
-      "status": "정상",
+      "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-09 18:44:19",
+      "checked_at": "2026-11-09 19:09:56",
       "total_delta": 1147,
       "yesterday_visitors": 417,
       "day_before_yesterday_visitors": 351,
@@ -245,7 +245,7 @@
     {
       "domain": "krealestate365.com",
       "date": "2026-11-09",
-      "weekday": "월",
+      "weekday": "\uc6d4",
       "daily_visitors": 973,
       "visitor_delta": 602,
       "total_visitors": 8686,
@@ -264,9 +264,9 @@
       "recent_index_increase": 0,
       "total_posts": 67,
       "gsc_property": "sc-domain:krealestate365.com",
-      "status": "정상",
+      "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-09 18:44:19",
+      "checked_at": "2026-11-09 19:09:56",
       "total_delta": 973,
       "yesterday_visitors": 371,
       "day_before_yesterday_visitors": 233,
@@ -275,11 +275,11 @@
     {
       "domain": "ktech365.com",
       "date": "2026-11-09",
-      "weekday": "월",
-      "daily_visitors": 1096,
-      "visitor_delta": 514,
-      "total_visitors": 15973,
-      "today_live": 1096,
+      "weekday": "\uc6d4",
+      "daily_visitors": 1109,
+      "visitor_delta": 527,
+      "total_visitors": 15986,
+      "today_live": 1109,
       "gsc_clicks": 0,
       "clicks": 0,
       "impressions": 2,
@@ -294,10 +294,10 @@
       "recent_index_increase": 0,
       "total_posts": 86,
       "gsc_property": "sc-domain:ktech365.com",
-      "status": "정상",
+      "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-09 18:44:19",
-      "total_delta": 1096,
+      "checked_at": "2026-11-09 19:09:56",
+      "total_delta": 1109,
       "yesterday_visitors": 582,
       "day_before_yesterday_visitors": 532,
       "yesterday_delta": 50
@@ -305,11 +305,11 @@
     {
       "domain": "kskin365.com",
       "date": "2026-11-09",
-      "weekday": "월",
-      "daily_visitors": 901,
-      "visitor_delta": 277,
-      "total_visitors": 13684,
-      "today_live": 901,
+      "weekday": "\uc6d4",
+      "daily_visitors": 902,
+      "visitor_delta": 278,
+      "total_visitors": 13685,
+      "today_live": 902,
       "gsc_clicks": 0,
       "clicks": 0,
       "impressions": 0,
@@ -324,10 +324,10 @@
       "recent_index_increase": 0,
       "total_posts": 116,
       "gsc_property": "sc-domain:kskin365.com",
-      "status": "정상",
+      "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-09 18:44:19",
-      "total_delta": 901,
+      "checked_at": "2026-11-09 19:09:56",
+      "total_delta": 902,
       "yesterday_visitors": 624,
       "day_before_yesterday_visitors": 282,
       "yesterday_delta": 342
@@ -335,11 +335,11 @@
     {
       "domain": "oliveyoungkorea.com",
       "date": "2026-11-09",
-      "weekday": "월",
-      "daily_visitors": 873,
-      "visitor_delta": 438,
-      "total_visitors": 15057,
-      "today_live": 873,
+      "weekday": "\uc6d4",
+      "daily_visitors": 919,
+      "visitor_delta": 484,
+      "total_visitors": 15103,
+      "today_live": 919,
       "gsc_clicks": 0,
       "clicks": 0,
       "impressions": 14,
@@ -352,12 +352,12 @@
       "unindexed": 95,
       "index_rate": 0.0,
       "recent_index_increase": 0,
-      "total_posts": 74,
+      "total_posts": 75,
       "gsc_property": "sc-domain:oliveyoungkorea.com",
-      "status": "정상",
+      "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-09 18:44:19",
-      "total_delta": 873,
+      "checked_at": "2026-11-09 19:09:56",
+      "total_delta": 919,
       "yesterday_visitors": 435,
       "day_before_yesterday_visitors": 208,
       "yesterday_delta": 227
@@ -365,11 +365,11 @@
     {
       "domain": "kworld365.com",
       "date": "2026-11-09",
-      "weekday": "월",
-      "daily_visitors": 1918,
-      "visitor_delta": 1212,
-      "total_visitors": 16105,
-      "today_live": 1918,
+      "weekday": "\uc6d4",
+      "daily_visitors": 1920,
+      "visitor_delta": 1214,
+      "total_visitors": 16107,
+      "today_live": 1920,
       "gsc_clicks": 0,
       "clicks": 0,
       "impressions": 3,
@@ -384,10 +384,10 @@
       "recent_index_increase": 0,
       "total_posts": 67,
       "gsc_property": "sc-domain:kworld365.com",
-      "status": "정상",
+      "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-09 18:44:19",
-      "total_delta": 1918,
+      "checked_at": "2026-11-09 19:09:56",
+      "total_delta": 1920,
       "yesterday_visitors": 706,
       "day_before_yesterday_visitors": 209,
       "yesterday_delta": 497
@@ -395,11 +395,11 @@
     {
       "domain": "k-trip365.com",
       "date": "2026-11-09",
-      "weekday": "월",
-      "daily_visitors": 191,
-      "visitor_delta": 51,
-      "total_visitors": 12611,
-      "today_live": 191,
+      "weekday": "\uc6d4",
+      "daily_visitors": 193,
+      "visitor_delta": 53,
+      "total_visitors": 12613,
+      "today_live": 193,
       "gsc_clicks": 0,
       "clicks": 0,
       "impressions": 1,
@@ -414,10 +414,10 @@
       "recent_index_increase": 0,
       "total_posts": 78,
       "gsc_property": "sc-domain:k-trip365.com",
-      "status": "정상",
+      "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-09 18:44:19",
-      "total_delta": 191,
+      "checked_at": "2026-11-09 19:09:56",
+      "total_delta": 193,
       "yesterday_visitors": 140,
       "day_before_yesterday_visitors": 231,
       "yesterday_delta": -91
@@ -425,7 +425,7 @@
     {
       "domain": "k-visa365.com",
       "date": "2026-11-09",
-      "weekday": "월",
+      "weekday": "\uc6d4",
       "daily_visitors": 1039,
       "visitor_delta": 1015,
       "total_visitors": 7482,
@@ -444,9 +444,9 @@
       "recent_index_increase": 0,
       "total_posts": 50,
       "gsc_property": "sc-domain:k-visa365.com",
-      "status": "정상",
+      "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-09 18:44:19",
+      "checked_at": "2026-11-09 19:09:56",
       "total_delta": 1039,
       "yesterday_visitors": 24,
       "day_before_yesterday_visitors": 4,
@@ -455,11 +455,11 @@
     {
       "domain": "koreawedding365.com",
       "date": "2026-11-09",
-      "weekday": "월",
-      "daily_visitors": 1049,
-      "visitor_delta": 238,
-      "total_visitors": 19213,
-      "today_live": 1049,
+      "weekday": "\uc6d4",
+      "daily_visitors": 1050,
+      "visitor_delta": 239,
+      "total_visitors": 19214,
+      "today_live": 1050,
       "gsc_clicks": 0,
       "clicks": 0,
       "impressions": 11,
@@ -474,10 +474,10 @@
       "recent_index_increase": 0,
       "total_posts": 138,
       "gsc_property": "sc-domain:koreawedding365.com",
-      "status": "정상",
+      "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-09 18:44:19",
-      "total_delta": 1049,
+      "checked_at": "2026-11-09 19:09:56",
+      "total_delta": 1050,
       "yesterday_visitors": 811,
       "day_before_yesterday_visitors": 455,
       "yesterday_delta": 356
@@ -485,7 +485,7 @@
     {
       "domain": "kstudy365.com",
       "date": "2026-11-09",
-      "weekday": "월",
+      "weekday": "\uc6d4",
       "daily_visitors": 984,
       "visitor_delta": 454,
       "total_visitors": 12314,
@@ -504,9 +504,9 @@
       "recent_index_increase": 0,
       "total_posts": 77,
       "gsc_property": "sc-domain:kstudy365.com",
-      "status": "정상",
+      "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-09 18:44:19",
+      "checked_at": "2026-11-09 19:09:56",
       "total_delta": 984,
       "yesterday_visitors": 530,
       "day_before_yesterday_visitors": 234,
@@ -515,11 +515,11 @@
     {
       "domain": "studyinkorea365.com",
       "date": "2026-11-09",
-      "weekday": "월",
-      "daily_visitors": 141,
-      "visitor_delta": -48,
-      "total_visitors": 10955,
-      "today_live": 141,
+      "weekday": "\uc6d4",
+      "daily_visitors": 142,
+      "visitor_delta": -47,
+      "total_visitors": 10956,
+      "today_live": 142,
       "gsc_clicks": 0,
       "clicks": 0,
       "impressions": 0,
@@ -534,10 +534,10 @@
       "recent_index_increase": 0,
       "total_posts": 127,
       "gsc_property": "sc-domain:studyinkorea365.com",
-      "status": "정상",
+      "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-09 18:44:19",
-      "total_delta": 141,
+      "checked_at": "2026-11-09 19:09:56",
+      "total_delta": 142,
       "yesterday_visitors": 189,
       "day_before_yesterday_visitors": 275,
       "yesterday_delta": -86
@@ -545,7 +545,7 @@
     {
       "domain": "kieca-korea.org",
       "date": "2026-11-09",
-      "weekday": "월",
+      "weekday": "\uc6d4",
       "daily_visitors": 1013,
       "visitor_delta": 599,
       "total_visitors": 8683,
@@ -564,9 +564,9 @@
       "recent_index_increase": 0,
       "total_posts": 86,
       "gsc_property": "sc-domain:kieca-korea.org",
-      "status": "정상",
+      "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-09 18:44:19",
+      "checked_at": "2026-11-09 19:09:56",
       "total_delta": 1013,
       "yesterday_visitors": 414,
       "day_before_yesterday_visitors": 198,
@@ -594,14 +594,14 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "https://ksa-korea.org/",
-      "status": "visitor API 예외: HTTPSConnectionPool(host='ksa-korea.org', port=443): Max retries exceeded with url: /wp-json/site-stats/v1/visitors (Caused by NameResolutionError(\"HTTPSConnect | posts API 예외: HTTPSConnectionPool(host='ksa-korea.org', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=1&_fields=id (Caused by NameResolutionError(\"H | GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://ksa-korea.org | 사이트맵 목록 HTTP 403",
+      "status": "visitor API \uc608\uc678: HTTPSConnectionPool(host='ksa-korea.org', port=443): Max retries exceeded with url: /wp-json/site-stats/v1/visitors (Caused by NameResolutionError(\"HTTPSConnect | posts API \uc608\uc678: HTTPSConnectionPool(host='ksa-korea.org', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=1&_fields=id (Caused by NameResolutionError(\"H | GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://ksa-korea.org | \uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403",
       "errors": [
-        "visitor API 예외: HTTPSConnectionPool(host='ksa-korea.org', port=443): Max retries exceeded with url: /wp-json/site-stats/v1/visitors (Caused by NameResolutionError(\"HTTPSConnect",
-        "posts API 예외: HTTPSConnectionPool(host='ksa-korea.org', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=1&_fields=id (Caused by NameResolutionError(\"H",
+        "visitor API \uc608\uc678: HTTPSConnectionPool(host='ksa-korea.org', port=443): Max retries exceeded with url: /wp-json/site-stats/v1/visitors (Caused by NameResolutionError(\"HTTPSConnect",
+        "posts API \uc608\uc678: HTTPSConnectionPool(host='ksa-korea.org', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=1&_fields=id (Caused by NameResolutionError(\"H",
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://ksa-korea.org",
-        "사이트맵 목록 HTTP 403"
+        "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     },
     {
       "domain": "sis-korea.com",
@@ -625,23 +625,23 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "https://sis-korea.com/",
-      "status": "visitor API 예외: HTTPSConnectionPool(host='sis-korea.com', port=443): Max retries exceeded with url: /wp-json/site-stats/v1/visitors (Caused by SSLError(SSLCertVerificationError | posts API 예외: HTTPSConnectionPool(host='sis-korea.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=1&_fields=id (Caused by SSLError(SSLCertVerifi | GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://sis-korea.com | 사이트맵 목록 HTTP 403",
+      "status": "visitor API \uc608\uc678: HTTPSConnectionPool(host='sis-korea.com', port=443): Max retries exceeded with url: /wp-json/site-stats/v1/visitors (Caused by SSLError(SSLCertVerificationError | posts API \uc608\uc678: HTTPSConnectionPool(host='sis-korea.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=1&_fields=id (Caused by SSLError(SSLCertVerifi | GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://sis-korea.com | \uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403",
       "errors": [
-        "visitor API 예외: HTTPSConnectionPool(host='sis-korea.com', port=443): Max retries exceeded with url: /wp-json/site-stats/v1/visitors (Caused by SSLError(SSLCertVerificationError",
-        "posts API 예외: HTTPSConnectionPool(host='sis-korea.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=1&_fields=id (Caused by SSLError(SSLCertVerifi",
+        "visitor API \uc608\uc678: HTTPSConnectionPool(host='sis-korea.com', port=443): Max retries exceeded with url: /wp-json/site-stats/v1/visitors (Caused by SSLError(SSLCertVerificationError",
+        "posts API \uc608\uc678: HTTPSConnectionPool(host='sis-korea.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=1&_fields=id (Caused by SSLError(SSLCertVerifi",
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://sis-korea.com",
-        "사이트맵 목록 HTTP 403"
+        "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     },
     {
       "domain": "jobkorea365.com",
       "date": "2026-11-09",
-      "weekday": "월",
-      "daily_visitors": 661,
-      "visitor_delta": 258,
-      "total_visitors": 16167,
-      "today_live": 661,
+      "weekday": "\uc6d4",
+      "daily_visitors": 668,
+      "visitor_delta": 265,
+      "total_visitors": 16174,
+      "today_live": 668,
       "gsc_clicks": 0,
       "clicks": 0,
       "impressions": 3,
@@ -656,10 +656,10 @@
       "recent_index_increase": 0,
       "total_posts": 85,
       "gsc_property": "sc-domain:jobkorea365.com",
-      "status": "정상",
+      "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-09 18:44:19",
-      "total_delta": 661,
+      "checked_at": "2026-11-09 19:09:56",
+      "total_delta": 668,
       "yesterday_visitors": 403,
       "day_before_yesterday_visitors": 193,
       "yesterday_delta": 210
@@ -667,11 +667,11 @@
     {
       "domain": "jobinkorea365.com",
       "date": "2026-11-09",
-      "weekday": "월",
-      "daily_visitors": 62,
-      "visitor_delta": -17,
-      "total_visitors": 9728,
-      "today_live": 62,
+      "weekday": "\uc6d4",
+      "daily_visitors": 63,
+      "visitor_delta": -16,
+      "total_visitors": 9729,
+      "today_live": 63,
       "gsc_clicks": 0,
       "clicks": 0,
       "impressions": 1,
@@ -686,10 +686,10 @@
       "recent_index_increase": 0,
       "total_posts": 47,
       "gsc_property": "sc-domain:jobinkorea365.com",
-      "status": "정상",
+      "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-09 18:44:19",
-      "total_delta": 62,
+      "checked_at": "2026-11-09 19:09:56",
+      "total_delta": 63,
       "yesterday_visitors": 79,
       "day_before_yesterday_visitors": 66,
       "yesterday_delta": 13
@@ -697,11 +697,11 @@
     {
       "domain": "jobkoreaglobal.com",
       "date": "2026-11-09",
-      "weekday": "월",
-      "daily_visitors": 1255,
-      "visitor_delta": 746,
-      "total_visitors": 17301,
-      "today_live": 1255,
+      "weekday": "\uc6d4",
+      "daily_visitors": 1258,
+      "visitor_delta": 749,
+      "total_visitors": 17304,
+      "today_live": 1258,
       "gsc_clicks": 1,
       "clicks": 1,
       "impressions": 9,
@@ -716,10 +716,10 @@
       "recent_index_increase": 0,
       "total_posts": 103,
       "gsc_property": "sc-domain:jobkoreaglobal.com",
-      "status": "정상",
+      "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-09 18:44:19",
-      "total_delta": 1255,
+      "checked_at": "2026-11-09 19:09:56",
+      "total_delta": 1258,
       "yesterday_visitors": 509,
       "day_before_yesterday_visitors": 276,
       "yesterday_delta": 233
@@ -727,11 +727,11 @@
     {
       "domain": "korea365.org",
       "date": "2026-11-09",
-      "weekday": "월",
-      "daily_visitors": 387,
-      "visitor_delta": -233,
-      "total_visitors": 31845,
-      "today_live": 387,
+      "weekday": "\uc6d4",
+      "daily_visitors": 405,
+      "visitor_delta": -215,
+      "total_visitors": 31863,
+      "today_live": 405,
       "gsc_clicks": 0,
       "clicks": 0,
       "impressions": 23,
@@ -746,10 +746,10 @@
       "recent_index_increase": 0,
       "total_posts": 174,
       "gsc_property": "sc-domain:korea365.org",
-      "status": "정상",
+      "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-09 18:44:19",
-      "total_delta": 387,
+      "checked_at": "2026-11-09 19:09:56",
+      "total_delta": 405,
       "yesterday_visitors": 620,
       "day_before_yesterday_visitors": 435,
       "yesterday_delta": 185
@@ -757,7 +757,7 @@
     {
       "domain": "koreanews365.com",
       "date": "2026-11-09",
-      "weekday": "월",
+      "weekday": "\uc6d4",
       "daily_visitors": 231,
       "visitor_delta": 133,
       "total_visitors": 6587,
@@ -776,9 +776,9 @@
       "recent_index_increase": 0,
       "total_posts": 132,
       "gsc_property": "sc-domain:koreanews365.com",
-      "status": "정상",
+      "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-09 18:44:19",
+      "checked_at": "2026-11-09 19:09:56",
       "total_delta": 231,
       "yesterday_visitors": 98,
       "day_before_yesterday_visitors": 152,
@@ -806,14 +806,14 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "sc-domain:theseouljournal.com",
-      "status": "visitor API 예외: HTTPSConnectionPool(host='theseouljournal.com', port=443): Max retries exceeded with url: /wp-json/site-stats/v1/visitors (Caused by NameResolutionError(\"HTTPSC | posts API 예외: HTTPSConnectionPool(host='theseouljournal.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=1&_fields=id (Caused by NameResolutionEr | GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'sc-domain:theseouljou | 사이트맵 목록 HTTP 403",
+      "status": "visitor API \uc608\uc678: HTTPSConnectionPool(host='theseouljournal.com', port=443): Max retries exceeded with url: /wp-json/site-stats/v1/visitors (Caused by NameResolutionError(\"HTTPSC | posts API \uc608\uc678: HTTPSConnectionPool(host='theseouljournal.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=1&_fields=id (Caused by NameResolutionEr | GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'sc-domain:theseouljou | \uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403",
       "errors": [
-        "visitor API 예외: HTTPSConnectionPool(host='theseouljournal.com', port=443): Max retries exceeded with url: /wp-json/site-stats/v1/visitors (Caused by NameResolutionError(\"HTTPSC",
-        "posts API 예외: HTTPSConnectionPool(host='theseouljournal.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=1&_fields=id (Caused by NameResolutionEr",
+        "visitor API \uc608\uc678: HTTPSConnectionPool(host='theseouljournal.com', port=443): Max retries exceeded with url: /wp-json/site-stats/v1/visitors (Caused by NameResolutionError(\"HTTPSC",
+        "posts API \uc608\uc678: HTTPSConnectionPool(host='theseouljournal.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=1&_fields=id (Caused by NameResolutionEr",
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'sc-domain:theseouljou",
-        "사이트맵 목록 HTTP 403"
+        "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     },
     {
       "domain": "k-insight-vietnam.tistory.com",
@@ -837,11 +837,11 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "",
-      "status": "GSC 속성 연결 필요",
+      "status": "GSC \uc18d\uc131 \uc5f0\uacb0 \ud544\uc694",
       "errors": [
-        "GSC 속성 연결 필요"
+        "GSC \uc18d\uc131 \uc5f0\uacb0 \ud544\uc694"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     },
     {
       "domain": "k-vietnam.tistory.com",
@@ -865,11 +865,11 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "",
-      "status": "GSC 속성 연결 필요",
+      "status": "GSC \uc18d\uc131 \uc5f0\uacb0 \ud544\uc694",
       "errors": [
-        "GSC 속성 연결 필요"
+        "GSC \uc18d\uc131 \uc5f0\uacb0 \ud544\uc694"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     },
     {
       "domain": "k-healthcare.tistory.com",
@@ -893,11 +893,11 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "",
-      "status": "GSC 속성 연결 필요",
+      "status": "GSC \uc18d\uc131 \uc5f0\uacb0 \ud544\uc694",
       "errors": [
-        "GSC 속성 연결 필요"
+        "GSC \uc18d\uc131 \uc5f0\uacb0 \ud544\uc694"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     },
     {
       "domain": "huh0303.tistory.com",
@@ -921,11 +921,11 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "",
-      "status": "GSC 속성 연결 필요",
+      "status": "GSC \uc18d\uc131 \uc5f0\uacb0 \ud544\uc694",
       "errors": [
-        "GSC 속성 연결 필요"
+        "GSC \uc18d\uc131 \uc5f0\uacb0 \ud544\uc694"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     },
     {
       "domain": "k-trip365.tistory.com",
@@ -949,11 +949,11 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "",
-      "status": "GSC 속성 연결 필요",
+      "status": "GSC \uc18d\uc131 \uc5f0\uacb0 \ud544\uc694",
       "errors": [
-        "GSC 속성 연결 필요"
+        "GSC \uc18d\uc131 \uc5f0\uacb0 \ud544\uc694"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     },
     {
       "domain": "k-trip365.blogspot.com",
@@ -977,12 +977,12 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "https://k-trip365.blogspot.com/",
-      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://k-trip365.blo | 사이트맵 목록 HTTP 403",
+      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://k-trip365.blo | \uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403",
       "errors": [
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://k-trip365.blo",
-        "사이트맵 목록 HTTP 403"
+        "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     },
     {
       "domain": "kworld365seoul.blogspot.com",
@@ -1006,12 +1006,12 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "https://kworld365seoul.blogspot.com/",
-      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://kworld365seou | 사이트맵 목록 HTTP 403",
+      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://kworld365seou | \uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403",
       "errors": [
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://kworld365seou",
-        "사이트맵 목록 HTTP 403"
+        "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     },
     {
       "domain": "jobkorea365.blogspot.com",
@@ -1035,12 +1035,12 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "https://jobkorea365.blogspot.com/",
-      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://jobkorea365.b | 사이트맵 목록 HTTP 403",
+      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://jobkorea365.b | \uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403",
       "errors": [
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://jobkorea365.b",
-        "사이트맵 목록 HTTP 403"
+        "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     },
     {
       "domain": "kstudy365.blogspot.com",
@@ -1064,12 +1064,12 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "https://kstudy365.blogspot.com/",
-      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://kstudy365.blo | 사이트맵 목록 HTTP 403",
+      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://kstudy365.blo | \uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403",
       "errors": [
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://kstudy365.blo",
-        "사이트맵 목록 HTTP 403"
+        "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     },
     {
       "domain": "koreainsurance365.blogspot.com",
@@ -1093,12 +1093,12 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "https://koreainsurance365.blogspot.com/",
-      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://koreainsuranc | 사이트맵 목록 HTTP 403",
+      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://koreainsuranc | \uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403",
       "errors": [
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://koreainsuranc",
-        "사이트맵 목록 HTTP 403"
+        "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     },
     {
       "domain": "kfinance365.blogspot.com",
@@ -1122,12 +1122,12 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "https://kfinance365.blogspot.com/",
-      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://kfinance365.b | 사이트맵 목록 HTTP 403",
+      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://kfinance365.b | \uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403",
       "errors": [
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://kfinance365.b",
-        "사이트맵 목록 HTTP 403"
+        "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     },
     {
       "domain": "koreamedicaltour365.blogspot.com",
@@ -1151,12 +1151,12 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "https://koreamedicaltour365.blogspot.com/",
-      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://koreamedicalt | 사이트맵 목록 HTTP 403",
+      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://koreamedicalt | \uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403",
       "errors": [
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://koreamedicalt",
-        "사이트맵 목록 HTTP 403"
+        "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     },
     {
       "domain": "k-visa365.blogspot.com",
@@ -1180,12 +1180,12 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "https://k-visa365.blogspot.com/",
-      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://k-visa365.blo | 사이트맵 목록 HTTP 403",
+      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://k-visa365.blo | \uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403",
       "errors": [
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://k-visa365.blo",
-        "사이트맵 목록 HTTP 403"
+        "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     },
     {
       "domain": "koreanews365daily.blogspot.com",
@@ -1209,12 +1209,12 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "https://koreanews365daily.blogspot.com/",
-      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://koreanews365d | 사이트맵 목록 HTTP 403",
+      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://koreanews365d | \uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403",
       "errors": [
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://koreanews365d",
-        "사이트맵 목록 HTTP 403"
+        "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     },
     {
       "domain": "koreainvest365.blogspot.com",
@@ -1238,12 +1238,12 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "https://koreainvest365.blogspot.com/",
-      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://koreainvest36 | 사이트맵 목록 HTTP 403",
+      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://koreainvest36 | \uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403",
       "errors": [
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://koreainvest36",
-        "사이트맵 목록 HTTP 403"
+        "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     },
     {
       "domain": "oliveyoungkorea.blogspot.com",
@@ -1267,12 +1267,12 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "https://oliveyoungkorea.blogspot.com/",
-      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://oliveyoungkor | 사이트맵 목록 HTTP 403",
+      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://oliveyoungkor | \uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403",
       "errors": [
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://oliveyoungkor",
-        "사이트맵 목록 HTTP 403"
+        "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     },
     {
       "domain": "koreacrypto365.blogspot.com",
@@ -1296,12 +1296,12 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "https://koreacrypto365.blogspot.com/",
-      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://koreacrypto36 | 사이트맵 목록 HTTP 403",
+      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://koreacrypto36 | \uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403",
       "errors": [
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://koreacrypto36",
-        "사이트맵 목록 HTTP 403"
+        "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     },
     {
       "domain": "jobinkorea365.blogspot.com",
@@ -1325,12 +1325,12 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "https://jobinkorea365.blogspot.com/",
-      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://jobinkorea365 | 사이트맵 목록 HTTP 403",
+      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://jobinkorea365 | \uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403",
       "errors": [
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://jobinkorea365",
-        "사이트맵 목록 HTTP 403"
+        "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     },
     {
       "domain": "koreawedding365.blogspot.com",
@@ -1354,12 +1354,12 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "https://koreawedding365.blogspot.com/",
-      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://koreawedding3 | 사이트맵 목록 HTTP 403",
+      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://koreawedding3 | \uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403",
       "errors": [
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://koreawedding3",
-        "사이트맵 목록 HTTP 403"
+        "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     },
     {
       "domain": "theseouljournal.blogspot.com",
@@ -1383,12 +1383,12 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "https://theseouljournal.blogspot.com/",
-      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://theseouljourn | 사이트맵 목록 HTTP 403",
+      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://theseouljourn | \uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403",
       "errors": [
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://theseouljourn",
-        "사이트맵 목록 HTTP 403"
+        "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     },
     {
       "domain": "ktech365.blogspot.com",
@@ -1412,12 +1412,12 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "https://ktech365.blogspot.com/",
-      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://ktech365.blog | 사이트맵 목록 HTTP 403",
+      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://ktech365.blog | \uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403",
       "errors": [
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://ktech365.blog",
-        "사이트맵 목록 HTTP 403"
+        "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     },
     {
       "domain": "kieca-korea.blogspot.com",
@@ -1441,12 +1441,12 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "https://kieca-korea.blogspot.com/",
-      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://kieca-korea.b | 사이트맵 목록 HTTP 403",
+      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://kieca-korea.b | \uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403",
       "errors": [
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://kieca-korea.b",
-        "사이트맵 목록 HTTP 403"
+        "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     },
     {
       "domain": "ki-korea.blogspot.com",
@@ -1470,12 +1470,12 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "https://ki-korea.blogspot.com/",
-      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://ki-korea.blog | 사이트맵 목록 HTTP 403",
+      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://ki-korea.blog | \uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403",
       "errors": [
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://ki-korea.blog",
-        "사이트맵 목록 HTTP 403"
+        "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     },
     {
       "domain": "ksa-korea.blogspot.com",
@@ -1499,12 +1499,12 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "https://ksa-korea.blogspot.com/",
-      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://ksa-korea.blo | 사이트맵 목록 HTTP 403",
+      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://ksa-korea.blo | \uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403",
       "errors": [
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://ksa-korea.blo",
-        "사이트맵 목록 HTTP 403"
+        "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     },
     {
       "domain": "koreataxnlaw.blogspot.com",
@@ -1528,12 +1528,12 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "https://koreataxnlaw.blogspot.com/",
-      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://koreataxnlaw. | 사이트맵 목록 HTTP 403",
+      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://koreataxnlaw. | \uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403",
       "errors": [
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://koreataxnlaw.",
-        "사이트맵 목록 HTTP 403"
+        "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     },
     {
       "domain": "jobkoreaglobal.blogspot.com",
@@ -1557,12 +1557,12 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "https://jobkoreaglobal.blogspot.com/",
-      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://jobkoreagloba | 사이트맵 목록 HTTP 403",
+      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://jobkoreagloba | \uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403",
       "errors": [
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://jobkoreagloba",
-        "사이트맵 목록 HTTP 403"
+        "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     },
     {
       "domain": "studyinkorea365.blogspot.com",
@@ -1586,12 +1586,12 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "https://studyinkorea365.blogspot.com/",
-      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://studyinkorea3 | 사이트맵 목록 HTTP 403",
+      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://studyinkorea3 | \uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403",
       "errors": [
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://studyinkorea3",
-        "사이트맵 목록 HTTP 403"
+        "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     },
     {
       "domain": "korea365guide.blogspot.com",
@@ -1615,12 +1615,12 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "https://korea365guide.blogspot.com/",
-      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://korea365guide | 사이트맵 목록 HTTP 403",
+      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://korea365guide | \uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403",
       "errors": [
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://korea365guide",
-        "사이트맵 목록 HTTP 403"
+        "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     },
     {
       "domain": "sis-korea.blogspot.com",
@@ -1644,12 +1644,12 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "https://sis-korea.blogspot.com/",
-      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://sis-korea.blo | 사이트맵 목록 HTTP 403",
+      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://sis-korea.blo | \uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403",
       "errors": [
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://sis-korea.blo",
-        "사이트맵 목록 HTTP 403"
+        "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     },
     {
       "domain": "krealestate365.blogspot.com",
@@ -1673,12 +1673,12 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "https://krealestate365.blogspot.com/",
-      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://krealestate36 | 사이트맵 목록 HTTP 403",
+      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://krealestate36 | \uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403",
       "errors": [
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://krealestate36",
-        "사이트맵 목록 HTTP 403"
+        "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     },
     {
       "domain": "k-health365.blogspot.com",
@@ -1702,12 +1702,12 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "https://k-health365.blogspot.com/",
-      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://k-health365.b | 사이트맵 목록 HTTP 403",
+      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://k-health365.b | \uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403",
       "errors": [
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://k-health365.b",
-        "사이트맵 목록 HTTP 403"
+        "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     },
     {
       "domain": "skin.k-health365.com",
@@ -1731,11 +1731,11 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "",
-      "status": "GSC 속성 연결 필요",
+      "status": "GSC \uc18d\uc131 \uc5f0\uacb0 \ud544\uc694",
       "errors": [
-        "GSC 속성 연결 필요"
+        "GSC \uc18d\uc131 \uc5f0\uacb0 \ud544\uc694"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     },
     {
       "domain": "glow.k-health365.com",
@@ -1759,11 +1759,11 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "",
-      "status": "GSC 속성 연결 필요",
+      "status": "GSC \uc18d\uc131 \uc5f0\uacb0 \ud544\uc694",
       "errors": [
-        "GSC 속성 연결 필요"
+        "GSC \uc18d\uc131 \uc5f0\uacb0 \ud544\uc694"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     },
     {
       "domain": "k-health365-edu.blogspot.com",
@@ -1787,12 +1787,12 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "https://k-health365-edu.blogspot.com/",
-      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://k-health365-e | 사이트맵 목록 HTTP 403",
+      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://k-health365-e | \uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403",
       "errors": [
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://k-health365-e",
-        "사이트맵 목록 HTTP 403"
+        "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     },
     {
       "domain": "korea-life-support365.blogspot.com",
@@ -1816,12 +1816,12 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "https://korea-life-support365.blogspot.com/",
-      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://korea-life-su | 사이트맵 목록 HTTP 403",
+      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://korea-life-su | \uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403",
       "errors": [
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://korea-life-su",
-        "사이트맵 목록 HTTP 403"
+        "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     },
     {
       "domain": "koreamedicaltour1.blogspot.com",
@@ -1845,12 +1845,12 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "https://koreamedicaltour1.blogspot.com/",
-      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://koreamedicalt | 사이트맵 목록 HTTP 403",
+      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://koreamedicalt | \uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403",
       "errors": [
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://koreamedicalt",
-        "사이트맵 목록 HTTP 403"
+        "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     },
     {
       "domain": "kworld365.blogspot.com",
@@ -1874,12 +1874,12 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "https://kworld365.blogspot.com/",
-      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://kworld365.blo | 사이트맵 목록 HTTP 403",
+      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://kworld365.blo | \uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403",
       "errors": [
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://kworld365.blo",
-        "사이트맵 목록 HTTP 403"
+        "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     },
     {
       "domain": "seoulintlschoolguide.blogspot.com",
@@ -1903,12 +1903,12 @@
       "recent_index_increase": null,
       "total_posts": null,
       "gsc_property": "https://seoulintlschoolguide.blogspot.com/",
-      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://seoulintlscho | 사이트맵 목록 HTTP 403",
+      "status": "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://seoulintlscho | \uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403",
       "errors": [
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://seoulintlscho",
-        "사이트맵 목록 HTTP 403"
+        "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-09 18:44:19"
+      "checked_at": "2026-11-09 19:09:56"
     }
   ],
   "partial": false
