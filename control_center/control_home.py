@@ -235,6 +235,8 @@ def build_sns_ranking(bucket: int) -> dict:
     audience = _read(audience_path, {}).get("accounts", {})
     probe = _sns_probe_stats()
     publications = _latest_social_publications()
+    overrides = {(str(x.get("platform") or ""), str(x.get("handle") or "")): int(x.get("posts_per_day") or 1)
+                 for x in policy.get("schedule", {}).get("account_overrides", []) if isinstance(x, dict)}
     rows = []
     for item in policy.get("accounts", []):
         platform = str(item.get("platform") or "")
@@ -275,6 +277,7 @@ def build_sns_ranking(bucket: int) -> dict:
             "account_exists": bool(item.get("account_exists")),
             "identity_verified": bool(item.get("identity_verified")),
             "publish_connected": bool(item.get("publish_connected")),
+            "cadence": f"일{overrides.get((platform, handle), 1)}회",
             "handle": handle,
             "url": item.get("url") or "",
             "followers": followers,

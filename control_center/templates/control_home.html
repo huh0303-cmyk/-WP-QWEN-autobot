@@ -83,8 +83,8 @@ tbody tr:hover{filter:brightness(.98)}
 <button class="platform-tab" type="button" data-platform="wordpress" aria-pressed="true">WordPress</button><button class="platform-tab" type="button" data-platform="blogspot" aria-pressed="false">Blogspot</button><button class="platform-tab" type="button" data-platform="tistory" aria-pressed="false">Tistory</button><button class="platform-tab" type="button" data-platform="naver" aria-pressed="false">Naver</button>
 </nav>
 <div class="sheet"><table class="k365-table blog"><thead><tr>
-<th>순위</th><th>사이트</th><th>어제 방문자(증감)</th><th>GSC 클릭(증감)</th><th>GSC 노출</th><th>CTR</th><th>평균 게재순위</th><th>발행경과</th><th>7일 추세</th><th>수집상태</th>
-</tr></thead><tbody id="blog-rows"><tr><td colspan="10" style="text-align:center">데이터 불러오는 중…</td></tr></tbody></table></div>
+<th>순위</th><th>사이트</th><th>어제 방문자(증감)</th><th>GSC 클릭(증감)</th><th>GSC 노출</th><th>CTR</th><th>평균 게재순위</th><th>발행주기</th><th>발행경과</th><th>7일 추세</th><th>수집상태</th>
+</tr></thead><tbody id="blog-rows"><tr><td colspan="11" style="text-align:center">데이터 불러오는 중…</td></tr></tbody></table></div>
 </section>
 <section class="section platform-section social-platform-section" data-active-platform="youtube">
 <div class="section-head"><div><h2 id="social-title">계정별 플랫폼 순위</h2><p id="social-basis">플랫폼별 계정을 각각 표시합니다. 구독자·팔로워가 확인된 운영 계정만 순위에 포함합니다.</p></div><div class="actions"><a class="more" href="https://sns.korea365.org/social-accounts">계정 관리 →</a></div></div>
@@ -92,8 +92,8 @@ tbody tr:hover{filter:brightness(.98)}
 <button class="platform-tab" type="button" data-platform="youtube" aria-pressed="true">YouTube</button><button class="platform-tab" type="button" data-platform="tiktok" aria-pressed="false">TikTok</button><button class="platform-tab" type="button" data-platform="instagram" aria-pressed="false">Instagram</button><button class="platform-tab" type="button" data-platform="threads" aria-pressed="false">Threads</button><button class="platform-tab" type="button" data-platform="facebook" aria-pressed="false">Facebook</button>
 </nav>
 <div class="sheet"><table class="k365-table social"><thead><tr>
-  <th>순위</th><th>채널/계정</th><th>운영 역할</th><th>구독자/팔로워</th><th>조회수</th><th>콘텐츠</th><th>누적 수익</th><th>발행경과</th><th>7일 추세</th><th>계정·연결 상태</th>
-</tr></thead><tbody id="social-rows"><tr><td colspan="10" style="text-align:center">계정 데이터를 불러오는 중…</td></tr></tbody></table></div>
+  <th>순위</th><th>채널/계정</th><th>운영 역할</th><th>구독자/팔로워</th><th>조회수</th><th>콘텐츠</th><th>누적 수익</th><th>발행주기</th><th>발행경과</th><th>7일 추세</th><th>계정·연결 상태</th>
+</tr></thead><tbody id="social-rows"><tr><td colspan="11" style="text-align:center">계정 데이터를 불러오는 중…</td></tr></tbody></table></div>
 </section>
 </div>
 <section class="section" style="margin-top:8px">
@@ -267,8 +267,8 @@ function renderBlogRanking(){
   const visitor=Number.isFinite(c.yesterday_visitors)?'<span class="good">'+metric(c.yesterday_visitors,c.yesterday_visitors_delta)+'</span>':'<span class="warn">미집계 · 순위 없음</span>';
   const identity=c.url?'<a href="'+esc(c.url)+'" target="_blank" rel="noopener">'+esc(shortSite(c))+' ↗</a>':esc(shortSite(c));
   const rowPlatform=String(c.platform||'').toLowerCase();
-  return '<tr class="platform-'+esc(rowPlatform)+'"><td>'+rank(rankValue)+'</td><td title="'+esc(c.name||c.url)+'">'+identity+'</td><td>'+visitor+'</td><td>'+clicks+'</td><td>'+impressions+'</td><td>'+ctr+'</td><td>'+position+'</td><td>'+publishElapsed(c)+'</td><td>'+trend7(c)+'</td><td title="'+esc(status)+'">'+esc(shortDate(c.checked_at||c.gsc_date)||'—')+' · '+esc(status)+'</td></tr>;
- }).join('')||'<tr><td colspan="10" style="text-align:center">이 플랫폼의 등록 데이터가 없습니다.</td></tr>';
+  return '<tr class="platform-'+esc(rowPlatform)+'"><td>'+rank(rankValue)+'</td><td title="'+esc(c.name||c.url)+'">'+identity+'</td><td>'+visitor+'</td><td>'+clicks+'</td><td>'+impressions+'</td><td>'+ctr+'</td><td>'+position+'</td><td>'+esc(c.cadence||'설정 확인 필요')+'</td><td>'+publishElapsed(c)+'</td><td>'+trend7(c)+'</td><td title="'+esc(status)+'">'+esc(shortDate(c.checked_at||c.gsc_date)||'—')+' · '+esc(status)+'</td></tr>;
+ }).join('')||'<tr><td colspan="11" style="text-align:center">이 플랫폼의 등록 데이터가 없습니다.</td></tr>';
 }
 async function loadSocial(){
  const r=await fetch('/api/control/social-ranking',{cache:'no-store'});if(!r.ok)throw new Error('social '+r.status);const d=await r.json();
@@ -308,8 +308,8 @@ function renderSocialRanking(){
   const handle=c.handle?' · @'+esc(c.handle):'';
   const name=c.url?'<a href="'+esc(c.url)+'" target="_blank" rel="noopener">'+esc(c.name)+' ↗</a>':esc(c.name);
   const platformClass=String(c.platform||'').toLowerCase();
-  return '<tr class="platform-'+esc(platformClass)+(monetized?' monetized-row':'')+(c.active_role===false?' inactive-row':'')+'"><td>'+rank(rankValue)+'</td><td>'+name+'<small class="identity-note">'+handle+'</small></td><td>'+role+'</td><td>'+socialMetric(c.audience,c.audience_delta,c.metric_status)+'</td><td>'+socialMetric(c.views,c.views_delta,c.views_status||c.metric_status)+'</td><td>'+socialMetric(c.content_count,c.content_count_delta,c.metric_status)+'</td><td class="'+(monetized?'revenue-cell':'')+'">'+revenueStatus(c.revenue)+'</td><td>'+publishElapsed(c)+'</td><td>'+trend7(c)+'</td><td><span class="status-note">'+status+'</span></td></tr>;
- }).join('')||'<tr><td colspan="10" style="text-align:center">이 플랫폼의 계정 데이터가 없습니다.</td></tr>';
+  return '<tr class="platform-'+esc(platformClass)+(monetized?' monetized-row':'')+(c.active_role===false?' inactive-row':'')+'"><td>'+rank(rankValue)+'</td><td>'+name+'<small class="identity-note">'+handle+'</small></td><td>'+role+'</td><td>'+socialMetric(c.audience,c.audience_delta,c.metric_status)+'</td><td>'+socialMetric(c.views,c.views_delta,c.views_status||c.metric_status)+'</td><td>'+socialMetric(c.content_count,c.content_count_delta,c.metric_status)+'</td><td class="'+(monetized?'revenue-cell':'')+'">'+revenueStatus(c.revenue)+'</td><td>'+esc(c.cadence||'설정 확인 필요')+'</td><td>'+publishElapsed(c)+'</td><td>'+trend7(c)+'</td><td><span class="status-note">'+status+'</span></td></tr>;
+ }).join('')||'<tr><td colspan="11" style="text-align:center">이 플랫폼의 계정 데이터가 없습니다.</td></tr>';
 }
 document.getElementById('blog-platform-tabs').addEventListener('click',event=>{const button=event.target.closest('.platform-tab');if(!button)return;blogPlatform=button.dataset.platform;renderBlogRanking();});
 document.getElementById('social-platform-tabs').addEventListener('click',event=>{const button=event.target.closest('.platform-tab');if(!button)return;socialPlatform=button.dataset.platform;renderSocialRanking();});
