@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       article_url:
-        description: "Optional Naver Politics article URL; leave blank to select a prominent article from Naver Politics"
+        description: "Optional Naver Politics article URL; leave blank to select a prominent article from Naver Politics. Political content only."
         required: false
         type: string
       confirm_private_upload:
@@ -76,9 +76,10 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install requests trafilatura beautifulsoup4 Pillow openai google-api-python-client google-auth google-auth-httplib2 edge-tts
-      - name: Build one-minute political Short and upload as PRIVATE
+      - name: Build one-minute POLITICS-ONLY Short and upload as PRIVATE
         env:
           INPUT_ARTICLE_URL: ${{ inputs.article_url }}
+          SEOUL_JOURNAL_CONTENT_SCOPE: politics
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           FISH_AUDIO_API_KEY: ${{ secrets.FISH_AUDIO_API_KEY }}
           YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_CLIENT_ID }}
