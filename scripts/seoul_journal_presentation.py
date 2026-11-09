@@ -9,6 +9,9 @@ NAVY=(11,23,48); YELLOW=(255,212,0); RED=(230,59,66); WHITE=(255,255,255)
 PORTRAITS={
     "이재명": "File:Lee Jae-myung (2025) (cropped).jpg",
 }
+SUBJECT_ALIASES={"오세훈":("오세훈","Oh Se-hoon","Oh Se Hun"),"이용철":("이용철","Lee Yong Cheol","Lee Yong-cheol")}
+THUMBNAIL_STYLES=("split_red","giant_quote","bottom_strip","angled_label","face_left")
+
 def run(args):
     r=subprocess.run(args,capture_output=True,text=True,timeout=300)
     if r.returncode: raise RuntimeError(r.stderr[-1800:])
@@ -45,59 +48,85 @@ def portrait(text,out):
             "date":"2025-08-25","use":"archival portrait; cropped; not current-event footage"}
     (out/"image_rights.json").write_text(json.dumps(record,ensure_ascii=False,indent=2),encoding="utf-8")
     return path,record
-def card(headline,caption,photo,credit,index=0,landscape=False,zoom=1.0,overlay_only=False,category='정치·시사'):
-    """Full-frame portrait with transparent text overlays; no opaque news panels."""
+def title_subject(text):
+    title=(text or "").splitlines()[0]
+    found=[name for name,aliases in SUBJECT_ALIASES.items() if any(alias in title for alias in aliases)]
+    if len(found)>1: raise RuntimeError("AMBIGUOUS_TITLE_SUBJECT")
+    return found[0] if found else next((name for name in PORTRAITS if name in title),None)
+
+def card(headline,caption,photo,credit,index=0,landscape=False,zoom=1.0,overlay_only=False,category='정치·시사',style='split_red'):
+    """Five varied, mobile-first headline compositions."""
     w,h=(1280,720) if landscape else (1080,1920)
     im=Image.new("RGBA" if overlay_only else "RGB",(w,h),(0,0,0,0) if overlay_only else NAVY)
     if photo and not overlay_only:
         source=Image.open(photo).convert("RGB")
         if landscape:
-            # Keep the full portrait visible on the right instead of stretching a Short.
             background=ImageOps.fit(source,(w,h),centering=(.5,.4))
-            im.paste(Image.blend(background,Image.new("RGB",(w,h),NAVY),.65))
-            crop=ImageOps.fit(source,(690,h),centering=(.5,.4))
-            im.paste(crop,(590,0))
+            im.paste(Image.blend(background,Image.new("RGB",(w,h),NAVY),.58))
+            im.paste(ImageOps.fit(source,(690,h),centering=(.5,.4)),(590,0))
         else:
             scaled=ImageOps.fit(source,(round(w*zoom),round(h*zoom)),centering=(.5,.4))
             x=(scaled.width-w)//2; y=(scaled.height-h)//2
             im.paste(scaled.crop((x,y,x+w,y+h)))
-    d=ImageDraw.Draw(im)
-    stroke=(0,0,0)
+    d=ImageDraw.Draw(im); stroke=(0,0,0)
     def text(x,y,value,size,color=WHITE):
-        d.text((x,y),value,font=font(size),fill=color,
-               stroke_width=max(2,size//15),stroke_fill=stroke)
-    text(35,20,"서울저널",38 if landscape else 48)
-    label=(credit["subject"]+" · 자료사진("+(re.search(r"(?:19|20)\d{2}",credit.get("date","")) or ["촬영일 미상"])[0]+")") if credit else "서울저널 자체 제작 그래픽"
+        d.text((x,y),value,font=font(size),fill=color,stroke_width=max(2,size//12),stroke_fill=stroke)
+    style=style if style in THUMBNAIL_STYLES else "split_red"
+    label=(credit["subject"]+" · 자료사진("+(re.search(r"(?:19|20)\\d{2}",credit.get("date","")) or ["촬영일 미상"])[0]+")") if credit else "서울저널 자체 제작 그래픽"
     if landscape:
-        size=78
-        while size>42 and len(wrap(headline,size,570))>4: size-=2
-        lines=wrap(headline,size,570)
-        if len(lines)>4: raise ValueError("Landscape headline too long")
-        for i,line in enumerate(lines):
-            text(35,175+i*(size+18),line,size,YELLOW if i==0 else WHITE)
-        text(35,640,category+" | "+("승부의 순간" if category=="스포츠" else "쟁점과 반박"),25,YELLOW)
-        text(720,668,label,22)
-    else:
-        # Reserve the bottom and right for YouTube controls; never cover the face.
-        text(55,1160,category+" | "+("승부의 순간" if category=="스포츠" else "쟁점과 반박"),34,YELLOW)
-        size=82
-        while size>48 and len(wrap(headline,size,860))>3: size-=2
-        lines=wrap(headline,size,860)
-        if len(lines)>3: raise ValueError("Short headline too long")
-        for i,line in enumerate(lines):
-            text(55,1230+i*(size+18),line,size,YELLOW if i==0 else WHITE)
-        caption_size=46
-        while caption_size>28 and len(wrap(caption,caption_size,850))>3: caption_size-=2
-        caption_lines=wrap(caption,caption_size,850)
-        if len(caption_lines)>3: raise ValueError("Split caption into shorter segments")
-        for i,line in enumerate(caption_lines):
-            text(55,1550+i*(caption_size+15),line,caption_size)
-        text(55,1760,label,25)
+        cfg={
+          "split_red":((20,78,770,630),YELLOW,84,48,155),
+          "giant_quote":((0,385,880,720),WHITE,90,44,420),
+          "bottom_strip":((0,455,1280,720),YELLOW,86,55,480),
+          "angled_label":((20,80,850,690),RED,80,62,165),
+          "face_left":((0,70,720,650),WHITE,88,38,175),
+        }
+        panel,color,size,x,y=cfg[style]
+        if style=="angled_label": d.polygon([(0,110),(850,55),(850,650),(0,710)],fill=NAVY)
+        elif style=="bottom_strip": d.rectangle(panel,fill=NAVY)
+        elif style=="giant_quote":
+            d.rectangle(panel,fill=NAVY); d.rectangle((0,385,14,720),fill=RED)
+        else: d.rounded_rectangle(panel,radius=24,fill=NAVY)
+        text(32,18,"서울저널",30,YELLOW if style in ("giant_quote","angled_label") else WHITE)
+        maxw=panel[2]-panel[0]-65
+        while size>48 and len(wrap(headline,size,maxw))>3: size-=2
+        lines=wrap(headline,size,maxw)
+        if len(lines)>3: raise ValueError("Thumbnail headline too long")
+        for i,line in enumerate(lines): text(x,y+i*(size+10),line,size,color if i==0 else (WHITE if color!=WHITE else YELLOW))
+        return im
+    cfg={
+      "split_red":(55,1110,920,YELLOW,NAVY,82),
+      "giant_quote":(48,1280,940,WHITE,(255,255,255),94),
+      "bottom_strip":(42,1400,996,(255,222,89),(8,28,62),88),
+      "angled_label":(70,1160,850,(255,90,90),NAVY,82),
+      "face_left":(95,1040,830,WHITE,(12,26,48),86),
+    }
+    left,top,width,color,bg,size=cfg[style]
+    if style=="giant_quote":
+        d.rectangle((0,top-35,w,h),fill=bg); d.text((35,top-110),"“",font=font(155),fill=YELLOW)
+    elif style=="bottom_strip": d.rectangle((0,top-45,w,h),fill=bg)
+    elif style=="angled_label": d.polygon([(0,top+20),(w,top-40),(w,h),(0,h)],fill=bg)
+    elif style=="split_red":
+        d.rounded_rectangle((25,top-30,w-25,h-75),radius=28,fill=bg); d.rectangle((25,top-30,42,h-75),fill=RED)
+    else: d.rectangle((0,top-50,w,h),fill=bg)
+    text(35,22,"서울저널",37,YELLOW if style in ("giant_quote","angled_label") else WHITE)
+    text(left,top-18,"승부의 순간" if category=="스포츠" else "쟁점·반박",29,YELLOW)
+    while size>48 and len(wrap(headline,size,width))>3: size-=2
+    lines=wrap(headline,size,width)
+    if len(lines)>3: raise ValueError("Short headline too long")
+    for i,line in enumerate(lines): text(left,top+35+i*(size+12),line,size,color)
+    cap_size=40 if style in ("split_red","face_left") else 35
+    cap=wrap(caption,cap_size,width)
+    if len(cap)>3: cap_size=29; cap=wrap(caption,cap_size,width)
+    for i,line in enumerate(cap[:3]): text(left,top+330+i*(cap_size+12),line,cap_size,WHITE)
+    text(left,1760,label,20)
     return im
 
 ANCHOR_VOICES = (
-    {"name":"남성 저음", "edge":"ko-KR-InJoonNeural", "pitch":"-12Hz", "fish_env":"SJ_FISH_MALE_ANCHOR"},
-    {"name":"여성 저음", "edge":"ko-KR-SunHiNeural", "pitch":"-8Hz", "fish_env":"SJ_FISH_FEMALE_ANCHOR"},
+ {"name":"남성 뉴스앵커 1","gender":"male","edge":"ko-KR-InJoonNeural","pitch":"-4Hz","fish_env":"SJ_FISH_MALE_ANCHOR"},
+ {"name":"남성 다큐 2","gender":"male","edge":"ko-KR-BongJinNeural","pitch":"+1Hz","fish_env":"SJ_FISH_MALE_2"},
+ {"name":"여성 뉴스앵커 1","gender":"female","edge":"ko-KR-SunHiNeural","pitch":"-2Hz","fish_env":"SJ_FISH_FEMALE_ANCHOR"},
+ {"name":"여성 다큐 2","gender":"female","edge":"ko-KR-YuJinNeural","pitch":"+1Hz","fish_env":"SJ_FISH_FEMALE_2"},
 )
 def photo_sequence(meta,out):
     """Use reviewed Commons file titles, or the exact registered subject's named photos."""
@@ -105,9 +134,9 @@ def photo_sequence(meta,out):
     session.headers.update({"User-Agent":"SeoulJournalEditorial/2.0 (https://github.com/huh0303-cmyk/-WP-QWEN-autobot; news asset attribution)"})
     files=meta.get("photo_files", [])
     evidence=meta.get("source_title","")+" "+meta["youtube_title"]+" "+meta["narration"]
-    proposed=meta.get("visual_subject","").strip()
-    subject=proposed if proposed and len(proposed)<=30 and proposed in evidence else next((n for n in PORTRAITS if n in evidence),None)
-    english="Lee Jae-myung" if subject=="이재명" else None
+    subject=title_subject(meta.get("source_title") or meta.get("youtube_title"))
+    if not subject: raise RuntimeError("NO_TITLE_MATCHED_SUBJECT: refusing unrelated portrait")
+    english={"이재명":"Lee Jae-myung","오세훈":"Oh Se-hoon","이용철":"Lee Yong Cheol"}[subject]
     if subject and not english:
         # Resolve the exact Korean label before searching named Commons images.
         response=session.get("https://www.wikidata.org/w/api.php",params={
@@ -122,6 +151,8 @@ def photo_sequence(meta,out):
             kinds=[x.get("mainsnak",{}).get("datavalue",{}).get("value",{}).get("id") for x in entity.get("claims",{}).get("P31",[])]
             if "Q5" in kinds:
                 english=entity.get("labels",{}).get("en",{}).get("value")
+    if not files and subject=="이용철":
+        raise RuntimeError("LICENSE_REVIEW_REQUIRED: 이용철 official portrait has no verified reuse mark")
     if not files and english:
         response=session.get("https://commons.wikimedia.org/w/api.php",params={
             "action":"query","list":"search","srsearch":'intitle:"'+english+'" filetype:bitmap',
@@ -162,10 +193,10 @@ def photo_sequence(meta,out):
     return assets
 
 def anchor(meta):
-    # Stable per-story selection: retries never change voice in the same video.
-    seed=int(hashlib.sha256(meta["youtube_title"].encode()).hexdigest(),16)
-    voice=dict(ANCHOR_VOICES[seed%len(ANCHOR_VOICES)])
-    return voice
+    # One of two male or two female profiles; stable for retries, varied between stories.
+    seed=meta.get("slot_marker") or (meta["youtube_title"]+str(random.SystemRandom().randint(0,2**32-1)))
+    pick=int(hashlib.sha256(seed.encode()).hexdigest(),16)%len(ANCHOR_VOICES)
+    return dict(ANCHOR_VOICES[pick])
 
 def fish(text,path,language,reference_id=None):
     key=os.getenv("FISH_AUDIO_API_KEY","").strip()
@@ -191,6 +222,9 @@ def make(meta,out):
     run(["ffmpeg","-y","-i",str(audio),"-af","atempo=1.2","-c:a","aac","-b:a","192k",str(speed)])
     duration=float(run(["ffprobe","-v","error","-show_entries","format=duration","-of","default=nw=1:nk=1",str(speed)]).strip())
     if not 20<=duration<=120: raise RuntimeError("Narration outside Short duration gate: "+str(duration))
+    style=meta.get("thumbnail_style")
+    if style not in THUMBNAIL_STYLES: style=random.SystemRandom().choice(THUMBNAIL_STYLES)
+    meta["thumbnail_style"]=style
     captions=meta.get("captions") or [s.strip() for s in re.split(r"(?<=[.!?。])\s+",meta["narration"]) if s.strip()]
     weights=[max(len(s),1) for s in captions]; total=sum(weights)
     category=meta.get("display_category","정치·시사")
@@ -204,7 +238,7 @@ def make(meta,out):
         card("","",photo,rights,i,overlay_only=False,category=category).save(bg,quality=94)
         # Background must contain no duplicated typography.
         ImageOps.fit(Image.open(photo).convert("RGB"),(1080,1920),centering=(.5,.4)).save(bg,quality=94)
-        card(meta["headline"],caption,None,rights,i,overlay_only=True,category=category).save(overlay)
+        card(meta["headline"],caption,None,rights,i,overlay_only=True,category=category,style=style).save(overlay)
         frames=max(1,math.ceil(seconds*30))
         z=f"1+0.10*on/{max(frames-1,1)}" if i%2==0 else f"1.10-0.10*on/{max(frames-1,1)}"
         clip=out/f"scene-{i:02d}.mp4"
@@ -213,13 +247,13 @@ def make(meta,out):
              "-map","[v]","-t",str(seconds),"-an","-c:v","libx264","-preset","veryfast","-threads","2",str(clip)])
         concat.append("file '"+clip.name+"'"); elapsed+=seconds
     (out/"scenes.txt").write_text("\n".join(concat),encoding="utf-8")
-    card(meta["headline"],"",assets[0][0],assets[0][1],landscape=True,category=category).save(out/"thumbnail.jpg",quality=95)
-    card(meta["headline"],"",assets[0][0],assets[0][1],category=category).save(out/"cover.jpg",quality=95)
+    card(meta["headline"],"",assets[0][0],assets[0][1],landscape=True,category=category,style=style).save(out/"thumbnail.jpg",quality=95)
+    card(meta["headline"],"",assets[0][0],assets[0][1],category=category,style=style).save(out/"cover.jpg",quality=95)
     video=out/"seoul-journal-short.mp4"
     run(["ffmpeg","-y","-f","concat","-safe","0","-i",str(out/"scenes.txt"),"-i",str(speed),
          "-c:v","copy","-c:a","aac","-shortest","-movflags","+faststart",str(video)])
     audit={"duration_seconds":duration,"tts_speed":1.2,"tts":tts,"caption_cards":len(captions),
-           "photo":assets[0][1],"photos":[r for _,r in assets],"anchor":voice["name"],"motion":"alternating zoom in/out; stationary text","video":str(video),"thumbnail":str(out/"thumbnail.jpg")}
+           "photo":assets[0][1],"photos":[r for _,r in assets],"anchor":voice["name"],"voice_gender":voice["gender"],"thumbnail_style":style,"motion":"alternating zoom in/out; stationary text","video":str(video),"thumbnail":str(out/"thumbnail.jpg")}
     (out/"presentation_receipt.json").write_text(json.dumps(audit,ensure_ascii=False,indent=2),encoding="utf-8")
     print("PRESENTATION_READY "+json.dumps(audit,ensure_ascii=True),flush=True)
     return video,audit
