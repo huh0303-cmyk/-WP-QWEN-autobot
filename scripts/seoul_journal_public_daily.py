@@ -12,7 +12,7 @@ KST=datetime.timezone(datetime.timedelta(hours=9))
 UA={"User-Agent":"Mozilla/5.0 SeoulJournalEditorial/1.0"}
 HTTP=requests.Session()
 HTTP.headers.update(UA)
-HTTP.mount("https://",HTTPAdapter(max_retries=Retry(total=2,backoff_factor=1,status_forcelist=[429,500,502,503,504])))
+HTTP.mount("https://",HTTPAdapter(max_retries=Retry(total=5,connect=5,read=3,backoff_factor=1,status_forcelist=[429,500,502,503,504],allowed_methods=["GET","HEAD"])))
 def candidates(category):
     if category=="sports":
         # Search only dated Naver news reports; unsupported sports-page layouts fail visibly.
