@@ -63,3 +63,12 @@ PR #273 merged (1a39cba65feebe5f682518afbea3130eee67970f). Full no-extra-publica
 - Oh Se-hoon: use only a verified Commons portrait with the corresponding license metadata.
 - Lee Yong-cheol: official DAPA portrait requires a confirmed KOGL Type 1 reuse mark or separate reuse authorization. Until confirmed, production stops with LICENSE_REVIEW_REQUIRED; never substitute Lee Jae-myung.
 - Retrofitting an already-public Short requires a newly rendered, reviewed package and a YouTube thumbnail update or replacement publication; a code commit alone does not change existing uploads.
+
+
+## 2026-11-09 owner revision: politics discovery, headlines and accessibility
+- Owner requests 3–5 daily political Shorts depending on current Naver search interest and news exposure; select the most visible politicians and explain the parties' disputed points and supported counterarguments.
+- The five thumbnail compositions remain randomized. Added five independently randomized title-hook patterns: attributed quote/clash, question and reaction, claim and response, decision/number, and open consequence. These are abstract packaging patterns; no wording or footage is copied.
+- Subtitle captions are now bold, high-contrast, 50 px on the 1080x1920 canvas (44 px fallback), intended for older viewers. Existing photo scenes use alternating zoom movement with stationary caption overlays. Two female and two male profiles remain randomly selected and narration stays at 1.2x.
+- Immediate rebuild is targeted to Naver article 052/0002429854 and existing video iVbWovsizVg. It will create a new review package; no existing upload is deleted or publicly replaced by this action.
+- This account has no configured NAVER API Hub Search Trend credentials. Therefore exact query-volume rankings and automated 4th/5th slots are not yet available. Do not label Naver front-page order or article counts as search volume. Existing scheduler currently runs three slots; high-exposure-based 4th/5th scheduling remains blocked until credentials and scoring gate are configured.
+- For the target story, attribute the election-interference allegation to Oh Se-hoon and distinguish it from the Ministry's stated reasons for the May 28 target allocation adjustment (14.9% to 20.8%). The cited YTN report contains no direct government response to Oh's allegation; do not imply that the ministry statement answers that allegation.

@@ -115,9 +115,10 @@ def card(headline,caption,photo,credit,index=0,landscape=False,zoom=1.0,overlay_
     lines=wrap(headline,size,width)
     if len(lines)>3: raise ValueError("Short headline too long")
     for i,line in enumerate(lines): text(left,top+35+i*(size+12),line,size,color)
-    cap_size=40 if style in ("split_red","face_left") else 35
+    # Senior-viewer captions: high contrast, bold, and at least 44 px on 1080x1920.
+    cap_size=50
     cap=wrap(caption,cap_size,width)
-    if len(cap)>3: cap_size=29; cap=wrap(caption,cap_size,width)
+    if len(cap)>3: cap_size=44; cap=wrap(caption,cap_size,width)
     for i,line in enumerate(cap[:3]): text(left,top+330+i*(cap_size+12),line,cap_size,WHITE)
     text(left,1760,label,20)
     return im
