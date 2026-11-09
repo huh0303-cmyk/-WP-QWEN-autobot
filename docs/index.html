@@ -394,6 +394,7 @@ function drawSocialPlatform(data){
     else if(/nasa|retro|silent|hollywood|invention|space/.test(nameKey))rule={label:'주3회 랜덤',maxDays:3};
     else if(/seoul[_ -]?jisoo1|seoul[_ -]?jisoo/.test(nameKey))rule={label:'일3회 랜덤',maxDays:1};
     else if(/survival|topik|토픽|language/.test(nameKey))rule={label:'일1회 랜덤',maxDays:1};
+    else rule={label:'일1회 랜덤',maxDays:1};
   }else if(a.platform==='TikTok')rule={label:'매일 1회 · 랜덤',maxDays:1};
   else if(a.platform==='Facebook')rule={label:'매일 3회 · 랜덤',maxDays:1};
   else if(a.platform==='Instagram'||a.platform==='Threads')rule={label:'매일 2회 · 랜덤',maxDays:1};
