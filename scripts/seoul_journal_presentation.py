@@ -87,7 +87,7 @@ def card(headline,caption,photo,credit,index=0,landscape=False,zoom=1.0,overlay_
         elif style=="giant_quote":
             d.rectangle(panel,fill=NAVY); d.rectangle((0,385,14,720),fill=RED)
         else: d.rounded_rectangle(panel,radius=24,fill=NAVY)
-        text(32,18,"서울저널",30,YELLOW if style in ("giant_quote","angled_label") else WHITE)
+        text(28,18,"서울저널",22,YELLOW if style in ("giant_quote","angled_label") else WHITE)
         maxw=panel[2]-panel[0]-65
         while size>48 and len(wrap(headline,size,maxw))>3: size-=2
         lines=wrap(headline,size,maxw)
@@ -109,7 +109,7 @@ def card(headline,caption,photo,credit,index=0,landscape=False,zoom=1.0,overlay_
     elif style=="split_red":
         d.rounded_rectangle((25,top-30,w-25,h-75),radius=28,fill=bg); d.rectangle((25,top-30,42,h-75),fill=RED)
     else: d.rectangle((0,top-50,w,h),fill=bg)
-    text(35,22,"서울저널",37,YELLOW if style in ("giant_quote","angled_label") else WHITE)
+    text(34,20,"서울저널",26,YELLOW if style in ("giant_quote","angled_label") else WHITE)
     text(left,top-18,"승부의 순간" if category=="스포츠" else "쟁점·반박",29,YELLOW)
     while size>48 and len(wrap(headline,size,width))>3: size-=2
     lines=wrap(headline,size,width)
