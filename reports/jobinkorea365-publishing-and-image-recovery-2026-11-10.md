@@ -12,8 +12,8 @@ Site: https://jobinkorea365.com
 ## Repository findings
 - wp_jobinkorea is configured in docs/SITE_PUBLISHING_TIERS.md.
 - Historical data/site-publication-history.json contains a Sep 12 wp_jobinkorea workflow success with no public URL, and older REST API 403 failures. These records do not establish the cause of the current Nov 2026 gap.
-- scripts/autopost_mega.py contains a global publishing freeze: WP_AUTOPUBLISH_ENABLED defaults to false, with a comment that publishing stays disabled unless a future reviewed workflow explicitly opts in.
-- Existing London pipeline documentation says image creation/selection is conditional on provider credentials and enable flags; its documented fallback can continue without an image. That behavior explains how an image-less post can pass through, but does not prove which exact provider failed for this post.
+- The specific daily-network-publish workflow is an explicitly approved, isolated immediate-publish path. It had REPLICATE_API_TOKEN set to an empty string, so the approved generated-image provider could not authenticate. The wrapper enabled image publishing but the credential was absent; the publisher could then continue via its text-only fallback.
+- The active repository image gateway attempts matching stock selection and then the approved Replicate model chain; when generation and fallback selection fail, it can continue without an image. This explains how a text-only post passed through.
 - KoreaWedding365 is configured separately as wp_koreawedding; its records show publications, and the repository has a duplicate-hero incident report. The reusable lesson is to set WordPress featured_media and avoid inserting the same hero again into the body. It does not establish that its writer/image engine is interchangeable without inspecting current workflow code and secret availability.
 
 ## Required recovery work
