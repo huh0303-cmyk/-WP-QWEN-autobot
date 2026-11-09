@@ -167,53 +167,78 @@ def fetch_photo(image_url):
         log(f"Image unavailable; using branded background: {e}")
         return None
 
+# Five reference-led editorial thumbnail systems: red breaking, quote/debate,
+# numeric briefing, field report, and viewer poll. The same selected system is used
+# for the opening frame and the generated cover image.
 SHORT_STYLES = [
-    {"name":"breaking_red","bg":(18,27,43),"highlight":(255,210,74),"accent":(210,35,45)},
-    {"name":"blue_briefing","bg":(11,43,75),"highlight":(255,226,106),"accent":(28,114,190)},
-    {"name":"parliament_watch","bg":(38,32,28),"highlight":(247,208,133),"accent":(156,47,39)},
-    {"name":"fact_check","bg":(22,54,48),"highlight":(196,239,210),"accent":(42,150,110)},
-    {"name":"evening_report","bg":(37,26,58),"highlight":(255,221,126),"accent":(180,54,76)},
+    {"name":"01_breaking_red","bg":(13,25,47),"highlight":(255,220,45),"accent":(222,24,35),"badge":"속보"},
+    {"name":"02_quote_debate","bg":(5,27,55),"highlight":(0,226,255),"accent":(236,35,45),"badge":"발언 대 반박"},
+    {"name":"03_issue_briefing","bg":(8,38,71),"highlight":(255,226,32),"accent":(0,154,217),"badge":"핵심 쟁점"},
+    {"name":"04_field_report","bg":(28,27,35),"highlight":(255,214,74),"accent":(210,35,45),"badge":"현장 리포트"},
+    {"name":"05_viewer_poll","bg":(12,24,48),"highlight":(0,229,255),"accent":(221,27,39),"badge":"여러분의 선택은?"},
 ]
 
-def render(headline,photo,audio):
-    style=random.choice(SHORT_STYLES)
-    W,H=1080,1920
-    base=Image.new("RGB",(W,H),(12,20,34))
-    if photo:
-        try:
-            im=Image.open(photo).convert("RGB")
-            scale=max(W/im.width,1250/im.height); im=im.resize((int(im.width*scale),int(im.height*scale)))
-            x=(im.width-W)//2; y=max(0,(im.height-1250)//2)
-            base.paste(im.crop((x,y,x+W,y+1250)),(0,0))
-            # dark overlay on photo for legibility
-            overlay=Image.new("RGBA",(W,1250),(5,10,20,78)); base.paste(overlay,(0,0),overlay)
-        except Exception: pass
-    draw=ImageDraw.Draw(base)
-    navy=style["bg"]; yellow=style["highlight"]; red=style["accent"]; white=(255,255,255) if sum(style["bg"])<400 else (25,25,25)
-    draw.rectangle((0,0,W,115),fill=navy)
-    draw.rectangle((0,115,W,130),fill=red)
-    font_paths=[
+def _font(size):
+    paths=[
       "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
       "/usr/share/fonts/truetype/noto/NotoSansCJK-Bold.ttc",
       "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"]
-    fp=next((p for p in font_paths if os.path.exists(p)),None)
-    try:
-        logo=ImageFont.truetype(fp,43); title_font=ImageFont.truetype(fp,94); foot=ImageFont.truetype(fp,33)
-    except Exception: logo=title_font=foot=ImageFont.load_default()
-    draw.text((54,28),"SEOUL JOURNAL  |  정치 뉴스",font=logo,fill=white,stroke_width=1,stroke_fill=navy)
-    draw.rectangle((0,1240,W,H),fill=navy)
-    draw.rectangle((0,1240,22,H),fill=red)
-    # big, readable headline blocks; each line is short enough for mobile
-    chars=10
-    lines=textwrap.wrap(headline,width=chars,break_long_words=True,replace_whitespace=False)
-    y=1325
-    for idx,line in enumerate(lines[:4]):
-        color=yellow if idx==0 else white
-        draw.text((58,y),line,font=title_font,fill=color,stroke_width=3,stroke_fill=(0,0,0))
-        y+=122
-    draw.rectangle((58,1770,1020,1778),fill=red)
-    draw.text((58,1810),"원문과 공식 자료를 확인하세요",font=foot,fill=(220,230,242))
-    still=OUT/"cover.jpg"; base.save(still,quality=94)
+    fp=next((p for p in paths if os.path.exists(p)),None)
+    try: return ImageFont.truetype(fp,size) if fp else ImageFont.load_default()
+    except Exception: return ImageFont.load_default()
+
+def _cover_frame(headline,photo,style,index):
+    W,H=1080,1920
+    base=Image.new("RGB",(W,H),style["bg"])
+    if photo:
+        try:
+            im=Image.open(photo).convert("RGB")
+            scale=max(W/im.width,H/im.height)
+            im=im.resize((int(im.width*scale),int(im.height*scale)))
+            x=(im.width-W)//2; y=(im.height-H)//2
+            base.paste(im.crop((x,y,x+W,y+H)),(0,0))
+        except Exception as exc:
+            log(f"Photo crop fallback ({type(exc).__name__})")
+    # Editorial darkening preserves the real photograph while keeping type readable.
+    shade=Image.new("RGBA",(W,H),(0,0,0,88))
+    base=Image.alpha_composite(base.convert("RGBA"),shade)
+    draw=ImageDraw.Draw(base)
+    # top identity and breaking badge
+    draw.rectangle((0,0,W,130),fill=(*style["bg"],238))
+    draw.rectangle((42,34,250,105),fill=style["accent"])
+    draw.text((58,43),style["badge"],font=_font(42),fill=(255,255,255),stroke_width=1,stroke_fill=(0,0,0))
+    draw.text((W-425,48),"SEOUL JOURNAL",font=_font(30),fill=(255,255,255))
+    # Center-safe copy: large, high-contrast Korean title over translucent panel.
+    panel_top,panel_bottom=635,1270
+    draw.rounded_rectangle((38,panel_top,W-38,panel_bottom),radius=26,fill=(*style["bg"],220),outline=(*style["accent"],255),width=6)
+    words=textwrap.wrap(headline,width=9,break_long_words=True,replace_whitespace=False)[:3]
+    title_font=_font(100 if len(words)<=2 else 84)
+    line_heights=[]
+    for line in words:
+        box=draw.textbbox((0,0),line,font=title_font,stroke_width=2)
+        line_heights.append(box[3]-box[1])
+    gap=24
+    total=sum(line_heights)+max(0,len(words)-1)*gap
+    y=panel_top+(panel_bottom-panel_top-total)//2
+    for i,line in enumerate(words):
+        box=draw.textbbox((0,0),line,font=title_font,stroke_width=3)
+        tw=box[2]-box[0]; x=(W-tw)//2
+        color=style["highlight"] if i in (0,len(words)-1) else (255,255,255)
+        draw.text((x,y),line,font=title_font,fill=color,stroke_width=4,stroke_fill=(0,0,0))
+        y+=line_heights[i]+gap
+    # bottom editorial label; safe margin remains clear for Shorts controls
+    draw.rectangle((0,1670,W,1760),fill=(*style["bg"],232))
+    draw.text((55,1693),"핵심 발언  ·  반박  ·  확인된 사실",font=_font(31),fill=(255,255,255))
+    return base.convert("RGB")
+
+def render(headline,photo,audio):
+    style=random.choice(SHORT_STYLES)
+    # Save five distinct reusable cover examples to the run artifact; select one at random.
+    for idx,template in enumerate(SHORT_STYLES,1):
+        preview=_cover_frame(headline,photo,template,idx)
+        preview.save(OUT/f"thumbnail-template-{idx:02d}.jpg",quality=93)
+    cover=_cover_frame(headline,photo,style,SHORT_STYLES.index(style)+1)
+    still=OUT/"cover.jpg"; cover.save(still,quality=94)
     (OUT/"template.txt").write_text(style["name"],encoding="utf-8")
     ffmpeg=os.getenv("FFMPEG_BINARY","ffmpeg")
     video=OUT/"seoul-journal-short.mp4"
