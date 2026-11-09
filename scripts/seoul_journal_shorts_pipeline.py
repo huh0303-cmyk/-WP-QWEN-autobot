@@ -108,6 +108,9 @@ EDGE_VOICES = [("ko-KR-SunHiNeural","female_news"),("ko-KR-JiMinNeural","female_
     """
     p = OUT / "voice.mp3"
     errors = []
+    voice_name, voice_role = random.choice(EDGE_VOICES)
+    fish_ids = [x.strip() for x in os.getenv("FISH_AUDIO_VOICE_IDS","").split(",") if x.strip()]
+    fish_voice = random.choice(fish_ids) if fish_ids else ""
     api_key = os.getenv("FISH_AUDIO_API_KEY", "").strip()
     if api_key:
         try:
