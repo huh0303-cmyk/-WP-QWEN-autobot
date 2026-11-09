@@ -67,7 +67,28 @@ TISTORY_GSC_SITES = [
     "https://k-trip365.tistory.com/",
 ]
 
-SITES = WORDPRESS_SITES + TISTORY_GSC_SITES
+def load_blogger_gsc_sites():
+    """Load active Blogspot properties from the single site registry."""
+    path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "config", "automation_hub_sites.json")
+    try:
+        with open(path, encoding="utf-8") as f:
+            registry = json.load(f)
+        sites = []
+        for item in registry.get("sites", []):
+            if item.get("platform") != "blogger":
+                continue
+            if item.get("enabled") is False or item.get("retired") is True:
+                continue
+            url = str(item.get("url") or "").strip()
+            if url and url not in sites:
+                sites.append(url.rstrip("/") + "/")
+        return sites
+    except Exception as exc:
+        print(f"BLOGGER_GSC_REGISTRY_ERROR: {exc}", flush=True)
+        return []
+
+BLOGGER_GSC_SITES = load_blogger_gsc_sites()
+SITES = WORDPRESS_SITES + TISTORY_GSC_SITES + BLOGGER_GSC_SITES
 
 BROWSER_HEADERS = {
     "User-Agent": (
