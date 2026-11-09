@@ -25,6 +25,12 @@ jobs:
     timeout-minutes: 15
     environment: youtube-channels
     env:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      GEMINI_API_KEY_2: ${{ secrets.GEMINI_API_KEY_2 }}
+      GEMINI_API_KEY_3: ${{ secrets.GEMINI_API_KEY_3 }}
+      FISH_AUDIO_API_KEY: ${{ secrets.FISH_AUDIO_API_KEY }}
+      SJ_FISH_MALE_ANCHOR: ${{ secrets.SJ_FISH_MALE_ANCHOR }}
+      SJ_FISH_FEMALE_ANCHOR: ${{ secrets.SJ_FISH_FEMALE_ANCHOR }}
       YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
       YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
       YOUTUBE_OAUTH_REFRESH_TOKEN_SHOPPING_SEOUL_JISOO1: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_SHOPPING_SEOUL_JISOO1 }}
@@ -39,8 +45,8 @@ jobs:
       - name: Install free video dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq ffmpeg fonts-nanum
-          python -m pip install --disable-pip-version-check pillow edge-tts google-api-python-client google-auth
+          sudo apt-get install -y -qq ffmpeg fonts-noto-cjk
+          python -m pip install --disable-pip-version-check pillow requests beautifulsoup4 edge-tts google-api-python-client google-auth
       - name: Resolve category and publishing mode
         id: mode
         env:
@@ -84,6 +90,7 @@ jobs:
           path: |
             artifacts/seoul-jisoo-shorts/**/manifest.json
             artifacts/seoul-jisoo-shorts/**/cover.jpg
-            artifacts/seoul-jisoo-shorts/**/short.mp4
+            artifacts/seoul-jisoo-shorts/**/seoul-journal-short.mp4
+            artifacts/seoul-jisoo-shorts/**/presentation_receipt.json
           retention-days: 7
           if-no-files-found: warn
