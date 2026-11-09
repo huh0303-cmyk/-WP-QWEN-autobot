@@ -148,6 +148,10 @@ Provide 1-3 short, highly relevant labels only.{hint}"""
     return title, body, labels, description, image_subject
 
 
+def normalize_title(value: str) -> str:
+    return re.sub(r"[^a-z0-9가-힣]+", "", str(value or "").casefold())
+
+
 def main() -> int:
     draft_mode = os.environ.get("BLOGGER_REVIEW_DRAFT_MODE", "false").strip().lower() == "true"
     run_key = os.environ.get("REVIEW_RUN_KEY" if draft_mode else "PUBLIC_RUN_KEY", "").strip()
@@ -175,6 +179,8 @@ def main() -> int:
             existing.raise_for_status()
             existing_items = existing.json().get("items", [])
             recent_titles = [str(p.get("title", "")).strip() for p in existing_items if str(p.get("title", "")).strip()]
+            recent_title_keys = {normalize_title(x) for x in recent_titles}
+            recent_image_urls = {u for p in existing_items for u in re.findall(r"https?://[^\\\"'<> ]+\\.(?:jpg|jpeg|png|webp)(?:\\?[^\\\"'<> ]*)?", str(p.get("content", "")), flags=re.I)}
             match = next((p for p in existing_items if marker in str(p.get("content", ""))), None)
             if match:
                 if draft_mode:
@@ -197,10 +203,12 @@ def main() -> int:
             for attempt in range(4):
                 try:
                     title, body, labels, description, image_subject = generate(site, hint, recent_titles)
+                    if normalize_title(title) in recent_title_keys:
+                        raise RuntimeError("duplicate title gate: exact or normalized duplicate title")
                     break
                 except (RuntimeError, ValueError) as gate_exc:  # ValueError covers JSONDecodeError (empty/non-JSON model output)
                     retriable = isinstance(gate_exc, ValueError) or any(
-                        k in str(gate_exc) for k in ("adsense structure gate", "language mismatch", "quality gate"))
+                        k in str(gate_exc) for k in ("adsense structure gate", "language mismatch", "quality gate", "duplicate title gate"))
                     if not retriable or attempt == 3:
                         raise
                     print(f"generation retry {attempt + 1} for {site['key']}: {str(gate_exc)[:120]}")
@@ -214,6 +222,9 @@ def main() -> int:
                 image_policy = os.environ.get("BLOGGER_IMAGE_POLICY", "auto_free").strip().lower()
                 found = None if image_policy == "none" else pick_image(image_subject or site['theme'], alternates=[site['theme']])
                 # Free-only rule: relevant free stock/AI image or no image; never a generic topic card.
+                if found and found.get("url") in recent_image_urls:
+                    print(f"duplicate image blocked for {site['key']}; publishing without reused image")
+                    found = None
                 if found and found.get("url"):
                     body = insert_image(body, found, title)
             except Exception as exc:
