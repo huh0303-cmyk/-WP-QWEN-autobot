@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Build one source-grounded Seoul Journal political Short and upload PRIVATE only."""
-import os, re, json, textwrap, subprocess, sys
+import os, re, json, textwrap, subprocess, sys, random
 from pathlib import Path
 from urllib.parse import urljoin, urlparse
 import requests, trafilatura
@@ -102,7 +102,7 @@ def draft(title, body):
     raise RuntimeError(f"Could not generate a sufficiently long fact-grounded narration after 3 attempts: {last_error}")
 
 
-def tts(text):
+EDGE_VOICES = [("ko-KR-SunHiNeural","female_news"),("ko-KR-HyunsuNeural","male_news"),("ko-KR-InJoonNeural","male_documentary"),("ko-KR-BongJinNeural","male_documentary")]\n\ndef tts(text):
     """Free-only narration: Fish Audio S2.1 Pro Free first, then Edge TTS.
     Never calls a paid endpoint. Secrets are never printed to logs.
     """
@@ -119,12 +119,12 @@ def tts(text):
                     "Content-Type": "application/json",
                     "Accept": "audio/mpeg",
                 },
-                json={"text": text, "format": "mp3"},
+                json={"text": text, "format": "mp3", **({"reference_id": fish_voice} if fish_voice else {})},
                 timeout=150,
             )
             if r.ok and len(r.content) >= 2000 and not r.content.lstrip().startswith(b"{"):
                 p.write_bytes(r.content)
-                log(f"TTS_ENGINE=fish_audio model=s2.1-pro-free bytes={p.stat().st_size}")
+                log(f"TTS_ENGINE=fish_audio model=s2.1-pro-free voice_role={voice_role} bytes={p.stat().st_size}")
                 return p
             errors.append(f"Fish Audio returned HTTP {r.status_code} or invalid audio")
         except Exception as exc:
@@ -137,10 +137,10 @@ def tts(text):
         import asyncio
         import edge_tts
         async def save_edge():
-            await edge_tts.Communicate(text, "ko-KR-SunHiNeural").save(str(p))
+            await edge_tts.Communicate(text, voice_name).save(str(p))
         asyncio.run(save_edge())
         if p.exists() and p.stat().st_size >= 2000:
-            log(f"TTS_ENGINE=edge_tts voice=ko-KR-SunHiNeural bytes={p.stat().st_size}")
+            log(f"TTS_ENGINE=edge_tts voice={voice_name} voice_role={voice_role} bytes={p.stat().st_size}")
             return p
         errors.append("Edge TTS returned invalid audio")
     except Exception as exc:
@@ -175,7 +175,7 @@ def render(headline,photo,audio):
             overlay=Image.new("RGBA",(W,1250),(5,10,20,78)); base.paste(overlay,(0,0),overlay)
         except Exception: pass
     draw=ImageDraw.Draw(base)
-    navy=(15,35,61); yellow=(255,214,10); red=(235,35,55); white=(255,255,255)
+    navy=style["bg"]; yellow=style["highlight"]; red=style["accent"]; white=(255,255,255) if sum(style["bg"])<400 else (25,25,25)
     draw.rectangle((0,0,W,115),fill=navy)
     draw.rectangle((0,115,W,130),fill=red)
     font_paths=[
@@ -199,7 +199,7 @@ def render(headline,photo,audio):
         y+=122
     draw.rectangle((58,1770,1020,1778),fill=red)
     draw.text((58,1810),"원문과 공식 자료를 확인하세요",font=foot,fill=(220,230,242))
-    still=OUT/"cover.jpg"; base.save(still,quality=94)
+    still=OUT/"cover.jpg"; base.save(still,quality=94)\n    (OUT/"template.txt").write_text(style["name"],encoding="utf-8")
     ffmpeg=os.getenv("FFMPEG_BINARY","ffmpeg")
     video=OUT/"seoul-journal-short.mp4"
     cmd=[ffmpeg,"-y","-loop","1","-i",str(still),"-i",str(audio),"-vf","scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,format=yuv420p","-c:v","libx264","-preset","medium","-tune","stillimage","-af","atempo=1.2","-c:a","aac","-b:a","192k","-shortest","-movflags","+faststart",str(video)]
