@@ -92,9 +92,9 @@ jobs:
           PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
           GH_ASSET_TOKEN: ${{ secrets.GH_ASSET_TOKEN || github.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-          BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
-          BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
-          BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
+          BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID || secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET || secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN || secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
         run: python scripts/publish_blogger_33_now.py
       - name: Save exact post IDs and URLs
         if: always()
