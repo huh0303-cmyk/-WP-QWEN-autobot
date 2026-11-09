@@ -1,3 +1,4 @@
+import ast
 import sys
 import unittest
 from pathlib import Path
@@ -57,6 +58,31 @@ class DuplicateLeadImageTests(unittest.TestCase):
     def test_cleanup_keeps_nonmatching_lead_and_later_images(self):
         html = '<p><img src="other.jpg" alt="Other"></p><p><img src="product.jpg"></p>'
         self.assertIsNone(strip_leading_duplicate_block(html, "hero.jpg", "sha", lambda _url: "different"))
+
+
+class PublisherWiringTests(unittest.TestCase):
+    def test_wp_post_imports_image_guard_before_call(self):
+        source = (ROOT / "scripts" / "autopost_mega.py").read_text(encoding="utf-8")
+        tree = ast.parse(source)
+        wp_post = next(
+            node for node in ast.walk(tree)
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name == "wp_post"
+        )
+        import_lines = [
+            node.lineno for node in ast.walk(wp_post)
+            if isinstance(node, ast.ImportFrom)
+            and node.module == "editorial_image_guard"
+            and any(alias.name == "strip_title_duplicate_lead_image" for alias in node.names)
+        ]
+        call_lines = [
+            node.lineno for node in ast.walk(wp_post)
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "strip_title_duplicate_lead_image"
+        ]
+        self.assertTrue(import_lines, "wp_post must import the title-image guard in executable code")
+        self.assertTrue(call_lines, "wp_post must apply the title-image guard before publication")
+        self.assertLess(min(import_lines), min(call_lines))
 
 
 if __name__ == "__main__":
