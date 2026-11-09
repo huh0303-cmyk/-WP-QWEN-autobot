@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Owner directive (2026-11-09): managed affiliate footer is applied fleet-wide;
+# weekly product rotation policy is authoritative in london-shared-policy.json.
 """Backfill exactly ten shared Coupang cards into every existing WP/Blogger post.
 Legacy provider buttons and old product shelves are replaced by the canonical English logo footer.
 
