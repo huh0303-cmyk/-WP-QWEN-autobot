@@ -486,7 +486,7 @@ def main():
         with open(RESULT_PATH, "w", encoding="utf-8") as f:
             json.dump(
                 {"checked_at": checked_at, "records": records, "partial": i < len(SITES)},
-                f, ensure_ascii=False, indent=2,
+                f, ensure_ascii=True, indent=2,
             )
         # 2026-09-26: 0.2초는 공유 호스팅 IP 레이트리밋을 피하기에 너무 짧았다
         # (ensure_required_pages.py 재시도에서도 같은 IP대의 사이트들이 연속
@@ -499,7 +499,7 @@ def main():
     with open(RESULT_PATH, "w", encoding="utf-8") as f:
         json.dump(
             {"checked_at": checked_at, "records": records, "partial": False},
-            f, ensure_ascii=False, indent=2,
+            f, ensure_ascii=True, indent=2,
         )
     log("✅ 완료 — 그저께 방문자·누적방문·GSC 사이트맵 색인수 형식으로 기록")
 
