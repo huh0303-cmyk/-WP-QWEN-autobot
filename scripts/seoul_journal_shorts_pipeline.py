@@ -16,6 +16,7 @@ ROOT=Path.cwd()
 OUT=ROOT/"artifacts"/"seoul-journal-short"
 OUT.mkdir(parents=True,exist_ok=True)
 NAVER_POLITICS="https://news.naver.com/section/100"
+CONTENT_SCOPE="politics"
 UA={"User-Agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/126 Safari/537.36"}
 
 def log(s): print(s,flush=True)
@@ -270,16 +271,19 @@ def upload_private(video,meta,source_url):
     return {"video_id":response["id"],"url":"https://studio.youtube.com/video/"+response["id"]+"/edit","privacy":"private","channel_title":items[0]["snippet"]["title"],"channel_id":items[0]["id"]}
 
 def main():
+    scope=os.getenv("SEOUL_JOURNAL_CONTENT_SCOPE","politics").strip().casefold()
+    if scope != CONTENT_SCOPE:
+        raise RuntimeError("서울저널 워크플로는 정치(politics) 콘텐츠만 허용합니다.")
     url=os.getenv("INPUT_ARTICLE_URL","").strip()
     if not url:
         url,title_hint,selection=choose_naver_article()
         log(f"Auto-selected from Naver Politics: {url} ({selection})")
     else:
-        title_hint=""; selection="User-supplied Naver article URL"
+        title_hint=""; selection="User-supplied Naver Politics article URL (politics-only workflow)"
     title,body,img=extract(url)
     if title_hint and len(title)<8: title=title_hint
     meta=draft(title,body)
-    meta["source_title"]=title; meta["source_url"]=url; meta["article_selection_method"]=selection
+    meta["source_title"]=title; meta["source_url"]=url; meta["article_selection_method"]=selection; meta["content_scope"]="politics"
     (OUT/"package.json").write_text(json.dumps(meta,ensure_ascii=False,indent=2),encoding="utf-8")
     (OUT/"narration.txt").write_text(meta["narration"],encoding="utf-8")
     log("SCRIPT_READY: "+meta["youtube_title"])
