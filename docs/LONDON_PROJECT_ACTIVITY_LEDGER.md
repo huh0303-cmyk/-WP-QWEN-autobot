@@ -925,3 +925,5 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - Verification still required after code is committed: syntax compile, focused `tests/test_channel_long_video.py`, workflow YAML parse, and ideally build-only runs for both languages. No video generation/upload was done in this session.
 - Runtime block: workflow currently lacks `QWEN3_TTS_URL` / optional `QWEN3_TTS_API_KEY` wiring; Fish Audio credential/provider was not probed. Qwen fallback will be skipped until an endpoint URL is configured. Do not report either provider as tested/working without a build log.
 - Change status: code/document/ledger update proposed for review; no main merge and no production deployment/publication in this session.
+
+- PR follow-up: corrected randomized voice selection so legacy single-voice environment overrides cannot pin one narrator; stock query order rotates by scene index to vary demographic coverage. Workflow now passes QWEN3_TTS_URL from Actions variable and QWEN3_TTS_API_KEY from secret, reports missing endpoint without exposing values, and no longer blocks Japanese fallback when Fish Audio is absent. Branch checks still pending.

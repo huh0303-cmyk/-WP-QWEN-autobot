@@ -2,7 +2,7 @@
 """Daily 3-5 minute narrated video for the Health Clinic USA / Japan and Seoul_Jisoo1 shopping channels.
 
 Free-only health TTS order: Fish Audio -> Qwen3-TTS -> Edge TTS. Localized stock searches target Japanese seniors in Japan and a varied U.S. pool including Asian Americans.
-footage and photos -> ffmpeg (Ken Burns, burned-in subtitles) -> YouTube Data API.
+Pexels/Pixabay licensed footage and photos -> ffmpeg (Ken Burns, burned-in subtitles) -> YouTube Data API.
 Safety: exact authenticated channel ID must equal the locked UC ID before any upload; one video
 per KST day per channel (checked against the channel's uploads); health scripts pass a
 claim/dosage gate; shopping scripts may use only facts from config/korea_travel_catalog.json.
@@ -235,6 +235,9 @@ def fetch_media(query: str, want_video: bool, used: set, tmp: Path, idx: int, ki
     if kind == "shopping" and not re.search(r"(?i)korea|seoul|busan|jeju|hanok|myeongdong|hongdae|gangnam", query):
         query = "Korea " + query
     localized_queries = fetch_media_queries(channel, original_query)
+    if channel in ("health_japan", "health_usa") and localized_queries:
+        shift = idx % len(localized_queries)
+        localized_queries = localized_queries[shift:] + localized_queries[:shift]
     pk, xk = os.getenv("PEXELS_API_KEY", ""), os.getenv("PIXABAY_KEY", "") or os.getenv("PIXABAY_API_KEY", "")
     words = query.split()
     queries = localized_queries + [query]
@@ -411,8 +414,7 @@ def choose_health_narrator(channel: str) -> dict:
     }
     pool = pools[channel]
     profile = random.choice(pool)
-    configured_id = os.getenv(profile["profile_env"], "").strip()
-    return {**profile, "id": configured_id or profile["edge_voice"], "language": "ja-JP" if channel == "health_japan" else "en-US"}
+    return {**profile, "id": profile["edge_voice"], "language": "ja-JP" if channel == "health_japan" else "en-US"}
 
 
 def fetch_media_queries(channel: str, query: str) -> list[str]:
