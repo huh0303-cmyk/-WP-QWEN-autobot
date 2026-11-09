@@ -36,7 +36,6 @@ jobs:
           - {site_id: wp_ktech365, url: "https://ktech365.com", secret: KTECH365COM}
           - {site_id: wp_kieca, url: "https://kieca-korea.org", secret: KIECAKOREAORG}
           - {site_id: wp_ksa, url: "https://ksa-korea.org", secret: KSAKOREAORG}
-          - {site_id: wp_sis, url: "https://sis-korea.com", secret: SISKOREACOM}
           - {site_id: wp_kikorea, url: "https://ki-korea.com", secret: KIKOREACOM}
           - {site_id: wp_koreanews, url: "https://koreanews365.com", secret: KOREANEWS365COM}
           - {site_id: wp_seouljournal, url: "https://theseouljournal.com", secret: THESEOULJOURNALCOM}
