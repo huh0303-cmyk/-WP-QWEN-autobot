@@ -43,7 +43,6 @@ WP25 = [
     "https://studyinkorea365.com",
     "https://kieca-korea.org",
     "https://ksa-korea.org",
-    "https://sis-korea.com",
     "https://jobkorea365.com",
     "https://jobinkorea365.com",
     "https://jobkoreaglobal.com",
