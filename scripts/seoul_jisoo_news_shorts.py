@@ -46,7 +46,7 @@ def fetch_news(category):
         try: stamp=parsedate_to_datetime(pub).astimezone(dt.timezone.utc)
         except (ValueError,TypeError): continue
         if not source and " - " in title: source=title.rsplit(" - ",1)[-1].strip()
-        if source not in TRUSTED_SOURCES or not (0 <= (now-stamp).total_seconds() <= 36*3600): continue
+        if not source or source in {"Google News","Google 뉴스"} or not (0 <= (now-stamp).total_seconds() <= 36*3600): continue
         if not link.startswith("https://") or len(title)<12: continue
         headline=title.removesuffix(" - "+source).strip()
         if any(x in headline for x in ("[포토]","[사설]","[칼럼]","오늘의 일정","소문","카더라")): continue
