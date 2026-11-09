@@ -394,7 +394,11 @@ def main():
     # Blogspot pageviews are owned by blogger_total_pageviews.py (Playwright).
     # Do not scrape them a second time here: the requests-only parser can mistake
     # chart labels for the counter and overwrite the validated widget feed.
-    prior_dashboard = json.loads(OUT.read_text(encoding="utf-8")) if OUT.exists() else {}
+    try:
+        prior_dashboard = json.loads(OUT.read_text(encoding="utf-8")) if OUT.exists() else {}
+    except (OSError, ValueError, TypeError):
+        # Ignore a partial/concatenated prior snapshot and rebuild today's dashboard.
+        prior_dashboard = {}
     blogger_pageviews = prior_dashboard.get("blogger_pageviews", {
         "generated_at": None,
         "source": "Awaiting rendered Blogger Stats widget collector",
