@@ -167,7 +167,16 @@ def fetch_photo(image_url):
         log(f"Image unavailable; using branded background: {e}")
         return None
 
+SHORT_STYLES = [
+    {"name":"breaking_red","bg":(18,27,43),"highlight":(255,210,74),"accent":(210,35,45)},
+    {"name":"blue_briefing","bg":(11,43,75),"highlight":(255,226,106),"accent":(28,114,190)},
+    {"name":"parliament_watch","bg":(38,32,28),"highlight":(247,208,133),"accent":(156,47,39)},
+    {"name":"fact_check","bg":(22,54,48),"highlight":(196,239,210),"accent":(42,150,110)},
+    {"name":"evening_report","bg":(37,26,58),"highlight":(255,221,126),"accent":(180,54,76)},
+]
+
 def render(headline,photo,audio):
+    style=random.choice(SHORT_STYLES)
     W,H=1080,1920
     base=Image.new("RGB",(W,H),(12,20,34))
     if photo:
@@ -204,7 +213,8 @@ def render(headline,photo,audio):
         y+=122
     draw.rectangle((58,1770,1020,1778),fill=red)
     draw.text((58,1810),"원문과 공식 자료를 확인하세요",font=foot,fill=(220,230,242))
-    still=OUT/"cover.jpg"; base.save(still,quality=94)\n    (OUT/"template.txt").write_text(style["name"],encoding="utf-8")
+    still=OUT/"cover.jpg"; base.save(still,quality=94)
+    (OUT/"template.txt").write_text(style["name"],encoding="utf-8")
     ffmpeg=os.getenv("FFMPEG_BINARY","ffmpeg")
     video=OUT/"seoul-journal-short.mp4"
     cmd=[ffmpeg,"-y","-loop","1","-i",str(still),"-i",str(audio),"-vf","scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,format=yuv420p","-c:v","libx264","-preset","medium","-tune","stillimage","-af","atempo=1.2","-c:a","aac","-b:a","192k","-shortest","-movflags","+faststart",str(video)]
