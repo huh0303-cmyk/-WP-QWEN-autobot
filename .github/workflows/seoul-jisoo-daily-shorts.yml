@@ -89,6 +89,7 @@ jobs:
           path: |
             artifacts/seoul-jisoo-shorts/**/manifest.json
             artifacts/seoul-jisoo-shorts/**/cover.jpg
+            artifacts/seoul-jisoo-shorts/**/card_*.jpg
             artifacts/seoul-jisoo-shorts/**/short.mp4
           retention-days: 7
           if-no-files-found: warn
