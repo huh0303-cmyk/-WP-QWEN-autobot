@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Append verified, per-destination affiliate offers to WordPress and Blogger."""
 from __future__ import annotations
-import argparse, hashlib, html, json, os, sys
+import argparse, hashlib, html, json, os, sys, re
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
@@ -13,7 +13,7 @@ ENGINE=ROOT/"affiliate-engine"
 ROUTING=ENGINE/"config"/"affiliate-routing.json"
 POLICY=ROOT/"config"/"affiliate_distribution_policy.json"
 CATALOG_DIR=ENGINE/"data"/"catalogs"
-MARKER="<!-- london-affiliate-engine:v5 -->"
+MARKER="<!-- london-affiliate-engine:v6 -->"
 DISCLOSURE="<p><small>Disclosure: This section contains affiliate links. We may earn a commission at no extra cost to you.</small></p>"
 
 def load_json(path:Path)->Any:
@@ -105,9 +105,16 @@ def build_block(offers:list[dict[str,Any]],header_buttons:list[dict[str,Any]]|No
     cards=[]
     for o in offers:
         title=html.escape(o["title"])
-        cards.append(f'<article class="london-affiliate-card"><a class="london-affiliate-image-link" href="{html.escape(o["url"],quote=True)}" rel="sponsored nofollow noopener" target="_blank"><img src="{html.escape(o["image_url"],quote=True)}" alt="{html.escape(o.get("image_alt",o["title"]),quote=True)}" loading="lazy"/></a><small>{html.escape(o.get("category_label",o.get("category","")))}</small><strong>{title}</strong><a class="london-affiliate-cta" href="{html.escape(o["url"],quote=True)}" rel="sponsored nofollow noopener" target="_blank">???? ????</a></article>')
+        cards.append(f'<article class="london-affiliate-card"><a class="london-affiliate-image-link" href="{html.escape(o["url"],quote=True)}" rel="sponsored nofollow noopener" target="_blank"><img src="{html.escape(o["image_url"],quote=True)}" alt="{html.escape(o.get("image_alt",o["title"]),quote=True)}" loading="lazy"/></a><small>{html.escape(o.get("category_label",o.get("category","")))}</small><strong>{title}</strong><a class="london-affiliate-cta" href="{html.escape(o["url"],quote=True)}" rel="sponsored nofollow noopener" target="_blank">Shop now</a></article>')
     css="<style>.london-affiliate-provider-buttons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:18px 0 24px}.london-affiliate-provider-button{display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:10px;border-radius:9px;background:var(--brand-color);color:#fff!important;text-decoration:none!important;font-weight:800;text-align:center}.london-affiliate-brand-logo{max-width:34px;max-height:24px;object-fit:contain}.london-affiliate-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.london-affiliate-card{display:flex;min-width:0;flex-direction:column;gap:8px;border:1px solid #e5e7eb;border-radius:12px;padding:12px}.london-affiliate-card img{width:100%;height:160px;object-fit:contain}.london-affiliate-card strong{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;min-height:4.5em}.london-affiliate-cta{margin-top:auto;text-align:center;padding:9px;background:#17365d;color:white!important;border-radius:7px;text-decoration:none!important}@media(max-width:640px){.london-affiliate-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.london-affiliate-provider-buttons{gap:6px}.london-affiliate-provider-button{font-size:12px;padding:8px 4px;min-height:44px}}</style>"
-    return "\n".join([MARKER,'<section class="london-affiliate-engine"><div class="london-affiliate-provider-buttons">',*buttons,'</div>',DISCLOSURE,'<h2>?? ??? ?? ?? ??</h2>','<div class="london-affiliate-grid">',*cards,'</div></section>',css])
+    return "\n".join([MARKER,'<section class="london-affiliate-engine"><div class="london-affiliate-provider-buttons">',*buttons,'</div>',DISCLOSURE,'<h2>Recommended products from Seoulmall</h2>','<div class="london-affiliate-grid">',*cards,'</div></section>',css])
+
+def strip_previous_ktrip_affiliate(content:str)->str:
+    content=re.sub(r"<!-- KTRIP365_COUPANG_ALL_POSTS_V1:[0-9]+ -->.*?</section>","",content,flags=re.I|re.S)
+    content=re.sub(r"<!-- KTRIP365_COUPANG_[^>]*-->.*?</section>","",content,flags=re.I|re.S)
+    content=re.sub(r"<!-- london-affiliate-engine:v[0-9]+ -->.*?</section>","",content,flags=re.I|re.S)
+    content=re.sub(r"<p>\s*</p>","",content,flags=re.I)
+    return content
 
 def can_write(requested:bool)->bool:
     return requested and os.getenv("AFFILIATE_WRITE_ENABLED","").lower()=="true"
@@ -115,30 +122,38 @@ def can_write(requested:bool)->bool:
 def wordpress(dest,since,block_for,write,scope,batch_size):
     base=dest["url"].rstrip("/"); password=os.getenv(dest["secret_name"],""); rows=[]; page=1
     while len(rows)<batch_size:
-        params={"status":"publish","per_page":100,"page":page,"orderby":"date","order":"desc"}
+        params={"status":"publish","per_page":100,"page":page,"orderby":"date","order":"desc","context":"edit"}
         if scope=="new": params["after"]=since
         response=requests.get(f"{base}/wp-json/wp/v2/posts",params=params,timeout=30)
         if response.status_code==400 and page>1: break
         response.raise_for_status(); posts=response.json()
         if not posts: break
         for post in posts:
-            content=post["content"]["rendered"]
+            content=post["content"].get("raw") or post["content"].get("rendered","")
             result={"platform":"wordpress","site":dest["site_key"],"post_id":post["id"],"url":post["link"],"action":"skipped"}
-            if MARKER in content: result["reason"]="already_has_v5_marker"
+            current=content
+            if MARKER in current:
+                marker_section=current.split(MARKER,1)[1]
+                valid=(marker_section.count('class="london-affiliate-card"')==10 and all(f'href="{b.get("affiliate_url","")}"' in marker_section for b in load_site_catalog(dest["site_key"]).get("header_buttons",[])))
+                if valid:
+                    result["reason"]="already_has_valid_v5_marker"
+                    rows.append(result)
+                    if len(rows)>=batch_size: break
+                    continue
+            current=strip_previous_ktrip_affiliate(current)
+            try: block=block_for(post["title"]["rendered"],current,dest["site_key"])
+            except ValueError as exc: result.update(action="blocked",reason=str(exc))
             else:
-                try: block=block_for(post["title"]["rendered"],content,dest["site_key"])
-                except ValueError as exc: result.update(action="blocked",reason=str(exc))
-                else:
-                    result["action"]="would_append"
-                    if write:
-                        if not password: result.update(action="blocked",reason="missing_wordpress_secret")
-                        else:
-                            update=requests.post(f"{base}/wp-json/wp/v2/posts/{post['id']}",auth=(os.getenv("WP_USER",""),password),json={"content":content+"\n"+block},timeout=30)
-                            update.raise_for_status()
-                            verify=requests.get(f"{base}/wp-json/wp/v2/posts/{post['id']}",params={"context":"edit"},auth=(os.getenv("WP_USER",""),password),timeout=30)
-                            verify.raise_for_status()
-                            if MARKER not in verify.json()["content"]["raw"]: raise RuntimeError("wordpress_readback_marker_missing")
-                            result["action"]="appended_verified"
+                result["action"]="would_replace_affiliate_block"
+                if write:
+                    if not password: result.update(action="blocked",reason="missing_wordpress_secret")
+                    else:
+                        update=requests.post(f"{base}/wp-json/wp/v2/posts/{post['id']}",auth=(os.getenv("WP_USER",""),password),json={"content":current.rstrip()+"\n"+block},timeout=30)
+                        update.raise_for_status()
+                        verify=requests.get(f"{base}/wp-json/wp/v2/posts/{post['id']}",params={"context":"edit"},auth=(os.getenv("WP_USER",""),password),timeout=30)
+                        verify.raise_for_status()
+                        if MARKER not in verify.json()["content"]["raw"]: raise RuntimeError("wordpress_readback_marker_missing")
+                        result["action"]="replaced_verified"
             rows.append(result)
             if len(rows)>=batch_size: break
         if scope=="new" or len(posts)<100: break
@@ -185,6 +200,7 @@ def main():
     parser.add_argument("--since-hours",type=int,default=36)
     parser.add_argument("--batch-size",type=int,default=5)
     parser.add_argument("--write",action="store_true")
+    parser.add_argument("--site-key",default="")
     args=parser.parse_args(); routing=load_json(ROUTING); write=can_write(args.write)
     if args.write and not write: raise SystemExit("write blocked: set AFFILIATE_WRITE_ENABLED=true as a GitHub secret")
     since=recent_since(args.since_hours)
@@ -195,6 +211,7 @@ def main():
     results=[]
     if args.platform in {"wordpress","all"}:
         for dest in load_destinations("wordpress"):
+            if args.site_key and dest["site_key"]!=args.site_key: continue
             try: results.extend(wordpress(dest,since,block_for,write,args.scope,args.batch_size))
             except (requests.RequestException,ValueError,RuntimeError) as exc: results.append({"platform":"wordpress","site":dest["site_key"],"action":"blocked","reason":str(exc)[:240]})
     if args.platform in {"blogger","all"}:
