@@ -169,11 +169,11 @@ def photo_sequence(meta,out):
             "action":"query","list":"categorymembers","cmtitle":"Category:Kim Jong-in",
             "cmtype":"file","cmlimit":100,"format":"json"},timeout=30)
         response.raise_for_status()
-        # Only accept file titles that explicitly identify Kim Jong-in.
-        # Excludes other people's cropped portraits and videos in mixed group categories.
+        # Require the actual named subject in the file title. Mixed-category
+        # portraits of other people, group-only shots, videos, and signatures are excluded.
         files=[x["title"] for x in response.json()["query"]["categorymembers"]
                if re.search(r"Kim[_ ](?:Jong[- ]?in|Chong[- ]?in)",x["title"],re.I)
-               and not re.search(r"video|signature",x["title"],re.I)]
+               and not re.search(r"video|signature|Jo[_ ]Myeong",x["title"],re.I)]
         preferred=("Kim_Jong-in_in_Aeranwon_(cropped).jpg",
                    "Kim_Jongin's_press_conference_in_2016.jpg")
         files=sorted(files,key=lambda title:(0 if any(p.lower() in title.lower().replace(" ","_") for p in preferred) else 1,title))
