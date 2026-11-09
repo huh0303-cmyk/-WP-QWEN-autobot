@@ -1,6 +1,6 @@
 {
-  "version": 10,
-  "name": "London Project affiliate footer standard v10 - logos, Coupang cards, then SeoulMall storefront",
+  "version": 11,
+  "name": "London Project affiliate footer standard v11 - owner-directed weekly 5+5 rotation",
   "platforms": [
     "wordpress",
     "blogger"
@@ -21,11 +21,20 @@
       "k_beauty_skincare": 5
     },
     "randomize_per_article": false,
-    "avoid_repeating_same_ten_item_set": false,
-    "fixed_product_set_per_site": true,
-    "reuse_same_ten_until_manual_replacement": true,
+    "avoid_repeating_same_ten_item_set": true,
+    "fixed_product_set_per_site": false,
+    "reuse_same_ten_until_manual_replacement": false,
     "english_description_required": true,
-    "bottom_coupang_logo": true
+    "bottom_coupang_logo": true,
+    "rotation_cadence": "weekly_168_hours",
+    "weekly_category_mix": {
+      "k_beauty_skincare": 5,
+      "health_functional_foods": 5
+    },
+    "rotation_scope": "all_existing_and_new_wordpress_25_and_blogspot_33_posts",
+    "tracking_requirement": "each product must use an account-generated Coupang Partners tracking URL",
+    "image_requirement": "official Coupang affiliate banner image only",
+    "missing_verified_replacement": "hold rotation and retain current valid set; never invent URLs or images"
   },
   "trip_com_categories": [],
   "disabled_providers": [
@@ -77,17 +86,17 @@
     "agoda_enabled": false,
     "require_trip_com_three_tracked_categories": false,
     "olive_young_reward_url_verification_pending": true,
-    "require_exact_category_mix": false,
+    "require_exact_category_mix": true,
     "require_site_pool_target_100": false,
     "randomize_per_article": false,
-    "avoid_repeated_ten_product_set": false,
+    "avoid_repeated_ten_product_set": true,
     "no_trip_category_text_link_row": true,
     "footer_logo_brand_colors": {
       "trip_com": "blue",
       "olive_young_global": "green",
       "coupang_partners": "orange"
     },
-    "fixed_product_set_per_site": true,
+    "fixed_product_set_per_site": false,
     "require_official_company_logo_images": true,
     "require_footer_only": true,
     "never_insert_at_article_top_or_inside_body": true,
@@ -115,5 +124,26 @@
     "text": "This post contains Coupang Partners affiliate links. If you visit Coupang through one of these links and make a purchase within 24 hours, including a purchase of another eligible product, we may earn a commission at no additional cost to you. Attribution rules, cancellations and returns may affect commission eligibility.",
     "text_ko": "이 게시물에는 쿠팡 파트너스 제휴 링크가 포함되어 있습니다. 이 링크를 통해 쿠팡에 방문한 뒤 24시간 이내에 다른 상품을 구매하더라도 운영정책상 실적으로 인정되는 구매라면 수수료를 제공받을 수 있습니다. 구매 경로의 최종 기여, 주문 취소 및 반품 등에 따라 수수료가 인정되지 않을 수 있습니다.",
     "trademark_notice": "Coupang’s trademarks are used under license from Coupang, LLC or its affiliates."
+  },
+  "supersedes": [
+    "version 10 fixed product set per site",
+    "reuse same ten until manual replacement",
+    "no weekly auto rotation"
+  ],
+  "rotation_policy": {
+    "priority": "owner_latest_directive",
+    "cadence": "every_168_hours",
+    "timezone": "Asia/Seoul",
+    "categories": {
+      "k_beauty_skincare": 5,
+      "health_functional_foods": 5
+    },
+    "all_blog_post_footer_apply": true,
+    "apply_to_existing_posts": true,
+    "apply_to_new_posts": true,
+    "links": "verified account-generated Coupang Partners tracking links",
+    "images": "verified Coupang affiliate banner assets",
+    "fallback": "keep last verified set and flag rotation pending when the next verified set is unavailable",
+    "supersedes_prior_fixed_set_rules": true
   }
 }
