@@ -1,7 +1,6 @@
-name: Seoul Journal Automatic Political Shorts
+name: Seoul Journal Automatic Domestic Political Shorts
 
 on:
-  # Manual recovery only; daily scheduling is owned by seoul-journal-daily-shorts.yml.
   workflow_dispatch:
 
 permissions:
@@ -17,6 +16,7 @@ jobs:
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
+
       - name: Validate required secrets before generation
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -35,16 +35,22 @@ jobs:
             fi
           done
           if [ -n "$missing" ]; then
-            echo "Stopped before generating or uploading a video."
             exit 1
           fi
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
           cache: pip
-      - name: Install requests for read-only OAuth preflight
-        run: python -m pip install --disable-pip-version-check requests
-      - name: Verify exact Seoul Journal channel before spending build time
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-noto-cjk
+          python -m pip install --upgrade pip
+          pip install requests trafilatura beautifulsoup4 Pillow openai google-api-python-client google-auth google-auth-httplib2 edge-tts
+
+      - name: Verify exact Seoul Journal channel
         env:
           PROFILE: SEOUL_JOURNAL
           CLIENT_ID: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_CLIENT_ID }}
@@ -52,15 +58,8 @@ jobs:
           REFRESH_TOKEN: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN }}
           EXPECTED_CHANNEL_ID: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID }}
         run: python scripts/youtube_auth_preflight.py
-      - name: Install system fonts and FFmpeg
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y ffmpeg fonts-noto-cjk
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install requests trafilatura beautifulsoup4 Pillow openai google-api-python-client google-auth google-auth-httplib2 edge-tts
-      - name: Build and publish one source-grounded political Short
+
+      - name: Build domestic political breaking-news Short
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           FISH_AUDIO_API_KEY: ${{ secrets.FISH_AUDIO_API_KEY }}
@@ -68,13 +67,25 @@ jobs:
           YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_CLIENT_SECRET }}
           SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN }}
           SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID }}
+          SEOUL_JOURNAL_CONTENT_SCOPE: politics
+          DOMESTIC_POLITICS_ONLY: "1"
+          POLITICAL_SOURCE_PRIORITY: "chosun.com,news.chosun.com,hani.co.kr,news.naver.com"
+          POLITICAL_SOURCE_POLICY: "Use Chosun Ilbo and Hankyoreh breaking coverage as contrasting source leads; verify against the original report and attribute claims."
+          POLITICIAN_PHOTO_ALLOWLIST: "이재명,한동훈,김민석,장동혁,추미애,주진우,이진숙,김태우,이용철,국무총리,장관,서영교"
+          POLITICIAN_PHOTO_POLICY: "Use a real, current, source-attributed public photograph of the central political figure when available; do not fabricate likenesses; keep captions neutral."
           YOUTUBE_PRIVACY_STATUS: private
-        run: python scripts/seoul_journal_shorts_pipeline.py
+        run: |
+          set -eu
+          echo "Domestic politics only"
+          echo "Source priority: $POLITICAL_SOURCE_PRIORITY"
+          echo "Photo policy: real, attributed political figure photos with neutral framing"
+          python scripts/seoul_journal_shorts_pipeline.py
+
       - name: Save video package and upload receipt
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: seoul-journal-auto-short-${{ github.run_id }}
+          name: seoul-journal-domestic-politics-${{ github.run_id }}
           path: artifacts/seoul-journal-short/
           if-no-files-found: warn
           retention-days: 14
