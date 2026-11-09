@@ -9,7 +9,7 @@ NAVY=(11,23,48); YELLOW=(255,212,0); RED=(230,59,66); WHITE=(255,255,255)
 PORTRAITS={
     "이재명": "File:Lee Jae-myung (2025) (cropped).jpg",
 }
-SUBJECT_ALIASES={"오세훈":("오세훈","Oh Se-hoon","Oh Se Hun"),"이용철":("이용철","Lee Yong Cheol","Lee Yong-cheol")}
+SUBJECT_ALIASES={"오세훈":("오세훈","Oh Se-hoon","Oh Se Hun"),"이용철":("이용철","Lee Yong Cheol","Lee Yong-cheol"),"김종인":("김종인","Kim Jong-in","Kim Chong-in")}
 THUMBNAIL_STYLES=("split_red","giant_quote","bottom_strip","angled_label","face_left")
 
 def run(args):
@@ -119,7 +119,9 @@ def card(headline,caption,photo,credit,index=0,landscape=False,zoom=1.0,overlay_
     cap_size=50
     cap=wrap(caption,cap_size,width)
     if len(cap)>3: cap_size=44; cap=wrap(caption,cap_size,width)
-    for i,line in enumerate(cap[:3]): text(left,top+330+i*(cap_size+12),line,cap_size,WHITE)
+    # Place narration captions around the screen center, synchronized to each narration beat.
+    cap_top=940-(len(cap[:3])*(cap_size+12))//2
+    for i,line in enumerate(cap[:3]): text((w-d.textbbox((0,0),line,font=font(cap_size))[2])//2,cap_top+i*(cap_size+12),line,cap_size,WHITE)
     text(left,1760,label,20)
     return im
 
@@ -137,7 +139,7 @@ def photo_sequence(meta,out):
     evidence=meta.get("source_title","")+" "+meta["youtube_title"]+" "+meta["narration"]
     subject=title_subject(meta.get("source_title") or meta.get("youtube_title"))
     if not subject: raise RuntimeError("NO_TITLE_MATCHED_SUBJECT: refusing unrelated portrait")
-    english={"이재명":"Lee Jae-myung","오세훈":"Oh Se-hoon","이용철":"Lee Yong Cheol"}[subject]
+    english={"이재명":"Lee Jae-myung","오세훈":"Oh Se-hoon","이용철":"Lee Yong Cheol","김종인":"Kim Jong-in"}[subject]
     if subject and not english:
         # Resolve the exact Korean label before searching named Commons images.
         response=session.get("https://www.wikidata.org/w/api.php",params={
@@ -162,6 +164,12 @@ def photo_sequence(meta,out):
         files=[x["title"] for x in response.json()["query"]["categorymembers"]]
         # Prefer current official municipal portrait releases, then other exact-category archival images.
         files.sort(key=lambda name:int((re.search(r"(20\d{2})",name) or ["", "0"])[1]),reverse=True)
+    if not files and subject=="김종인":
+        response=session.get("https://commons.wikimedia.org/w/api.php",params={
+            "action":"query","list":"categorymembers","cmtitle":"Category:Kim Jong-in",
+            "cmtype":"file","cmlimit":100,"format":"json"},timeout=30)
+        response.raise_for_status()
+        files=[x["title"] for x in response.json()["query"]["categorymembers"]]
     if not files and english:
         response=session.get("https://commons.wikimedia.org/w/api.php",params={
             "action":"query","list":"search","srsearch":'intitle:"'+english+'" filetype:bitmap',
