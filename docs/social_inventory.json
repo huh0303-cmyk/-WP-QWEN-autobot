@@ -402,66 +402,6 @@
       "last_publish": ""
     },
     {
-      "platform": "Instagram",
-      "name": "English Survival",
-      "handle": "englishsurvival1",
-      "url": "https://www.instagram.com/englishsurvival1/",
-      "status": "legacy_identity_recheck_required",
-      "exists": true,
-      "followers": null,
-      "views": null,
-      "last_publish": "",
-      "identity_verified": false
-    },
-    {
-      "platform": "Instagram",
-      "name": "Japanese Survival",
-      "handle": "japanese_survival1",
-      "url": "https://www.instagram.com/japanese_survival1/",
-      "status": "legacy_identity_recheck_required",
-      "exists": true,
-      "followers": null,
-      "views": null,
-      "last_publish": "",
-      "identity_verified": false
-    },
-    {
-      "platform": "Instagram",
-      "name": "Seoul TOPIK",
-      "handle": "sis_topik1",
-      "url": "https://www.instagram.com/sis_topik1/",
-      "status": "legacy_identity_recheck_required",
-      "exists": true,
-      "followers": null,
-      "views": null,
-      "last_publish": "",
-      "identity_verified": false
-    },
-    {
-      "platform": "Instagram",
-      "name": "서울 트립365",
-      "handle": "seoul_trip365",
-      "url": "https://www.instagram.com/seoul_trip365/",
-      "status": "legacy_identity_recheck_required",
-      "exists": true,
-      "followers": null,
-      "views": null,
-      "last_publish": "",
-      "identity_verified": false
-    },
-    {
-      "platform": "Instagram",
-      "name": "서울 헬스365",
-      "handle": "seoul_health365",
-      "url": "https://www.instagram.com/seoul_health365/",
-      "status": "legacy_identity_recheck_required",
-      "exists": true,
-      "followers": null,
-      "views": null,
-      "last_publish": "",
-      "identity_verified": false
-    },
-    {
       "platform": "Threads",
       "name": "English Pick",
       "handle": "english_pick",
@@ -525,54 +465,6 @@
       "followers": null,
       "views": null,
       "last_publish": ""
-    },
-    {
-      "platform": "Threads",
-      "name": "English Survival",
-      "handle": "english_survival_1",
-      "url": "https://www.threads.com/@english_survival_1",
-      "status": "legacy_identity_recheck_required",
-      "exists": true,
-      "followers": null,
-      "views": null,
-      "last_publish": "",
-      "identity_verified": false
-    },
-    {
-      "platform": "Threads",
-      "name": "Seoul TOPIK",
-      "handle": "seoultopik",
-      "url": "https://www.threads.com/@seoultopik",
-      "status": "legacy_identity_recheck_required",
-      "exists": true,
-      "followers": null,
-      "views": null,
-      "last_publish": "",
-      "identity_verified": false
-    },
-    {
-      "platform": "Threads",
-      "name": "서울 라이프365",
-      "handle": "seoul_life365",
-      "url": "https://www.threads.com/@seoul_life365",
-      "status": "legacy_identity_recheck_required",
-      "exists": true,
-      "followers": null,
-      "views": null,
-      "last_publish": "",
-      "identity_verified": false
-    },
-    {
-      "platform": "Threads",
-      "name": "서울 헬스365",
-      "handle": "seoul_health365",
-      "url": "https://www.threads.com/@seoul_health365",
-      "status": "legacy_identity_recheck_required",
-      "exists": true,
-      "followers": null,
-      "views": null,
-      "last_publish": "",
-      "identity_verified": false
     },
     {
       "platform": "TikTok",
@@ -651,6 +543,116 @@
       "followers": null,
       "views": null,
       "last_publish": ""
+    }
+  ],
+  "legacy_social_accounts_pending_reconciliation": [
+    {
+      "platform": "Instagram",
+      "name": "English Survival",
+      "handle": "englishsurvival1",
+      "url": "https://www.instagram.com/englishsurvival1/",
+      "status": "legacy_identity_recheck_required",
+      "exists": true,
+      "followers": null,
+      "views": null,
+      "last_publish": "",
+      "identity_verified": false
+    },
+    {
+      "platform": "Instagram",
+      "name": "Japanese Survival",
+      "handle": "japanese_survival1",
+      "url": "https://www.instagram.com/japanese_survival1/",
+      "status": "legacy_identity_recheck_required",
+      "exists": true,
+      "followers": null,
+      "views": null,
+      "last_publish": "",
+      "identity_verified": false
+    },
+    {
+      "platform": "Instagram",
+      "name": "Seoul TOPIK",
+      "handle": "sis_topik1",
+      "url": "https://www.instagram.com/sis_topik1/",
+      "status": "legacy_identity_recheck_required",
+      "exists": true,
+      "followers": null,
+      "views": null,
+      "last_publish": "",
+      "identity_verified": false
+    },
+    {
+      "platform": "Instagram",
+      "name": "서울 트립365",
+      "handle": "seoul_trip365",
+      "url": "https://www.instagram.com/seoul_trip365/",
+      "status": "legacy_identity_recheck_required",
+      "exists": true,
+      "followers": null,
+      "views": null,
+      "last_publish": "",
+      "identity_verified": false
+    },
+    {
+      "platform": "Instagram",
+      "name": "서울 헬스365",
+      "handle": "seoul_health365",
+      "url": "https://www.instagram.com/seoul_health365/",
+      "status": "legacy_identity_recheck_required",
+      "exists": true,
+      "followers": null,
+      "views": null,
+      "last_publish": "",
+      "identity_verified": false
+    },
+    {
+      "platform": "Threads",
+      "name": "English Survival",
+      "handle": "english_survival_1",
+      "url": "https://www.threads.com/@english_survival_1",
+      "status": "legacy_identity_recheck_required",
+      "exists": true,
+      "followers": null,
+      "views": null,
+      "last_publish": "",
+      "identity_verified": false
+    },
+    {
+      "platform": "Threads",
+      "name": "Seoul TOPIK",
+      "handle": "seoultopik",
+      "url": "https://www.threads.com/@seoultopik",
+      "status": "legacy_identity_recheck_required",
+      "exists": true,
+      "followers": null,
+      "views": null,
+      "last_publish": "",
+      "identity_verified": false
+    },
+    {
+      "platform": "Threads",
+      "name": "서울 라이프365",
+      "handle": "seoul_life365",
+      "url": "https://www.threads.com/@seoul_life365",
+      "status": "legacy_identity_recheck_required",
+      "exists": true,
+      "followers": null,
+      "views": null,
+      "last_publish": "",
+      "identity_verified": false
+    },
+    {
+      "platform": "Threads",
+      "name": "서울 헬스365",
+      "handle": "seoul_health365",
+      "url": "https://www.threads.com/@seoul_health365",
+      "status": "legacy_identity_recheck_required",
+      "exists": true,
+      "followers": null,
+      "views": null,
+      "last_publish": "",
+      "identity_verified": false
     }
   ]
 }
