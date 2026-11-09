@@ -1,7 +1,7 @@
 {
- "generated_at": "2026-11-10T00:22:58.323501+09:00",
+ "generated_at": "2026-11-10T00:26:23.873699+09:00",
  "reference_date": "2026-11-07",
- "blogspot_content_metadata_checked_at": "2026-11-10T00:22:58.323501+09:00",
+ "blogspot_content_metadata_checked_at": "2026-11-10T00:26:23.873699+09:00",
  "blogger_pageviews": {
   "generated_at": null,
   "source": "Awaiting rendered Blogger Stats widget collector",
@@ -1479,28 +1479,6 @@
    "google_indexed_delta": null,
    "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "rank": 65
-  },
-  {
-   "site": "sis-korea.com",
-   "url": "https://sis-korea.com",
-   "platform": "wordpress",
-   "display_name": "sis-korea.com",
-   "status": "NO_GSC_ACCESS",
-   "gsc_property": null,
-   "content": null,
-   "latest_publish_date": null,
-   "content_delta": null,
-   "clicks": null,
-   "clicks_delta": null,
-   "impressions": null,
-   "impressions_delta": null,
-   "cumulative": null,
-   "cumulative_delta": null,
-   "cumulative_impressions": null,
-   "google_indexed": null,
-   "google_indexed_delta": null,
-   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
-   "rank": 66
   }
  ]
 }
