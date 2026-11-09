@@ -1,15 +1,16 @@
-name: Seoul Jisoo daily politics sports Shorts
+name: Seoul Jisoo daily issue card Shorts
 on:
   schedule:
     - cron: "17 1 * * *"
     - cron: "47 9 * * *"
+    - cron: "23 13 * * *"
   workflow_dispatch:
     inputs:
       category:
         required: true
         type: choice
-        options: [politics, sports]
-        default: sports
+        options: [politics, society, sports, shopping]
+        default: society
       upload:
         description: Publish when Seoul Jisoo live gate is enabled
         type: boolean
@@ -31,6 +32,9 @@ jobs:
       SEOUL_JISOO_SHORTS_LIVE: ${{ vars.SEOUL_JISOO_SHORTS_LIVE }}
       SEOUL_JISOO_COUPANG_HEALTH_URL: ${{ secrets.SEOUL_JISOO_COUPANG_HEALTH_URL }}
       SEOUL_JISOO_COUPANG_BEAUTY_URL: ${{ secrets.SEOUL_JISOO_COUPANG_BEAUTY_URL }}
+      SEOUL_MALL_URL: ${{ secrets.SEOUL_MALL_URL }}
+      FISH_AUDIO_API_KEY: ${{ secrets.FISH_AUDIO_API_KEY }}
+      QWEN3_TTS_URL: ${{ vars.QWEN3_TTS_URL }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -54,6 +58,7 @@ jobs:
             case "$SCHEDULE" in
               '17 1 * * *') CATEGORY=politics ;;
               '47 9 * * *') CATEGORY=sports ;;
+              '23 13 * * *') CATEGORY=shopping ;;
               *) echo "::error::Unrecognized schedule"; exit 1 ;;
             esac
             REQUEST_UPLOAD=true
