@@ -117,7 +117,7 @@ def build_prompt(channel: str, topic: dict, retry_note: str = "") -> str:
             f"Topic: {name}" + (f" (focus: {topic['focus']})" if topic.get("focus") else "") + f". Type: {topic['kind']}.\n"
             + ("Audience: adults 60+ and their families in Japan. Warm, calm, plain spoken Japanese, short sentences. Use familiar Japanese daily-life settings and examples.\n" if lang == "ja" else
                "Audience: adults 60+ and their families in the United States. Warm, calm, plain American English, short sentences. Show a mix of U.S. seniors, including Asian American people, without inferring identity from appearance.\n")
-            "Cover: what it is, what it is commonly used for, what the general evidence says (mixed or limited where true), who should be careful "
+            + "Cover: what it is, what it is commonly used for, what the general evidence says (mixed or limited where true), who should be careful "
             "(medication interactions such as blood thinners, kidney or liver conditions, pregnancy not relevant), food sources where relevant, "
             "and when to see a doctor. Use cautious wording such as 'may help support' or 'is often used for'.\n"
             "FORBIDDEN: cure/treat/prevent-disease claims, miracle or guarantee language, dosage numbers (no mg/mcg/IU/grams), brand names, "
