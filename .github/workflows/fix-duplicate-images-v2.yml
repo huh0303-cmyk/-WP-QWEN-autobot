@@ -21,9 +21,9 @@ jobs:
       - run: pip install requests beautifulsoup4 pillow
       - env:
           APPLY_CHANGES: ${{ inputs.apply_changes }}
-          BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
-          BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
-          BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
+          BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID || secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET || secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN || secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
           JOBINKOREA365COM: ${{ secrets.JOBINKOREA365COM }}
           JOBKOREA365COM: ${{ secrets.JOBKOREA365COM }}
           JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
