@@ -96,8 +96,21 @@ SOURCE TITLE: """+title+"\nSOURCE BODY:\n"+body[:14000]
                 if not 6<=len(meta["captions"])<=10: raise RuntimeError("Caption gate")
                 if len(meta["youtube_title"])>100: raise RuntimeError("Title too long")
                 if len(meta["headline"].splitlines())>3: raise RuntimeError("Headline too many lines")
+                # A spoken, issue-specific audience vote is mandatory on every Short.
+                # Append it to narration and its final visual caption so the card is actually rendered.
+                subject=(meta.get("visual_subject") or "").strip()
+                if subject and subject not in title:
+                    subject=""
+                issue=subject or "이 쟁점"
+                vote=f"{issue}에 대한 이 발언에 동의하십니까? 동의 또는 비동의, 댓글로 투표해 주세요."
+                if not re.search(r"(댓글.*투표|투표.*댓글)",meta["narration"][-100:]):
+                    meta["narration"]=meta["narration"].rstrip()+" "+vote
+                captions=list(meta["captions"])
+                captions[-1]=f"{issue} 주장, 동의?\\n동의 vs 비동의\\n댓글로 투표"
+                meta["captions"]=captions
                 meta["writer_model"]=model
                 meta["title_template_id"]=title_template[0]
+                meta["poll_vote_enforced"]=vote
                 return meta
         except Exception as exc: errors.append(type(exc).__name__)
     raise RuntimeError("Gemini-only generation failed: "+",".join(errors))
