@@ -109,8 +109,11 @@ jobs:
           run-id: ${{ inputs.reuse_run }}
           github-token: ${{ github.token }}
           path: artifacts/seoul-journal-reuse/
+      - name: Refresh restored review package
+        if: ${{ inputs.reuse_run != '' && inputs.verify_only == true }}
+        run: python scripts/seoul_journal_refresh_package.py artifacts/seoul-journal-reuse/
       - name: Publish restored revision
-        if: ${{ inputs.reuse_run != '' }}
+        if: ${{ inputs.reuse_run != '' && inputs.verify_only != true }}
         env:
           SEOUL_JOURNAL_SLOT_MARKER: SJ_REVISION:oEZaFVnqKR0:motion-v2
         run: |
