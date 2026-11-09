@@ -43,15 +43,15 @@ class LanguageProfile:
 
 LANGUAGES = {
     "ko": LanguageProfile("ko", "KOREAN / TOPIK", "ko-KR-SunHiNeural", "ko-KR", (85, 109, 255)),
-    "en": LanguageProfile("en", "ENGLISH SURVIVAL", "en-US-JennyNeural", "en-US", (12, 173, 125)),
-    "ja": LanguageProfile("ja", "JAPANESE SURVIVAL", "ja-JP-NanamiNeural", "ja-JP", (236, 72, 93)),
-    "zh": LanguageProfile("zh", "CHINESE SURVIVAL", "zh-CN-XiaoxiaoNeural", "zh-CN", (235, 77, 75)),
-    "vi": LanguageProfile("vi", "VIETNAMESE SURVIVAL", "vi-VN-HoaiMyNeural", "vi-VN", (255, 153, 46)),
-    "es": LanguageProfile("es", "SPANISH SURVIVAL", "es-ES-ElviraNeural", "es-ES", (255, 193, 7)),
-    "fr": LanguageProfile("fr", "FRENCH SURVIVAL", "fr-FR-DeniseNeural", "fr-FR", (44, 123, 229)),
-    "de": LanguageProfile("de", "GERMAN SURVIVAL", "de-DE-KatjaNeural", "de-DE", (120, 83, 190)),
-    "it": LanguageProfile("it", "ITALIAN SURVIVAL", "it-IT-ElsaNeural", "it-IT", (0, 150, 136)),
-    "pt": LanguageProfile("pt", "PORTUGUESE SURVIVAL", "pt-BR-FranciscaNeural", "pt-BR", (46, 125, 50)),
+    "en": LanguageProfile("en", "ENGLISH_SOS", "en-US-JennyNeural", "en-US", (12, 173, 125)),
+    "ja": LanguageProfile("ja", "JAPANESE_SOS", "ja-JP-NanamiNeural", "ja-JP", (236, 72, 93)),
+    "zh": LanguageProfile("zh", "CHINESE_SOS", "zh-CN-XiaoxiaoNeural", "zh-CN", (235, 77, 75)),
+    "vi": LanguageProfile("vi", "VIETNAMESE_SOS", "vi-VN-HoaiMyNeural", "vi-VN", (255, 153, 46)),
+    "es": LanguageProfile("es", "SPANISH_SOS", "es-ES-ElviraNeural", "es-ES", (255, 193, 7)),
+    "fr": LanguageProfile("fr", "FRENCH_SOS", "fr-FR-DeniseNeural", "fr-FR", (44, 123, 229)),
+    "de": LanguageProfile("de", "GERMAN_SOS", "de-DE-KatjaNeural", "de-DE", (120, 83, 190)),
+    "it": LanguageProfile("it", "ITALIAN_SOS", "it-IT-ElsaNeural", "it-IT", (0, 150, 136)),
+    "pt": LanguageProfile("pt", "PORTUGUESE_SOS", "pt-BR-FranciscaNeural", "pt-BR", (46, 125, 50)),
 }
 
 
@@ -433,7 +433,7 @@ async def async_main(args: argparse.Namespace) -> int:
     target_date = dt.date.fromisoformat(args.date)
     pair = select_pair(target_date, args.pair_id)
     registry = channel_map()
-    codes = list(LANGUAGES) if args.languages == "all" else [value.strip() for value in args.languages.split(",") if value.strip()]
+    codes = [code for code, row in registry.items() if row.get("upload_enabled", True)] if args.languages == "all" else [value.strip() for value in args.languages.split(",") if value.strip()]
     invalid = sorted(set(codes) - set(LANGUAGES))
     if invalid:
         raise ValueError(f"Unknown languages: {invalid}")

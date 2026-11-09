@@ -1,4 +1,4 @@
-name: Daily scheduled ten-language vocabulary Shorts
+name: Daily scheduled nine-language SOS vocabulary Shorts
 
 on:
   schedule:
@@ -14,7 +14,7 @@ on:
         required: false
         type: string
       languages:
-        description: Publish the complete ten-language set; partial batches are disabled to prevent accidental omissions
+        description: Publish the complete nine-language SOS set; partial batches are disabled to prevent accidental omissions
         required: true
         default: all
         type: choice
@@ -52,7 +52,6 @@ jobs:
     env:
       YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
       YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
-      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_KO: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_KO }}
       YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_EN: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_EN }}
       YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_JA: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_JA }}
       YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_ZH: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_ZH }}
@@ -144,13 +143,13 @@ jobs:
           import json
           import os
           from pathlib import Path
-          expected = {"ko", "en", "ja", "zh", "vi", "es", "fr", "de", "it", "pt"}
+          expected = {"en", "ja", "zh", "vi", "es", "fr", "de", "it", "pt"}
           manifest = Path("artifacts/youtube/language-adjectives") / os.environ["TARGET_DATE"] / "batch_manifest.json"
           data = json.loads(manifest.read_text(encoding="utf-8"))
           completed = data.get("completed_languages", [])
-          if len(completed) != 10 or set(completed) != expected:
-              raise SystemExit(f"Ten-language release blocked: expected 10 languages, got {completed}")
-          print("TEN_LANGUAGE_BATCH_VERIFIED=10/10")
+          if len(completed) != 9 or set(completed) != expected:
+              raise SystemExit(f"Nine-language SOS release blocked: expected 9 languages, got {completed}")
+          print("NINE_LANGUAGE_SOS_BATCH_VERIFIED=9/9")
           PY
           echo "target_date=$TARGET_DATE" >> "$GITHUB_OUTPUT"
           echo "publish_at=$PUBLISH_AT" >> "$GITHUB_OUTPUT"
@@ -173,7 +172,6 @@ jobs:
       PYTHONUTF8: "1"
       YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
       YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
-      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_KO: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_KO }}
       YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_EN: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_EN }}
       YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_JA: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_JA }}
       YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_ZH: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_ZH }}
