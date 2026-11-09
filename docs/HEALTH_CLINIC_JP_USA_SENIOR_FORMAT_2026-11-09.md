@@ -9,12 +9,12 @@
 
 ## Shared TTS requirement
 - Provider order for both health channels: 1) Fish Audio, 2) Qwen3-TTS, 3) Edge TTS.
-- Select one of four profiles randomly per video: two male and two female documentary/news-anchor-style narrators, with locale-specific Japanese and U.S. English profiles.
+- Select one of four profiles randomly per video: two male and two female documentary/news-anchor-style narrators, with locale-specific Japanese and U.S. English profiles. Pass the selected profile through Fish Audio (optional profile reference ID), Qwen3-TTS (profile speaker), and Edge TTS so provider fallback does not lose narrator selection.
 - Qwen endpoint and optional credentials are environment inputs; never print or commit secret values.
-- Confirmed current code changes implement the ordered attempts, randomized profile selection, and locale-specific stock query variants in the active channel worker.
-- Runtime dependency/credential state remains an operational gate: `QWEN3_TTS_URL` and optional `QWEN3_TTS_API_KEY` are not present in the workflow configuration as of this review. Fish API credential presence and provider success were not probed. Edge TTS remains the final configured fallback. Do not claim Fish/Qwen provider audio was successfully generated until a verification run records the engine and artifact.
+- Confirmed current code implements the ordered attempts, random narrator routing to all three providers, and locale-specific image query variants in the active channel worker.
+- Runtime dependency/credential state remains an operational gate: `QWEN3_TTS_URL` is configured as a repository Actions variable and optional `QWEN3_TTS_API_KEY` is read as a secret. Fish profile reference IDs and Qwen speaker mappings are optional per-profile settings; without them those providers use their defaults. Fish API credential presence and provider success were not probed. Edge TTS remains the final configured fallback. Do not claim Fish/Qwen provider audio was successfully generated until a verification run records the engine and artifact.
 
 ## Verification and rollout
-- Commit is proposed on a feature branch and must pass focused tests plus workflow checks before merge.
+- Voice-routing follow-up is proposed on a feature branch and must pass focused checks before merge.
 - No video was generated or uploaded during this change.
 - YouTube OAuth exact-channel preflight and live private upload remain separate gates. Existing scheduled privacy is private.

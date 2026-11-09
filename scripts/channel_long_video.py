@@ -325,7 +325,7 @@ def _trim_leading_silence(path: Path) -> None:
     os.replace(trimmed, path)
 
 
-async def _tts(text: str, voice: str, out: Path, elevenlabs_voice_id: str = "", require_fish: bool = False):
+async def _tts(text: str, voice: str, out: Path, elevenlabs_voice_id: str = "", require_fish: bool = False, narrator_profile: dict | None = None):
     """Free provider priority shared by Health Clinic Japan and USA."""
     lang = "ja" if require_fish else "en"
     errors = []
@@ -334,11 +334,16 @@ async def _tts(text: str, voice: str, out: Path, elevenlabs_voice_id: str = "", 
     api_key = os.getenv("FISH_AUDIO_API_KEY", "").strip()
     if api_key:
         try:
+            fish_payload = {"text": text, "format": "mp3"}
+            fish_reference_id = (os.getenv(narrator_profile.get("fish_reference_env", ""), "").strip()
+                                 if narrator_profile else "")
+            if fish_reference_id:
+                fish_payload["reference_id"] = fish_reference_id
             response = requests.post(
                 "https://api.fish.audio/v1/tts",
                 headers={"Authorization": f"Bearer {api_key}", "model": os.getenv("FISH_AUDIO_MODEL", "s2.1-pro-free"),
                          "Content-Type": "application/json", "Accept": "audio/mpeg"},
-                json={"text": text, "format": "mp3"}, timeout=150,
+                json=fish_payload, timeout=150,
             )
             if response.ok and len(response.content) > 2000 and not response.content.lstrip().startswith(b"{"):
                 out.write_bytes(response.content)
@@ -363,8 +368,15 @@ async def _tts(text: str, voice: str, out: Path, elevenlabs_voice_id: str = "", 
             payload = {
                 "text": text,
                 "language": "Japanese" if lang == "ja" else "English",
-                "speaker": os.getenv("QWEN3_TTS_SPEAKER_JA" if lang == "ja" else "QWEN3_TTS_SPEAKER_EN", "default"),
-                "instruct": "Calm documentary or professional news-anchor narration, clear diction, warm and trustworthy.",
+                "speaker": (os.getenv(narrator_profile.get("qwen_speaker_env", ""), "").strip()
+                            or (narrator_profile.get("qwen_speaker") if narrator_profile else "")
+                            or os.getenv("QWEN3_TTS_SPEAKER_JA" if lang == "ja" else "QWEN3_TTS_SPEAKER_EN", "default")),
+                "instruct": (
+                    f"Use the selected {narrator_profile['gender']} narrator profile {narrator_profile['name']}; "
+                    "professional documentary or news-anchor delivery, clear diction, warm and trustworthy."
+                    if narrator_profile else
+                    "Calm documentary or professional news-anchor narration, clear diction, warm and trustworthy."
+                ),
                 "response_format": "mp3",
             }
             response = requests.post(qwen_url, headers=headers, json=payload, timeout=180)
@@ -400,16 +412,16 @@ def choose_health_narrator(channel: str) -> dict:
     """Choose one of four gender-balanced documentary/news narrator profiles."""
     pools = {
         "health_usa": [
-            {"name": "Guy", "gender": "male", "edge_voice": "en-US-GuyNeural", "profile_env": "HEALTH_USA_VOICE_MALE_1"},
-            {"name": "Davis", "gender": "male", "edge_voice": "en-US-DavisNeural", "profile_env": "HEALTH_USA_VOICE_MALE_2"},
-            {"name": "Aria", "gender": "female", "edge_voice": "en-US-AriaNeural", "profile_env": "HEALTH_USA_VOICE_FEMALE_1"},
-            {"name": "Jenny", "gender": "female", "edge_voice": "en-US-JennyNeural", "profile_env": "HEALTH_USA_VOICE_FEMALE_2"},
+            {"name": "Guy", "gender": "male", "edge_voice": "en-US-GuyNeural", "fish_reference_env": "FISH_HEALTH_USA_MALE_1_REFERENCE_ID", "qwen_speaker_env": "QWEN_HEALTH_USA_MALE_1_SPEAKER", "qwen_speaker": "Guy"},
+            {"name": "Davis", "gender": "male", "edge_voice": "en-US-DavisNeural", "fish_reference_env": "FISH_HEALTH_USA_MALE_2_REFERENCE_ID", "qwen_speaker_env": "QWEN_HEALTH_USA_MALE_2_SPEAKER", "qwen_speaker": "Davis"},
+            {"name": "Aria", "gender": "female", "edge_voice": "en-US-AriaNeural", "fish_reference_env": "FISH_HEALTH_USA_FEMALE_1_REFERENCE_ID", "qwen_speaker_env": "QWEN_HEALTH_USA_FEMALE_1_SPEAKER", "qwen_speaker": "Aria"},
+            {"name": "Jenny", "gender": "female", "edge_voice": "en-US-JennyNeural", "fish_reference_env": "FISH_HEALTH_USA_FEMALE_2_REFERENCE_ID", "qwen_speaker_env": "QWEN_HEALTH_USA_FEMALE_2_SPEAKER", "qwen_speaker": "Jenny"},
         ],
         "health_japan": [
-            {"name": "Keita", "gender": "male", "edge_voice": "ja-JP-KeitaNeural", "profile_env": "HEALTH_JP_VOICE_MALE_1"},
-            {"name": "Daichi", "gender": "male", "edge_voice": "ja-JP-DaichiNeural", "profile_env": "HEALTH_JP_VOICE_MALE_2"},
-            {"name": "Nanami", "gender": "female", "edge_voice": "ja-JP-NanamiNeural", "profile_env": "HEALTH_JP_VOICE_FEMALE_1"},
-            {"name": "Aoi", "gender": "female", "edge_voice": "ja-JP-AoiNeural", "profile_env": "HEALTH_JP_VOICE_FEMALE_2"},
+            {"name": "Keita", "gender": "male", "edge_voice": "ja-JP-KeitaNeural", "fish_reference_env": "FISH_HEALTH_JP_MALE_1_REFERENCE_ID", "qwen_speaker_env": "QWEN_HEALTH_JP_MALE_1_SPEAKER", "qwen_speaker": "Keita"},
+            {"name": "Daichi", "gender": "male", "edge_voice": "ja-JP-DaichiNeural", "fish_reference_env": "FISH_HEALTH_JP_MALE_2_REFERENCE_ID", "qwen_speaker_env": "QWEN_HEALTH_JP_MALE_2_SPEAKER", "qwen_speaker": "Daichi"},
+            {"name": "Nanami", "gender": "female", "edge_voice": "ja-JP-NanamiNeural", "fish_reference_env": "FISH_HEALTH_JP_FEMALE_1_REFERENCE_ID", "qwen_speaker_env": "QWEN_HEALTH_JP_FEMALE_1_SPEAKER", "qwen_speaker": "Nanami"},
+            {"name": "Aoi", "gender": "female", "edge_voice": "ja-JP-AoiNeural", "fish_reference_env": "FISH_HEALTH_JP_FEMALE_2_REFERENCE_ID", "qwen_speaker_env": "QWEN_HEALTH_JP_FEMALE_2_SPEAKER", "qwen_speaker": "Aoi"},
         ],
     }
     pool = pools[channel]
@@ -518,7 +530,7 @@ def build_video(channel: str, data: dict, outdir: Path) -> dict:
     for i, sc in enumerate(scenes):
         audio = tmp / f"a_{i:02d}.mp3"
         tts_voice = voice_profile["edge_voice"] if voice_profile else cfg["voice"]
-        asyncio.run(_tts(sc["narration"], tts_voice, audio, selected_voice_id, require_fish=(lang == "ja")))
+        asyncio.run(_tts(sc["narration"], tts_voice, audio, selected_voice_id, require_fish=(lang == "ja"), narrator_profile=voice_profile))
         dur = duration(audio) + 0.45
         media = fetch_media(sc["visual"], want_video=(i % 2 == 0), used=used, tmp=tmp, idx=i, kind=cfg["kind"], channel=channel)
         if media is None:
