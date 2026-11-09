@@ -315,7 +315,7 @@ def _trim_leading_silence(path: Path) -> None:
     trimmed = path.with_name(path.stem + ".trimmed.mp3")
     result = subprocess.run(
         ["ffmpeg", "-y", "-i", str(path),
-         "-af", "silenceremove=start_periods=1:start_duration=0.08:start_threshold=-50dB",
+         "-af", "silenceremove=start_periods=1:start_duration=0.02:start_threshold=-50dB",
          "-codec:a", "libmp3lame", "-q:a", "2", str(trimmed)],
         capture_output=True, text=True,
     )
@@ -545,12 +545,12 @@ def build_video(channel: str, data: dict, outdir: Path) -> dict:
         if media["type"] == "video":
             vf = f"scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},setsar=1"
             run(["ffmpeg", "-y", "-stream_loop", "-1", "-i", str(media["path"]), "-i", str(audio), "-t", f"{dur:.2f}",
-                 "-vf", vf, "-af", "apad", *common, str(clip)])
+                 "-vf", vf, "-af", "asetpts=PTS-STARTPTS,apad", *common, str(clip)])
         else:
             frames = int(dur * FPS) + 2
             vf = (f"scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,"
                   f"zoompan=z='min(zoom+0.0007,1.18)':d={frames}:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s={W}x{H}:fps={FPS},setsar=1")
-            run(["ffmpeg", "-y", "-i", str(media["path"]), "-i", str(audio), "-t", f"{dur:.2f}", "-vf", vf, "-af", "apad", *common, str(clip)])
+            run(["ffmpeg", "-y", "-i", str(media["path"]), "-i", str(audio), "-t", f"{dur:.2f}", "-vf", vf, "-af", "asetpts=PTS-STARTPTS,apad", *common, str(clip)])
         clips.append(clip)
         durs.append(duration(clip))
         texts.append(sc["narration"])
