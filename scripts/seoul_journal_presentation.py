@@ -154,6 +154,14 @@ def photo_sequence(meta,out):
                 english=entity.get("labels",{}).get("en",{}).get("value")
     if not files and subject=="이용철":
         raise RuntimeError("LICENSE_REVIEW_REQUIRED: 이용철 official portrait has no verified reuse mark")
+    if not files and subject=="오세훈":
+        response=session.get("https://commons.wikimedia.org/w/api.php",params={
+            "action":"query","list":"categorymembers","cmtitle":"Category:Oh Se-hoon",
+            "cmtype":"file","cmlimit":200,"format":"json"},timeout=30)
+        response.raise_for_status()
+        files=[x["title"] for x in response.json()["query"]["categorymembers"]]
+        # Prefer current official municipal portrait releases, then other exact-category archival images.
+        files.sort(key=lambda name:int((re.search(r"(20\d{2})",name) or ["", "0"])[1]),reverse=True)
     if not files and english:
         response=session.get("https://commons.wikimedia.org/w/api.php",params={
             "action":"query","list":"search","srsearch":'intitle:"'+english+'" filetype:bitmap',
@@ -171,7 +179,7 @@ def photo_sequence(meta,out):
         if not page.get("imageinfo"): continue
         info=page["imageinfo"][0]; md=info.get("extmetadata",{})
         license_name=md.get("LicenseShortName",{}).get("value","")
-        if license_name not in ("Public domain","CC0","CC BY 4.0","CC BY-SA 4.0","CC BY 3.0","CC BY-SA 3.0"): continue
+        if license_name not in ("Public domain","CC0","Attribution","CC BY 4.0","CC BY-SA 4.0","CC BY 3.0","CC BY-SA 3.0","KOGL Type 1","Korea Open Government License Type 1"): continue
         if info.get("sha1") in hashes: continue
         image=session.get(info.get("thumburl",info["url"]),timeout=45); image.raise_for_status()
         digest=hashlib.sha256(image.content).hexdigest()
