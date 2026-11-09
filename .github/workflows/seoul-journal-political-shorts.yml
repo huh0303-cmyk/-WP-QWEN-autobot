@@ -30,7 +30,7 @@ jobs:
       - name: Validate OAuth secrets before spending build time
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          FISH_AUDIO_API_KEY: ${{ secrets.FISH_AUDIO_API_KEY }}
+          FISH_AUDIO_API_KEY: ${{ secrets.FISH_AUDIO_API_KEY }}\n          FISH_AUDIO_VOICE_IDS: ${{ secrets.FISH_AUDIO_VOICE_IDS }}
           YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_CLIENT_ID }}
           YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_CLIENT_SECRET }}
           SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN }}
@@ -38,7 +38,7 @@ jobs:
           CONFIRM_PRIVATE_UPLOAD: ${{ inputs.confirm_private_upload }}
         run: |
           set -eu
-          if [ "$CONFIRM_PRIVATE_UPLOAD" != "true" ]; then
+          if [ "${{ github.event_name }}" != "schedule" ] && [ "$CONFIRM_PRIVATE_UPLOAD" != "true" ]; then
             echo "::error title=Confirmation required::Re-run this workflow and check 'Confirm upload will be PRIVATE only'."
             exit 1
           fi
