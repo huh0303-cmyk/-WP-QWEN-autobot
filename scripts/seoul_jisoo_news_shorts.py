@@ -137,7 +137,8 @@ def render(news,category,out_dir):
             y+=line_h[j]+spacing
         d.rectangle((0,1680,1080,1835),fill=bg)
         d.text((45,1725),f"{news['source']}  ·  {dt.datetime.now(KST).strftime('%Y.%m.%d')}",font=small,fill=(255,255,255))
-        still=out_dir/f"card_{i+1:02d}.jpg"; base.save(still,quality=90)
+        still=out_dir/f"card_{i+1:02d}.jpg"; base.save(still,quality=92)
+        if i==0: base.save(out_dir/"cover.jpg",quality=94)
         clip=out_dir/f"clip_{i+1:02d}.mp4"
         subprocess.run(["ffmpeg","-hide_banner","-loglevel","error","-y","-loop","1","-i",str(still),"-i",str(audio),"-t",str(min(12,duration/5+1)),"-c:v","libx264","-preset","ultrafast","-pix_fmt","yuv420p","-c:a","aac","-shortest",str(clip)],check=True,timeout=150)
         clips.append(clip)
