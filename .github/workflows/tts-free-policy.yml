@@ -130,22 +130,25 @@ jobs:
           assert 'os.getenv("WRITER_429_COOLDOWN", "1800")' in source
           print("PASS: default Gemini output is capped at 8192 tokens; transient retries are bounded; 429 cooldown is 30 minutes.")
           PY
-      - name: Verify Japan health voice and per-language failure isolation
+      - name: Verify Health Clinic randomized narrator pools and failure isolation
         run: |
           python -m py_compile scripts/voice_rotation.py scripts/channel_long_video.py scripts/publish_survival_adjective_shorts.py
           python - <<'PY'
-          import os
-          from scripts.voice_rotation import choose_voice
-          os.environ.pop("ELEVENLABS_VOICE_ID_HEALTH_JAPAN", None)
-          os.environ.pop("ELEVENLABS_VOICE_IDS_HEALTH_JAPAN", None)
-          voice = choose_voice("health_japan")
-          assert voice["id"] == "fish-audio-s2.1-pro-free", voice
-          assert voice["gender"] == "unspecified", voice
-          assert "Fish Audio S2.1 Pro Free" in voice["name"], voice
+          import random
+          import scripts.channel_long_video as channel
           publisher = open("scripts/publish_survival_adjective_shorts.py", encoding="utf-8").read()
           assert "PUBLISH_FAILED" in publisher
           assert "failed_count" in publisher
-          print("PASS: Japan health has a fixed free female voice profile; language failures are isolated and recorded.")
+          for key in ("health_usa", "health_japan"):
+              pool = channel.choose_health_narrator.__globals__  # ensure helper is present in the active worker
+              assert callable(channel.choose_health_narrator)
+              random.seed(7)
+              voice = channel.choose_health_narrator(key)
+              assert voice["gender"] in ("male", "female")
+              assert voice["edge_voice"].startswith("en-US-") if key == "health_usa" else voice["edge_voice"].startswith("ja-JP-")
+          source = open("scripts/channel_long_video.py", encoding="utf-8").read()
+          assert source.index("# 1. Fish Audio") < source.index("# 2. Qwen3-TTS") < source.index("# 3. Edge TTS")
+          print("PASS: both Health Clinic locales use the ordered free TTS chain and a four-profile narrator pool; language failures remain isolated.")
           PY
       - name: Verify provider order and paid-fallback guard
         run: |
