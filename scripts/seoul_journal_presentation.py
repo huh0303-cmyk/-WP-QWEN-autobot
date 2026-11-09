@@ -229,10 +229,11 @@ def make(meta,out):
     assets=meta.pop("_prepared_assets",None) or photo_sequence(meta,out)
     photo,rights=assets[0]
     voice=anchor(meta)
+    fish_profile_id=os.getenv(voice["fish_env"],"").strip()
     def anchor_fish(text,path,language):
-        reference=os.getenv(voice["fish_env"],"").strip()
-        # Unconfigured Fish default voices do not satisfy the selected anchor profile.
-        return fish(text,path,language,reference) if reference else False
+        # Fish Audio's default voice remains usable when no verified profile ID is configured.
+        # The receipt reports this accurately instead of claiming a named gender/profile voice.
+        return fish(text,path,language,fish_profile_id or None)
     audio=out/"voice-original.mp3"
     tts=generate_tts(meta["narration"],audio,language="ko",fish_generator=anchor_fish, edge_voice=voice["edge"], edge_pitch=voice["pitch"])
     speed=out/"voice-1.2x.m4a"
@@ -269,8 +270,11 @@ def make(meta,out):
     video=out/"seoul-journal-short.mp4"
     run(["ffmpeg","-y","-f","concat","-safe","0","-i",str(out/"scenes.txt"),"-i",str(speed),
          "-c:v","copy","-c:a","aac","-shortest","-movflags","+faststart",str(video)])
+    actual_voice=(voice["name"] if tts["engine"]!="fish_audio" or fish_profile_id else "Fish Audio default voice; gender profile unconfigured")
     audit={"duration_seconds":duration,"tts_speed":1.2,"tts":tts,"caption_cards":len(captions),
-           "photo":assets[0][1],"photos":[r for _,r in assets],"anchor":voice["name"],"voice_gender":voice["gender"],"thumbnail_style":style,"motion":"alternating zoom in/out; stationary text","video":str(video),"thumbnail":str(out/"thumbnail.jpg")}
+           "photo":assets[0][1],"photos":[r for _,r in assets],"anchor":actual_voice,
+           "intended_anchor_profile":voice["name"],"voice_gender":voice["gender"] if fish_profile_id or tts["engine"]!="fish_audio" else "unverified",
+           "thumbnail_style":style,"motion":"alternating zoom in/out; stationary text","video":str(video),"thumbnail":str(out/"thumbnail.jpg")}
     (out/"presentation_receipt.json").write_text(json.dumps(audit,ensure_ascii=False,indent=2),encoding="utf-8")
     print("PRESENTATION_READY "+json.dumps(audit,ensure_ascii=True),flush=True)
     return video,audit
