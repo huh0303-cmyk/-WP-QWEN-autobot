@@ -1,7 +1,7 @@
 {
- "generated_at": "2026-11-10T00:54:28.456025+09:00",
+ "generated_at": "2026-11-10T01:02:58.611088+09:00",
  "reference_date": "2026-11-07",
- "blogspot_content_metadata_checked_at": "2026-11-10T00:54:28.456025+09:00",
+ "blogspot_content_metadata_checked_at": "2026-11-10T01:02:58.611088+09:00",
  "blogger_pageviews": {
   "generated_at": null,
   "source": "Awaiting rendered Blogger Stats widget collector",
@@ -27,7 +27,7 @@
    "impressions_delta": -8,
    "cumulative_impressions": 1210,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 1
   },
@@ -49,7 +49,7 @@
    "impressions_delta": 6,
    "cumulative_impressions": 3041,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 2
   },
@@ -71,7 +71,7 @@
    "impressions_delta": 8,
    "cumulative_impressions": 2812,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 3
   },
@@ -93,7 +93,7 @@
    "impressions_delta": 2,
    "cumulative_impressions": 6101,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 4
   },
@@ -115,7 +115,7 @@
    "impressions_delta": 0,
    "cumulative_impressions": 2075,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 5
   },
@@ -137,7 +137,7 @@
    "impressions_delta": 5,
    "cumulative_impressions": 1321,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 6
   },
@@ -160,7 +160,7 @@
    "impressions_delta": 5,
    "cumulative_impressions": 9,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 7
   },
@@ -183,7 +183,7 @@
    "impressions_delta": -14,
    "cumulative_impressions": 30,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 8
   },
@@ -206,7 +206,7 @@
    "impressions_delta": 1,
    "cumulative_impressions": 8,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 9
   },
@@ -229,7 +229,7 @@
    "impressions_delta": 2,
    "cumulative_impressions": 6,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 10
   },
@@ -251,7 +251,7 @@
    "impressions_delta": 0,
    "cumulative_impressions": 1297,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 11
   },
@@ -274,7 +274,7 @@
    "impressions_delta": 2,
    "cumulative_impressions": 18,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 12
   },
@@ -297,7 +297,7 @@
    "impressions_delta": 3,
    "cumulative_impressions": 3,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 13
   },
@@ -319,7 +319,7 @@
    "impressions_delta": 1,
    "cumulative_impressions": 293,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 14
   },
@@ -342,7 +342,7 @@
    "impressions_delta": 2,
    "cumulative_impressions": 2,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 15
   },
@@ -364,7 +364,7 @@
    "impressions_delta": 2,
    "cumulative_impressions": 546,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 16
   },
@@ -387,7 +387,7 @@
    "impressions_delta": 1,
    "cumulative_impressions": 67,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 17
   },
@@ -409,7 +409,7 @@
    "impressions_delta": 0,
    "cumulative_impressions": 1421,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 18
   },
@@ -432,7 +432,7 @@
    "impressions_delta": 1,
    "cumulative_impressions": 6,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 19
   },
@@ -454,7 +454,7 @@
    "impressions_delta": 1,
    "cumulative_impressions": 1011,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 20
   },
@@ -476,7 +476,7 @@
    "impressions_delta": 1,
    "cumulative_impressions": 437,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 21
   },
@@ -499,7 +499,7 @@
    "impressions_delta": 1,
    "cumulative_impressions": 1,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 22
   },
@@ -521,7 +521,7 @@
    "impressions_delta": -3,
    "cumulative_impressions": 1190,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 23
   },
@@ -544,7 +544,7 @@
    "impressions_delta": 1,
    "cumulative_impressions": 1,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 24
   },
@@ -567,7 +567,7 @@
    "impressions_delta": 0,
    "cumulative_impressions": 0,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 25
   },
@@ -590,7 +590,7 @@
    "impressions_delta": -1,
    "cumulative_impressions": 1,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 26
   },
@@ -613,7 +613,7 @@
    "impressions_delta": 0,
    "cumulative_impressions": 43,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 27
   },
@@ -636,7 +636,7 @@
    "impressions_delta": -1,
    "cumulative_impressions": 1,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 28
   },
@@ -659,7 +659,7 @@
    "impressions_delta": 0,
    "cumulative_impressions": 8,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 29
   },
@@ -682,7 +682,7 @@
    "impressions_delta": 0,
    "cumulative_impressions": 0,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 30
   },
@@ -704,7 +704,7 @@
    "impressions_delta": 0,
    "cumulative_impressions": 827,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 31
   },
@@ -727,7 +727,7 @@
    "impressions_delta": 0,
    "cumulative_impressions": 28,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 32
   },
@@ -749,7 +749,7 @@
    "impressions_delta": 0,
    "cumulative_impressions": 1137,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 33
   },
@@ -772,7 +772,7 @@
    "impressions_delta": 0,
    "cumulative_impressions": 13,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 34
   },
@@ -795,7 +795,7 @@
    "impressions_delta": 0,
    "cumulative_impressions": 0,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 35
   },
@@ -818,7 +818,7 @@
    "impressions_delta": 0,
    "cumulative_impressions": 0,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 36
   },
@@ -841,7 +841,7 @@
    "impressions_delta": 0,
    "cumulative_impressions": 22,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 37
   },
@@ -863,7 +863,7 @@
    "impressions_delta": 0,
    "cumulative_impressions": 277,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 38
   },
@@ -886,7 +886,7 @@
    "impressions_delta": 0,
    "cumulative_impressions": 27,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 39
   },
@@ -908,7 +908,7 @@
    "impressions_delta": 0,
    "cumulative_impressions": 51,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 40
   },
@@ -931,7 +931,7 @@
    "impressions_delta": 0,
    "cumulative_impressions": 0,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 41
   },
@@ -953,7 +953,7 @@
    "impressions_delta": 0,
    "cumulative_impressions": 40,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 42
   },
@@ -976,7 +976,7 @@
    "impressions_delta": 0,
    "cumulative_impressions": 0,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 43
   },
@@ -999,7 +999,7 @@
    "impressions_delta": -1,
    "cumulative_impressions": 2,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 44
   },
@@ -1022,7 +1022,7 @@
    "impressions_delta": 0,
    "cumulative_impressions": 10,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 45
   },
@@ -1045,7 +1045,7 @@
    "impressions_delta": 0,
    "cumulative_impressions": 4,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 46
   },
@@ -1067,7 +1067,7 @@
    "impressions_delta": -1,
    "cumulative_impressions": 231,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 47
   },
@@ -1090,7 +1090,7 @@
    "impressions_delta": 0,
    "cumulative_impressions": 1,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 48
   },
@@ -1112,7 +1112,7 @@
    "impressions_delta": 0,
    "cumulative_impressions": 68,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 49
   },
@@ -1135,7 +1135,7 @@
    "impressions_delta": 0,
    "cumulative_impressions": 0,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 50
   },
@@ -1157,7 +1157,7 @@
    "impressions_delta": -2,
    "cumulative_impressions": 1787,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 51
   },
@@ -1179,7 +1179,7 @@
    "impressions_delta": -2,
    "cumulative_impressions": 950,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 52
   },
@@ -1202,7 +1202,7 @@
    "impressions_delta": 0,
    "cumulative_impressions": 31,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 53
   },
@@ -1225,7 +1225,7 @@
    "impressions_delta": 0,
    "cumulative_impressions": 19,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 54
   },
@@ -1248,7 +1248,7 @@
    "impressions_delta": 0,
    "cumulative_impressions": 31,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 55
   },
@@ -1271,7 +1271,7 @@
    "impressions_delta": 0,
    "cumulative_impressions": 0,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 56
   },
@@ -1294,7 +1294,7 @@
    "impressions_delta": 0,
    "cumulative_impressions": 3,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 57
   },
@@ -1316,7 +1316,7 @@
    "impressions_delta": 0,
    "cumulative_impressions": 87,
    "google_indexed": null,
-   "google_indexed_status": "URL_INSPECTION_REQUIRED",
+   "google_indexed_status": "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 58
   },
