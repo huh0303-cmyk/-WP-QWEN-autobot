@@ -41,6 +41,8 @@ from stock_image_provider import find_stock_image  # paid Replicate image-gen pa
 from stable_image_hosting import host_permanently, is_temporary
 from sync_automation_hub_to_sheets import QUEUE_TAB
 from budget_guard import check_and_record
+from automation_hub.coupang_partners import apply_footer
+from automation_hub.seoulmall_widget import append_widget
 
 # Worst case for one run: two GPT writing attempts plus one image.
 ESTIMATED_COST_PER_RUN_USD = 0.03
@@ -488,6 +490,10 @@ def main():
             image_url = host_permanently(image_url, asset_key=content_id, folder="blogger_images")
         except (RuntimeError, KeyError):
             image_url = None
+    # Mandatory commerce footer for every Blogger post: verified Coupang Partners cards
+    # followed by the SeoulMall storefront CTA, both idempotent across retries.
+    content = apply_footer(content, rewritten["title"], blogger_site_id, language)
+    content = append_widget(content)
     from stock_image_provider import credit_html, contains_public_photo_credit
     content += credit_html(image_url)
     if contains_public_photo_credit(content):
