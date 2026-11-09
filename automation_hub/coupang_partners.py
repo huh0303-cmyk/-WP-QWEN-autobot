@@ -18,7 +18,7 @@ COUPANG_TRADEMARK_NOTICE = "Coupang’s trademarks are used under license from C
 # substitute text-only labels, emoji, or CSS-drawn wordmarks.
 LOGOS = {
     "coupang_partners": "https://news.coupang.com/wp-content/uploads/2023/01/coupang-bi-brand-logo-230109-01.jpg",
-    "olive_young_global": "https://dist.oliveyoung.com/fo/fe126e9b35/resources/images/common/logo.svg",
+    "olive_young_global": "https://corp.oliveyoung.com/img/about/img_brand_logo-0302319eaf2f635e58ce7cf02502e21b.png",
     "trip_com": "https://commons.wikimedia.org/wiki/Special:FilePath/Trip.com_logo.svg",
 }
 POLICY_PATH = ROOT / "config/affiliate/london-shared-policy.json"
@@ -246,11 +246,11 @@ def render_header(site_id=""):
         + ''.join(cards) + '</div>'
         + '<style>.london-affiliate-partner-strip{box-sizing:border-box;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:center;gap:12px;width:100%;margin:0 0 18px;padding:12px;border:1px solid #e5e7eb;border-radius:12px;background:#fff}'
         '.london-partner-logo{box-sizing:border-box;display:flex;min-width:0;min-height:78px;align-items:center;justify-content:center;padding:10px;border-radius:8px;background:#fff;text-decoration:none!important}'
-        '.london-partner-logo img{display:block;width:100%;max-width:210px;height:58px;object-fit:contain}'
+        '.london-partner-logo img{display:block;width:100%;max-width:280px;height:76px;object-fit:contain}'
         '.london-partner-logo.coupang_partners{border-top:4px solid #e87518}'
         '.london-partner-logo.olive_young_global{border-top:4px solid #168a43}'
         '.london-partner-logo.trip_com{border-top:4px solid #1769d2}'
-        '@media(max-width:520px){.london-affiliate-partner-strip{gap:4px;padding:6px}.london-partner-logo{min-height:58px;padding:4px}.london-partner-logo img{height:38px}}</style>'
+        '@media(max-width:520px){.london-affiliate-partner-strip{gap:4px;padding:6px}.london-partner-logo{min-height:64px;padding:4px}.london-partner-logo img{height:48px;max-width:240px}}</style>'
         + HEADER_END)
 
 def render_footer(title, article_text, site_id="", lang="en"):
