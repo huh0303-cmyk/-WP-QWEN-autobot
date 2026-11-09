@@ -5,6 +5,7 @@ import datetime as dt
 import json
 import os
 import re
+import random
 import subprocess
 import sys
 import tempfile
@@ -112,14 +113,30 @@ def render(news,category,out_dir):
     font=ImageFont.truetype(fp,76); small=ImageFont.truetype(fp,38); clips=[]
     colors={"red_breaking":((180,20,35),(255,235,80)),"blue_split":((20,70,145),(255,255,255)),"gold_frame":((30,25,20),(255,205,60)),"black_ticker":((10,10,10),(255,90,70)),"white_press":((245,245,240),(30,30,30))}
     for i,photo in enumerate(photos):
-        template=TEMPLATES[i%5]; base=Image.open(photo).convert("RGB").resize((1080,1920))
-        overlay=Image.new("RGBA",base.size,(0,0,0,95)); base=Image.alpha_composite(base.convert("RGBA"),overlay).convert("RGB")
+        template=TEMPLATES[i%5]
+        from PIL import ImageOps
+        base=ImageOps.fit(Image.open(photo).convert("RGB"),(1080,1920),method=Image.Resampling.LANCZOS,centering=(0.5,0.42))
+        overlay=Image.new("RGBA",base.size,(0,0,0,105)); base=Image.alpha_composite(base.convert("RGBA"),overlay).convert("RGB")
         d=ImageDraw.Draw(base); bg,fg=colors[template]
-        d.rectangle((0,0,1080,220),fill=bg); d.rectangle((0,1680,1080,1920),fill=bg)
-        text=(news["title"][:55] if i==0 else news["title"][:42])
-        d.multiline_text((540,930),text,font=font,fill=fg,anchor="mm",align="center",spacing=10,stroke_width=2,stroke_fill=(0,0,0) if template!="white_press" else (255,255,255))
-        d.text((45,70),("속보" if category in ("politics","society") else "서울지수"),font=small,fill=fg)
-        d.text((45,1725),f"{news['source']}  ·  {dt.datetime.now(KST).strftime('%Y.%m.%d')}",font=small,fill=fg)
+        # Strong editorial header and central headline panel, matching the supplied political-news references.
+        d.rectangle((0,0,1080,190),fill=bg)
+        d.rectangle((48,48,270,132),fill=(205,24,38) if category in ("politics","society") else bg)
+        d.text((62,62),("속보" if category in ("politics","society") else "서울지수"),font=small,fill=(255,255,255))
+        d.rounded_rectangle((36,625,1044,1290),radius=28,fill=(*bg,222),outline=fg,width=6)
+        textwrap_lines=textwrap.wrap(news["title"],width=12,break_long_words=True,replace_whitespace=False)[:3]
+        headline_font=ImageFont.truetype(fp,78 if len(textwrap_lines)<=2 else 68)
+        line_h=[]
+        for line in textwrap_lines:
+            b=d.textbbox((0,0),line,font=headline_font,stroke_width=2); line_h.append(b[3]-b[1])
+        spacing=24; total=sum(line_h)+max(0,len(line_h)-1)*spacing
+        y=625+(665-total)//2
+        for j,line in enumerate(textwrap_lines):
+            b=d.textbbox((0,0),line,font=headline_font,stroke_width=3); x=(1080-(b[2]-b[0]))//2
+            color=fg if j in (0,len(textwrap_lines)-1) else (255,255,255)
+            d.text((x,y),line,font=headline_font,fill=color,stroke_width=4,stroke_fill=(0,0,0))
+            y+=line_h[j]+spacing
+        d.rectangle((0,1680,1080,1835),fill=bg)
+        d.text((45,1725),f"{news['source']}  ·  {dt.datetime.now(KST).strftime('%Y.%m.%d')}",font=small,fill=(255,255,255))
         still=out_dir/f"card_{i+1:02d}.jpg"; base.save(still,quality=90)
         clip=out_dir/f"clip_{i+1:02d}.mp4"
         subprocess.run(["ffmpeg","-hide_banner","-loglevel","error","-y","-loop","1","-i",str(still),"-i",str(audio),"-t",str(min(12,duration/5+1)),"-c:v","libx264","-preset","ultrafast","-pix_fmt","yuv420p","-c:a","aac","-shortest",str(clip)],check=True,timeout=150)
