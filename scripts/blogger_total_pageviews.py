@@ -73,8 +73,17 @@ async def collect_one(browser, blog, semaphore, checked_at):
                 if response and response.status >= 400:
                     row["status"] = "HTTP_" + str(response.status)
                 else:
-                    row["total_pageviews"] = await extract_widget_total(page)
-                    row["status"] = "OK_WIDGET_ESTIMATE"
+                    try:
+                        row["total_pageviews"] = await extract_widget_total(page)
+                        row["status"] = "OK_WIDGET_ESTIMATE"
+                        break
+                    except ValueError as exc:
+                        row["status"] = str(exc)
+                        # Blogger Stats widgets sometimes hydrate after the page.
+                        # Retry a fresh render, but never substitute a stale total.
+                        if attempt < 3:
+                            await page.wait_for_timeout(2500 * (attempt + 1))
+                            continue
                 break
         except Exception as exc:
             msg = str(exc)
