@@ -1,28 +1,25 @@
-# JobInKorea365 publishing and image incident
+# JobInKorea365 publishing incident and recovery
 
 Date: 2026-11-10 (KST)
 Site: https://jobinkorea365.com
 
-## Verified live state
-- The selected public article is titled “Strategic Job Search Paths for International Tech Talent in Korea.”
-- Its visible published date is 2026-11-01 (the page also shows an updated date of 2026-11-09). Thus the live article is not evidence of a new publication on Nov 9.
-- The article has no visible featured/inline editorial image in its rendered content.
-- The article includes a cross-domain link to jobkorea365.com and generic, repeated instructional copy. Review content quality before treating it as a recovery publication.
+## Verified findings
+- The homepage's newest visible article, “Strategic Job Search Paths for International Tech Talent in Korea,” has original publish date 2026-11-01 and modified date 2026-11-09. It is an update, not a new Nov 9 publication.
+- This article has no visible featured/editorial image.
+- The site's 46-item SEO metadata batch log reports 45/46 success. Item 869 timed out after 60 seconds while navigating to wp-admin. This was an SEO metadata batch, not an article-publishing run.
+- A workflow run started 2026-11-09 17:10 UTC (run 42661956114) with run name identifying a JobInKorea365-only recovery, but its workflow_dispatch inputs were blank. The workflow therefore fanned out across the site matrix. As of 2026-11-10 it was still in progress and the JobInKorea365 matrix job (129315562670) was queued; no publication result was recorded for this site.
+- In .github/workflows/daily-network-publish.yml the user-controlled target_site_url defaults blank, which means all sites. Always provide the exact target URL on a recovery dispatch.
+- scripts/autopost_current.py reads WP_IMAGE_COUNT, but its initializer sets base.WP_IMAGE_COUNT to 0 unconditionally unless the environment happens to be "0"; this reverses the requested count. Thus the current publishing entrypoint suppresses article images despite the workflow asking for one.
+- Image generation and WordPress authorization are not established by the public page or the SEO batch log. Do not claim either was validated.
 
-## Repository findings
-- wp_jobinkorea is configured in docs/SITE_PUBLISHING_TIERS.md.
-- Historical data/site-publication-history.json contains a Sep 12 wp_jobinkorea workflow success with no public URL, and older REST API 403 failures. These records do not establish the cause of the current Nov 2026 gap.
-- The specific daily-network-publish workflow is an explicitly approved, isolated immediate-publish path. It had REPLICATE_API_TOKEN set to an empty string, so the approved generated-image provider could not authenticate. The wrapper enabled image publishing but the credential was absent; the publisher could then continue via its text-only fallback.
-- The active repository image gateway attempts matching stock selection and then the approved Replicate model chain; when generation and fallback selection fail, it can continue without an image. This explains how a text-only post passed through.
-- KoreaWedding365 is configured separately as wp_koreawedding; its records show publications, and the repository has a duplicate-hero incident report. The reusable lesson is to set WordPress featured_media and avoid inserting the same hero again into the body. It does not establish that its writer/image engine is interchangeable without inspecting current workflow code and secret availability.
+## Corrective actions required
+1. Correct the WP_IMAGE_COUNT initializer to preserve a validated value (0/1), default to 1, and fail closed if mandatory image upload/featured_media setup fails for this site.
+2. Add a JobInKorea365-only workflow dispatch path and an assertion that TARGET_SITE_URL is exactly https://jobinkorea365.com before invoking publishing. Do not run the 25-site matrix for this recovery.
+3. Add timeout/retry with exponential backoff to the SEO metadata browser batch, and persist item-level checkpoints so a retry resumes only missing work.
+4. Ensure the generated or licensed matching image is uploaded to WordPress, attached as featured_media, and has descriptive ALT text. Avoid text-only public publication.
+5. Confirm WordPress REST credentials and publish capability through a non-mutating authentication check before publishing.
+6. Publish one article only after those gates pass; verify its public URL, actual publication date, featured-media attachment, image URL, and ALT text.
+7. Only after verifying the one-post recovery, restore the normal site cadence. Keep the network-wide freeze in place; never enable unattended publishing for all sites as a side effect.
 
-## Required recovery work
-1. Inspect the actual scheduled/manual workflow run history and logs for wp_jobinkorea around Nov 2–10; the repository's tracked history is stale and cannot identify a current failing step.
-2. Check the exact site secret, WordPress REST authentication, and publish capability without exposing secret values.
-3. Compare the full wp_jobinkorea and wp_koreawedding workflow/config/provider paths. Reuse only the shared writer and image implementation that can be verified as site-compatible.
-4. Make an image mandatory for this site: require one relevant licensed stock or generated asset, upload it to WordPress, set it as featured_media, provide descriptive ALT text, and fail/queue the article when no image is attached. Do not silently publish text-only articles.
-5. Keep the global freeze intact until a narrowly scoped, reviewed JobInKorea365 recovery workflow is added. The user's explicit request on 2026-11-10 authorizes that scoped recovery; do not enable unattended publishing across the whole network.
-6. Resume with one reviewed JobInKorea365 post, verify its public URL, publish date, image URL, and featured-media attachment, then restore the site's normal cadence and monitor the next run.
-
-## Current status
-Root cause is not yet established from available evidence. No recovery post has been published, and no provider credentials or workflow logs were available in the evidence reviewed for this report. Avoid claiming the site is fixed until the recovery run is verified live.
+## Current execution status
+No JobInKorea365 recovery post has been verified as published in this session. The queued run was not a site-specific execution. Do not report the site fixed or resumed until the above gates and live verification are complete.
