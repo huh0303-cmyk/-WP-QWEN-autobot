@@ -80,3 +80,14 @@ PR #273 merged (1a39cba65feebe5f682518afbea3130eee67970f). Full no-extra-publica
 - No NAVER API Hub Search Trend credentials are configured. Exact query-volume rankings and automated fourth/fifth slots remain unavailable. Do not label Naver front-page order or article counts as search volume. The scheduled workflow currently runs three slots; high-exposure-based extra slots require credentials and a scoring gate.
 - For the target story, attribute the election-interference allegation to Oh Se-hoon and distinguish it from the Ministry's stated reasons for the May 28 target allocation adjustment (14.9% to 20.8%). The YTN article contains no direct government response to Oh's allegation; do not imply the ministry statement answers that allegation.
 - Additional high-view political Shorts used only for headline-structure research (view counts observed 2026-11-09): Channel A News “소리 지르다 웃음 터진 정청래” (4,210,160 views) https://www.youtube.com/watch?v=c6JJOrju8C4; Channel A News “최민희가 말 끊자 이진숙이 보인 반응은?” (1,891,528 views) https://www.youtube.com/watch?v=vtkYpDkni-c. Abstract takeaways: named people plus observable clash/reaction; specific question plus visible response. Copy no wording or footage.
+
+
+## 2026-11-09 owner update — unified Seoul Journal + Seoul_Jisoo standard
+This section is the latest owner instruction and supersedes conflicting earlier cadence and topic rules.
+- Seoul Journal: political breaking/issues. Seoul_Jisoo: same production standard but broader Korea-facing topics (politics, society, economy, consumer, sports); never cross-route.
+- Discover timely topics from Naver search-interest and exposure signals; compare Chosun Ilbo and Hankyoreh reporting for political items. Capture the metric/source/time when available; never invent rankings. If exact volume is unavailable, log that and use a transparent fallback based on Naver current political headlines corroborated across both outlets.
+- Target 3–9 distinct Shorts per day for each channel based on the actual verified news volume. Minimum 3 is a target when eligible stories and dependencies work; do not force thin/duplicate stories.
+- Maintain five varied 9:16 templates with large, high-contrast Korean type, randomized palette/type scale/caption placement and purposeful scene changes. Learn broad mechanics from exact individually verified 500K+ Shorts; no view guarantee or copying.
+- Randomly rotate two male professional voices (news anchor/documentary) and two female professional voices (news anchor/documentary); use Fish Audio → Qwen3-TTS → Edge-TTS; record actual provider/voice ID and use only configured profiles. Target natural 1.2x narration.
+- Every Short ends with an issue-specific, neutral audience vote, shown and spoken.
+- Apply the detailed shared policy in `SEOUL_JOURNAL_JISOO_POLITICAL_SHORTS_STANDARD_2026-11-09.md` and the Seoul_Jisoo rendering standard in `SEOUL_JISOO_VISUAL_TTS_STANDARD_2026-11-09.md`.
