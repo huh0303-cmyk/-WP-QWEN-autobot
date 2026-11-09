@@ -18,6 +18,9 @@ th:nth-child(3),td:nth-child(3){position:sticky;left:63px;z-index:4;text-align:l
 th:nth-child(3){left:63px;z-index:7;background:#1f2937;color:#fff}
 td:nth-child(3) a{display:inline-block;max-width:240px;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}
 th:nth-child(n+4),td:nth-child(n+4){padding-left:6px;padding-right:6px}
+/* WordPress control columns: keep operational status values easy to scan */
+table:has(> tbody#b) th,table:has(> tbody#b) td{text-align:center;vertical-align:middle}
+table:has(> tbody#b) th:nth-child(3),table:has(> tbody#b) td:nth-child(3){text-align:left}
 
 .up{color:#1d4ed8;font-weight:700}.down{color:#dc2626;font-weight:700}.na{color:#999}.tag{font-size:.72rem;padding:1px 6px;border-radius:8px;background:#e5e7eb}
 .WP{background:#dbeafe}.BS{background:#fde68a}.TS{background:#fce7f3}.NV{background:#dcfce7}.NR{background:#e9d5ff}
@@ -144,8 +147,8 @@ function weeklyFor(r){
 var CADENCE_DATA=null,HEALTH_DATA=null,BLOGGER_HEALTH=null;
 function cadenceFor(r){
  var c=CADENCE_DATA&&CADENCE_DATA.cadence||{},p=blogPlatformOf(r);
- if(p==='wordpress'){var site=String(r.site||'').toLowerCase();var isNews=/koreanews365/.test(site);var rule=isNews?c.newsrooms:c.wordpress_general;return rule?'매일 1회':'설정 미수집';}
- if(p==='blogspot')return c.blogspot?'매일 1회':'설정 미수집';
+ if(p==='wordpress'){var site=String(r.site||'').toLowerCase();var isNews=/koreanews365/.test(site);var rule=isNews?c.newsrooms:c.wordpress_general;return rule?'1일회':'설정 미수집';}
+ if(p==='blogspot')return c.blogspot?'1일회':'설정 미수집';
  if(p==='tistory')return c.tistory?'전체 5곳 중 매일 3곳':'설정 미수집';
  if(p==='naver')return c.naver?'계정별 차등':'설정 미수집';
  return '설정 미수집';
