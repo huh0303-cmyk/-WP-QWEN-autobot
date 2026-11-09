@@ -4,16 +4,13 @@ import argparse
 import datetime as dt
 import json
 import os
-import re
-import subprocess
-import sys
-import tempfile
-import textwrap
 import urllib.request
 import xml.etree.ElementTree as ET
 from email.utils import parsedate_to_datetime
 from pathlib import Path
 from urllib.parse import urlencode, urlparse
+
+from seoul_journal_presentation import make, wrap
 
 CHANNEL_ID = "UCAizx0tPkRSol8sIhanN_QQ"
 KST = dt.timezone(dt.timedelta(hours=9))
@@ -29,10 +26,6 @@ TRUSTED_SOURCES = {
     "스포츠서울","스포티비뉴스","OSEN","연합뉴스TV","YTN",
 }
 AD_DISCLOSURE = "이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다."
-FONT_PATHS = [
-    "/usr/share/fonts/truetype/nanum/NanumGothicBold.ttf",
-    "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
-]
 
 def fetch_news(category):
     url = FEEDS[category]
@@ -84,62 +77,17 @@ def affiliate_urls():
     return found
 
 def render(headline, source, category, out_dir):
-    from PIL import Image, ImageDraw, ImageFont
-    import asyncio
-    import edge_tts
-    font_path = next((p for p in FONT_PATHS if Path(p).exists()), None)
-    if not font_path:
-        raise RuntimeError("Korean font unavailable")
-    out_dir.mkdir(parents=True, exist_ok=True)
-    kind = "오늘의 정치 뉴스" if category == "politics" else "오늘의 스포츠 뉴스"
-    date = dt.datetime.now(KST).strftime("%Y.%m.%d")
-    narration = f"{date}, {kind}입니다. {source}의 보도 제목을 전합니다. {headline}. 자세한 내용은 영상 설명의 원문에서 확인해 주세요."
-    audio = out_dir / "voice.mp3"
-    asyncio.run(edge_tts.Communicate(narration, voice="ko-KR-SunHiNeural", rate="-7%").save(str(audio)))
-    if not audio.exists() or audio.stat().st_size < 2000:
-        raise RuntimeError("Voice synthesis did not produce valid audio")
-    duration = float(subprocess.check_output(
-        ["ffprobe","-v","error","-show_entries","format=duration","-of","default=noprint_wrappers=1:nokey=1",str(audio)],
-        text=True).strip()) + 2.0
-    img = Image.new("RGB",(1080,1920),(15,25,48))
-    draw = ImageDraw.Draw(img)
-    for y in range(1920):
-        c = int(20+24*y/1920)
-        draw.line((0,y,1080,y), fill=(12,c,50+int(12*y/1920)))
-    draw.rounded_rectangle((72,156,1008,318),radius=35,fill=(39,63,111))
-    font_tag = ImageFont.truetype(font_path,70)
-    font_title = ImageFont.truetype(font_path,72)
-    font_small = ImageFont.truetype(font_path,42)
-    draw.text((105,195),kind,font=font_tag,fill="white")
-    # Wrap on pixel width, not Unicode character count.
-    words = list(headline)
-    lines, current = [], ""
-    for char in words:
-        if draw.textbbox((0,0),current+char,font=font_title)[2] > 860:
-            lines.append(current)
-            current = char
-        else:
-            current += char
-    if current: lines.append(current)
-    if len(lines) > 8:
-        raise RuntimeError("Headline too long to display legibly")
-    start_y = 460
-    for i,line in enumerate(lines):
-        draw.text((100,start_y+i*108),line,font=font_title,fill="white")
-    draw.line((95,1460,985,1460),fill=(100,145,190),width=4)
-    draw.text((100,1520),f"출처: {source}",font=font_small,fill=(205,224,255))
-    draw.text((100,1600),date,font=font_small,fill=(205,224,255))
-    draw.text((100,1750),"원문 링크 · 영상 설명 확인",font=font_small,fill=(230,230,230))
-    still = out_dir/"cover.jpg"
-    img.save(still,quality=90)
-    video = out_dir/"short.mp4"
-    subprocess.run(["ffmpeg","-hide_banner","-loglevel","error","-y","-loop","1","-framerate","25",
-        "-i",str(still),"-i",str(audio),"-t",str(min(59,duration)),"-c:v","libx264",
-        "-preset","ultrafast","-pix_fmt","yuv420p","-c:a","aac","-b:a","128k",
-        "-movflags","+faststart","-shortest",str(video)],check=True,timeout=150)
-    if video.stat().st_size < 50000:
-        raise RuntimeError("Video render unexpectedly small")
-    return video
+    narration = f"{headline}. {source} 보도입니다. 자세한 내용은 영상 설명의 원문에서 확인할 수 있습니다."
+    meta = {
+        "source_title": headline,
+        "youtube_title": headline,
+        "headline": "\n".join(wrap(headline, 48, 860)[:3]),
+        "narration": narration,
+        "captions": [f"{source} 보도", "자세한 내용은 원문에서", "원문 링크는 영상 설명에"],
+        "display_category": "스포츠" if category == "sports" else "정치·시사",
+    }
+    return make(meta, out_dir, minimum_duration=4, brand="서울지수")
+
 
 def youtube_service():
     from google.oauth2.credentials import Credentials
@@ -165,13 +113,16 @@ def ensure_not_duplicate(svc,uploads,day,category):
         if f"[SJ-{category.upper()}-{day}]" in title:
             raise RuntimeError("Already uploaded this category today, refusing duplicate")
 
-def upload(video, news, category, svc):
+def upload(video, news, category, svc, photos):
     from googleapiclient.http import MediaFileUpload
     day = dt.datetime.now(KST).strftime("%Y%m%d")
     tag = f"[SJ-{category.upper()}-{day}]"
     title = (news["title"][:75] + " #Shorts " + tag)[:100]
     desc = ("출처: "+news["source"]+"\n보도 제목: "+news["title"]+
             "\n원문: "+news["link"]+"\n\n출처를 밝힌 뉴스 제목 요약이며 독자적인 사실 확인이나 지지를 의미하지 않습니다.")
+    desc += "\n\n자료사진 (크롭·줌·텍스트 삽입)\n" + "\n".join(
+        f"{photo['credit']} · {photo['license']} · {photo['source']}" for photo in photos
+    )
     links = affiliate_urls()
     if links:
         desc += "\n\n[뉴스와 별개인 쇼핑 추천 · 광고·제휴 안내]\n"+AD_DISCLOSURE
@@ -216,12 +167,12 @@ def main():
             raise RuntimeError("Live publishing disabled by environment variable")
         svc,uploads=youtube_service()
         ensure_not_duplicate(svc,uploads,day,args.category)
-    video=render(news["title"],news["source"],args.category,out)
+    video,audit=render(news["title"],news["source"],args.category,out)
     manifest={"category":args.category,"day":day,"news":news,"video":str(video),
-              "affiliate_link_count":len(urls),"status":"PREPARED"}
+              "presentation":audit,"affiliate_link_count":len(urls),"status":"PREPARED"}
     if args.upload:
         try:
-            receipt=upload(video,news,args.category,svc)
+            receipt=upload(video,news,args.category,svc,audit['photos'])
             manifest.update(status="PUBLISHED",receipt=receipt)
             print("PUBLISH_OK",json.dumps(receipt,ensure_ascii=False),flush=True)
         except Exception as e:

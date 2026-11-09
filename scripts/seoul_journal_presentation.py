@@ -45,7 +45,7 @@ def portrait(text,out):
             "date":"2025-08-25","use":"archival portrait; cropped; not current-event footage"}
     (out/"image_rights.json").write_text(json.dumps(record,ensure_ascii=False,indent=2),encoding="utf-8")
     return path,record
-def card(headline,caption,photo,credit,index=0,landscape=False,zoom=1.0,overlay_only=False,category='정치·시사'):
+def card(headline,caption,photo,credit,index=0,landscape=False,zoom=1.0,overlay_only=False,category='정치·시사',brand="서울저널"):
     """Full-frame portrait with transparent text overlays; no opaque news panels."""
     w,h=(1280,720) if landscape else (1080,1920)
     im=Image.new("RGBA" if overlay_only else "RGB",(w,h),(0,0,0,0) if overlay_only else NAVY)
@@ -66,8 +66,8 @@ def card(headline,caption,photo,credit,index=0,landscape=False,zoom=1.0,overlay_
     def text(x,y,value,size,color=WHITE):
         d.text((x,y),value,font=font(size),fill=color,
                stroke_width=max(2,size//15),stroke_fill=stroke)
-    text(35,20,"서울저널",38 if landscape else 48)
-    label=(credit["subject"]+" · 자료사진("+(re.search(r"(?:19|20)\d{2}",credit.get("date","")) or ["촬영일 미상"])[0]+")") if credit else "서울저널 자체 제작 그래픽"
+    text(35,20,brand,38 if landscape else 48)
+    label=(credit["subject"]+" · 자료사진("+(re.search(r"(?:19|20)\d{2}",credit.get("date","")) or ["촬영일 미상"])[0]+")") if credit else brand+" 자체 제작 그래픽"
     if landscape:
         size=78
         while size>42 and len(wrap(headline,size,570))>4: size-=2
@@ -97,6 +97,8 @@ def card(headline,caption,photo,credit,index=0,landscape=False,zoom=1.0,overlay_
 
 ANCHOR_VOICES = (
     {"name":"남성 저음", "edge":"ko-KR-InJoonNeural", "pitch":"-12Hz", "fish_env":"SJ_FISH_MALE_ANCHOR"},
+    {"name":"남성 다큐", "edge":"ko-KR-HyunsuMultilingualNeural", "pitch":"-5Hz", "fish_env":"SJ_FISH_MALE_DOCUMENTARY"},
+    {"name":"여성 다큐", "edge":"ko-KR-JiMinNeural", "pitch":"-3Hz", "fish_env":"SJ_FISH_FEMALE_DOCUMENTARY"},
     {"name":"여성 저음", "edge":"ko-KR-SunHiNeural", "pitch":"-8Hz", "fish_env":"SJ_FISH_FEMALE_ANCHOR"},
 )
 def photo_sequence(meta,out):
@@ -106,7 +108,7 @@ def photo_sequence(meta,out):
     files=meta.get("photo_files", [])
     evidence=meta.get("source_title","")+" "+meta["youtube_title"]+" "+meta["narration"]
     proposed=meta.get("visual_subject","").strip()
-    subject=proposed if proposed and len(proposed)<=30 and proposed in evidence else next((n for n in PORTRAITS if n in evidence),None)
+    subject=proposed if proposed and len(proposed)<=30 and proposed in evidence else next((n for n in (*PORTRAITS, "안세영", "노시환") if n in evidence),None)
     english="Lee Jae-myung" if subject=="이재명" else None
     if subject and not english:
         # Resolve the exact Korean label before searching named Commons images.
@@ -176,7 +178,7 @@ def fish(text,path,language,reference_id=None):
         json={"text":text,"format":"mp3",**({"reference_id":reference_id} if reference_id else {})},timeout=150)
     if not r.ok or len(r.content)<2000 or r.content.lstrip().startswith(b"{"): return False
     Path(path).write_bytes(r.content); return True
-def make(meta,out):
+def make(meta,out,*,minimum_duration=20,brand="서울저널"):
     out=Path(out); out.mkdir(parents=True,exist_ok=True)
     assets=meta.pop("_prepared_assets",None) or photo_sequence(meta,out)
     photo,rights=assets[0]
@@ -188,9 +190,9 @@ def make(meta,out):
     audio=out/"voice-original.mp3"
     tts=generate_tts(meta["narration"],audio,language="ko",fish_generator=anchor_fish, edge_voice=voice["edge"], edge_pitch=voice["pitch"])
     speed=out/"voice-1.2x.m4a"
-    run(["ffmpeg","-y","-i",str(audio),"-af","atempo=1.2","-c:a","aac","-b:a","192k",str(speed)])
+    run(["ffmpeg","-y","-i",str(audio),"-af","silenceremove=start_periods=1:start_threshold=-50dB:window=0.01,atempo=1.2","-c:a","aac","-b:a","192k",str(speed)])
     duration=float(run(["ffprobe","-v","error","-show_entries","format=duration","-of","default=nw=1:nk=1",str(speed)]).strip())
-    if not 20<=duration<=120: raise RuntimeError("Narration outside Short duration gate: "+str(duration))
+    if not minimum_duration<=duration<=120: raise RuntimeError("Narration outside Short duration gate: "+str(duration))
     captions=meta.get("captions") or [s.strip() for s in re.split(r"(?<=[.!?。])\s+",meta["narration"]) if s.strip()]
     weights=[max(len(s),1) for s in captions]; total=sum(weights)
     category=meta.get("display_category","정치·시사")
@@ -201,10 +203,9 @@ def make(meta,out):
         # Animate only the photograph. Typography stays stationary and legible.
         bg=out/f"background-{i:02d}.jpg"
         overlay=out/f"overlay-{i:02d}.png"
-        card("","",photo,rights,i,overlay_only=False,category=category).save(bg,quality=94)
         # Background must contain no duplicated typography.
         ImageOps.fit(Image.open(photo).convert("RGB"),(1080,1920),centering=(.5,.4)).save(bg,quality=94)
-        card(meta["headline"],caption,None,rights,i,overlay_only=True,category=category).save(overlay)
+        card(meta["headline"],caption,None,rights,i,overlay_only=True,category=category,brand=brand).save(overlay)
         frames=max(1,math.ceil(seconds*30))
         z=f"1+0.10*on/{max(frames-1,1)}" if i%2==0 else f"1.10-0.10*on/{max(frames-1,1)}"
         clip=out/f"scene-{i:02d}.mp4"
@@ -213,8 +214,8 @@ def make(meta,out):
              "-map","[v]","-t",str(seconds),"-an","-c:v","libx264","-preset","veryfast","-threads","2",str(clip)])
         concat.append("file '"+clip.name+"'"); elapsed+=seconds
     (out/"scenes.txt").write_text("\n".join(concat),encoding="utf-8")
-    card(meta["headline"],"",assets[0][0],assets[0][1],landscape=True,category=category).save(out/"thumbnail.jpg",quality=95)
-    card(meta["headline"],"",assets[0][0],assets[0][1],category=category).save(out/"cover.jpg",quality=95)
+    card(meta["headline"],"",assets[0][0],assets[0][1],landscape=True,category=category,brand=brand).save(out/"thumbnail.jpg",quality=95)
+    card(meta["headline"],"",assets[0][0],assets[0][1],category=category,brand=brand).save(out/"cover.jpg",quality=95)
     video=out/"seoul-journal-short.mp4"
     run(["ffmpeg","-y","-f","concat","-safe","0","-i",str(out/"scenes.txt"),"-i",str(speed),
          "-c:v","copy","-c:a","aac","-shortest","-movflags","+faststart",str(video)])
