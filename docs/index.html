@@ -64,8 +64,8 @@ tr.platform-youtube{background:#fff7f7}tr.platform-tiktok{background:#f2fcfd}tr.
 <nav id="all-platform-summary" class="platform-tabs" aria-label="전체 플랫폼 계정 수" style="margin:8px 0 12px"></nav>
 <div class="bar"><span>블로그 순위 기준: 확인된 전일 방문자 수</span><span class="na">7일 방문 추세는 일별 기록이 7일 이상 축적된 경우에만 표시합니다. 검색 성과는 SEO 상세 분석에서 확인합니다.</span></div>
 
-<div class="sub" style="padding:7px 9px;background:#fff7ed;border-left:3px solid #d97706">발행 관리는 기존 발행 화면을 엽니다. 예약 스케줄과 격리된 즉시 발행은 아직 검증되지 않았으므로, 이 화면에서는 자동 실행하지 않습니다. 신규 GA4·Rank Math 컬럼은 인증 수집이 연결될 때까지 미수집으로 표시합니다. SEO 건강도는 공개 글의 제목·대표이미지·본문을 점검한 편집 품질 신호등이며 Rank Math 공식 점수가 아닙니다. 데이터가 없으면 회색으로 표시합니다.</div><div class="sub" id="blog-ranking-meta">플랫폼별로 순위를 따로 표시합니다.</div>
-<div class="table-wrap"><table><thead><tr><th>순위</th><th>구분</th><th>사이트</th><th>일일방문자 (증감)</th><th>콘텐츠 수(증감)</th><th>GSC 색인 확인</th><th>발행주기 (GitHub)</th><th>발행경과</th><th>Rank Math 평균점수</th><th>즉시발행</th></tr></thead>
+<div class="sub" style="padding:7px 9px;background:#fff7ed;border-left:3px solid #d97706">발행 관리는 기존 발행 화면을 엽니다. 예약 스케줄과 격리된 즉시 발행은 아직 검증되지 않았으므로, 이 화면에서는 자동 실행하지 않습니다. SEO 건강도는 공개 글의 제목·대표이미지·본문을 점검한 편집 품질 신호등이며 Rank Math 공식 점수가 아닙니다. 데이터가 없으면 회색으로 표시합니다.</div><div class="sub" id="blog-ranking-meta">플랫폼별로 순위를 따로 표시합니다.</div>
+<div class="table-wrap"><table><thead><tr><th>순위</th><th>구분</th><th>사이트</th><th>일일방문자 (증감)</th><th>콘텐츠 수(증감)</th><th>GSC 색인 확인</th><th>발행주기 (GitHub)</th><th>발행경과</th><th>즉시발행</th></tr></thead>
 <tbody id="b"></tbody></table></div>
 <section id="blogger-pageviews" style="margin:18px 0 10px;padding:12px;background:#fff;border:1px solid #cbd5e1;border-radius:8px">
 <h2 id="blogger-pageviews-title" style="margin:0 0 4px;font-size:1.05rem;color:#0f172a">Blogspot (33개) · 누적 페이지뷰 순위</h2>
@@ -259,7 +259,7 @@ function draw(){
     if(!wp){gaUsers=gaGrowth=seoAverage=seoBelow=dupTitles=dupImages='<span class="na">—</span>';}
 
     var publishUrl='https://blog.korea365.org/publish?site='+encodeURIComponent(r.site||'')+'&mode=manual';
-    var p=blogPlatformOf(r);return '<tr class="platform-'+esc(p)+'"><td>'+(rankValue===null?'—':rankValue+'위')+'</td><td>'+platformCell(p)+'</td><td><a href="'+esc(safeUrl(r.url,r.site))+'" target="_blank" rel="noopener">'+esc(r.display_name||r.site)+'</a></td><td>'+vis+'</td><td>'+metricNumber(r.content,'글')+(r.content_delta===null||r.content_delta===undefined?' <span class="na">(증감 미수집)</span>':' '+d(r.content_delta))+'</td><td>'+(Number.isFinite(r.inspected_indexed_count)?f(r.inspected_indexed_count)+' / '+f(r.inspected_url_count||0):'<span class="na">미확인</span>')+'</td><td>'+esc(cadence)+'</td><td>'+publishElapsedFor(r)+'</td><td>'+seoAverage+'</td><td><a class="publish-link" href="'+esc(publishUrl)+'" target="_blank" rel="noopener" title="사이트별 수동 발행 화면; 예약 작업 변경 없음">즉시발행 ↗</a></td></tr>';
+    var p=blogPlatformOf(r);return '<tr class="platform-'+esc(p)+'"><td>'+(rankValue===null?'—':rankValue+'위')+'</td><td>'+platformCell(p)+'</td><td><a href="'+esc(safeUrl(r.url,r.site))+'" target="_blank" rel="noopener">'+esc(r.display_name||r.site)+'</a></td><td>'+vis+'</td><td>'+metricNumber(r.content,'글')+(r.content_delta===null||r.content_delta===undefined?' <span class="na">(증감 미수집)</span>':' '+d(r.content_delta))+'</td><td>'+(Number.isFinite(r.inspected_indexed_count)?f(r.inspected_indexed_count)+' / '+f(r.inspected_url_count||0):'<span class="na">미확인</span>')+'</td><td>'+esc(cadence)+'</td><td>'+publishElapsedFor(r)+'</td><td><a class="publish-link" href="'+esc(publishUrl)+'" target="_blank" rel="noopener" title="사이트별 수동 발행 화면; 예약 작업 변경 없음">즉시발행 ↗</a></td></tr>';
   }).join('');
 }
 document.getElementById('all-platform-summary').addEventListener('click',function(e){var b=e.target.closest('.platform-tab[data-kind="blog"]');if(!b)return;blogPlatform=b.dataset.platform;draw();});
