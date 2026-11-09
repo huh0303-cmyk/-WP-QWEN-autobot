@@ -267,7 +267,7 @@ function renderBlogRanking(){
   const visitor=Number.isFinite(c.yesterday_visitors)?'<span class="good">'+metric(c.yesterday_visitors,c.yesterday_visitors_delta)+'</span>':'<span class="warn">미집계 · 순위 없음</span>';
   const identity=c.url?'<a href="'+esc(c.url)+'" target="_blank" rel="noopener">'+esc(shortSite(c))+' ↗</a>':esc(shortSite(c));
   const rowPlatform=String(c.platform||'').toLowerCase();
-  return '<tr class="platform-'+esc(rowPlatform)+'"><td>'+rank(rankValue)+'</td><td title="'+esc(c.name||c.url)+'">'+identity+'</td><td>'+visitor+'</td><td>'+clicks+'</td><td>'+impressions+'</td><td>'+ctr+'</td><td>'+position+'</td><td>'+publishElapsed(c)+'</td><td>'+trend7(c)+'</td><td title="'+esc(status)+'">'+esc(shortDate(c.checked_at||c.gsc_date)||'—')+' · '+esc(status)+'<br>'+publishAction(c)+'</td></tr>';
+  return '<tr class="platform-'+esc(rowPlatform)+'"><td>'+rank(rankValue)+'</td><td title="'+esc(c.name||c.url)+'">'+identity+'</td><td>'+visitor+'</td><td>'+clicks+'</td><td>'+impressions+'</td><td>'+ctr+'</td><td>'+position+'</td><td>'+publishElapsed(c)+'</td><td>'+trend7(c)+'</td><td title="'+esc(status)+'">'+esc(shortDate(c.checked_at||c.gsc_date)||'—')+' · '+esc(status)+'</td></tr>;
  }).join('')||'<tr><td colspan="10" style="text-align:center">이 플랫폼의 등록 데이터가 없습니다.</td></tr>';
 }
 async function loadSocial(){
@@ -308,7 +308,7 @@ function renderSocialRanking(){
   const handle=c.handle?' · @'+esc(c.handle):'';
   const name=c.url?'<a href="'+esc(c.url)+'" target="_blank" rel="noopener">'+esc(c.name)+' ↗</a>':esc(c.name);
   const platformClass=String(c.platform||'').toLowerCase();
-  return '<tr class="platform-'+esc(platformClass)+(monetized?' monetized-row':'')+(c.active_role===false?' inactive-row':'')+'"><td>'+rank(rankValue)+'</td><td>'+name+'<small class="identity-note">'+handle+'</small></td><td>'+role+'</td><td>'+socialMetric(c.audience,c.audience_delta,c.metric_status)+'</td><td>'+socialMetric(c.views,c.views_delta,c.views_status||c.metric_status)+'</td><td>'+socialMetric(c.content_count,c.content_count_delta,c.metric_status)+'</td><td class="'+(monetized?'revenue-cell':'')+'">'+revenueStatus(c.revenue)+'</td><td>'+publishElapsed(c)+'</td><td>'+trend7(c)+'</td><td><span class="status-note">'+status+'</span><br><a class="quick" href="https://sns.korea365.org/social-accounts?platform='+encodeURIComponent(c.platform||'')+'">발행관리 ↗</a></td></tr>';
+  return '<tr class="platform-'+esc(platformClass)+(monetized?' monetized-row':'')+(c.active_role===false?' inactive-row':'')+'"><td>'+rank(rankValue)+'</td><td>'+name+'<small class="identity-note">'+handle+'</small></td><td>'+role+'</td><td>'+socialMetric(c.audience,c.audience_delta,c.metric_status)+'</td><td>'+socialMetric(c.views,c.views_delta,c.views_status||c.metric_status)+'</td><td>'+socialMetric(c.content_count,c.content_count_delta,c.metric_status)+'</td><td class="'+(monetized?'revenue-cell':'')+'">'+revenueStatus(c.revenue)+'</td><td>'+publishElapsed(c)+'</td><td>'+trend7(c)+'</td><td><span class="status-note">'+status+'</span></td></tr>;
  }).join('')||'<tr><td colspan="10" style="text-align:center">이 플랫폼의 계정 데이터가 없습니다.</td></tr>';
 }
 document.getElementById('blog-platform-tabs').addEventListener('click',event=>{const button=event.target.closest('.platform-tab');if(!button)return;blogPlatform=button.dataset.platform;renderBlogRanking();});
