@@ -1,7 +1,7 @@
 name: Daily long videos - Health Clinic USA / Japan + Seoul_Jisoo1 shopping
 
 # One narrated 3-5 minute video per channel per KST day. Scheduled uploads are PRIVATE only per owner instruction (2026-10-24).
-# TTS policy: Japanese Health Clinic MUST use Fish Audio S2.1 Pro Free (fail closed; never Edge fallback); non-Japanese channels may use free Edge TTS fallback -> Pexels/Pixabay -> ffmpeg -> YouTube API. No paid TTS fallback.
+# Health TTS policy: both locales use Fish Audio -> Qwen3-TTS -> Edge TTS; no paid TTS fallback.
 # Upload happens only after the authenticated channel ID equals the locked UC ID; the job fails
 # visibly (and publishes nothing) while a channel's OAuth token is not yet re-authorised.
 on:
@@ -71,6 +71,8 @@ jobs:
       PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
       PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
       FISH_AUDIO_API_KEY: ${{ secrets.FISH_AUDIO_API_KEY }}
+      QWEN3_TTS_URL: ${{ vars.QWEN3_TTS_URL }}
+      QWEN3_TTS_API_KEY: ${{ secrets.QWEN3_TTS_API_KEY }}
       BOOKING_AID: ${{ secrets.BOOKING_AID }}
       AGODA_CID: ${{ secrets.AGODA_CID }}
       KLOOK_AID: ${{ secrets.KLOOK_AID }}
@@ -113,17 +115,16 @@ jobs:
             CH="$INPUT_CHANNEL"
           fi
           echo "channel=$CH" >> "$GITHUB_OUTPUT"
-      - name: Require Fish Audio secret for Japanese before script generation
-        if: ${{ steps.pick.outputs.channel == 'health_japan' }}
+      - name: Report health TTS fallback readiness
+        if: ${{ startsWith(steps.pick.outputs.channel, 'health_') }}
         env:
           FISH_AUDIO_API_KEY: ${{ secrets.FISH_AUDIO_API_KEY }}
+          QWEN3_TTS_URL: ${{ vars.QWEN3_TTS_URL }}
+          QWEN3_TTS_API_KEY: ${{ secrets.QWEN3_TTS_API_KEY }}
         run: |
-          set -eu
-          if [ -z "${FISH_AUDIO_API_KEY:-}" ]; then
-            echo "::error title=Missing Fish Audio secret::Japanese generation is blocked; no Edge TTS fallback is allowed."
-            exit 1
-          fi
-          echo "Japanese Fish Audio credential is present; value is not printed."
+          if [ -z "${FISH_AUDIO_API_KEY:-}" ]; then echo "Fish Audio unavailable; Qwen3-TTS/Edge TTS fallback may continue."; fi
+          if [ -z "${QWEN3_TTS_URL:-}" ]; then echo "::warning title=Qwen3-TTS endpoint missing::Set Actions variable QWEN3_TTS_URL; the chain will fall through to Edge TTS."; fi
+          echo "Credential values are never printed."
       - name: Write script, narrate, render, verify channel, upload
         run: python -u scripts/channel_long_video.py ${{ steps.pick.outputs.args }}
       - name: Keep manifest, subtitles and receipt (video only for build-only runs)

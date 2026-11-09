@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Daily 3-5 minute narrated video for the Health Clinic USA / Japan and Seoul_Jisoo1 shopping channels.
 
-Free-only stack: free LLM chain (economy_text) -> Fish Audio S2.1 Pro Free for Japanese narration (fail closed) -> Edge TTS for other channels -> Pexels/Pixabay
-footage and photos -> ffmpeg (Ken Burns, burned-in subtitles) -> YouTube Data API.
+Free-only health TTS order: Fish Audio -> Qwen3-TTS -> Edge TTS. Localized stock searches target Japanese seniors in Japan and a varied U.S. pool including Asian Americans.
+Pexels/Pixabay licensed footage and photos -> ffmpeg (Ken Burns, burned-in subtitles) -> YouTube Data API.
 Safety: exact authenticated channel ID must equal the locked UC ID before any upload; one video
 per KST day per channel (checked against the channel's uploads); health scripts pass a
 claim/dosage gate; shopping scripts may use only facts from config/korea_travel_catalog.json.
@@ -115,8 +115,9 @@ def build_prompt(channel: str, topic: dict, retry_note: str = "") -> str:
         name = topic[lang] if lang in topic else topic["en"]
         rules = (
             f"Topic: {name}" + (f" (focus: {topic['focus']})" if topic.get("focus") else "") + f". Type: {topic['kind']}.\n"
-            "Audience: adults 60+ and their families. Warm, calm, plain words, short sentences, no jargon without a simple explanation.\n"
-            "Cover: what it is, what it is commonly used for, what the general evidence says (mixed or limited where true), who should be careful "
+            + ("Audience: adults 60+ and their families in Japan. Warm, calm, plain spoken Japanese, short sentences. Use familiar Japanese daily-life settings and examples.\n" if lang == "ja" else
+               "Audience: adults 60+ and their families in the United States. Warm, calm, plain American English, short sentences. Show a mix of U.S. seniors, including Asian American people, without inferring identity from appearance.\n")
+            + "Cover: what it is, what it is commonly used for, what the general evidence says (mixed or limited where true), who should be careful "
             "(medication interactions such as blood thinners, kidney or liver conditions, pregnancy not relevant), food sources where relevant, "
             "and when to see a doctor. Use cautious wording such as 'may help support' or 'is often used for'.\n"
             "FORBIDDEN: cure/treat/prevent-disease claims, miracle or guarantee language, dosage numbers (no mg/mcg/IU/grams), brand names, "
@@ -139,7 +140,7 @@ def build_prompt(channel: str, topic: dict, retry_note: str = "") -> str:
 {rules}
 Structure: a hook (1 scene), 6-9 content scenes, a short friendly closing (1 scene). 9-12 scenes in total.
 Total narration length: {lo}-{hi} {unit}. Each scene is 2-5 sentences of spoken narration (no headings, no bullet marks, no emojis, no stage directions).
-For every scene give "visual": 2-4 ENGLISH words to search stock footage (concrete, wholesome, generic: e.g. 'senior couple walking park', 'fish oil capsules'; for Korea travel always name the place, e.g. 'seoul hanok village', 'myeongdong street night', 'busan haeundae beach').
+For every health scene, use a concrete visual phrase reflecting the audience locale: Japan scenes should show Japanese older adults or recognizable everyday Japanese settings; U.S. scenes should show varied American seniors, including Asian American people across the episode. Avoid repeating the same demographic phrase every scene. For Korea travel always name the place.
 {retry_note}
 Return ONLY JSON: {{"title":"<=65 chars, specific and honest, no clickbait, no year","hook":"one sentence summary for the description",
 "tags":["5-10 short tags"],"scenes":[{{"narration":"...","visual":"..."}}]}}"""
@@ -229,12 +230,20 @@ def pixabay_photo(query: str, used: set, key: str):
     return None
 
 
-def fetch_media(query: str, want_video: bool, used: set, tmp: Path, idx: int, kind: str = ""):
+def fetch_media(query: str, want_video: bool, used: set, tmp: Path, idx: int, kind: str = "", channel: str = ""):
+    original_query = query.strip()
     if kind == "shopping" and not re.search(r"(?i)korea|seoul|busan|jeju|hanok|myeongdong|hongdae|gangnam", query):
-        query = "Korea " + query  # generic stock has no Korean context unless asked
+        query = "Korea " + query
+    localized_queries = fetch_media_queries(channel, original_query)
+    if channel in ("health_japan", "health_usa") and localized_queries:
+        shift = idx % len(localized_queries)
+        localized_queries = localized_queries[shift:] + localized_queries[:shift]
     pk, xk = os.getenv("PEXELS_API_KEY", ""), os.getenv("PIXABAY_KEY", "") or os.getenv("PIXABAY_API_KEY", "")
     words = query.split()
-    queries = [query] + ([" ".join(words[:2])] if len(words) > 2 else [])
+    queries = localized_queries + [query]
+    if len(words) > 2:
+        queries.append(" ".join(words[:2]))
+    queries = list(dict.fromkeys(q for q in queries if q))
     steps = []
     for q in queries:
         if pk and want_video:
@@ -317,43 +326,111 @@ def _trim_leading_silence(path: Path) -> None:
 
 
 async def _tts(text: str, voice: str, out: Path, elevenlabs_voice_id: str = "", require_fish: bool = False):
-    """Fish Audio S2.1 Pro Free is mandatory for Japanese; Edge TTS is non-Japanese fallback only."""
+    """Free provider priority shared by Health Clinic Japan and USA."""
+    lang = "ja" if require_fish else "en"
+    errors = []
+
+    # 1. Fish Audio
     api_key = os.getenv("FISH_AUDIO_API_KEY", "").strip()
-    fish_error = "FISH_AUDIO_API_KEY unavailable"
     if api_key:
         try:
             response = requests.post(
                 "https://api.fish.audio/v1/tts",
-                headers={"Authorization": f"Bearer {api_key}", "model": "s2.1-pro-free",
+                headers={"Authorization": f"Bearer {api_key}", "model": os.getenv("FISH_AUDIO_MODEL", "s2.1-pro-free"),
                          "Content-Type": "application/json", "Accept": "audio/mpeg"},
-                json={"text": text, "format": "mp3"},
-                timeout=150,
+                json={"text": text, "format": "mp3"}, timeout=150,
             )
             if response.ok and len(response.content) > 2000 and not response.content.lstrip().startswith(b"{"):
                 out.write_bytes(response.content)
                 _trim_leading_silence(out)
-                print(f"TTS_ENGINE=fish_audio model=s2.1-pro-free bytes={out.stat().st_size}", flush=True)
+                print(f"TTS_ENGINE=fish_audio model={os.getenv('FISH_AUDIO_MODEL', 's2.1-pro-free')} bytes={out.stat().st_size}", flush=True)
                 return
-            fish_error = f"HTTP {response.status_code}"
+            errors.append(f"fish_audio_http_{response.status_code}")
         except Exception as exc:
-            fish_error = type(exc).__name__
+            errors.append(f"fish_audio_{type(exc).__name__}")
+    else:
+        errors.append("fish_audio_key_missing")
 
-    if require_fish:
-        raise RuntimeError(
-            f"Japanese Health Clinic requires Fish Audio s2.1-pro-free; {fish_error}. "
-            "Stopping instead of switching to Edge TTS."
-        )
+    # 2. Qwen3-TTS. The endpoint is an owner-provided compatible service;
+    # never print its token or request body.
+    qwen_url = os.getenv("QWEN3_TTS_URL", "").strip()
+    qwen_key = os.getenv("QWEN3_TTS_API_KEY", "").strip()
+    if qwen_url:
+        try:
+            headers = {"Content-Type": "application/json"}
+            if qwen_key:
+                headers["Authorization"] = f"Bearer {qwen_key}"
+            payload = {
+                "text": text,
+                "language": "Japanese" if lang == "ja" else "English",
+                "speaker": os.getenv("QWEN3_TTS_SPEAKER_JA" if lang == "ja" else "QWEN3_TTS_SPEAKER_EN", "default"),
+                "instruct": "Calm documentary or professional news-anchor narration, clear diction, warm and trustworthy.",
+                "response_format": "mp3",
+            }
+            response = requests.post(qwen_url, headers=headers, json=payload, timeout=180)
+            if response.ok and len(response.content) > 2000 and not response.content.lstrip().startswith(b"{"):
+                out.write_bytes(response.content)
+                _trim_leading_silence(out)
+                print(f"TTS_ENGINE=qwen3_tts bytes={out.stat().st_size}", flush=True)
+                return
+            errors.append(f"qwen3_tts_http_{response.status_code}")
+        except Exception as exc:
+            errors.append(f"qwen3_tts_{type(exc).__name__}")
+    else:
+        errors.append("qwen3_tts_url_missing")
 
+    # 3. Edge TTS is the final free fallback, localized to the destination.
+    edge_voice = voice
+    if not edge_voice or (lang == "ja" and not edge_voice.startswith("ja-")) or (lang == "en" and not edge_voice.startswith("en-")):
+        edge_voice = "ja-JP-KeitaNeural" if lang == "ja" else "en-US-GuyNeural"
     try:
         import edge_tts
-        await edge_tts.Communicate(text, voice).save(str(out))
+        await edge_tts.Communicate(text, edge_voice).save(str(out))
         if out.exists() and out.stat().st_size > 2000:
             _trim_leading_silence(out)
-            print(f"TTS_ENGINE=edge_tts voice={voice} bytes={out.stat().st_size}", flush=True)
+            print(f"TTS_ENGINE=edge_tts voice={edge_voice} bytes={out.stat().st_size}", flush=True)
             return
-        raise RuntimeError("Edge TTS returned an empty/short audio file")
+        errors.append("edge_tts_empty_audio")
     except Exception as exc:
-        raise RuntimeError(f"All permitted free TTS providers failed: {type(exc).__name__}: {exc}") from exc
+        errors.append(f"edge_tts_{type(exc).__name__}")
+    raise RuntimeError("TTS providers exhausted in required order Fish Audio -> Qwen3-TTS -> Edge TTS: " + ", ".join(errors))
+
+
+def choose_health_narrator(channel: str) -> dict:
+    """Choose one of four gender-balanced documentary/news narrator profiles."""
+    pools = {
+        "health_usa": [
+            {"name": "Guy", "gender": "male", "edge_voice": "en-US-GuyNeural", "profile_env": "HEALTH_USA_VOICE_MALE_1"},
+            {"name": "Davis", "gender": "male", "edge_voice": "en-US-DavisNeural", "profile_env": "HEALTH_USA_VOICE_MALE_2"},
+            {"name": "Aria", "gender": "female", "edge_voice": "en-US-AriaNeural", "profile_env": "HEALTH_USA_VOICE_FEMALE_1"},
+            {"name": "Jenny", "gender": "female", "edge_voice": "en-US-JennyNeural", "profile_env": "HEALTH_USA_VOICE_FEMALE_2"},
+        ],
+        "health_japan": [
+            {"name": "Keita", "gender": "male", "edge_voice": "ja-JP-KeitaNeural", "profile_env": "HEALTH_JP_VOICE_MALE_1"},
+            {"name": "Daichi", "gender": "male", "edge_voice": "ja-JP-DaichiNeural", "profile_env": "HEALTH_JP_VOICE_MALE_2"},
+            {"name": "Nanami", "gender": "female", "edge_voice": "ja-JP-NanamiNeural", "profile_env": "HEALTH_JP_VOICE_FEMALE_1"},
+            {"name": "Aoi", "gender": "female", "edge_voice": "ja-JP-AoiNeural", "profile_env": "HEALTH_JP_VOICE_FEMALE_2"},
+        ],
+    }
+    pool = pools[channel]
+    profile = random.choice(pool)
+    return {**profile, "id": profile["edge_voice"], "language": "ja-JP" if channel == "health_japan" else "en-US"}
+
+
+def fetch_media_queries(channel: str, query: str) -> list[str]:
+    """Build local, varied stock-search queries for each health audience."""
+    base = query.strip()
+    if channel == "health_japan":
+        prefixes = ["Japanese older adult Japan", "Japanese senior couple", "older Japanese woman", "older Japanese man"]
+    elif channel == "health_usa":
+        prefixes = ["Asian American senior", "diverse American older adults", "Asian American older woman", "Asian American older man"]
+    else:
+        return [base]
+    variants = [f"{prefix} {base}" for prefix in prefixes]
+    variants.append(base)
+    return list(dict.fromkeys(v for v in variants if v))
+
+
 
 
 def split_chunks(text: str, lang: str) -> list[str]:
@@ -432,17 +509,18 @@ def build_video(channel: str, data: dict, outdir: Path) -> dict:
     scenes = list(data["scenes"])
     if cfg["kind"] == "health":
         scenes.append({"narration": DISCLAIMER[lang], "visual": "doctor consultation senior"})
-    from voice_rotation import choose_voice
-    voice_profile = choose_voice(channel)
-    selected_voice_id = voice_profile["id"]
-    print(f"VOICE_ROTATION channel={channel} language={voice_profile['language']} gender={voice_profile['gender']} name={voice_profile['name']} id={selected_voice_id}", flush=True)
+    voice_profile = choose_health_narrator(channel) if channel in ("health_usa", "health_japan") else None
+    selected_voice_id = voice_profile["id"] if voice_profile else ""
+    if voice_profile:
+        print(f"VOICE_ROTATION channel={channel} language={voice_profile['language']} gender={voice_profile['gender']} name={voice_profile['name']}", flush=True)
     used: set = set()
     clips, durs, texts, credits = [], [], [], []
     for i, sc in enumerate(scenes):
         audio = tmp / f"a_{i:02d}.mp3"
-        asyncio.run(_tts(sc["narration"], cfg["voice"], audio, selected_voice_id, require_fish=(lang == "ja")))
+        tts_voice = voice_profile["edge_voice"] if voice_profile else cfg["voice"]
+        asyncio.run(_tts(sc["narration"], tts_voice, audio, selected_voice_id, require_fish=(lang == "ja")))
         dur = duration(audio) + 0.45
-        media = fetch_media(sc["visual"], want_video=(i % 2 == 0), used=used, tmp=tmp, idx=i, kind=cfg["kind"])
+        media = fetch_media(sc["visual"], want_video=(i % 2 == 0), used=used, tmp=tmp, idx=i, kind=cfg["kind"], channel=channel)
         if media is None:
             card = tmp / f"card_{i:02d}.jpg"
             fallback_card(sc["visual"].title(), card, i)
