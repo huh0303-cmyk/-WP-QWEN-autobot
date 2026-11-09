@@ -616,24 +616,6 @@
       "platform": "blogspot"
     },
     {
-      "site": "https://ki-korea.com",
-      "property": null,
-      "status": "PROPERTY_NOT_AVAILABLE",
-      "requested_date": "2026-11-06",
-      "period_start": "2026-10-31",
-      "period_end": "2026-11-06",
-      "previous_period_start": "2026-10-24",
-      "previous_period_end": "2026-10-30",
-      "date": null,
-      "clicks": null,
-      "delta": null,
-      "impressions": null,
-      "ctr": null,
-      "position": null,
-      "previous_date": "2026-10-30",
-      "platform": "wordpress"
-    },
-    {
       "site": "https://kieca-korea.blogspot.com",
       "property": null,
       "status": "PROPERTY_NOT_AVAILABLE",
@@ -1012,24 +994,6 @@
       "platform": "blogspot"
     },
     {
-      "site": "https://sis-korea.com",
-      "property": null,
-      "status": "PROPERTY_NOT_AVAILABLE",
-      "requested_date": "2026-11-06",
-      "period_start": "2026-10-31",
-      "period_end": "2026-11-06",
-      "previous_period_start": "2026-10-24",
-      "previous_period_end": "2026-10-30",
-      "date": null,
-      "clicks": null,
-      "delta": null,
-      "impressions": null,
-      "ctr": null,
-      "position": null,
-      "previous_date": "2026-10-30",
-      "platform": "wordpress"
-    },
-    {
       "site": "https://studyinkorea365.blogspot.com",
       "property": null,
       "status": "PROPERTY_NOT_AVAILABLE",
@@ -1066,4 +1030,4 @@
       "platform": "blogspot"
     }
   ]
-}
+}\n
