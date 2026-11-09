@@ -72,7 +72,7 @@ def card(headline,caption,photo,credit,index=0,landscape=False,zoom=1.0,overlay_
     def text(x,y,value,size,color=WHITE):
         d.text((x,y),value,font=font(size),fill=color,stroke_width=max(2,size//12),stroke_fill=stroke)
     style=style if style in THUMBNAIL_STYLES else "split_red"
-    label=(credit["subject"]+" · 자료사진("+(re.search(r"(?:19|20)\\d{2}",credit.get("date","")) or ["촬영일 미상"])[0]+")") if credit else "서울저널 자체 제작 그래픽"
+    label=(credit["subject"]+" · 자료사진("+(re.search(r"(?:19|20)\d{2}",credit.get("date","")) or ["촬영일 미상"])[0]+")") if credit else "서울저널 자체 제작 그래픽"
     if landscape:
         cfg={
           "split_red":((20,78,770,630),YELLOW,84,48,155),
