@@ -60,8 +60,27 @@ def prop_for(url, props):
 
 
 def indexed_sitemap_count(h, prop):
-    """Deprecated GSC sitemap indexed field is not a reliable index count."""
-    return None
+    """Return the indexed URL count reported by Search Console Sitemaps API.
+
+    Search Analytics does not expose an index count. The Sitemaps endpoint
+    exposes per-sitemap contents indexed values, so sum those values across
+    the property. Return None only when the API is unavailable or no sitemap
+    has a numeric indexed value; never fabricate zero.
+    """
+    endpoint = "https://www.googleapis.com/webmasters/v3/sites/" + quote(prop, safe="") + "/sitemaps"
+    response = requests.get(endpoint, headers=h, timeout=30)
+    if response.status_code != 200:
+        return None
+    payload = response.json()
+    total = 0
+    found = False
+    for sitemap in payload.get("sitemap", []):
+        for content in sitemap.get("contents", []) or []:
+            value = content.get("indexed")
+            if isinstance(value, (int, float)):
+                total += int(value)
+                found = True
+    return total if found else None
 
 def content_metadata(url, platform):
     """Return published content count and latest publish date using lightweight public endpoints."""
@@ -333,7 +352,7 @@ def one(h, props, platform, url, display_name, ref, prev_hist):
     row["impressions_delta"] = int(im[day] - im.get(before, 0)) if has_day else None
     row["cumulative_impressions"] = int(sum(r.get("impressions", 0) for r in tot)) if tot is not None else None
     row["google_indexed"] = indexed_sitemap_count(h, prop)
-    row["google_indexed_status"] = "URL_INSPECTION_REQUIRED"
+    row["google_indexed_status"] = "GSC_SITEMAPS_API" if row["google_indexed"] is not None else "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE"
     previous_indexed = p.get("google_indexed", p.get("google_pages"))
     if row["google_indexed"] is not None and previous_indexed is not None:
         row["google_indexed_delta"] = row["google_indexed"] - previous_indexed
