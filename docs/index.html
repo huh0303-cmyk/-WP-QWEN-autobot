@@ -7,17 +7,17 @@ h1{font-size:2rem;margin:0 0 4px;color:#0f172a}.sub{color:#475569;font-size:.85r
 .bar{display:flex;gap:8px;align-items:center;margin-bottom:8px;font-size:.85rem}
 select{padding:4px 7px;border:1px solid #cbd5e1;border-radius:6px;background:#fff}
 .table-wrap{width:100%;overflow:auto;background:#fff;border:1px solid #dbe2ea}
-table{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%;background:#fff;font-size:.84rem;table-layout:auto}
-th,td{padding:5px 7px;border-bottom:1px solid #e5e7eb;text-align:right;white-space:nowrap}
+table{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%;background:#fff;font-size:.78rem;table-layout:auto}th,td{text-align:center;vertical-align:middle;white-space:nowrap;padding-top:4px;padding-bottom:4px}
+th,td{padding:3px 4px;border-bottom:1px solid #e5e7eb;text-align:center;white-space:nowrap}
 th{background:#1f2937;color:#fff;position:sticky;top:0;z-index:3}
 th:first-child,td:first-child{position:sticky;left:0;z-index:2;text-align:center;min-width:48px;width:48px;background:#eef2f7;font-weight:800;border-right:1px solid #cbd5e1}
 th:first-child,td:first-child{left:0;z-index:6}
 th:first-child{z-index:8;background:#1f2937}
-th:nth-child(2),td:nth-child(2){text-align:left;min-width:68px;width:68px}
-th:nth-child(3),td:nth-child(3){position:sticky;left:63px;z-index:4;text-align:left;padding-left:7px;padding-right:8px;min-width:150px;background:#fff;border-right:1px solid #cbd5e1;box-shadow:2px 0 3px rgba(15,23,42,.08)}
+th:nth-child(2),td:nth-child(2){text-align:center;min-width:54px;width:54px}
+th:nth-child(3),td:nth-child(3){position:sticky;left:63px;z-index:4;text-align:center;padding-left:4px;padding-right:4px;min-width:130px;background:#fff;border-right:1px solid #cbd5e1;box-shadow:2px 0 3px rgba(15,23,42,.08)}
 th:nth-child(3){left:63px;z-index:7;background:#1f2937;color:#fff}
 td:nth-child(3) a{display:inline-block;max-width:240px;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}
-th:nth-child(n+4),td:nth-child(n+4){padding-left:6px;padding-right:6px}
+th:nth-child(n+4),td:nth-child(n+4){padding-left:3px;padding-right:3px}
 /* WordPress control columns: keep operational status values easy to scan */
 table:has(> tbody#b) th,table:has(> tbody#b) td{text-align:center;vertical-align:middle}
 table:has(> tbody#b) th:nth-child(3),table:has(> tbody#b) td:nth-child(3){text-align:left}
@@ -147,8 +147,8 @@ function weeklyFor(r){
 var CADENCE_DATA=null,HEALTH_DATA=null,BLOGGER_HEALTH=null;
 function cadenceFor(r){
  var c=CADENCE_DATA&&CADENCE_DATA.cadence||{},p=blogPlatformOf(r);
- if(p==='wordpress'){var site=String(r.site||'').toLowerCase();var isNews=/koreanews365/.test(site);var rule=isNews?c.newsrooms:c.wordpress_general;return rule?'일1회':'설정 미수집';}
- if(p==='blogspot')return c.blogspot?'일1회':'설정 미수집';
+ if(p==='wordpress'){var site=String(r.site||'').toLowerCase();var isNews=/koreanews365/.test(site);var rule=isNews?c.newsrooms:c.wordpress_general;return rule?'일1회 랜덤':'설정 미수집';}
+ if(p==='blogspot')return c.blogspot?'일1회 랜덤':'설정 미수집';
  if(p==='tistory')return c.tistory?'전체 5곳 중 매일 3곳':'설정 미수집';
  if(p==='naver')return c.naver?'계정별 차등':'설정 미수집';
  return '설정 미수집';
@@ -390,9 +390,10 @@ function drawSocialPlatform(data){
   if(a.platform==='YouTube'){
     if(/seoul.?journal|서울저널/.test(nameKey))rule={label:'매일 3개 · 랜덤',maxDays:1};
     else if(/history|히스토리/.test(nameKey))rule={label:'매일 1개 · 랜덤',maxDays:1};
-    else if(/cafe|카페|스타벅스|starbucks|kpop|k-pop/.test(nameKey))rule={label:'주 3회 · 랜덤',maxDays:3};
-    else if(/nasa|retro|silent|hollywood|invention|space/.test(nameKey))rule={label:'주 3회 · 랜덤',maxDays:3};
-    else if(/survival|topik|토픽|language/.test(nameKey))rule={label:'매일 1개 · 랜덤',maxDays:1};
+    else if(/cafe|카페|스타벅스|starbucks|kpop|k-pop/.test(nameKey))rule={label:'주3회 랜덤',maxDays:3};
+    else if(/nasa|retro|silent|hollywood|invention|space/.test(nameKey))rule={label:'주3회 랜덤',maxDays:3};
+    else if(/seoul[_ -]?jisoo1|seoul[_ -]?jisoo/.test(nameKey))rule={label:'일3회 랜덤',maxDays:1};
+    else if(/survival|topik|토픽|language/.test(nameKey))rule={label:'일1회 랜덤',maxDays:1};
   }else if(a.platform==='TikTok')rule={label:'매일 1회 · 랜덤',maxDays:1};
   else if(a.platform==='Facebook')rule={label:'매일 3회 · 랜덤',maxDays:1};
   else if(a.platform==='Instagram'||a.platform==='Threads')rule={label:'매일 2회 · 랜덤',maxDays:1};
