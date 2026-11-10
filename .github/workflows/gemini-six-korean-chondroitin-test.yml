@@ -1,0 +1,36 @@
+name: Gemini six Korean chondroitin writing test
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  korean:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+    steps:
+      - name: Test six models with same Korean chondroitin article
+        shell: python
+        run: |
+          import os,json,time,urllib.request,urllib.error
+          key=os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+          if not key: raise SystemExit("API key secret unavailable")
+          models=["gemini-3.8-flash","gemini-3.6-flash","gemini-3.5-flash","gemini-3.5-flash-lite","gemini-3.1-flash-lite","gemini-2.5-flash"]
+          prompt="제목: 콘드로이친 건강식품, 어떻게 섭취해야 할까? 한국어 건강정보 블로그용으로 300~400자의 독창적인 도입문을 작성하세요. 콘드로이친의 일반적 용도, 제품 표시사항에 따른 복용, 복용 전 전문가 상담이 필요한 경우, 효과 근거의 불확실성을 균형 있게 설명하세요. 치료·완치 효능이나 확정적인 복용량을 지어내지 말고 한국어로만 작성하세요."
+          for model in models:
+              payload={"contents":[{"parts":[{"text":prompt}]}],"generationConfig":{"maxOutputTokens":1600,"temperature":0.5}}
+              req=urllib.request.Request("https://generativelanguage.googleapis.com/v1beta/models/"+model+":generateContent",data=json.dumps(payload,ensure_ascii=False).encode(),headers={"x-goog-api-key":key,"Content-Type":"application/json"})
+              t=time.monotonic()
+              try:
+                  with urllib.request.urlopen(req,timeout=75) as response:
+                      result=json.load(response)
+                      output="".join(p.get("text","") for c in result.get("candidates",[]) for p in c.get("content",{}).get("parts",[]))
+                      korean=sum("\uac00"<=ch<="\ud7a3" for ch in output)
+                      finish=result.get("candidates",[{}])[0].get("finishReason")
+                      print("RESULT",model,"HTTP",response.status,"seconds",round(time.monotonic()-t,2),"chars",len(output),"korean_syllables",korean,"finish",finish,"output_tokens",result.get("usageMetadata",{}).get("candidatesTokenCount"),"preview",repr(output[:120]))
+              except urllib.error.HTTPError as e:
+                  print("RESULT",model,"HTTP_ERROR",e.code,"seconds",round(time.monotonic()-t,2),"detail",e.read(180).decode(errors="replace"))
+              except Exception as e:
+                  print("RESULT",model,type(e).__name__,"seconds",round(time.monotonic()-t,2))
