@@ -121,11 +121,8 @@ Do not join or automate dozens of affiliate programs at once. Start with a small
 ## 7. AI/model routing — frozen policy
 - WordPress long-form writing: GPT.
 - Blogger/Blogspot writing: Gemini.
-- YouTube generated thumbnails: Replicate black-forest-labs/flux-schnell.
-- Approved Replicate image model pool for non-YouTube image needs:
-  1. black-forest-labs/flux-schnell
-  2. bytedance/sdxl-lightning-4step
-  3. jyoung105/sdxl-turbo
+- Shared image fallback for WordPress, Blogger, Tistory, YouTube videos and Shorts: Pexels → Pixabay → Replicate SDXL Turbo (`bytonylee/sdxl-turbo`) → Replicate FLUX.1 Schnell (`black-forest-labs/flux-schnell`).
+- Make at most one attempt and request one output per paid model. SDXL Lightning and FLUX.1 [dev] are excluded.
 - Shared Replicate credential: REPLICATE_API_TOKEN.
 - Do not silently introduce or fall back to legacy paid image APIs/providers.
 - Codex is an implementation/development agent; it must implement this master specification rather than invent business policy.
