@@ -3,7 +3,7 @@
 """Single approved image-generation gateway for the automation repository.
 
 HARD POLICY (2026-09-02):
-- Matching Pexels, then Pixabay stock is attempted before paid generation.
+- Pexels and Pixabay are attempted in randomized order before paid generation.
 - Paid fallback order is SDXL Turbo, then FLUX.1 Schnell.
 - Only these two models may be called; each gets one attempt and one output maximum per content item.
 - One shared secret: REPLICATE_API_TOKEN.
@@ -200,14 +200,20 @@ def _cost_receipt(model, subject, status):
 
 
 def generate_image_url(subject: str, theme: str = "", *, mode: str = "auto") -> Optional[str]:
-    """Exactly four stages: Pexels -> Pixabay -> SDXL Turbo -> FLUX Schnell."""
+    """Exactly four stages: randomized free pair -> SDXL Turbo -> FLUX Schnell."""
     global last_image_model
     last_image_model = "none"
     if mode == "none": return None
     if mode not in {"auto", "legacy", "auto_free", "replicate_sdxl", "replicate_flux", "pexels", "pixabay"}:
         raise ValueError("unsupported image model")
     from stock_image_provider import find_stock_image, METADATA
-    stock = find_stock_image(subject, theme, force=True, selected_provider="auto")
+    import random
+    for free_source in random.sample(("pexels", "pixabay"), 2):
+        stock = find_stock_image(subject, theme, force=True, selected_provider=free_source)
+        if stock:
+            last_image_model = (METADATA.get(stock) or {}).get("provider", free_source)
+            return stock
+    stock = None
     if stock:
         last_image_model = (METADATA.get(stock) or {}).get("provider", "stock")
         return stock
