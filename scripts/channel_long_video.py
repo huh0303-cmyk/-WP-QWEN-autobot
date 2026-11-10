@@ -210,21 +210,29 @@ def pexels_video(query: str, used: set, key: str):
     return None
 
 
-def pexels_photo(query: str, used: set, key: str):
+def _has_japan_context(description: str) -> bool:
+    return bool(re.search(r"\b(?:japan(?:ese)?|tokyo|osaka|kyoto)\b|日本|東京|大阪|京都", description, re.I))
+
+
+def pexels_photo(query: str, used: set, key: str, *, japan_only: bool = False):
     r = requests.get("https://api.pexels.com/v1/search", headers={"Authorization": key},
                      params={"query": query, "orientation": "landscape", "per_page": 12}, timeout=25)
     r.raise_for_status()
     for p in r.json().get("photos", []):
+        if japan_only and not _has_japan_context(p.get("alt") or ""):
+            continue
         if f"pp{p['id']}" not in used and p.get("width", 0) >= 1280:
             return {"id": f"pp{p['id']}", "url": p["src"]["large2x"], "type": "image", "credit": "Pexels"}
     return None
 
 
-def pixabay_photo(query: str, used: set, key: str):
+def pixabay_photo(query: str, used: set, key: str, *, japan_only: bool = False):
     r = requests.get("https://pixabay.com/api/", params={"key": key, "q": query, "image_type": "photo", "orientation": "horizontal",
                                                            "safesearch": "true", "min_width": 1280, "per_page": 12}, timeout=25)
     r.raise_for_status()
     for p in r.json().get("hits", []):
+        if japan_only and not _has_japan_context(p.get("tags") or ""):
+            continue
         if f"px{p['id']}" not in used:
             return {"id": f"px{p['id']}", "url": p["largeImageURL"], "type": "image", "credit": "Pixabay"}
     return None
@@ -240,13 +248,14 @@ def fetch_media(query: str, want_video: bool, used: set, tmp: Path, idx: int, ki
         localized_queries = localized_queries[shift:] + localized_queries[:shift]
     pk, xk = os.getenv("PEXELS_API_KEY", ""), os.getenv("PIXABAY_KEY", "") or os.getenv("PIXABAY_API_KEY", "")
     words = query.split()
-    queries = localized_queries + [query]
-    if len(words) > 2:
+    japan_only = channel == "health_japan"
+    queries = localized_queries if japan_only else localized_queries + [query]
+    if not japan_only and len(words) > 2:
         queries.append(" ".join(words[:2]))
     queries = list(dict.fromkeys(q for q in queries if q))
     steps = []
     for q in queries:
-        if pk and want_video:
+        if pk and want_video and not japan_only:
             steps.append((pexels_video, q, pk))
         if pk:
             steps.append((pexels_photo, q, pk))
@@ -254,7 +263,7 @@ def fetch_media(query: str, want_video: bool, used: set, tmp: Path, idx: int, ki
             steps.append((pixabay_photo, q, xk))
     for fn, q, key in steps:
         try:
-            m = fn(q, used, key)
+            m = fn(q, used, key, japan_only=True) if japan_only else fn(q, used, key)
         except requests.RequestException as exc:
             print(f"media source error {fn.__name__}: {type(exc).__name__}", flush=True)
             continue
@@ -439,7 +448,8 @@ def fetch_media_queries(channel: str, query: str) -> list[str]:
     else:
         return [base]
     variants = [f"{prefix} {base}" for prefix in prefixes]
-    variants.append(base)
+    if channel != "health_japan":
+        variants.append(base)
     return list(dict.fromkeys(v for v in variants if v))
 
 
@@ -502,7 +512,7 @@ def make_srt(scene_texts: list[str], durations: list[float], lang: str) -> str:
     for text, dur in zip(scene_texts, durations):
         chunks = split_chunks(text, lang)
         weights = [max(1, len(re.sub(r"\s", "", c))) for c in chunks]
-        total, cur = sum(weights), t0 + 0.15
+        total, cur = sum(weights), t0 + (0 if lang == "ja" else 0.15)
         usable = max(0.5, dur - 0.5)
         for c, w in zip(chunks, weights):
             span = usable * w / total
@@ -545,12 +555,12 @@ def build_video(channel: str, data: dict, outdir: Path) -> dict:
         if media["type"] == "video":
             vf = f"scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},setsar=1"
             run(["ffmpeg", "-y", "-stream_loop", "-1", "-i", str(media["path"]), "-i", str(audio), "-t", f"{dur:.2f}",
-                 "-vf", vf, "-af", "asetpts=PTS-STARTPTS,apad", *common, str(clip)])
+                 "-map", "0:v:0", "-map", "1:a:0", "-vf", vf, "-af", "asetpts=PTS-STARTPTS,apad", *common, str(clip)])
         else:
             frames = int(dur * FPS) + 2
             vf = (f"scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,"
                   f"zoompan=z='min(zoom+0.0007,1.18)':d={frames}:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s={W}x{H}:fps={FPS},setsar=1")
-            run(["ffmpeg", "-y", "-i", str(media["path"]), "-i", str(audio), "-t", f"{dur:.2f}", "-vf", vf, "-af", "asetpts=PTS-STARTPTS,apad", *common, str(clip)])
+            run(["ffmpeg", "-y", "-i", str(media["path"]), "-i", str(audio), "-t", f"{dur:.2f}", "-map", "0:v:0", "-map", "1:a:0", "-vf", vf, "-af", "asetpts=PTS-STARTPTS,apad", *common, str(clip)])
         clips.append(clip)
         durs.append(duration(clip))
         texts.append(sc["narration"])
