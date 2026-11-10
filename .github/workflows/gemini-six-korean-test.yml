@@ -1,0 +1,36 @@
+name: Gemini six Korean writing test
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  korean:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+    steps:
+      - name: Test all six models in Korean without publishing
+        shell: python
+        run: |
+          import os,json,time,urllib.request,urllib.error
+          key=os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+          if not key:
+              raise SystemExit("API key secret unavailable")
+          models=["gemini-3.8-flash","gemini-3.6-flash","gemini-3.5-flash","gemini-3.5-flash-lite","gemini-3.1-flash-lite","gemini-2.5-flash"]
+          prompt="한국어 뉴스·정보 블로그용으로 '2026년 한국 대학 진학을 준비하는 학생을 위한 실용적인 준비 체크리스트'라는 제목의 사실에 기반한 독창적인 한국어 도입문을 300~400자 분량으로 작성하세요. 확인되지 않은 통계는 쓰지 마세요. 한국어만 사용하세요."
+          for model in models:
+              payload={"contents":[{"parts":[{"text":prompt}]}],"generationConfig":{"maxOutputTokens":1200,"temperature":0.6}}
+              req=urllib.request.Request("https://generativelanguage.googleapis.com/v1beta/models/"+model+":generateContent",data=json.dumps(payload,ensure_ascii=False).encode(),headers={"x-goog-api-key":key,"Content-Type":"application/json"})
+              t=time.monotonic()
+              try:
+                  with urllib.request.urlopen(req,timeout=75) as response:
+                      result=json.load(response)
+                      output="".join(p.get("text","") for c in result.get("candidates",[]) for p in c.get("content",{}).get("parts",[]))
+                      korean=sum("\uac00"<=ch<="\ud7a3" for ch in output)
+                      print("RESULT",model,"HTTP",response.status,"seconds",round(time.monotonic()-t,2),"chars",len(output),"korean_syllables",korean,"finish",result.get("candidates",[{}])[0].get("finishReason"),"output_tokens",result.get("usageMetadata",{}).get("candidatesTokenCount"),"preview",repr(output[:150]))
+              except urllib.error.HTTPError as e:
+                  print("RESULT",model,"HTTP_ERROR",e.code,"seconds",round(time.monotonic()-t,2),"detail",e.read(250).decode(errors="replace"))
+              except Exception as e:
+                  print("RESULT",model,type(e).__name__,"seconds",round(time.monotonic()-t,2))
