@@ -15,7 +15,7 @@ Example only: 3,000 input + 2,000 billed output tokens, one writing call per art
 Sources:
 - https://developers.openai.com/api/docs/models/gpt-5-mini
 - https://ai.google.dev/gemini-api/docs/pricing
-- https://replicate.com/bytedance/sdxl-lightning-4step
+- https://replicate.com/bytonylee/sdxl-turbo
 - https://replicate.com/black-forest-labs/flux-schnell/api
 - https://www.pexels.com/api/documentation/
 - https://pixabay.com/api/docs/
