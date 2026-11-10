@@ -27,7 +27,7 @@ class BloggerModuleContractTests(unittest.TestCase):
             self.assertEqual(8, rules["labels_min"])
             self.assertEqual(14, rules["labels_max"])
             self.assertEqual(
-                ["sdxl-lightning", "flux-schnell", "pass_no_image"],
+                ["pexels", "pixabay", "bytonylee/sdxl-turbo", "black-forest-labs/flux-schnell", "pass_no_image"],
                 rules["image_provider_order"],
             )
 
