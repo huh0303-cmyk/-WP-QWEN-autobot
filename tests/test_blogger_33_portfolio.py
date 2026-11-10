@@ -11,7 +11,7 @@ NEW_IDS = {
     "3683978748331752523",
     "8077962392257357260",
 }
-IMAGE_CHAIN = ["bytedance/sdxl-lightning-4step", "black-forest-labs/flux-schnell"]
+IMAGE_CHAIN = ["auto", "none"]
 
 
 def test_all_33_blogspot_cards_are_consistent_and_unique():
