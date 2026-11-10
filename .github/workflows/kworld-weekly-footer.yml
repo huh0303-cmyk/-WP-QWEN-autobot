@@ -1,0 +1,22 @@
+name: Kworld365 - apply weekly SeoulMall and Coupang 10 to all posts
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '20 16 * * 3'
+permissions:
+  contents: read
+jobs:
+  update-weekly-footer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests beautifulsoup4
+      - name: Refresh all existing posts from the current verified weekly catalog
+        env:
+          KWORLD365COM: ${{ secrets.KWORLD365COM }}
+          PYTHONPATH: scripts:.
+        run: python -m scripts.kworld_apply_weekly_footer
