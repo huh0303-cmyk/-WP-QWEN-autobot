@@ -1,0 +1,53 @@
+name: Gemini six-candidate API smoke test
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+    steps:
+      - name: Check available key and probe models without publishing
+        shell: python
+        run: |
+          import os, json, time, urllib.request, urllib.error
+          key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+          if not key:
+              print("BLOCKED: neither GEMINI_API_KEY nor GOOGLE_API_KEY secret is available")
+              raise SystemExit(1)
+          base = "https://generativelanguage.googleapis.com/v1beta/"
+          def request(path, payload=None):
+              data = None if payload is None else json.dumps(payload).encode()
+              req = urllib.request.Request(base + path, data=data, headers={"x-goog-api-key": key, "Content-Type": "application/json"}, method="GET" if data is None else "POST")
+              try:
+                  with urllib.request.urlopen(req, timeout=30) as res:
+                      return res.status, json.load(res)
+              except urllib.error.HTTPError as e:
+                  return e.code, {}
+              except Exception as e:
+                  print("Transport error:", type(e).__name__)
+                  return 0, {}
+          status, listing = request("models?pageSize=1000")
+          if status != 200:
+              print("MODEL_LIST_FAILED", status)
+              raise SystemExit(1)
+          available = {m["name"].split("/")[-1]: m for m in listing.get("models", [])}
+          print("Models listed:", len(available))
+          candidates = ["gemini-3.8-flash", "gemini-3.6-flash", "gemini-3.5-flash", "gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-2.5-flash"]
+          for model in candidates:
+              if model not in available:
+                  print(model, "NOT_LISTED")
+                  continue
+              if "generateContent" not in available[model].get("supportedGenerationMethods", []):
+                  print(model, "NO_GENERATE_CONTENT")
+                  continue
+              start = time.monotonic()
+              payload = {"contents": [{"parts": [{"text": "Write one original, factual, 70-word English introduction about preparing to study in South Korea. No links."}]}], "generationConfig": {"maxOutputTokens": 180}}
+              code, body = request("models/" + model + ":generateContent", payload)
+              usage = body.get("usageMetadata", {})
+              print(model, "HTTP", code, "seconds", round(time.monotonic()-start, 2), "input_tokens", usage.get("promptTokenCount"), "output_tokens", usage.get("candidatesTokenCount"), "has_text", bool(body.get("candidates")))
+          print("Note: successful calls do not establish free-tier quota or pricing.")
