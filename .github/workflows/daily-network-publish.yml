@@ -198,7 +198,6 @@ jobs:
           STUDYINKOREA365COM: ${{ secrets.STUDYINKOREA365COM }}
           KIECAKOREAORG: ${{ secrets.KIECAKOREAORG }}
           KSAKOREAORG: ${{ secrets.KSAKOREAORG }}
-          SISKOREACOM: ${{ secrets.SISKOREACOM }}
           JOBKOREA365COM: ${{ secrets.JOBKOREA365COM }}
           JOBINKOREA365COM: ${{ secrets.JOBINKOREA365COM }}
           JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
