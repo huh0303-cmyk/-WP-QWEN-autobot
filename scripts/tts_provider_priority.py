@@ -48,6 +48,23 @@ def choose_narrator(channel: str, language: str = "ko", history_path: str | Path
             "fish_voice_id": os.getenv(f"FISH_VOICE_{base.upper()}_{index + 1}", "").strip(),
             "qwen_voice": os.getenv(f"QWEN_VOICE_{base.upper()}_{index + 1}", "").strip()}
 
+def shorts_audio_filter() -> str:
+    """1.2x speed, subtle brightening and loudness control for narrated Shorts."""
+    return "atempo=1.2,highpass=f=90,treble=g=2:f=3500,loudnorm=I=-16:TP=-1.5:LRA=9"
+
+def render_shorts_audio(input_path: str | Path, output_path: str | Path) -> Path:
+    """Postprocess any successful provider uniformly; fail closed on bad output."""
+    source, dest = Path(input_path), Path(output_path)
+    if not verify_audio(source):
+        raise RuntimeError("Invalid TTS source audio")
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    subprocess.run(["ffmpeg", "-y", "-v", "error", "-i", str(source),
+        "-af", shorts_audio_filter(), "-c:a", "libmp3lame", "-q:a", "2", str(dest)],
+        check=True, capture_output=True, timeout=180)
+    if not verify_audio(dest):
+        raise RuntimeError("Invalid processed Shorts audio")
+    return dest
+
 def verify_audio(path: str | Path, minimum_seconds: float = 0.4) -> bool:
     """Reject missing, corrupt or implausibly short files using ffprobe."""
     out = Path(path)
