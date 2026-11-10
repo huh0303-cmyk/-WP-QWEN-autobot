@@ -23,7 +23,7 @@
       "model": "FLUX.1 [dev]",
       "model_id": "black-forest-labs/flux-dev",
       "role": "second paid fallback",
-      "license_gate": "FLUX.1 dev non-commercial weights license and Replicate commercial-use terms; confirm output commercial use per Replicate"
+      "license_gate": "Replicate's hosted model page allows commercial use of generated outputs; do not treat downloaded model weights as commercially licensed"
     },
     {
       "priority": 3,
