@@ -98,8 +98,8 @@ Must hold:
 - WordPress long-form = GPT
 - no silent Gemini fallback for WP long-form
 - Blogger/Blogspot long-form = Gemini
-- YouTube generated thumbnail = black-forest-labs/flux-schnell only
-- approved non-YouTube Replicate pool only: flux-schnell / bytedance sdxl-lightning-4step / jyoung105 sdxl-turbo
+- Shared image order = Pexels → Pixabay → bytonylee/sdxl-turbo → black-forest-labs/flux-schnell for WordPress, Blogger, Tistory, YouTube long-form and Shorts
+- approved paid Replicate models only: bytonylee/sdxl-turbo / black-forest-labs/flux-schnell
 - legacy image providers must not be reachable from active paths
 - REPLICATE_API_TOKEN is the shared credential for approved Replicate images
 - retries bounded
