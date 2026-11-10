@@ -38,3 +38,9 @@ Accept only relevant, licensed, nonduplicate, nonwatermarked images, with descri
 - Verify GitHub Actions and provider receipts before claiming production migration complete.
 
 This document replaces the 2026-09-12 GPT-5-mini/random Gemini policy. Existing code is not automatically migrated by this document commit.
+
+## Mandatory precedence and migration gate — 2026-11-11
+
+This is the **highest-priority owner-approved runtime policy** for the entire London Project, including WordPress, Blogspot, Tistory, YouTube, TikTok, Instagram, Threads and Facebook. Where any old engine, fallback, provider selector, environment variable, workflow or channel override conflicts with this policy, **the new policy wins**. Remove/disable the conflicting executable route rather than leaving it reachable as an alternative. Preserve unrelated publication functionality and historical content. The TTS contract in `docs/TTS_PROVIDER_PRIORITY.md` has equal binding authority for all narrated video content.
+
+Migration acceptance must be **per actual producer entrypoint**, not per documentation file: trace caller to the shared text/image/TTS router; verify language routing, exact fallback order, rejection of unauthorized engines, six-voice anti-repeat, and fail-closed behavior. Run syntax/unit tests first, then only owner-approved English and Korean draft/private end-to-end tests. No mass publishing. Record commit, test command, observed result, and unresolved blockers; never claim complete rollout from a policy commit alone.
