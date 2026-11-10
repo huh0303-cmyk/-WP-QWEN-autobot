@@ -944,3 +944,8 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - Applied the Japan photo screening policy to Health Clinic USA with U.S. context markers and rotating searches for American seniors, including Asian Americans. Unverified stock media falls back to a text card.
 - One U.S. English voice per video is selected from Guy and Davis for documentary delivery and Aria and Jenny for news-anchor delivery. The selected profile follows Fish Audio, Qwen3-TTS, then Edge TTS. Fish Audio requires that profile's reference ID. Captions begin at the scene boundary.
 - Python compilation, diff check, and mocked checks for image selection, all four voice profiles and caption timing passed. Live provider rendering and YouTube upload were not tested.
+
+## health-clinic-japan-food-image-fallback-20261110
+
+- Japan stock portraits require metadata identifying a Japanese person. A location alone is insufficient. If no portrait passes, search for Japanese meals and screen out results with people mentioned in the metadata. The text card remains the final fallback when stock media is unavailable.
+- Verified compilation, diff check and mocked portrait screening and food fallback order. Live stock search and video rendering remain unverified.

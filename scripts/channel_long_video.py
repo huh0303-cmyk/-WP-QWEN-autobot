@@ -210,8 +210,17 @@ def pexels_video(query: str, used: set, key: str):
     return None
 
 
+JAPAN_FOOD_CONTEXT = re.compile(
+    r"^(?!.*\b(?:people|person|man|woman|men|women|child|children|family|couple|chef|hands?|eating)\b)"
+    r"(?=.*\b(?:meal|food|bento|miso|tofu|rice|vegetables|salmon|soup|salad|dish)\b)",
+    re.I,
+)
+
 HEALTH_IMAGE_CONTEXT = {
-    "health_japan": re.compile(r"\b(?:japan(?:ese)?|tokyo|osaka|kyoto)\b|日本|東京|大阪|京都", re.I),
+    "health_japan": re.compile(
+        r"\bJapanese (?:older |elderly |senior )?(?:man|woman|men|women|person|people|adults?|couple|seniors?|doctor|patient)\b"
+        r"|日本人", re.I,
+    ),
     "health_usa": re.compile(r"\b(?:united states|usa|u\.s|american|new york|los angeles|chicago|san francisco)\b", re.I),
 }
 
@@ -263,7 +272,17 @@ def fetch_media(query: str, want_video: bool, used: set, tmp: Path, idx: int, ki
             steps.append((pexels_photo, q, pk))
         if xk:
             steps.append((pixabay_photo, q, xk))
-    for fn, q, key in steps:
+    steps = [(fn, q, key, context) for fn, q, key in steps]
+    if channel == "health_japan":
+        meals = ["Japanese bento vegetables overhead", "Japanese rice miso soup meal overhead",
+                 "Japanese grilled fish vegetable meal overhead", "Japanese tofu vegetable dish overhead"]
+        shift = idx % len(meals)
+        for meal in meals[shift:] + meals[:shift]:
+            if pk:
+                steps.append((pexels_photo, meal, pk, JAPAN_FOOD_CONTEXT))
+            if xk:
+                steps.append((pixabay_photo, meal, xk, JAPAN_FOOD_CONTEXT))
+    for fn, q, key, context in steps:
         try:
             m = fn(q, used, key, context=context) if context is not None else fn(q, used, key)
         except requests.RequestException as exc:
@@ -282,7 +301,7 @@ def fetch_media(query: str, want_video: bool, used: set, tmp: Path, idx: int, ki
         if path.stat().st_size < 20_000:
             continue
         used.add(m["id"])
-        return {**m, "path": path}
+        return {**m, "path": path, "query": q}
     return None
 
 
@@ -551,7 +570,7 @@ def build_video(channel: str, data: dict, outdir: Path) -> dict:
             fallback_card(sc["visual"].title(), card, i)
             media = {"type": "image", "path": card, "id": f"card{i}", "credit": "generated card"}
             print(f"scene {i}: no stock media for '{sc['visual']}', used card", flush=True)
-        credits.append({"scene": i, "id": media["id"], "type": media["type"], "credit": media["credit"], "query": sc["visual"]})
+        credits.append({"scene": i, "id": media["id"], "type": media["type"], "credit": media["credit"], "query": media.get("query", sc["visual"])})
         clip = tmp / f"clip_{i:02d}.mp4"
         common = ["-c:v", "libx264", "-preset", "veryfast", "-crf", "23", "-pix_fmt", "yuv420p", "-r", str(FPS),
                   "-c:a", "aac", "-b:a", "160k", "-ar", "44100", "-shortest"]
