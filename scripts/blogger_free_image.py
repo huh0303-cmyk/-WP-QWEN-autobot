@@ -129,24 +129,6 @@ _pexels.accepts_exclude = True
 _pixabay.accepts_exclude = True
 
 
-def _wikimedia(query: str):
-    r = requests.get("https://commons.wikimedia.org/w/api.php", params={
-        "action": "query", "format": "json", "generator": "search", "gsrnamespace": 6,
-        "gsrsearch": f"filetype:bitmap {query}", "gsrlimit": 20, "prop": "imageinfo",
-        "iiprop": "url|size|mime|extmetadata", "iiurlwidth": 1200}, headers=UA, timeout=20)
-    r.raise_for_status()
-    for page in (r.json().get("query", {}).get("pages", {}) or {}).values():
-        info = (page.get("imageinfo") or [{}])[0]
-        meta = info.get("extmetadata") or {}
-        lic = str((meta.get("LicenseShortName") or {}).get("value") or "").lower()
-        url = info.get("thumburl") or info.get("url") or ""
-        title = str(page.get("title") or "").removeprefix("File:")
-        if lic in {"cc0", "public domain", "pdm"} and urlparse(url).hostname == "upload.wikimedia.org" \
-                and _relevant(query, title) and _is_image(url):
-            return {"url": url, "provider": "Wikimedia", "id": str(page.get("pageid")), "desc": title}
-    return None
-
-
 def pick_image(query: str, alternates=(), *, allow_paid_fallback: bool = True):
     """Return {url, alt-ready desc, provider} or None.
     Fixed stock order: Pexels, then Pixabay.
