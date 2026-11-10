@@ -104,7 +104,7 @@ def draft(title, body):
 
 def tts(text):
     """Free TTS: Fish Audio -> Qwen3-TTS -> Edge, six rotating narrator roles."""
-    from tts_provider_priority import generate_tts, choose_narrator
+    from tts_provider_priority import generate_tts, choose_narrator, render_shorts_audio
     p = OUT / "voice.mp3"
     narrator = choose_narrator("seoul_journal", "ko")
     key = os.getenv("FISH_AUDIO_API_KEY", "").strip()
@@ -126,7 +126,8 @@ def tts(text):
     result = generate_tts(text, p, language="ko", fish_generator=fish_adapter,
                           edge_voice=narrator["edge_voice"], narrator=narrator)
     log(f"TTS_ENGINE={result['engine']} narrator_role={narrator['role']}")
-    return p
+    processed = OUT / "voice-shorts.mp3"
+    return render_shorts_audio(p, processed)
 
 def fetch_photo(image_url):
     if not image_url: return None
@@ -217,7 +218,7 @@ def render(headline,photo,audio):
     (OUT/"template.txt").write_text(style["name"],encoding="utf-8")
     ffmpeg=os.getenv("FFMPEG_BINARY","ffmpeg")
     video=OUT/"seoul-journal-short.mp4"
-    cmd=[ffmpeg,"-y","-loop","1","-i",str(still),"-i",str(audio),"-vf","scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,format=yuv420p","-c:v","libx264","-preset","medium","-tune","stillimage","-af","atempo=1.2","-c:a","aac","-b:a","192k","-shortest","-movflags","+faststart",str(video)]
+    cmd=[ffmpeg,"-y","-loop","1","-i",str(still),"-i",str(audio),"-vf","scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,format=yuv420p","-c:v","libx264","-preset","medium","-tune","stillimage","-c:a","aac","-b:a","192k","-shortest","-movflags","+faststart",str(video)]
     p=subprocess.run(cmd,capture_output=True,text=True,timeout=240)
     if p.returncode: raise RuntimeError("FFmpeg 렌더링 실패: "+p.stderr[-1200:])
     return video
