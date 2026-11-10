@@ -20,7 +20,7 @@ ARTICLE = """
 <p>Touring teams must decide which equipment travels with the production and which items can be sourced locally. Lighting rigs, video walls, audio systems and stage structures require compatible specifications, trained crews and realistic setup windows. International freight can involve customs documents, temporary import arrangements and insurance.</p>
 
 <h2>Budget decisions and the announcement threshold</h2>
-<p>Ticket revenue is only part of the financial model. Agencies and promoters assess venue rental, labor, security, travel, taxes, marketing and potential currency exposure. They may adjust city selection, ticket inventory or the number of performances before committing to a route.</p>
+
 <p>Only an authorized agency, promoter or ticketing partner can confirm the details of a specific show. An industry planning article should not be read as a schedule announcement. Before booking flights or accommodation, fans should verify the artist, city, date, venue and official ticketing channel against primary announcements.</p>
 <h2>A practical verification checklist for fans</h2>
 <p>Check the artist's official channels and the agency's notices first. Compare the announcement with the named promoter and venue, then follow the ticket link from an official source rather than a resale advertisement. If a date appears only on fan accounts or speculative calendars, treat it as unconfirmed. Keep travel purchases flexible until the relevant details are published.</p>
