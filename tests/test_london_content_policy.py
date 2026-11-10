@@ -54,7 +54,8 @@ def test_london_image_policy_prefers_copyright_safe_sources():
     assert policy["image_policy"]["order"] == [
         "pexels",
         "pixabay",
-        "wikimedia_commons_cc0_public_domain",
+        "bytonylee/sdxl-turbo",
+        "black-forest-labs/flux-schnell",
         "pass_without_image",
     ]
     assert policy["image_policy"]["never_copy_unlicensed_news_photo"] is True
