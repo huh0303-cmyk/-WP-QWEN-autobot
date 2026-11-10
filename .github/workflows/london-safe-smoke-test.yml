@@ -4,6 +4,10 @@ on:
     paths:
       - '.github/workflows/london-safe-smoke-test.yml'
       - 'tests/test_london_safe_smoke.py'
+      - 'scripts/gemini_text.py'
+      - 'scripts/replicate_image_provider.py'
+      - 'scripts/tts_provider_priority.py'
+      - 'scripts/voice_rotation.py'
   workflow_dispatch:
 permissions:
   contents: read
@@ -15,8 +19,21 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install requests
+      - name: Install test dependencies
+        run: python -m pip install requests
+      - name: Verify test file is checked out
+        run: |
+          test -f tests/test_london_safe_smoke.py
+          python - <<'PY'
+          import ast
+          from pathlib import Path
+          p = Path("tests/test_london_safe_smoke.py")
+          tree = ast.parse(p.read_text(encoding="utf-8"))
+          methods = [n for c in tree.body if isinstance(c, ast.ClassDef) for n in c.body if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name.startswith("test_")]
+          assert len(methods) >= 6, f"Expected >=6 smoke tests; found {len(methods)}"
+          print(f"Found {len(methods)} test methods in {p}")
+          PY
       - name: Compile key runtime entrypoints
         run: python -m py_compile scripts/gemini_text.py scripts/replicate_image_provider.py scripts/tts_provider_priority.py scripts/voice_rotation.py scripts/knowledge_narrator.py
-      - name: English/Korean text, image fallback, TTS failure and private-only safety smoke
-        run: python -m unittest discover -s tests -p test_london_safe_smoke.py -v
+      - name: English/Korean writer, image fallback, TTS and no-publication smoke
+        run: python -m unittest discover -s tests -p 'test_london_safe_smoke.py' -v
