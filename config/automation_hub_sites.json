@@ -746,8 +746,10 @@
         "labels_min": 8,
         "labels_max": 14,
         "image_provider_order": [
-          "sdxl-lightning",
-          "flux-schnell",
+          "pexels",
+          "pixabay",
+          "bytonylee/sdxl-turbo",
+          "black-forest-labs/flux-schnell",
           "pass_no_image"
         ]
       }
@@ -788,8 +790,10 @@
         "labels_min": 8,
         "labels_max": 14,
         "image_provider_order": [
-          "sdxl-lightning",
-          "flux-schnell",
+          "pexels",
+          "pixabay",
+          "bytonylee/sdxl-turbo",
+          "black-forest-labs/flux-schnell",
           "pass_no_image"
         ]
       }
@@ -830,8 +834,10 @@
         "labels_min": 8,
         "labels_max": 14,
         "image_provider_order": [
-          "sdxl-lightning",
-          "flux-schnell",
+          "pexels",
+          "pixabay",
+          "bytonylee/sdxl-turbo",
+          "black-forest-labs/flux-schnell",
           "pass_no_image"
         ]
       }
@@ -872,8 +878,10 @@
         "labels_min": 8,
         "labels_max": 14,
         "image_provider_order": [
-          "sdxl-lightning",
-          "flux-schnell",
+          "pexels",
+          "pixabay",
+          "bytonylee/sdxl-turbo",
+          "black-forest-labs/flux-schnell",
           "pass_no_image"
         ]
       }
@@ -914,8 +922,10 @@
         "labels_min": 8,
         "labels_max": 14,
         "image_provider_order": [
-          "sdxl-lightning",
-          "flux-schnell",
+          "pexels",
+          "pixabay",
+          "bytonylee/sdxl-turbo",
+          "black-forest-labs/flux-schnell",
           "pass_no_image"
         ]
       }
@@ -956,8 +966,10 @@
         "labels_min": 8,
         "labels_max": 14,
         "image_provider_order": [
-          "sdxl-lightning",
-          "flux-schnell",
+          "pexels",
+          "pixabay",
+          "bytonylee/sdxl-turbo",
+          "black-forest-labs/flux-schnell",
           "pass_no_image"
         ]
       }
@@ -998,8 +1010,10 @@
         "labels_min": 8,
         "labels_max": 14,
         "image_provider_order": [
-          "sdxl-lightning",
-          "flux-schnell",
+          "pexels",
+          "pixabay",
+          "bytonylee/sdxl-turbo",
+          "black-forest-labs/flux-schnell",
           "pass_no_image"
         ]
       }
@@ -1040,8 +1054,10 @@
         "labels_min": 8,
         "labels_max": 14,
         "image_provider_order": [
-          "sdxl-lightning",
-          "flux-schnell",
+          "pexels",
+          "pixabay",
+          "bytonylee/sdxl-turbo",
+          "black-forest-labs/flux-schnell",
           "pass_no_image"
         ]
       }
@@ -1082,8 +1098,10 @@
         "labels_min": 8,
         "labels_max": 14,
         "image_provider_order": [
-          "sdxl-lightning",
-          "flux-schnell",
+          "pexels",
+          "pixabay",
+          "bytonylee/sdxl-turbo",
+          "black-forest-labs/flux-schnell",
           "pass_no_image"
         ]
       }
@@ -1124,8 +1142,10 @@
         "labels_min": 8,
         "labels_max": 14,
         "image_provider_order": [
-          "sdxl-lightning",
-          "flux-schnell",
+          "pexels",
+          "pixabay",
+          "bytonylee/sdxl-turbo",
+          "black-forest-labs/flux-schnell",
           "pass_no_image"
         ]
       }
@@ -1166,8 +1186,10 @@
         "labels_min": 8,
         "labels_max": 14,
         "image_provider_order": [
-          "sdxl-lightning",
-          "flux-schnell",
+          "pexels",
+          "pixabay",
+          "bytonylee/sdxl-turbo",
+          "black-forest-labs/flux-schnell",
           "pass_no_image"
         ]
       }
@@ -1208,8 +1230,10 @@
         "labels_min": 8,
         "labels_max": 14,
         "image_provider_order": [
-          "sdxl-lightning",
-          "flux-schnell",
+          "pexels",
+          "pixabay",
+          "bytonylee/sdxl-turbo",
+          "black-forest-labs/flux-schnell",
           "pass_no_image"
         ]
       }
@@ -1250,8 +1274,10 @@
         "labels_min": 8,
         "labels_max": 14,
         "image_provider_order": [
-          "sdxl-lightning",
-          "flux-schnell",
+          "pexels",
+          "pixabay",
+          "bytonylee/sdxl-turbo",
+          "black-forest-labs/flux-schnell",
           "pass_no_image"
         ]
       }
@@ -1292,8 +1318,10 @@
         "labels_min": 8,
         "labels_max": 14,
         "image_provider_order": [
-          "sdxl-lightning",
-          "flux-schnell",
+          "pexels",
+          "pixabay",
+          "bytonylee/sdxl-turbo",
+          "black-forest-labs/flux-schnell",
           "pass_no_image"
         ]
       }
@@ -1334,8 +1362,10 @@
         "labels_min": 8,
         "labels_max": 14,
         "image_provider_order": [
-          "sdxl-lightning",
-          "flux-schnell",
+          "pexels",
+          "pixabay",
+          "bytonylee/sdxl-turbo",
+          "black-forest-labs/flux-schnell",
           "pass_no_image"
         ]
       }
@@ -1376,8 +1406,10 @@
         "labels_min": 8,
         "labels_max": 14,
         "image_provider_order": [
-          "sdxl-lightning",
-          "flux-schnell",
+          "pexels",
+          "pixabay",
+          "bytonylee/sdxl-turbo",
+          "black-forest-labs/flux-schnell",
           "pass_no_image"
         ]
       }
@@ -1418,8 +1450,10 @@
         "labels_min": 8,
         "labels_max": 14,
         "image_provider_order": [
-          "sdxl-lightning",
-          "flux-schnell",
+          "pexels",
+          "pixabay",
+          "bytonylee/sdxl-turbo",
+          "black-forest-labs/flux-schnell",
           "pass_no_image"
         ]
       }
@@ -1460,8 +1494,10 @@
         "labels_min": 8,
         "labels_max": 14,
         "image_provider_order": [
-          "sdxl-lightning",
-          "flux-schnell",
+          "pexels",
+          "pixabay",
+          "bytonylee/sdxl-turbo",
+          "black-forest-labs/flux-schnell",
           "pass_no_image"
         ]
       }
@@ -1502,8 +1538,10 @@
         "labels_min": 8,
         "labels_max": 14,
         "image_provider_order": [
-          "sdxl-lightning",
-          "flux-schnell",
+          "pexels",
+          "pixabay",
+          "bytonylee/sdxl-turbo",
+          "black-forest-labs/flux-schnell",
           "pass_no_image"
         ]
       }
@@ -1544,8 +1582,10 @@
         "labels_min": 8,
         "labels_max": 14,
         "image_provider_order": [
-          "sdxl-lightning",
-          "flux-schnell",
+          "pexels",
+          "pixabay",
+          "bytonylee/sdxl-turbo",
+          "black-forest-labs/flux-schnell",
           "pass_no_image"
         ]
       }
@@ -1586,8 +1626,10 @@
         "labels_min": 8,
         "labels_max": 14,
         "image_provider_order": [
-          "sdxl-lightning",
-          "flux-schnell",
+          "pexels",
+          "pixabay",
+          "bytonylee/sdxl-turbo",
+          "black-forest-labs/flux-schnell",
           "pass_no_image"
         ]
       }
@@ -1628,8 +1670,10 @@
         "labels_min": 8,
         "labels_max": 14,
         "image_provider_order": [
-          "sdxl-lightning",
-          "flux-schnell",
+          "pexels",
+          "pixabay",
+          "bytonylee/sdxl-turbo",
+          "black-forest-labs/flux-schnell",
           "pass_no_image"
         ]
       }
@@ -1670,8 +1714,10 @@
         "labels_min": 8,
         "labels_max": 14,
         "image_provider_order": [
-          "sdxl-lightning",
-          "flux-schnell",
+          "pexels",
+          "pixabay",
+          "bytonylee/sdxl-turbo",
+          "black-forest-labs/flux-schnell",
           "pass_no_image"
         ]
       }
@@ -1712,8 +1758,10 @@
         "labels_min": 8,
         "labels_max": 14,
         "image_provider_order": [
-          "sdxl-lightning",
-          "flux-schnell",
+          "pexels",
+          "pixabay",
+          "bytonylee/sdxl-turbo",
+          "black-forest-labs/flux-schnell",
           "pass_no_image"
         ]
       }
@@ -1754,8 +1802,10 @@
         "labels_min": 8,
         "labels_max": 14,
         "image_provider_order": [
-          "sdxl-lightning",
-          "flux-schnell",
+          "pexels",
+          "pixabay",
+          "bytonylee/sdxl-turbo",
+          "black-forest-labs/flux-schnell",
           "pass_no_image"
         ]
       }
@@ -1796,8 +1846,10 @@
         "labels_min": 8,
         "labels_max": 14,
         "image_provider_order": [
-          "sdxl-lightning",
-          "flux-schnell",
+          "pexels",
+          "pixabay",
+          "bytonylee/sdxl-turbo",
+          "black-forest-labs/flux-schnell",
           "pass_no_image"
         ]
       }
@@ -1838,8 +1890,10 @@
         "labels_min": 8,
         "labels_max": 14,
         "image_provider_order": [
-          "sdxl-lightning",
-          "flux-schnell",
+          "pexels",
+          "pixabay",
+          "bytonylee/sdxl-turbo",
+          "black-forest-labs/flux-schnell",
           "pass_no_image"
         ]
       }
@@ -1880,8 +1934,10 @@
         "labels_min": 8,
         "labels_max": 14,
         "image_provider_order": [
-          "sdxl-lightning",
-          "flux-schnell",
+          "pexels",
+          "pixabay",
+          "bytonylee/sdxl-turbo",
+          "black-forest-labs/flux-schnell",
           "pass_no_image"
         ]
       }
@@ -1922,8 +1978,10 @@
         "labels_min": 8,
         "labels_max": 14,
         "image_provider_order": [
-          "sdxl-lightning",
-          "flux-schnell",
+          "pexels",
+          "pixabay",
+          "bytonylee/sdxl-turbo",
+          "black-forest-labs/flux-schnell",
           "pass_no_image"
         ],
         "theme": "한국 의료·보건·돌봄·복지 분야 자격 취득과 취업 준비",
@@ -2019,8 +2077,10 @@
         "labels_min": 8,
         "labels_max": 14,
         "image_provider_order": [
-          "sdxl-lightning",
-          "flux-schnell",
+          "pexels",
+          "pixabay",
+          "bytonylee/sdxl-turbo",
+          "black-forest-labs/flux-schnell",
           "pass_no_image"
         ]
       }
@@ -2061,8 +2121,10 @@
         "labels_min": 8,
         "labels_max": 14,
         "image_provider_order": [
-          "sdxl-lightning",
-          "flux-schnell",
+          "pexels",
+          "pixabay",
+          "bytonylee/sdxl-turbo",
+          "black-forest-labs/flux-schnell",
           "pass_no_image"
         ]
       }
@@ -2103,8 +2165,10 @@
         "labels_min": 8,
         "labels_max": 14,
         "image_provider_order": [
-          "sdxl-lightning",
-          "flux-schnell",
+          "pexels",
+          "pixabay",
+          "bytonylee/sdxl-turbo",
+          "black-forest-labs/flux-schnell",
           "pass_no_image"
         ]
       }
@@ -2145,8 +2209,10 @@
         "labels_min": 8,
         "labels_max": 14,
         "image_provider_order": [
-          "sdxl-lightning",
-          "flux-schnell",
+          "pexels",
+          "pixabay",
+          "bytonylee/sdxl-turbo",
+          "black-forest-labs/flux-schnell",
           "pass_no_image"
         ]
       }
