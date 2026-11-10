@@ -65,7 +65,7 @@ def main() -> int:
                 "meta_description_chars_max_exclusive": 120,
                 "labels_min": 8,
                 "labels_max": 14,
-                "image_provider_order": ["sdxl-lightning", "flux-schnell", "pass_no_image"],
+                "image_provider_order": ["pexels", "pixabay", "bytonylee/sdxl-turbo", "black-forest-labs/flux-schnell", "pass_no_image"],
             },
         })
 
