@@ -25,7 +25,8 @@ prompt=f"""Write a factual, original, well-researched English K-pop industry fea
 Focus on how agencies plan global touring, venue milestones, production approvals, logistics, realistic fan verification and 2026 planning. Do not invent any actual artist tour announcement, official government policy, ticket date, quotation, or number. Distinguish general industry practice from verified facts. Do not repeat boilerplate headings or sentences. Output HTML only: paragraphs and 4-6 informative h2 headings. No title h1, no images, no affiliate links, no footer. The article text with spaces removed MUST be 2500 to 3000 characters. Aim for 2750 characters. Specific, useful and journalistic, not promotional."""
 body=""
 for attempt in range(3):
-    raw=generate_text(prompt+ (f" Previous draft was {len(re.sub(r'\\s+','',BeautifulSoup(body,'html.parser').get_text(' ',strip=True)))} characters. Rewrite to 2750 characters." if body else ""),language="en")
+    previous_count=len(re.sub(r"\\s+","",BeautifulSoup(body,"html.parser").get_text(" ",strip=True)))
+    raw=generate_text(prompt+ (f" Previous draft was {previous_count} characters. Rewrite to 2750 characters." if body else ""),language="en")
     body=re.sub(r"^\\s*```(?:html)?|\\s*```\\s*$","",raw.strip(),flags=re.I)
     count=len(re.sub(r"\\s+","",BeautifulSoup(body,"html.parser").get_text(" ",strip=True)))
     print("EDITORIAL_CHAR_COUNT",count)
