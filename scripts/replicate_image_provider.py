@@ -211,7 +211,7 @@ def _free_image_fallback(subject: str, theme: str = "") -> Optional[str]:
             last_image_model = "GeneratedCard"
             return host_bytes(make_card_png(subject), asset_key="news-" + hashlib.sha256(subject.encode("utf-8")).hexdigest()[:12])
         import blogger_free_image as free
-        found = free.pick_image(subject, alternates=[theme])
+        found = free.pick_image(subject, alternates=[theme], allow_paid_fallback=False)
         if found:
             last_image_model = found["provider"]
             return found["url"]
