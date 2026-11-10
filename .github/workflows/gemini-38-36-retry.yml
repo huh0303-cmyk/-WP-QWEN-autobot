@@ -1,0 +1,36 @@
+name: Gemini 3.8 and 3.6 retry
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  retry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+    steps:
+      - name: Retry only 3.8 and 3.6 with 75-second timeout
+        shell: python
+        run: |
+          import os, json, time, urllib.request, urllib.error
+          key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+          if not key:
+              print("MISSING_API_KEY")
+              raise SystemExit(1)
+          base="https://generativelanguage.googleapis.com/v1beta/models/"
+          for model in ["gemini-3.8-flash","gemini-3.6-flash"]:
+              payload={"contents":[{"parts":[{"text":"Write a clear original 90-word English introduction for an article titled 'How to Prepare for University Study in South Korea'. Use practical, factual language."}]}],"generationConfig":{"maxOutputTokens":350}}
+              req=urllib.request.Request(base+model+":generateContent",data=json.dumps(payload).encode(),headers={"x-goog-api-key":key,"Content-Type":"application/json"})
+              start=time.monotonic()
+              try:
+                  with urllib.request.urlopen(req,timeout=75) as response:
+                      result=json.load(response)
+                      parts=result.get("candidates",[{}])[0].get("content",{}).get("parts",[])
+                      output=" ".join(p.get("text","") for p in parts)
+                      print(model,"HTTP",response.status,"elapsed_seconds",round(time.monotonic()-start,2),"words",len(output.split()),"usage",json.dumps(result.get("usageMetadata",{})),"preview",repr(output[:250]))
+              except urllib.error.HTTPError as e:
+                  print(model,"HTTP_ERROR",e.code,"elapsed_seconds",round(time.monotonic()-start,2),"details",e.read(500).decode(errors="replace"))
+              except Exception as e:
+                  print(model,"ERROR",type(e).__name__,"elapsed_seconds",round(time.monotonic()-start,2))
