@@ -374,7 +374,9 @@ function drawSocialPlatform(data){
  socialMeta.style.color=registryStale?'#b45309':'';
  var socialRank=0;
  document.getElementById('social-rows-'+socialPlatform.toLowerCase()).innerHTML=list.map(function(a){
-  var rawName=String(a.name||a.handle||'계정명 미등록');\n  if(a.platform==='YouTube'&&/Survival/i.test(rawName)&&!/TOPIK|토픽/i.test(rawName)){rawName=rawName.replace(/\\s*Survival\\s*/ig,'_SOS').replace(/_+/g,'_');}\n  var name=esc(rawName);
+  var rawName=String(a.name||a.handle||'계정명 미등록');
+  if(a.platform==='YouTube'&&/Survival/i.test(rawName)&&!/TOPIK|토픽/i.test(rawName)){rawName=rawName.replace(/\s*Survival\s*/ig,'_SOS').replace(/_+/g,'_');}
+  var name=esc(rawName);
   var linked=a.url?'<a href="'+esc(a.url)+'" target="_blank" rel="noopener">'+name+'</a>':a.search_url?'<a href="'+esc(a.search_url)+'" target="_blank" rel="noopener" title="프로필 직접 링크 미확인 · 플랫폼에서 이름 검색">'+name+' <span class="na">(검색 결과 ↗)</span></a>':name;
   var status=esc(a.status||'상태 미확인');
   var action=a.url?'<a class="publish-link" href="https://sns.korea365.org" target="_blank" rel="noopener">발행 화면 ↗</a>':a.search_url?'<a href="'+esc(a.search_url)+'" target="_blank" rel="noopener">검색으로 확인 ↗</a>':'<span class="na">프로필 링크 미확인</span>';
