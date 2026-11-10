@@ -1,0 +1,24 @@
+name: Kworld365 — rewrite existing post 1017 only
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  rewrite-existing:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests beautifulsoup4 Pillow
+      - name: Rewrite existing article in place and upload unique photo
+        env:
+          KWORLD365COM: ${{ secrets.KWORLD365COM }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_API_KEY_2: ${{ secrets.GEMINI_API_KEY_2 }}
+          GEMINI_API_KEY_3: ${{ secrets.GEMINI_API_KEY_3 }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
+        run: python -m scripts.one_off_rewrite_kworld_1017
