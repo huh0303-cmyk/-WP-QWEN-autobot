@@ -273,7 +273,7 @@ def get_naver_data() -> list[dict[str, object]]:
             "persona": persona,
             "tone": tone,
             "default_text_model": "gpt-5-mini",
-            "default_image_model": "bytedance/sdxl-lightning-4step",
+            "default_image_model": "auto",
             "today_visitors": traffic.get("today"),
             "today_delta": traffic.get("today_delta"),
             "yesterday_visitors": traffic.get("yesterday"),
