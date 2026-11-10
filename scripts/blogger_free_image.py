@@ -1,9 +1,8 @@
-"""Free-only image step for Blogger posts. Order (all-free):
-  1) Pexels  2) Pixabay  3) Wikimedia Commons (CC0/PD)  4) no image (caller falls back to a topic card).
-2026-10-10 Chairman: Pollinations/AI images are removed for good (watermarked, uncanny); every photo is 1:1.
-Never blocks publication: every failure returns None. No paid API is ever called."""
+"""Stock-first image step for Blogger posts.
+Order: Pexels -> Pixabay -> SDXL Turbo -> FLUX.1 Schnell; at most one output per model attempt.
+Stock photos and generated images are permanently hosted. Failure returns None."""
 from __future__ import annotations
-import html, json, os, random, re
+import html, json, os, re
 from pathlib import Path
 from urllib.parse import urlparse
 import requests
@@ -150,8 +149,8 @@ def _wikimedia(query: str):
 
 def pick_image(query: str, alternates=()):
     """Return {url, alt-ready desc, provider} or None.
-    Source order: Pexels/Pixabay (random order), then Wikimedia; within each source the specific query is tried
-    first, then looser alternates (e.g. the site's topic) so a relevant-enough photo is found almost always."""
+    Fixed order: Pexels, Pixabay, SDXL Turbo, FLUX.1 Schnell.
+    Within each stock source, try the specific query before its topic alternates."""
     queries = []
     for q in [query, *alternates]:
         q = " ".join(str(q or "").split())[:100]
@@ -160,15 +159,11 @@ def pick_image(query: str, alternates=()):
     if not queries:
         return None
     exclude = used_photo_ids()
-    # 2026-10-09: Pexels/Pixabay 둘 중 하나를 매번 고정으로 먼저 호출하지 않도록 둘의
-    # 순서만 무작위로 섞는다(Chairman 지시) — Wikimedia/AI는 그 뒤 순서 고정 유지.
-    pexels_pixabay = [_pexels, _pixabay]
-    random.shuffle(pexels_pixabay)
-    for fn in (*pexels_pixabay, _wikimedia):
+    for fn in (_pexels, _pixabay):
         found = None
         for q in queries:
             try:
-                found = fn(q, exclude) if getattr(fn, "accepts_exclude", False) else fn(q)
+                found = fn(q, exclude)
             except Exception as exc:  # never log request URLs (keys)
                 print(f"image source unavailable: {fn.__name__} ({type(exc).__name__})")
                 break
@@ -176,16 +171,26 @@ def pick_image(query: str, alternates=()):
                 break
         if not found:
             continue
-        if found.get("needs_hosting") or found["provider"] == "Wikimedia":  # hosting also centre-crops to 1:1
-            try:
-                from stable_image_hosting import host_permanently
-                found["url"] = host_permanently(found["url"], asset_key=f"blogger-{found['provider'].lower()}-{found['id']}", folder="blogger_images")
-            except Exception as exc:
-                print(f"image hosting unavailable: {found['provider']} ({type(exc).__name__})")
-                if found.get("needs_hosting"):
-                    continue
+        try:
+            from stable_image_hosting import host_permanently
+            found["url"] = host_permanently(found["url"], asset_key=f"blogger-{found['provider'].lower()}-{found['id']}", folder="blogger_images")
+        except Exception as exc:
+            print(f"image hosting unavailable: {found['provider']} ({type(exc).__name__})")
+            continue
         print(f"image selected: {found['provider']} {found['id']}")
         return found
+
+    try:
+        from replicate_image_provider import generate_image_url, last_image_model
+        generated = generate_image_url(query, theme="Blogger article", mode="replicate_sdxl")
+        if generated:
+            from stable_image_hosting import host_permanently
+            hosted = host_permanently(generated, asset_key="blogger-replicate-" + re.sub(r"[^a-z0-9]+", "-", query.lower())[:60], folder="blogger_images")
+            if hosted:
+                print(f"image selected: {last_image_model}")
+                return {"url": hosted, "provider": last_image_model or "Replicate", "id": "generated", "desc": query}
+    except Exception as exc:
+        print(f"image generation unavailable: {type(exc).__name__}")
     return None
 
 
