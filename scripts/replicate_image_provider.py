@@ -3,8 +3,8 @@
 """Single approved image-generation gateway for the automation repository.
 
 HARD POLICY (2026-09-02):
-- SDXL Lightning 4-step is attempted first.
-- FLUX Schnell is attempted once only when SDXL Lightning fails.
+- SDXL Turbo is attempted first.
+- FLUX Schnell is attempted once only when SDXL Turbo fails.
 - Only the two models in ALLOWED_MODELS may be called.
 - One shared secret: REPLICATE_API_TOKEN.
 - At most one output image per content item and one attempt per model.
@@ -27,7 +27,7 @@ import requests
 
 REPLICATE_API = "https://api.replicate.com/v1"
 
-PRIMARY_MODEL = "bytedance/sdxl-lightning-4step"
+PRIMARY_MODEL = "bytonylee/sdxl-turbo"
 SECONDARY_MODEL = "black-forest-labs/flux-schnell"
 ALLOWED_MODELS = (
     PRIMARY_MODEL,
@@ -110,9 +110,7 @@ def _input_for(model: str, prompt: str) -> dict:
             "width": 1024,
             "height": 576,
             "num_outputs": 1,
-            "num_inference_steps": 4,
-            "guidance_scale": 0,
-            "negative_prompt": "text, logo, watermark, low quality, distorted",
+            "num_inference_steps": 1,
         }
     raise RuntimeError(f"blocked image model: {model}")
 
@@ -186,10 +184,10 @@ def build_editorial_prompt(subject: str, theme: str = "") -> str:
 
 def _cost_receipt(model, subject, status):
     # Informational estimate, separate from the existing pre-call budget reservation.
-    amount = 0.0014 if model == PRIMARY_MODEL else 0.003
+    amount = 0.0015 if model == PRIMARY_MODEL else 0.003
     receipt = {"at": datetime.now(timezone.utc).isoformat(), "category": "image",
                "provider": "Replicate", "model": model, "status": status,
-               "estimated_usd": amount, "pricing_basis": "2026-09-11 public rate; SDXL runtime varies",
+               "estimated_usd": amount, "pricing_basis": "illustrative estimate only; check current Replicate pricing",
                "subject_hash": hashlib.sha256(subject.encode()).hexdigest()[:16]}
     path = Path("artifacts/image-cost-estimates.jsonl")
     try:
@@ -271,7 +269,7 @@ def generate_image_url(subject: str, theme: str = "", *, mode: str = "legacy") -
         except Exception as exc:
             print(f"  ⚠️ approved image model error: {model} ({exc})")
 
-    print("  ℹ️ SDXL Lightning and FLUX Schnell both failed — trying the free fallback chain")
+    print("  ℹ️ SDXL Turbo and FLUX Schnell both failed — trying the free fallback chain")
     free = _free_image_fallback(subject, theme)
     _prompt_cache[cache_key] = free
     return free
