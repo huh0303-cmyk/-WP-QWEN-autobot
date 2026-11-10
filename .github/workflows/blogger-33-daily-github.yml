@@ -90,6 +90,7 @@ jobs:
           LOCAL_TEXT_MAX_TOKENS: "3500"
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
           PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
           GH_ASSET_TOKEN: ${{ secrets.GH_ASSET_TOKEN || github.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID || secrets.GOOGLE_OAUTH_CLIENT_ID }}
