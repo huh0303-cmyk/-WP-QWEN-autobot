@@ -147,7 +147,7 @@ def _wikimedia(query: str):
     return None
 
 
-def pick_image(query: str, alternates=()):
+def pick_image(query: str, alternates=(), *, allow_paid_fallback: bool = True):
     """Return {url, alt-ready desc, provider} or None.
     Fixed order: Pexels, Pixabay, SDXL Turbo, FLUX.1 Schnell.
     Within each stock source, try the specific query before its topic alternates."""
@@ -180,6 +180,8 @@ def pick_image(query: str, alternates=()):
         print(f"image selected: {found['provider']} {found['id']}")
         return found
 
+    if not allow_paid_fallback:
+        return None
     try:
         from replicate_image_provider import generate_image_url, last_image_model
         generated = generate_image_url(query, theme="Blogger article", mode="replicate_sdxl")
