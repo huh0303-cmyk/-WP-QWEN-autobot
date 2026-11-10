@@ -34,6 +34,7 @@ jobs:
       SEOUL_JISOO_COUPANG_BEAUTY_URL: ${{ secrets.SEOUL_JISOO_COUPANG_BEAUTY_URL }}
       SEOUL_MALL_URL: ${{ secrets.SEOUL_MALL_URL }}
       FISH_AUDIO_API_KEY: ${{ secrets.FISH_AUDIO_API_KEY }}
+      REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
       QWEN3_TTS_URL: ${{ vars.QWEN3_TTS_URL }}
     steps:
       - uses: actions/checkout@v4
