@@ -1014,8 +1014,8 @@ SITE_PERSONA = {
             "What remains unconfirmed",
             "Next scheduled milestone"
         ],
-        "min_chars": (1200, 1800),
-        "max_chars": 1500,
+        "min_chars": 2500,
+        "max_chars": 3000,
         "tables": 0,
         "lang": "en",
         "cta": "See the related verified entertainment brief"
@@ -3087,7 +3087,7 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
     # KoreaWedding365 renders featured_media above the title. Remove a second
     # image-only lead block even when it is a different file/photo; preserve
     # images after the opening text.
-    if any(domain in url.lower() for domain in ("koreawedding365.com", "k-visa365.com")):
+    if any(domain in url.lower() for domain in ("koreawedding365.com", "k-visa365.com", "kworld365.com")):
         body_html = strip_leading_inline_image_block(body_html)
     try:
         repeat_errors = repetition_issues(title, body_html, fetch_wp_history(requests, url, (WP_USER, pw)))
@@ -3576,6 +3576,13 @@ def process_one(site, keyword):
         return False
 
     body,title,meta,faq,tags=best_result
+    if url.rstrip("/").lower() == "https://kworld365.com":
+        from automation_hub.repetition_guard import plain as _plain_article
+        _length = len(re.sub(r"\\s+", "", _plain_article(body)))
+        if not 2500 <= _length <= 3000:
+            print(f"KWORLD_LENGTH_BLOCKED: {_length} characters; required 2500-3000")
+            log(url, theme, keyword, title, "", 0, 0, "skip_kworld_length", str(_length))
+            return False
     newsroom_len=newsroom_char_count(body)
     if mode in ("news", "news_en"):
         # USER-LOCKED 2026-08-31: both newsrooms operate outside all blog
