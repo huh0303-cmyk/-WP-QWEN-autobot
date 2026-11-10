@@ -5,7 +5,6 @@ import html
 import json
 import os
 from pathlib import Path
-import random
 import re
 import time
 from urllib.parse import urlparse
@@ -102,17 +101,13 @@ def find_stock_image(subject, theme="", *, force=False, selected_provider="auto"
     query = " ".join(stock_query(subject, theme).split())
     if not query or len(query) > 100 or not terms(query):
         return None
-    # 2026-10-09: Pexels/Pixabay 둘 중 하나를 매번 고정으로 먼저 호출하지 않도록 둘의
-    # 순서만 무작위로 섞는다(Chairman 지시, blogger_free_image.py와 동일 로직) — Wikimedia는
-    # 그 뒤 순서 고정 유지.
-    pexels_pixabay_providers = [
+    # 2026-11-10 user directive: keep a fixed stock-first order and do not add
+    # Wikimedia or any other provider to the four-stage fallback chain.
+    providers = [
         ("Pexels", os.getenv("PEXELS_API_KEY", ""), "images.pexels.com", "https://www.pexels.com/license/"),
         ("Pixabay", os.getenv("PIXABAY_KEY", ""), "pixabay.com", "https://pixabay.com/service/license-summary/"),
     ]
-    random.shuffle(pexels_pixabay_providers)
-    for provider, key, domain, license_url in [
-        *pexels_pixabay_providers,
-        ("Wikimedia", "public-api", "upload.wikimedia.org", "https://creativecommons.org/publicdomain/mark/1.0/")]:
+    for provider, key, domain, license_url in providers:
         if selected_provider != "auto" and provider.lower() != selected_provider:
             continue
         if not key:
@@ -124,7 +119,7 @@ def find_stock_image(subject, theme="", *, force=False, selected_provider="auto"
                     for item in _search(provider, q, key):
                         host = urlparse(item["url"]).hostname or ""
                         source_host = urlparse(item["source"]).hostname or ""
-                        source_domain = {"Pexels": "pexels.com", "Pixabay": "pixabay.com", "Wikimedia": "commons.wikimedia.org"}[provider]
+                        source_domain = {"Pexels": "pexels.com", "Pixabay": "pixabay.com"}[provider]
                         if not (host == domain or host.endswith("." + domain)):
                             continue
                         if not (source_host == source_domain or source_host.endswith("." + source_domain)):
