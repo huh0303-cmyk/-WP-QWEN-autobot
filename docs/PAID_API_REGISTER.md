@@ -6,7 +6,7 @@ Last verified: 2026-08-27 (KST)
 
 | Service | Purpose and scope | Credential name | Confirmed billing state | Operating rule |
 | --- | --- | --- | --- | --- |
-| Replicate | All generated images for 27 WordPress sites, 27 Blogger sites, YouTube and SNS | `REPLICATE_API_TOKEN` | USD 10.00 credit purchased successfully; USD 10.00 remaining at verification | Use only the three-model priority in `config/network_image_generation_policy.json`; log actual usage and remaining credit |
+| Replicate | All generated images for 27 WordPress sites, 27 Blogger sites, YouTube and SNS | `REPLICATE_API_TOKEN` | USD 10.00 credit purchased successfully; USD 10.00 remaining at verification | Use only the two-model paid fallback in `config/network_image_generation_policy.json`; log actual usage and remaining credit |
 | Google Gemini API | Blogger article generation and workflows explicitly assigned to Gemini | `GEMINI_API_KEY` | Tier 1 project billing observed; monthly spend limit shown as KRW 80,000. The limit is a cap, not a prepaid balance | Monitor spend separately; Blogger text remains Gemini-only under `docs/BLOGGER_CONTENT_POLICY.md` |
 
 ## Image API policy
