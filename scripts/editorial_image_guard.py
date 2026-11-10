@@ -4,6 +4,7 @@ from functools import lru_cache
 from io import BytesIO
 import hashlib
 from urllib.parse import urlparse
+from bs4 import BeautifulSoup
 import requests
 from PIL import Image, ImageOps, ImageStat
 
@@ -38,7 +39,7 @@ def image_fingerprint(url):
 
 
 def recent_posts(site, auth=None):
-    r=requests.get(site.rstrip('/')+'/wp-json/wp/v2/posts',auth=auth,params={"per_page":50,"status":"publish","_embed":"wp:featuredmedia"},timeout=30)
+    r=requests.get(site.rstrip('/')+'/wp-json/wp/v2/posts',auth=auth,params={"per_page":100,"status":"publish","_embed":"wp:featuredmedia","_fields":"id,content,featured_media,_embedded"},timeout=30)
     r.raise_for_status()
     return r.json()
 
@@ -47,10 +48,32 @@ def photo_url(post):
     return next((m.get("source_url","") for m in post.get("_embedded",{}).get("wp:featuredmedia",[]) if isinstance(m,dict)),"")
 
 
+def historical_photo_urls(posts):
+    """Inspect both featured images and editorial inline images, not affiliate product cards."""
+    urls = []
+    for post in posts:
+        featured = photo_url(post)
+        if featured:
+            urls.append(featured)
+        content = post.get("content", {})
+        markup = content.get("rendered", "") if isinstance(content, dict) else str(content or "")
+        soup = BeautifulSoup(markup, "html.parser")
+        for tag in soup.find_all("img"):
+            # Product/affiliate image blocks are not editorial hero photos.
+            if tag.find_parent(class_=lambda cls: bool(cls and any(
+                word in str(cls).lower() for word in ("affiliate", "product", "seoul-mall", "coupang")
+            ))):
+                continue
+            src = tag.get("src", "")
+            if src.startswith(("https://", "http://")):
+                urls.append(src)
+    return list(dict.fromkeys(urls))
+
+
 def filter_wp_images(site, images, auth=None):
     if not images: return []
     try:
-        urls=list(dict.fromkeys(photo_url(p) for p in recent_posts(site,auth) if photo_url(p)))
+        urls=historical_photo_urls(recent_posts(site,auth))
         with ThreadPoolExecutor(max_workers=6) as pool:
             known=list(pool.map(image_fingerprint,urls))
         accepted=[]
