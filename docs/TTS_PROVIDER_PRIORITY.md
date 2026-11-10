@@ -37,3 +37,11 @@ This supersedes ALL older London Project TTS order instructions, including old E
 3. Microsoft Edge-TTS free voice
 
 On each failed or unavailable provider, record a non-secret failure reason and try the next. If all three fail, abort publishing; never upload silent or placeholder audio and never use a paid or fourth provider. Legacy documents mentioning ElevenLabs or other ordering are historical, not policy. Each actual video producer must be migrated and test-rendered; this document alone does not prove complete migration. Before publishing, verify channel OAuth identity, private/public setting, non-duplicate content, and successful audio generation. A private test upload is the default safe validation mode.
+
+## Owner voice direction — 2026-11-10
+
+- For every spoken-video pipeline, select from a rotating pool of **three male and three female** voices per supported output language, randomized per video.
+- Voices must be auditioned and approved for **deep, substantial documentary narration or authoritative broadcast-news delivery**. Female voices must likewise sound polished, mature, confident and professional; do not use childish, cartoonish or excessively bright voices.
+- The six-voice requirement is independent of provider: Fish Audio `s2.1-pro-free` -> locally installed Qwen3-TTS -> Microsoft Edge TTS, in that exact order. Never add a paid or fourth TTS provider.
+- If the selected provider lacks an approved voice or returns invalid audio, try the next approved provider. If all three fail, **block video rendering/upload/publication**; never publish a silent video.
+- Audit and migrate all YouTube, TikTok, Instagram Reels, Facebook Reels and other voice-dependent pipelines. Do not claim migration complete before each producer is wired and tested. An API voice name alone does not prove its vocal quality; audition and approve six voices for each target language.
