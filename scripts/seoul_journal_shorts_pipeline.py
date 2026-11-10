@@ -102,56 +102,31 @@ def draft(title, body):
     raise RuntimeError(f"Could not generate a sufficiently long fact-grounded narration after 3 attempts: {last_error}")
 
 
-EDGE_VOICES = [("ko-KR-SunHiNeural","female_news"),("ko-KR-JiMinNeural","female_documentary"),("ko-KR-HyunsuNeural","male_news"),("ko-KR-InJoonNeural","male_documentary")]
-
 def tts(text):
-    """Free-only narration: Fish Audio S2.1 Pro Free first, then Edge TTS.
-    Never calls a paid endpoint. Secrets are never printed to logs.
-    """
+    """Free TTS: Fish Audio -> Qwen3-TTS -> Edge, six rotating narrator roles."""
+    from tts_provider_priority import generate_tts, choose_narrator
     p = OUT / "voice.mp3"
-    errors = []
-    voice_name, voice_role = random.choice(EDGE_VOICES)
-    fish_ids = [x.strip() for x in os.getenv("FISH_AUDIO_VOICE_IDS","").split(",") if x.strip()]
-    fish_voice = random.choice(fish_ids) if fish_ids else ""
-    api_key = os.getenv("FISH_AUDIO_API_KEY", "").strip()
-    if api_key:
-        try:
-            r = requests.post(
-                "https://api.fish.audio/v1/tts",
-                headers={
-                    "Authorization": f"Bearer {api_key}",
-                    "model": "s2.1-pro-free",
-                    "Content-Type": "application/json",
-                    "Accept": "audio/mpeg",
-                },
-                json={"text": text, "format": "mp3", **({"reference_id": fish_voice} if fish_voice else {})},
-                timeout=150,
-            )
-            if r.ok and len(r.content) >= 2000 and not r.content.lstrip().startswith(b"{"):
-                p.write_bytes(r.content)
-                log(f"TTS_ENGINE=fish_audio model=s2.1-pro-free voice_role={voice_role} bytes={p.stat().st_size}")
-                return p
-            errors.append(f"Fish Audio returned HTTP {r.status_code} or invalid audio")
-        except Exception as exc:
-            errors.append(f"Fish Audio failed ({type(exc).__name__})")
-    else:
-        errors.append("Fish Audio API key not configured; trying free Edge TTS")
-
-    # Edge TTS is a free fallback. No paid provider is called if it fails.
-    try:
-        import asyncio
-        import edge_tts
-        async def save_edge():
-            await edge_tts.Communicate(text, voice_name).save(str(p))
-        asyncio.run(save_edge())
-        if p.exists() and p.stat().st_size >= 2000:
-            log(f"TTS_ENGINE=edge_tts voice={voice_name} voice_role={voice_role} bytes={p.stat().st_size}")
-            return p
-        errors.append("Edge TTS returned invalid audio")
-    except Exception as exc:
-        errors.append(f"Edge TTS failed ({type(exc).__name__})")
-
-    raise RuntimeError("All free TTS providers failed: " + "; ".join(errors))
+    narrator = choose_narrator("seoul_journal", "ko")
+    key = os.getenv("FISH_AUDIO_API_KEY", "").strip()
+    def fish_adapter(script, output, language):
+        if not key:
+            return False
+        payload = {"text": script, "format": "mp3"}
+        if narrator["fish_voice_id"]:
+            payload["reference_id"] = narrator["fish_voice_id"]
+        response = requests.post(
+            "https://api.fish.audio/v1/tts",
+            headers={"Authorization": f"Bearer {key}", "model": "s2.1-pro-free",
+                     "Content-Type": "application/json", "Accept": "audio/mpeg"},
+            json=payload, timeout=150)
+        if not response.ok or response.content.lstrip().startswith(b"{"):
+            return False
+        output.write_bytes(response.content)
+        return True
+    result = generate_tts(text, p, language="ko", fish_generator=fish_adapter,
+                          edge_voice=narrator["edge_voice"], narrator=narrator)
+    log(f"TTS_ENGINE={result['engine']} narrator_role={narrator['role']}")
+    return p
 
 def fetch_photo(image_url):
     if not image_url: return None
