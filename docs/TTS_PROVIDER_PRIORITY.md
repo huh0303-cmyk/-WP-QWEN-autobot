@@ -45,3 +45,13 @@ On each failed or unavailable provider, record a non-secret failure reason and t
 - The six-voice requirement is independent of provider: Fish Audio `s2.1-pro-free` -> locally installed Qwen3-TTS -> Microsoft Edge TTS, in that exact order. Never add a paid or fourth TTS provider.
 - If the selected provider lacks an approved voice or returns invalid audio, try the next approved provider. If all three fail, **block video rendering/upload/publication**; never publish a silent video.
 - Audit and migrate all YouTube, TikTok, Instagram Reels, Facebook Reels and other voice-dependent pipelines. Do not claim migration complete before each producer is wired and tested. An API voice name alone does not prove its vocal quality; audition and approve six voices for each target language.
+
+## Network-wide six-voice rotation lock — 2026-11-10
+
+**Mandatory across every voice-dependent publishing workflow** (YouTube, TikTok, Instagram/Facebook Reels, Threads video, WordPress/Blogspot/Tistory video): exactly **3 approved male + 3 approved female** narrator voices per output language. Male timbre: deep, resonant, measured documentary or authoritative news anchor. Female timbre: composed, mature, professional, confident and trustworthy. Audition each voice before approval; names/metadata alone are insufficient.
+
+Select one of the six approved voices randomly **for each new video**, with recent-use suppression: do not reuse the immediately previous voice for the same channel when at least two approved choices are available. Persist a per-channel voice-use history across scheduled runs so successive executions do not repeatedly select the same voice. Rotate across both genders without hardcoding a single default narrator. Record chosen voice ID, gender, provider and selection timestamp without credentials.
+
+The engine order remains strictly **Fish Audio S2.1 Pro Free -> Qwen3-TTS local -> Microsoft Edge TTS**. Each provider must use an approved voice compatible with the output language; on unavailable provider/voice or invalid audio move forward, never silently change to an unapproved narrator. **If all three providers fail to produce verified non-silent speech, fail the video job and do not render/upload/publish it.** Do not publish muted placeholders or use paid/fourth TTS. Text-only posts do not require TTS.
+
+Implementation status: this policy is a network-wide requirement, not evidence that every publisher has migrated. Audit every platform entrypoint and verify successful voice rotation and three-stage fail-closed behavior before declaring deployment complete.
