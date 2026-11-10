@@ -3629,36 +3629,20 @@ def process_one(site, keyword):
         images=[]
         print("  🚫 자동 이미지 생성·검색·첨부 전면 중지")
     else:
-        # WordPress blog policy: prefer a relevant Pexels/Pixabay stock photo.
-        # 2026-10-10 Chairman ("같은로직으로 하라니까"): if no genuinely relevant
-        # stock photo exists, fall through to the same free-only guarantee chain
-        # already used for Blogspot (image_guarantee.ensure_image — Wikimedia/
-        # Openverse, then a Pillow-generated topic card as the last resort that
-        # can never fail) instead of simply publishing without an image.
         images = []
         if not site.get("_newsroom_real_photo"):
             try:
-                from stock_image_provider import find_stock_image, credit_html
-                img_url = find_stock_image(keyword, theme=theme)
+                import replicate_image_provider as image_provider
+                img_url = image_provider.generate_image_url(f"{keyword} {title}", theme=theme)
                 if img_url:
                     images = [img_url]
-                    body += credit_html(img_url)
-            except Exception as _e:  # noqa: BLE001
-                print(f"  ⚠️ stock photo selection failed: {type(_e).__name__}")
+                    if image_provider.last_image_model in {"Pexels", "Pixabay"}:
+                        from stock_image_provider import credit_html
+                        body += credit_html(img_url)
+            except Exception as _e:
+                print(f"shared image chain error: {type(_e).__name__}")
         if not images and not site.get("_newsroom_real_photo"):
-            try:
-                from image_guarantee import ensure_image
-                found = ensure_image(
-                    title, queries=[keyword, title], theme=theme,
-                    asset_key=f"wp-{site.get('url', keyword)}",
-                )
-                if found and found.get("url"):
-                    images = [found["url"]]
-                    print(f"  🖼️ fallback image: {found.get('provider', 'unknown')}")
-            except Exception as _e:  # noqa: BLE001
-                print(f"  ⚠️ image guarantee fallback failed: {type(_e).__name__}")
-        if not images and not site.get("_newsroom_real_photo"):
-            print("  ℹ️ image guarantee chain exhausted → publish without image")
+            print("four stages exhausted; publishing without image")
     print(f"  🖼  이미지 {len(images)}장")
 
     # ★ 2026-09-06: wp_post()가 발행 직전에 코드로 강제 삽입하는 "관련 글" 박스
