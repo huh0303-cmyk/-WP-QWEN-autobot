@@ -1,5 +1,5 @@
 """Stock-first image step for Blogger posts.
-Order: Pexels -> Pixabay -> SDXL Turbo -> FLUX.1 Schnell; at most one output per model attempt.
+Stock search order: Pexels -> Pixabay. Paid fallback is delegated to the shared image gateway after both stock sources fail.
 Stock photos and generated images are permanently hosted. Failure returns None."""
 from __future__ import annotations
 import html, json, os, re
@@ -149,7 +149,7 @@ def _wikimedia(query: str):
 
 def pick_image(query: str, alternates=(), *, allow_paid_fallback: bool = True):
     """Return {url, alt-ready desc, provider} or None.
-    Fixed order: Pexels, Pixabay, SDXL Turbo, FLUX.1 Schnell.
+    Fixed stock order: Pexels, then Pixabay.
     Within each stock source, try the specific query before its topic alternates."""
     queries = []
     for q in [query, *alternates]:
