@@ -23,10 +23,10 @@ Route by OUTPUT language, not domain or UI language. Attempt each model in order
 ## Images — exactly four attempts
 1. Free stock source Pexels or Pixabay, randomized first choice per article
 2. The other free stock source
-3. Paid SDXL Lightning via configured provider
-4. Paid FLUX.1 Schnell via configured provider
+3. Paid SDXL Turbo (bytonylee/sdxl-turbo) via Replicate
+4. Paid FLUX.1 Schnell (black-forest-labs/flux-schnell) via Replicate
 
-Accept only relevant, licensed, nonduplicate, nonwatermarked images, with descriptive ALT. If all four fail, publish valid text without image. No fifth image source, reverse fallback, or stock search after paid models. Paid usage requires configured credentials and billing authorization.
+Accept only relevant, licensed, nonduplicate, nonwatermarked images, with descriptive ALT. If all four fail, publish valid text without image. SDXL Lightning is explicitly prohibited. No fifth image source, reverse fallback, or stock search after paid models. Paid usage requires configured credentials and billing authorization.
 
 ## Implementation obligations
 - Replace legacy conflicting code paths, not merely documentation.
