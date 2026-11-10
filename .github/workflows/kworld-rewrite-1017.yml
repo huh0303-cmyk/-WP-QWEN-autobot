@@ -15,6 +15,7 @@ jobs:
       - run: pip install requests beautifulsoup4 Pillow
       - name: Rewrite existing article in place and upload unique photo
         env:
+          PYTHONPATH: scripts:.
           KWORLD365COM: ${{ secrets.KWORLD365COM }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GEMINI_API_KEY_2: ${{ secrets.GEMINI_API_KEY_2 }}
