@@ -8,15 +8,79 @@ from __future__ import annotations
 import asyncio
 import os
 import shlex
+import hashlib
+import json
+import random
 import subprocess
 from pathlib import Path
 from typing import Callable
 
 TTS_PRIORITY = ("fish_audio", "qwen3_tts", "edge_tts")
 
+# Six approved narrator slots per channel: three male, three female.
+# Provider-specific IDs must be configured and verified, never fabricated.
+VOICE_ROLES = ("male_news_1", "male_documentary_2", "male_news_3",
+               "female_news_1", "female_documentary_2", "female_news_3")
+EDGE_VOICES = {
+    "ko": ("ko-KR-HyunsuNeural", "ko-KR-InJoonNeural", "ko-KR-BongJinNeural",
+           "ko-KR-SunHiNeural", "ko-KR-JiMinNeural", "ko-KR-SeoHyeonNeural"),
+    "en": ("en-US-GuyNeural", "en-US-DavisNeural", "en-US-ChristopherNeural",
+           "en-US-AriaNeural", "en-US-JennyNeural", "en-US-MichelleNeural"),
+}
+def choose_narrator(channel: str, language: str = "ko", history_path: str | Path | None = None) -> dict:
+    """Choose one of six roles, avoiding last two when persistent history is available."""
+    history = Path(history_path or os.getenv("TTS_VOICE_HISTORY_PATH", "data/tts_voice_history.json"))
+    key = channel + ":" + language.lower().split("-")[0]
+    try:
+        state = json.loads(history.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        state = {}
+    recent = state.get(key, [])[-2:]
+    eligible = [i for i in range(6) if i not in recent] or list(range(6))
+    index = random.SystemRandom().choice(eligible)
+    state[key] = (state.get(key, []) + [index])[-20:]
+    history.parent.mkdir(parents=True, exist_ok=True)
+    history.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
+    base = language.lower().split("-")[0]
+    edge_pool = EDGE_VOICES.get(base)
+    edge_voice = edge_pool[index] if edge_pool else None
+    return {"index": index, "role": VOICE_ROLES[index], "edge_voice": edge_voice,
+            "fish_voice_id": os.getenv(f"FISH_VOICE_{base.upper()}_{index + 1}", "").strip(),
+            "qwen_voice": os.getenv(f"QWEN_VOICE_{base.upper()}_{index + 1}", "").strip()}
+
+def shorts_audio_filter() -> str:
+    """1.2x speed, subtle brightening and loudness control for narrated Shorts."""
+    return "atempo=1.2,highpass=f=90,treble=g=2:f=3500,loudnorm=I=-16:TP=-1.5:LRA=9"
+
+def render_shorts_audio(input_path: str | Path, output_path: str | Path) -> Path:
+    """Postprocess any successful provider uniformly; fail closed on bad output."""
+    source, dest = Path(input_path), Path(output_path)
+    if not verify_audio(source):
+        raise RuntimeError("Invalid TTS source audio")
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    subprocess.run(["ffmpeg", "-y", "-v", "error", "-i", str(source),
+        "-af", shorts_audio_filter(), "-c:a", "libmp3lame", "-q:a", "2", str(dest)],
+        check=True, capture_output=True, timeout=180)
+    if not verify_audio(dest):
+        raise RuntimeError("Invalid processed Shorts audio")
+    return dest
+
+def verify_audio(path: str | Path, minimum_seconds: float = 0.4) -> bool:
+    """Reject missing, corrupt or implausibly short files using ffprobe."""
+    out = Path(path)
+    if not out.is_file() or out.stat().st_size < 1000:
+        return False
+    try:
+        p = subprocess.run(["ffprobe", "-v", "error", "-show_entries",
+            "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", str(out)],
+            capture_output=True, text=True, timeout=20, check=True)
+        return float(p.stdout.strip()) >= minimum_seconds
+    except (OSError, ValueError, subprocess.SubprocessError):
+        return False
+
 
 def _valid_audio(path: Path) -> bool:
-    return path.exists() and path.is_file() and path.stat().st_size > 0
+    return verify_audio(path)
 
 
 def local_qwen3_tts(text: str, output_path: str | Path, language: str) -> bool:
@@ -56,6 +120,8 @@ def generate_tts(
     qwen_generator: Callable | None = None,
     edge_voice: str | None = None,
     edge_pitch: str = "+0Hz",
+    channel: str | None = None,
+    narrator: dict | None = None,
 ) -> dict:
     """Generate audio using free providers only, in the policy order.
 
@@ -65,6 +131,8 @@ def generate_tts(
     that have not been verified for the installed model.
     No paid-provider adapter is accepted by this API.
     """
+    if narrator is None and channel:
+        narrator = choose_narrator(channel, language)
     out = Path(output_path)
     out.parent.mkdir(parents=True, exist_ok=True)
     if qwen_generator is None:
@@ -101,7 +169,7 @@ def generate_tts(
             "it": "it-IT-ElsaNeural",
             "th": "th-TH-PremwadeeNeural",
         }
-        voice = edge_voice or voices.get(base_language)
+        voice = edge_voice or (narrator or {}).get("edge_voice") or voices.get(base_language)
         if not voice:
             errors.append(f"edge_tts: no configured voice for {base_language}")
         else:
