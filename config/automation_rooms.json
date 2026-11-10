@@ -835,8 +835,8 @@
       "status": "READY_PUBLIC_DAILY",
       "text_model": "gpt-5-mini",
       "image_models": [
-        "bytedance/sdxl-lightning-4step",
-        "black-forest-labs/flux-schnell"
+        "auto",
+        "none"
       ],
       "daily_min": 1,
       "daily_max": 1,
@@ -858,8 +858,8 @@
       "status": "READY_PUBLIC_DAILY",
       "text_model": "gpt-5-mini",
       "image_models": [
-        "bytedance/sdxl-lightning-4step",
-        "black-forest-labs/flux-schnell"
+        "auto",
+        "none"
       ],
       "persona": "한국 보건의료·돌봄·복지 자격과 취업 경로를 공식 공고로 검증하는 자격정보 편집자. 실제 의료인·시험위원·취업상담사 경력을 사칭하지 않는다.",
       "tone": "한국어 존댓말 설명체(~입니다, ~하세요). 결론과 응시 가능 여부를 먼저 제시하고, 어려운 제도는 쉬운 말과 비교표로 설명한다. 차분하고 구체적이며 광고·과장·합격보장·고소득보장·가짜 체험담을 쓰지 않는다.",
@@ -915,8 +915,8 @@
       "status": "READY_PUBLIC_DAILY",
       "text_model": "gpt-5-mini",
       "image_models": [
-        "bytedance/sdxl-lightning-4step",
-        "black-forest-labs/flux-schnell"
+        "auto",
+        "none"
       ],
       "daily_min": 1,
       "daily_max": 1,
@@ -938,8 +938,8 @@
       "status": "READY_PUBLIC_DAILY",
       "text_model": "gpt-5-mini",
       "image_models": [
-        "bytedance/sdxl-lightning-4step",
-        "black-forest-labs/flux-schnell"
+        "auto",
+        "none"
       ],
       "daily_min": 1,
       "daily_max": 1,
@@ -961,8 +961,8 @@
       "status": "READY_PUBLIC_DAILY",
       "text_model": "gpt-5-mini",
       "image_models": [
-        "bytedance/sdxl-lightning-4step",
-        "black-forest-labs/flux-schnell"
+        "auto",
+        "none"
       ],
       "daily_min": 1,
       "daily_max": 1,
@@ -984,8 +984,8 @@
       "status": "READY_PUBLIC_DAILY",
       "text_model": "gpt-5-mini",
       "image_models": [
-        "bytedance/sdxl-lightning-4step",
-        "black-forest-labs/flux-schnell"
+        "auto",
+        "none"
       ],
       "daily_min": 1,
       "daily_max": 1,
