@@ -11,13 +11,14 @@ Last verified: 2026-08-27 (KST)
 
 ## Image API policy
 
-Replicate is the only approved provider for newly generated images across the full network. The required order is:
+Replicate is the only approved provider for newly generated images across the full network. The required four-stage order is:
 
-1. `black-forest-labs/flux-schnell`
-2. `bytedance/sdxl-lightning-4step`
-3. `bytonylee/sdxl-turbo`
+1. Pexels (free, relevant stock)
+2. Pixabay (free, relevant stock)
+3. Replicate `bytonylee/sdxl-turbo`
+4. Replicate `black-forest-labs/flux-schnell`
 
-The same Replicate account token covers all three models. Do not create or store one token per model. Do not expose the token in source code, logs, screenshots, spreadsheets, prompts, or documentation.
+The two Replicate models are the only paid image models approved. Attempt each at most once per content item and request one output per attempt. Do not use SDXL Lightning, FLUX.1 [dev], Nano Banana, OpenAI image generation, or other image models. Keep the shared token only in GitHub Actions secret `REPLICATE_API_TOKEN`; never put its value in source code, logs, screenshots, spreadsheets, prompts, or documentation.
 
 Generated imagery is never mandatory for a text article. Use 0 images if every candidate fails relevance, licensing, factual-integrity, medical/legal/financial safety, or quality checks. YouTube and other visual-first jobs must stop for human review when no acceptable image is available.
 
