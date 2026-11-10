@@ -200,7 +200,8 @@
     "order": [
       "pexels",
       "pixabay",
-      "wikimedia_commons_cc0_public_domain",
+      "bytonylee/sdxl-turbo",
+      "black-forest-labs/flux-schnell",
       "pass_without_image"
     ],
     "relevance_check_required": true,
