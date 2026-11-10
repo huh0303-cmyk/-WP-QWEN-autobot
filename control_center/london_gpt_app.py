@@ -20,7 +20,7 @@ GITHUB_REF = os.environ.get("LONDON_PROJECT_GITHUB_REF", "main")
 GITHUB_TOKEN = os.environ.get("LONDON_PROJECT_GITHUB_TOKEN") or os.environ.get("GH_DISPATCH_TOKEN") or os.environ.get("GITHUB_TOKEN") or ""
 GITHUB_PIPELINE_WORKFLOW = "london-content-pipeline.yml"
 WRITER_MODELS = {"auto_free", "local_qwen", "gpt-5-mini", "gemini-3.5-flash", "gemini-3.1-flash-lite", "gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-3.5-flash-lite"}
-IMAGE_MODELS = {"auto_free", "pexels", "pixabay", "wikimedia", "none"}
+IMAGE_MODELS = {"auto", "none"}
 
 
 def _safe_call(fn, fallback):
@@ -187,7 +187,7 @@ def install(app, runtime):
         category = str(payload.get("category") or "").strip()
         publish_mode = str(payload.get("publish_mode") or "manual").strip().lower()
         writer_model = str(payload.get("writer_model") or "auto_free").strip()
-        image_model = str(payload.get("image_model") or "auto_free").strip()
+        image_model = str(payload.get("image_model") or "auto").strip()
         if writer_model not in WRITER_MODELS or image_model not in IMAGE_MODELS:
             return jsonify({"ok": False, "error": "invalid_model_choice"}), 400
         valid = {site["site_id"]: site for site in _content_sites()}
