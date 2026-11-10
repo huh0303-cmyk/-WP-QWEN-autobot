@@ -31,6 +31,11 @@ def style(html):
     return '<section class="kworld-editorial" style="max-width:780px;margin:0 auto;font-family:inherit">'+str(soup)+'</section>'
 def get(url,**kwargs):
     r=requests.get(url,auth=AUTH,timeout=40,**kwargs);r.raise_for_status();return r.json()
+def clean_title(title):
+    title=re.sub(r"(?<!\\d)2026(?!\\d)","",title)
+    title=re.sub(r"\\s+([:;,.!?])",r"\\1",title)
+    title=re.sub(r"\\s{2,}"," ",title)
+    return title.strip(" -–—:|,;")
 def main():
     parser=argparse.ArgumentParser()
     parser.add_argument("--start",type=int,default=0)
@@ -44,12 +49,12 @@ def main():
     failed=[]
     for post in selection:
         id=post["id"]
-        title=plain(post["title"]["rendered"])
+        title=clean_title(plain(post["title"]["rendered"]))
         original=post["content"].get("raw") or post["content"]["rendered"]
         backup={"id":id,"title":title,"content":original,"featured_media":post["featured_media"],"tags":post["tags"],"categories":post["categories"],"meta":post.get("meta",{})}
         (OUT/f"{id}-backup.json").write_text(json.dumps(backup,ensure_ascii=False,indent=2),encoding="utf-8")
         # Do not use unsupported factual claims in old post as new facts.
-        prompt=f"""Create a fresh, original, useful English editorial article for a K-pop website, retaining this exact topic/title: {title}.
+        prompt=f"""Create a fresh, original, useful English editorial article for a K-pop website, retaining this exact topic/title: {title}. Never include 2026 in the headline.
 The original article may contain incorrect or outdated claims. Do not treat it as a verified source. Do not invent announcements, confirmed tour dates, quotes, statistics, award results, tickets, or agency decisions. If the title implies unverified news, clearly distinguish the claim from verified general context and tell readers to check primary sources. Do not imply you independently researched sources.
 Write semantic HTML only: 1 introductory paragraph, 5-6 descriptive H2 sections with useful detailed paragraphs, then H2 Frequently Asked Questions with 4 H3 questions and short factual answers. No H1, no images, no footers, no product ads, no markdown fences. Vary the prose naturally and make each section distinct. Aim for 3800 characters WITHOUT whitespace (including FAQ), strict acceptable range 2500-5000. Prioritize real reader utility over keyword stuffing."""
         try:
@@ -77,7 +82,7 @@ Write semantic HTML only: 1 introductory paragraph, 5-6 descriptive H2 sections 
             if args.dry_run:
                 print("DRY_RUN",id,title,"chars",chars(article),flush=True)
                 continue
-            response=requests.post(f"{SITE}/wp-json/wp/v2/posts/{id}",auth=AUTH,json={"content":output},timeout=45)
+            response=requests.post(f"{SITE}/wp-json/wp/v2/posts/{id}",auth=AUTH,json={"content":output,"title":title},timeout=45)
             response.raise_for_status()
             updated=response.json()
             if updated["id"]!=id or updated["featured_media"]!=post["featured_media"] or updated["tags"]!=post["tags"] or updated["categories"]!=post["categories"]:
