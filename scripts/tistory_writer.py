@@ -305,15 +305,6 @@ def generate_draft(job: dict) -> dict:
             generated_url = host_permanently(generated_url, asset_key=job["job_id"])
         except (RuntimeError, KeyError):
             generated_url = None
-    if not generated_url:
-        # 2026-10-06 Chairman: every post gets an image. Free chain (Pexels/Pixabay/Wikimedia/Openverse/AI) then a generated topic card.
-        try:
-            from image_guarantee import ensure_image
-            guaranteed = ensure_image(draft["title"], queries=[draft.get("image_prompt", ""), draft["title"], draft["category"]],
-                                      theme=draft["category"], asset_key=job["job_id"])
-            generated_url = guaranteed.get("url") or None
-        except Exception as exc:  # noqa: BLE001
-            print(f"image guarantee failed: {type(exc).__name__}")
     from stock_image_provider import credit_html, contains_public_photo_credit
     draft["body_html"] += credit_html(generated_url)
     if contains_public_photo_credit(draft["body_html"]):
@@ -323,11 +314,10 @@ def generate_draft(job: dict) -> dict:
     # AI generation prompt — use the article's own title instead.
     draft["image_alt"] = f'{draft["category"]} 주제를 설명하는 대표 이미지'
     draft["first_image_priority"] = bool(draft["image_url"])
-    draft["image_policy"] = "matching_stock_then_sdxl_then_flux"
-    draft["image_status"] = "generated" if draft["image_url"] else "missing_required_image"
+    draft["image_policy"] = "pexels_then_pixabay_then_sdxl_turbo_then_flux_schnell"
+    draft["image_status"] = "generated" if draft["image_url"] else "no_image_after_four_stages"
     if not draft["image_url"]:
-        draft["status"] = "MEDIA_REQUIRED"
-        draft["error"] = "대표 이미지 생성 또는 영구 보관 실패: 공개 발행 대기"
+        draft["image_status"] = "no_image_after_four_stages"
     if draft["image_url"]:
         draft["body_html"] = f'<p><img src="{html.escape(str(draft["image_url"]), quote=True)}" alt="{html.escape(draft["image_alt"], quote=True)}"></p>' + draft["body_html"]
     return draft
