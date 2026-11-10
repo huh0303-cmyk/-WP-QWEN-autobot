@@ -848,7 +848,7 @@ def get_site_data():
             "persona": registered.persona if registered else item["persona"],
             "tone": registered.tone if registered else item["tone"],
             "default_text_model": "gpt-5-mini",
-            "default_image_model": "bytedance/sdxl-lightning-4step",
+            "default_image_model": "auto",
         })
     sites = _overlay_core_metrics(sites, "wordpress")
     return sorted(sites, key=lambda site: (
@@ -937,7 +937,7 @@ def get_blogger_data():
             "persona": getattr(wp_registry.get((row.get("wp") or "").rstrip("/")), "persona", "Specialist editorial desk"),
             "tone": getattr(wp_registry.get((row.get("wp") or "").rstrip("/")), "tone", "Clear, practical and source-aware"),
             "default_text_model": "gpt-5-mini",
-            "default_image_model": "bytedance/sdxl-lightning-4step",
+            "default_image_model": "auto",
             "visitor_connected": bool(central.get("connected")),
             "visitor_checked_at": central.get("date") or stats_at,
             "today_visitors": traffic.get("today"),
@@ -1043,7 +1043,7 @@ def get_tistory_data() -> list[dict[str, object]]:
             "persona": persona,
             "tone": tone,
             "default_text_model": "gpt-5-mini",
-            "default_image_model": "bytedance/sdxl-lightning-4step",
+            "default_image_model": "auto",
             "today_visitors": traffic.get("today"),
             "today_delta": traffic.get("today_delta"),
             "yesterday_visitors": traffic.get("yesterday"),
@@ -1346,7 +1346,7 @@ def trigger_draft():
     domain = request.form.get("domain", "").strip()
     keyword = request.form.get("keyword", "").strip()
     text_model = request.form.get("text_model", "").strip()
-    image_model = request.form.get("image_model", "").strip()
+    image_model = request.form.get("image_model", "auto").strip()
     source_wp_url = request.form.get("source_wp_url", "").strip()
     selection_mode = request.form.get("selection_mode", "manual").strip().lower()
     automatic_blogger_topic = platform == "blogger" and selection_mode == "auto"
