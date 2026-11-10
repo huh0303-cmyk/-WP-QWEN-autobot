@@ -59,32 +59,17 @@ Gemini must not invent facts while reviewing. Material factual uncertainty goes 
 
 ## 2. Image generation pipeline
 
-Scope: WordPress 27, Blogger 33 and Tistory 5. YouTube retains its separate Gemini thumbnail lock.
-Provider: Replicate.
-Credential: REPLICATE_API_TOKEN.
+Scope: WordPress, Blogger/Blogspot, Tistory, YouTube long-form and Shorts.
+Use exactly four ordered image stages: Pexels → Pixabay → SDXL Turbo → FLUX.1 Schnell. Pexels and Pixabay are the two free stages; SDXL Turbo and FLUX Schnell are the two paid stages.
 
-Strict generation order:
+1. Relevant licensed Pexels image.
+2. Relevant licensed Pixabay image.
+3. Replicate SDXL Turbo (`bytonylee/sdxl-turbo`).
+4. Replicate FLUX.1 Schnell (`black-forest-labs/flux-schnell`).
 
-1. SDXL-Lightning 4-step — bytedance/sdxl-lightning-4step
-2. FLUX.1 Schnell — black-forest-labs/flux-schnell
-3. Both unavailable or rejected — PASS and continue without an image
+If all four stages fail, publish without an image where the platform permits it. Do not try any fifth source, generated card, or fallback after stage four. Each paid model gets at most one attempt and one output. SDXL Lightning and FLUX.1 [dev] are excluded. Replicate token is stored only as GitHub Actions secret `REPLICATE_API_TOKEN`.
 
-If SDXL Lightning fails or is unavailable, try FLUX Schnell once. If both fail, remove the rejected image and continue with a text-only draft; image failure must not block draft creation, review email or later publication.
-
-Hard rules:
-
-- image must be relevant to the article/video topic
-- free-stock fallback is forbidden
-- generic filler images are forbidden
-- generated blog images must contain no visible letters, words, numbers, captions, labels, logos, watermarks or UI anywhere in the scene
-- illegible pseudo-text, random glyphs, fake Hangul and Chinese/Japanese-looking dummy characters are blocking `QUALITY_FAIL` defects
-- avoid documents, forms, checklists, certificates, screens, signs, books and packaging whenever they could invite the image model to fabricate writing
-- if any text or pseudo-text is visible, reject that image and try the next approved model; if both fail, continue text-only
-- do not fabricate official documents
-- do not create misleading medical/legal/financial evidence
-- image/provider/license/cost logging is required
-- Blogger requires human review before publication
-- playlist thumbnails retain the existing-frame-only exception; do not generate thumbnail video
+Hard rules: images must be topic-relevant and properly licensed; no generic filler, fabricated documents, misleading medical/legal/financial evidence, visible generated text, pseudo-text, fake Hangul or random glyphs. Log image source, model, destination and actual cost when available. Blogger remains human-review-only.
 
 ### YouTube media generation lock (updated 2026-09-07)
 
