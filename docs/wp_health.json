@@ -1,36 +1,12 @@
 {
-  "generated_at": "2026-11-09T01:13:03.290111+00:00",
+  "generated_at": "2026-11-10T03:48:49.327091+00:00",
   "method": "public_wordpress_rest_read_only",
   "sample": "latest_50_public_posts",
   "warning": "Editorial/technical heuristic, NOT Rank Math score or Site Kit analytics; unknown is never green",
   "sites": {
-    "jobkoreaglobal.com": {
-      "site": "jobkoreaglobal.com",
-      "checked_at": "2026-11-09T01:11:43.568296+00:00",
-      "status": "unknown",
-      "posts_checked": 50,
-      "http_status": 200,
-      "error": "error: unterminated character set at position 2"
-    },
     "korea365.org": {
       "site": "korea365.org",
-      "checked_at": "2026-11-09T01:11:48.293090+00:00",
-      "status": "unknown",
-      "posts_checked": 50,
-      "http_status": 200,
-      "error": "error: unterminated character set at position 2"
-    },
-    "oliveyoungkorea.com": {
-      "site": "oliveyoungkorea.com",
-      "checked_at": "2026-11-09T01:11:51.240935+00:00",
-      "status": "unknown",
-      "posts_checked": 50,
-      "http_status": 200,
-      "error": "error: unterminated character set at position 2"
-    },
-    "koreawedding365.com": {
-      "site": "koreawedding365.com",
-      "checked_at": "2026-11-09T01:11:56.196051+00:00",
+      "checked_at": "2026-11-10T03:47:32.509491+00:00",
       "status": "unknown",
       "posts_checked": 50,
       "http_status": 200,
@@ -38,23 +14,31 @@
     },
     "koreainsurance365.com": {
       "site": "koreainsurance365.com",
-      "checked_at": "2026-11-09T01:11:59.059905+00:00",
+      "checked_at": "2026-11-10T03:47:35.542363+00:00",
       "status": "unknown",
       "posts_checked": 50,
       "http_status": 200,
       "error": "error: unterminated character set at position 2"
     },
-    "koreamedicaltour.com": {
-      "site": "koreamedicaltour.com",
-      "checked_at": "2026-11-09T01:12:01.760757+00:00",
+    "jobkoreaglobal.com": {
+      "site": "jobkoreaglobal.com",
+      "checked_at": "2026-11-10T03:47:38.268366+00:00",
       "status": "unknown",
       "posts_checked": 50,
       "http_status": 200,
       "error": "error: unterminated character set at position 2"
     },
-    "jobkorea365.com": {
-      "site": "jobkorea365.com",
-      "checked_at": "2026-11-09T01:12:05.108024+00:00",
+    "oliveyoungkorea.com": {
+      "site": "oliveyoungkorea.com",
+      "checked_at": "2026-11-10T03:47:42.580161+00:00",
+      "status": "unknown",
+      "posts_checked": 50,
+      "http_status": 200,
+      "error": "error: unterminated character set at position 2"
+    },
+    "koreawedding365.com": {
+      "site": "koreawedding365.com",
+      "checked_at": "2026-11-10T03:47:45.851879+00:00",
       "status": "unknown",
       "posts_checked": 50,
       "http_status": 200,
@@ -62,95 +46,23 @@
     },
     "kworld365.com": {
       "site": "kworld365.com",
-      "checked_at": "2026-11-09T01:12:08.557258+00:00",
+      "checked_at": "2026-11-10T03:47:49.116544+00:00",
       "status": "unknown",
       "posts_checked": 50,
       "http_status": 200,
       "error": "error: unterminated character set at position 2"
     },
-    "kstudy365.com": {
-      "site": "kstudy365.com",
-      "checked_at": "2026-11-09T01:12:10.454258+00:00",
+    "jobkorea365.com": {
+      "site": "jobkorea365.com",
+      "checked_at": "2026-11-10T03:47:52.722877+00:00",
       "status": "unknown",
       "posts_checked": 50,
-      "http_status": 200,
-      "error": "error: unterminated character set at position 2"
-    },
-    "ktech365.com": {
-      "site": "ktech365.com",
-      "checked_at": "2026-11-09T01:12:15.333710+00:00",
-      "status": "unknown",
-      "posts_checked": 50,
-      "http_status": 200,
-      "error": "error: unterminated character set at position 2"
-    },
-    "jobinkorea365.com": {
-      "site": "jobinkorea365.com",
-      "checked_at": "2026-11-09T01:12:18.289956+00:00",
-      "status": "unknown",
-      "posts_checked": 47,
       "http_status": 200,
       "error": "error: unterminated character set at position 2"
     },
     "k-trip365.com": {
       "site": "k-trip365.com",
-      "checked_at": "2026-11-09T01:12:23.100591+00:00",
-      "status": "unknown",
-      "posts_checked": 50,
-      "http_status": 200,
-      "error": "error: unterminated character set at position 2"
-    },
-    "krealestate365.com": {
-      "site": "krealestate365.com",
-      "checked_at": "2026-11-09T01:12:26.271653+00:00",
-      "status": "unknown",
-      "posts_checked": 50,
-      "http_status": 200,
-      "error": "error: unterminated character set at position 2"
-    },
-    "k-health365.com": {
-      "site": "k-health365.com",
-      "checked_at": "2026-11-09T01:12:30.746258+00:00",
-      "status": "unknown",
-      "posts_checked": 50,
-      "http_status": 200,
-      "error": "error: unterminated character set at position 2"
-    },
-    "k-visa365.com": {
-      "site": "k-visa365.com",
-      "checked_at": "2026-11-09T01:12:33.781618+00:00",
-      "status": "unknown",
-      "posts_checked": 50,
-      "http_status": 200,
-      "error": "error: unterminated character set at position 2"
-    },
-    "kfinance365.com": {
-      "site": "kfinance365.com",
-      "checked_at": "2026-11-09T01:12:37.355553+00:00",
-      "status": "unknown",
-      "posts_checked": 50,
-      "http_status": 200,
-      "error": "error: unterminated character set at position 2"
-    },
-    "kieca-korea.org": {
-      "site": "kieca-korea.org",
-      "checked_at": "2026-11-09T01:12:40.078307+00:00",
-      "status": "unknown",
-      "posts_checked": 50,
-      "http_status": 200,
-      "error": "error: unterminated character set at position 2"
-    },
-    "koreacrypto365.com": {
-      "site": "koreacrypto365.com",
-      "checked_at": "2026-11-09T01:12:44.547897+00:00",
-      "status": "unknown",
-      "posts_checked": 50,
-      "http_status": 200,
-      "error": "error: unterminated character set at position 2"
-    },
-    "koreainvest365.com": {
-      "site": "koreainvest365.com",
-      "checked_at": "2026-11-09T01:12:47.189487+00:00",
+      "checked_at": "2026-11-10T03:47:55.811415+00:00",
       "status": "unknown",
       "posts_checked": 50,
       "http_status": 200,
@@ -158,7 +70,79 @@
     },
     "koreataxnlaw.com": {
       "site": "koreataxnlaw.com",
-      "checked_at": "2026-11-09T01:12:49.637936+00:00",
+      "checked_at": "2026-11-10T03:47:58.913952+00:00",
+      "status": "unknown",
+      "posts_checked": 50,
+      "http_status": 200,
+      "error": "error: unterminated character set at position 2"
+    },
+    "jobinkorea365.com": {
+      "site": "jobinkorea365.com",
+      "checked_at": "2026-11-10T03:48:04.258865+00:00",
+      "status": "unknown",
+      "posts_checked": 47,
+      "http_status": 200,
+      "error": "error: unterminated character set at position 2"
+    },
+    "kfinance365.com": {
+      "site": "kfinance365.com",
+      "checked_at": "2026-11-10T03:48:09.594222+00:00",
+      "status": "unknown",
+      "posts_checked": 50,
+      "http_status": 200,
+      "error": "error: unterminated character set at position 2"
+    },
+    "kieca-korea.org": {
+      "site": "kieca-korea.org",
+      "checked_at": "2026-11-10T03:48:12.589569+00:00",
+      "status": "unknown",
+      "posts_checked": 50,
+      "http_status": 200,
+      "error": "error: unterminated character set at position 2"
+    },
+    "koreamedicaltour.com": {
+      "site": "koreamedicaltour.com",
+      "checked_at": "2026-11-10T03:48:15.499663+00:00",
+      "status": "unknown",
+      "posts_checked": 50,
+      "http_status": 200,
+      "error": "error: unterminated character set at position 2"
+    },
+    "k-health365.com": {
+      "site": "k-health365.com",
+      "checked_at": "2026-11-10T03:48:19.939093+00:00",
+      "status": "unknown",
+      "posts_checked": 50,
+      "http_status": 200,
+      "error": "error: unterminated character set at position 2"
+    },
+    "k-visa365.com": {
+      "site": "k-visa365.com",
+      "checked_at": "2026-11-10T03:48:23.080090+00:00",
+      "status": "unknown",
+      "posts_checked": 50,
+      "http_status": 200,
+      "error": "error: unterminated character set at position 2"
+    },
+    "koreacrypto365.com": {
+      "site": "koreacrypto365.com",
+      "checked_at": "2026-11-10T03:48:25.439402+00:00",
+      "status": "unknown",
+      "posts_checked": 50,
+      "http_status": 200,
+      "error": "error: unterminated character set at position 2"
+    },
+    "koreainvest365.com": {
+      "site": "koreainvest365.com",
+      "checked_at": "2026-11-10T03:48:28.137747+00:00",
+      "status": "unknown",
+      "posts_checked": 50,
+      "http_status": 200,
+      "error": "error: unterminated character set at position 2"
+    },
+    "krealestate365.com": {
+      "site": "krealestate365.com",
+      "checked_at": "2026-11-10T03:48:32.187184+00:00",
       "status": "unknown",
       "posts_checked": 50,
       "http_status": 200,
@@ -166,7 +150,23 @@
     },
     "kskin365.com": {
       "site": "kskin365.com",
-      "checked_at": "2026-11-09T01:12:54.114222+00:00",
+      "checked_at": "2026-11-10T03:48:35.015537+00:00",
+      "status": "unknown",
+      "posts_checked": 50,
+      "http_status": 200,
+      "error": "error: unterminated character set at position 2"
+    },
+    "kstudy365.com": {
+      "site": "kstudy365.com",
+      "checked_at": "2026-11-10T03:48:38.037520+00:00",
+      "status": "unknown",
+      "posts_checked": 50,
+      "http_status": 200,
+      "error": "error: unterminated character set at position 2"
+    },
+    "ktech365.com": {
+      "site": "ktech365.com",
+      "checked_at": "2026-11-10T03:48:42.679665+00:00",
       "status": "unknown",
       "posts_checked": 50,
       "http_status": 200,
@@ -174,11 +174,18 @@
     },
     "studyinkorea365.com": {
       "site": "studyinkorea365.com",
-      "checked_at": "2026-11-09T01:12:58.903666+00:00",
+      "checked_at": "2026-11-10T03:48:45.297751+00:00",
       "status": "unknown",
       "posts_checked": 50,
       "http_status": 200,
       "error": "error: unterminated character set at position 2"
+    },
+    "ki-korea.com": {
+      "site": "ki-korea.com",
+      "checked_at": "2026-11-10T03:48:48.180693+00:00",
+      "status": "unknown",
+      "posts_checked": 0,
+      "error": "SSLError: HTTPSConnectionPool(host='ki-korea.com', port=443): Max retries exceeded with url: / (Caused by SSLError(SSLCertVerificationError(1, \"[SSL: CERTIFICAT"
     }
   }
-}\n
+}
