@@ -6,9 +6,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 import replicate_image_provider as provider
 
 
-def test_blog_image_order_is_sdxl_then_flux_only():
+def test_blog_image_order_uses_turbo_then_flux_after_stock():
     assert provider.ALLOWED_MODELS == (
-        "bytedance/sdxl-lightning-4step",
+        "bytonylee/sdxl-turbo",
         "black-forest-labs/flux-schnell",
     )
 
