@@ -1,78 +1,40 @@
-# FINAL Content + Image Pipeline
+# London Project — Content Engine Policy (2026-11-10)
+Status: OWNER DIRECTIVE / supersedes prior conflicting text and image routing policies.
+Scope: WordPress, Blogger/Blogspot, Tistory, YouTube scripts/shorts/descriptions, news and all other generated editorial content.
 
-Status: LOCKED / OWNER APPROVED
-Date: 2026-09-12
+## English text fallback — exact priority
+1. gemini-3.6-flash
+2. gemini-3.5-flash
+3. gemini-3.5-flash-lite
+4. gemini-3.1-flash-lite
+5. gemini-2.5-flash
+6. gemini-3.8-flash
 
-This document is the authoritative pipeline policy. Older conflicting writing/image fallback documentation must not override it.
+## Korean text fallback — exact priority
+1. gemini-3.5-flash-lite
+2. gemini-3.1-flash-lite
+3. gemini-3.5-flash
+4. gemini-2.5-flash
+5. gemini-3.6-flash
+6. gemini-3.8-flash
 
-## Writing
+Route by OUTPUT language, not domain or UI language. Attempt each model in order; advance on unavailable model, API failure, empty/truncated/malformed output or quality rejection. After six failures, fail only that content job, never publish empty text. No GPT, Claude, Qwen, random writer selection or hidden extra fallback. Model IDs must be checked against the actual Gemini API model catalog before enabling production; an unavailable model is a failed step, not a reason to silently substitute an unapproved model.
 
-Primary writers:
-1. GPT-5 mini
-2. Gemini Flash
+## Images — exactly four attempts
+1. Free stock source Pexels or Pixabay, randomized first choice per article
+2. The other free stock source
+3. Paid SDXL Lightning via configured provider
+4. Paid FLUX.1 Schnell via configured provider
 
-Routing:
-- Select GPT-5 mini or Gemini Flash randomly / alternately for each article.
-- Do not copy one platform article verbatim to another platform.
-- Each platform/site output must preserve its own persona, language, search intent and formatting.
+Accept only relevant, licensed, nonduplicate, nonwatermarked images, with descriptive ALT. If all four fail, publish valid text without image. No fifth image source, reverse fallback, or stock search after paid models. Paid usage requires configured credentials and billing authorization.
 
-Fallback:
-- If GPT-5 mini fails or fails quality validation -> retry with Gemini Flash.
-- If Gemini Flash fails or fails quality validation -> retry with GPT-5 mini.
-- Failure includes API failure, empty/truncated output, wrong language, malformed structure, severe repetition, or quality-gate failure.
-- If both fail after controlled retry, mark only that job FAILED/RETRY. Never block the rest of the network.
+## Implementation obligations
+- Replace legacy conflicting code paths, not merely documentation.
+- Use one shared language-aware text router and one shared image router; migrate every platform entrypoint.
+- Preserve platform-specific formatting, quality gates, deduplication and isolated job failures.
+- Do not trigger mass publication while migrating.
+- Test one English and one Korean item in draft/private mode, including image and fallback traces.
+- Record exact model/provider attempted, result and error in logs; never log credentials.
+- Verify GitHub Actions and provider receipts before claiming production migration complete.
 
-## Image
-
-Order is fixed:
-
-1. Pexels / Pixabay stock search
-   - Search both/free sources as available.
-   - Use stock image only when it matches the article/title/intent sufficiently.
-   - Reject irrelevant or misleading images.
-
-2. SDXL Lightning
-   - First AI image generation fallback when no acceptable Pexels/Pixabay image is found.
-
-3. FLUX Schnell
-   - Second AI image generation fallback when SDXL Lightning fails or its result is unsuitable.
-
-4. No image
-   - If stock + SDXL Lightning + FLUX Schnell all fail or are unsuitable, publish without an image.
-   - Image failure must never block an otherwise valid article.
-
-## Quality Gate
-
-Before publication check at minimum:
-- correct site/topic/persona
-- correct language
-- non-duplicate title
-- no verbatim cross-platform duplication
-- no empty/truncated/malformed content
-- no obvious repetitive AI-template phrasing
-- image relevance when an image is used
-- valid ALT text when an image is used
-
-## Publication Flow
-
-MASTER / scheduler
--> topic + keyword + target site/platform
--> random/alternate writer (GPT-5 mini or Gemini Flash)
--> opposite writer fallback on failure
--> quality gate
--> Pexels/Pixabay relevance search
--> SDXL Lightning fallback
--> FLUX Schnell fallback
--> no-image fallback
--> platform-specific formatting
--> queue / publisher
--> real publication URL or provider receipt
--> result/status/error returned to Control Room / MASTER
-
-## Reliability Rule
-
-One failed site/platform/job must never stop other sites/platforms/jobs. Failures are isolated, logged and retryable.
-
-## Success Definition
-
-A job is SUCCESS only after a real provider publication result is confirmed (URL/post ID/receipt as applicable). Code existence, dispatch, or queue acceptance alone is not publication success.
+This document replaces the 2026-09-12 GPT-5-mini/random Gemini policy. Existing code is not automatically migrated by this document commit.
