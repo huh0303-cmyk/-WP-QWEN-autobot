@@ -348,6 +348,8 @@ async def _tts(text: str, voice: str, out: Path, elevenlabs_voice_id: str = "", 
                                  if narrator_profile else "")
             if fish_reference_id:
                 fish_payload["reference_id"] = fish_reference_id
+            if narrator_profile and narrator_profile.get("delivery") and not fish_reference_id:
+                raise ValueError("Selected Japanese narrator has no Fish Audio reference")
             response = requests.post(
                 "https://api.fish.audio/v1/tts",
                 headers={"Authorization": f"Bearer {api_key}", "model": os.getenv("FISH_AUDIO_MODEL", "s2.1-pro-free"),
@@ -382,7 +384,8 @@ async def _tts(text: str, voice: str, out: Path, elevenlabs_voice_id: str = "", 
                             or os.getenv("QWEN3_TTS_SPEAKER_JA" if lang == "ja" else "QWEN3_TTS_SPEAKER_EN", "default")),
                 "instruct": (
                     f"Use the selected {narrator_profile['gender']} narrator profile {narrator_profile['name']}; "
-                    "professional documentary or news-anchor delivery, clear diction, warm and trustworthy."
+                    f"{narrator_profile.get('delivery', 'professional documentary or news-anchor delivery')}; "
+                    "use clear diction and a trustworthy tone."
                     if narrator_profile else
                     "Calm documentary or professional news-anchor narration, clear diction, warm and trustworthy."
                 ),
@@ -406,7 +409,8 @@ async def _tts(text: str, voice: str, out: Path, elevenlabs_voice_id: str = "", 
         edge_voice = "ja-JP-KeitaNeural" if lang == "ja" else "en-US-GuyNeural"
     try:
         import edge_tts
-        await edge_tts.Communicate(text, edge_voice).save(str(out))
+        edge_rate = (narrator_profile or {}).get("edge_rate", "+0%")
+        await edge_tts.Communicate(text, edge_voice, rate=edge_rate).save(str(out))
         if out.exists() and out.stat().st_size > 2000:
             _trim_leading_silence(out)
             print(f"TTS_ENGINE=edge_tts voice={edge_voice} bytes={out.stat().st_size}", flush=True)
@@ -427,10 +431,10 @@ def choose_health_narrator(channel: str) -> dict:
             {"name": "Jenny", "gender": "female", "edge_voice": "en-US-JennyNeural", "fish_reference_env": "FISH_HEALTH_USA_FEMALE_2_REFERENCE_ID", "qwen_speaker_env": "QWEN_HEALTH_USA_FEMALE_2_SPEAKER", "qwen_speaker": "Jenny"},
         ],
         "health_japan": [
-            {"name": "Keita", "gender": "male", "edge_voice": "ja-JP-KeitaNeural", "fish_reference_env": "FISH_HEALTH_JP_MALE_1_REFERENCE_ID", "qwen_speaker_env": "QWEN_HEALTH_JP_MALE_1_SPEAKER", "qwen_speaker": "Keita"},
-            {"name": "Daichi", "gender": "male", "edge_voice": "ja-JP-DaichiNeural", "fish_reference_env": "FISH_HEALTH_JP_MALE_2_REFERENCE_ID", "qwen_speaker_env": "QWEN_HEALTH_JP_MALE_2_SPEAKER", "qwen_speaker": "Daichi"},
-            {"name": "Nanami", "gender": "female", "edge_voice": "ja-JP-NanamiNeural", "fish_reference_env": "FISH_HEALTH_JP_FEMALE_1_REFERENCE_ID", "qwen_speaker_env": "QWEN_HEALTH_JP_FEMALE_1_SPEAKER", "qwen_speaker": "Nanami"},
-            {"name": "Aoi", "gender": "female", "edge_voice": "ja-JP-AoiNeural", "fish_reference_env": "FISH_HEALTH_JP_FEMALE_2_REFERENCE_ID", "qwen_speaker_env": "QWEN_HEALTH_JP_FEMALE_2_SPEAKER", "qwen_speaker": "Aoi"},
+            {"name": "Keita", "delivery": "calm, measured documentary narration", "edge_rate": "-8%", "gender": "male", "edge_voice": "ja-JP-KeitaNeural", "fish_reference_env": "FISH_HEALTH_JP_MALE_1_REFERENCE_ID", "qwen_speaker_env": "QWEN_HEALTH_JP_MALE_1_SPEAKER", "qwen_speaker": "Keita"},
+            {"name": "Daichi", "delivery": "calm, measured documentary narration", "edge_rate": "-8%", "gender": "male", "edge_voice": "ja-JP-DaichiNeural", "fish_reference_env": "FISH_HEALTH_JP_MALE_2_REFERENCE_ID", "qwen_speaker_env": "QWEN_HEALTH_JP_MALE_2_SPEAKER", "qwen_speaker": "Daichi"},
+            {"name": "Nanami", "delivery": "professional news anchor delivery, crisp and steady", "edge_rate": "+0%", "gender": "female", "edge_voice": "ja-JP-NanamiNeural", "fish_reference_env": "FISH_HEALTH_JP_FEMALE_1_REFERENCE_ID", "qwen_speaker_env": "QWEN_HEALTH_JP_FEMALE_1_SPEAKER", "qwen_speaker": "Nanami"},
+            {"name": "Aoi", "delivery": "professional news anchor delivery, crisp and steady", "edge_rate": "+0%", "gender": "female", "edge_voice": "ja-JP-AoiNeural", "fish_reference_env": "FISH_HEALTH_JP_FEMALE_2_REFERENCE_ID", "qwen_speaker_env": "QWEN_HEALTH_JP_FEMALE_2_SPEAKER", "qwen_speaker": "Aoi"},
         ],
     }
     pool = pools[channel]
