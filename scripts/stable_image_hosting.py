@@ -18,6 +18,17 @@ from urllib.parse import urlparse
 import requests
 
 
+def _github_asset_credentials() -> tuple[str, str]:
+    """Validate image-hosting credentials before any network or upload attempt."""
+    repo = os.getenv("GITHUB_REPOSITORY", "").strip()
+    token = (os.getenv("GH_ASSET_TOKEN") or os.getenv("GITHUB_TOKEN") or os.getenv("GH_TOKEN") or "").strip()
+    if not repo:
+        raise RuntimeError("IMAGE_HOST_CONFIG_MISSING: GITHUB_REPOSITORY")
+    if not token:
+        raise RuntimeError("IMAGE_HOST_CONFIG_MISSING: GH_ASSET_TOKEN/GITHUB_TOKEN/GH_TOKEN")
+    return repo, token
+
+
 def is_temporary(url: str) -> bool:
     parsed = urlparse(url)
     return (parsed.netloc.lower().endswith(("replicate.delivery", "replicateusercontent.com", "r2.cloudflarestorage.com"))
@@ -44,8 +55,7 @@ def host_permanently(url: str, *, asset_key: str, folder: str = "tistory_images"
     Raises RuntimeError if the source image or the freshly hosted copy is not
     verifiably a real image; callers must not embed an unverified URL.
     """
-    repo = os.environ["GITHUB_REPOSITORY"]
-    token = os.environ["GH_ASSET_TOKEN"]
+    repo, token = _github_asset_credentials()
     ok, evidence = _image_ok(url)
     if not ok:
         raise RuntimeError(f"source image failed verification: {evidence}")
