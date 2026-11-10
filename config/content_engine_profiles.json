@@ -1059,8 +1059,8 @@
         "max_chars": 2304,
         "text_model": "gpt-5-mini",
         "image_models": [
-          "bytedance/sdxl-lightning-4step",
-          "black-forest-labs/flux-schnell"
+          "auto",
+          "none"
         ]
       }
     },
@@ -1097,8 +1097,8 @@
         "max_chars": 2304,
         "text_model": "gpt-5-mini",
         "image_models": [
-          "bytedance/sdxl-lightning-4step",
-          "black-forest-labs/flux-schnell"
+          "auto",
+          "none"
         ],
         "theme": "한국 의료·보건·돌봄·복지 분야 자격 취득과 취업 준비",
         "categories": [
@@ -1167,8 +1167,8 @@
         "max_chars": 1600,
         "text_model": "gpt-5-mini",
         "image_models": [
-          "bytedance/sdxl-lightning-4step",
-          "black-forest-labs/flux-schnell"
+          "auto",
+          "none"
         ],
         "theme": "한국 생활 정보와 검색량 많은 한국 이야기(정부지원금·혜택, 생활 꿀팁, 이슈·트렌드, 잡다한 한국 소식)를 한국어로 다룸"
       }
@@ -1206,8 +1206,8 @@
         "max_chars": 2304,
         "text_model": "gpt-5-mini",
         "image_models": [
-          "bytedance/sdxl-lightning-4step",
-          "black-forest-labs/flux-schnell"
+          "auto",
+          "none"
         ]
       }
     },
@@ -1244,8 +1244,8 @@
         "max_chars": 2304,
         "text_model": "gpt-5-mini",
         "image_models": [
-          "bytedance/sdxl-lightning-4step",
-          "black-forest-labs/flux-schnell"
+          "auto",
+          "none"
         ]
       }
     },
@@ -1282,8 +1282,8 @@
         "max_chars": 2304,
         "text_model": "gpt-5-mini",
         "image_models": [
-          "bytedance/sdxl-lightning-4step",
-          "black-forest-labs/flux-schnell"
+          "auto",
+          "none"
         ]
       }
     }
