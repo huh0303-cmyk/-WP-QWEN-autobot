@@ -1,5 +1,5 @@
 {
-  "version": 7,
+  "version": 8,
   "scope": [
     "wordpress",
     "blogger",
@@ -13,24 +13,31 @@
   "model_priority": [
     {
       "priority": 1,
-      "model": "SDXL Turbo",
-      "model_id": "bytonylee/sdxl-turbo",
-      "role": "first paid fallback after matching stock",
-      "license_gate": "Verify current model and provider terms before generation"
+      "model": "Pexels",
+      "model_id": "Pexels API",
+      "role": "free stock image first",
+      "estimated_cost_usd_per_image": 0
     },
     {
       "priority": 2,
-      "model": "FLUX.1 [dev]",
-      "model_id": "black-forest-labs/flux-dev",
-      "role": "second paid fallback",
-      "license_gate": "Replicate's hosted model page allows commercial use of generated outputs; do not treat downloaded model weights as commercially licensed"
+      "model": "Pixabay",
+      "model_id": "Pixabay API",
+      "role": "free stock fallback",
+      "estimated_cost_usd_per_image": 0
     },
     {
       "priority": 3,
+      "model": "SDXL Turbo",
+      "model_id": "bytonylee/sdxl-turbo",
+      "role": "first paid fallback",
+      "estimated_cost_usd_per_image": 0.0015
+    },
+    {
+      "priority": 4,
       "model": "FLUX.1 Schnell",
       "model_id": "black-forest-labs/flux-schnell",
-      "role": "third paid fallback",
-      "license_gate": "Apache-2.0 or provider terms"
+      "role": "second paid fallback",
+      "estimated_cost_usd_per_image": 0.003
     }
   ],
   "hard_rules": {
@@ -56,21 +63,22 @@
     "one_output_per_paid_model_attempt": true,
     "max_attempts_per_paid_model_per_content": 1,
     "paid_generation_only_after_stock_miss": true,
-    "testing_limit": "One output per paid model; no automatic retries"
+    "testing_limit": "One output per paid model; no automatic retries",
+    "forbid_sdxl_lightning": true,
+    "forbid_flux_dev": true
   },
   "failure_policy": {
     "fallback_order": [
-      "Matching Pexels photo",
-      "Matching Pixabay photo",
+      "Pexels",
+      "Pixabay",
       "SDXL Turbo",
-      "FLUX.1 [dev]",
       "FLUX.1 Schnell"
     ],
     "fallback_to_free_stock": false,
     "fallback_to_generic_image": false,
     "when_all_generation_models_fail": "PASS_AND_CONTINUE_WITH_ZERO_IMAGES"
   },
-  "notes": "2026-11-10 user directive: one shared stock-first and paid fallback policy for WordPress, Blogger/Blogspot, Tistory, YouTube long-form and Shorts. Pexels -> Pixabay -> SDXL Turbo -> FLUX.1 [dev] -> FLUX.1 Schnell. SDXL Lightning is excluded. One output and one attempt per paid model. Keep each workflow within its explicit image budget; never run paid generation tests more than once per model.",
+  "notes": "2026-11-10 user directive: use the same exact four-stage fallback for WordPress, Blogger/Blogspot, Tistory, YouTube long-form and Shorts: Pexels -> Pixabay -> SDXL Turbo -> FLUX.1 Schnell. Exclude SDXL Lightning, FLUX.1 [dev], and all other Replicate image models. One output and one attempt per paid model.",
   "stock_priority": [
     "Pexels",
     "Pixabay"
