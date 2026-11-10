@@ -20,7 +20,7 @@ def test_fallback_order_and_none(monkeypatch):
     for name in ("_pexels", "_pixabay", "_wikimedia"):
         monkeypatch.setattr(b, name, (lambda n: lambda q: calls.append(n))(name))
     assert b.pick_image("Seoul palace autumn") is None
-    # Pexels/Pixabay are shuffled; Wikimedia is always last; no AI source exists any more.
+    # Pexels is attempted before Pixabay, then the shared paid gateway runs only after both miss.
     assert set(calls[:2]) == {"_pexels", "_pixabay"} and calls[2] == "_wikimedia" and len(calls) == 3
 
 
