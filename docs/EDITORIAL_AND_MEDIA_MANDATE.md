@@ -3,7 +3,7 @@
 이 문서는 WordPress, Blogger, Tistory, SNS 및 제휴 콘텐츠에 공통 적용하는 필수 운영 규칙이다.
 
 1. 글에는 모델명, 프롬프트, 생성 과정, "AI가 작성", 상투적인 AI 서론·결론 등 제작 흔적을 남기지 않는다. 사실·출처·수정 이력은 숨기지 않는다.
-2. 이미지 생성 순서(2026-08-29 사용자 확정·GitHub 박제): ① **Nano Banana가 무료로 제공되는 경우에만 1회 먼저 시도**한다. 무료 여부가 확인되지 않거나 유료 계정·유료 호출이면 건너뛴다. ② Nano Banana가 실패하거나 무료가 아니면 Replicate `black-forest-labs/flux-schnell` 1회 시도 ③ 실패 시 `bytedance/sdxl-lightning-4step` 1회 시도 ④ 실패 시 `jyoung105/sdxl-turbo` 1회 시도 ⑤ 모두 실패하면 다른 이미지·스톡·인포그래픽으로 대체하지 않고 무이미지 처리한다. 글당 최대 1장, 본문과 직접 관련된 이미지만 사용하며 자연스러운 ALT를 입력한다.
+2. 이미지 생성 순서(2026-11-10 확정): WordPress, Blogspot, Tistory, YouTube 일반 영상과 Shorts 모두 **Pexels → Pixabay → SDXL Turbo(`bytonylee/sdxl-turbo`) → FLUX.1 Schnell(`black-forest-labs/flux-schnell`)** 순서를 사용한다. 유료 Replicate 모델은 마지막 두 단계만 허용하고 모델별 1회, 출력 1장으로 제한한다. SDXL Lightning, FLUX.1 [dev], Nano Banana, OpenAI 이미지 생성, Wikimedia, Openverse 및 일반 카드 대체를 사용하지 않는다. 네 단계가 모두 실패하면 허용되는 플랫폼에서는 이미지 없이 진행한다. ALT는 실제 이미지 내용을 설명한다.
 3. 황금 주제어는 매일 최신 검색 흐름과 공식 출처를 조사해 추출한다. 정부지원·장려금·시간표·예매·정책 글은 당일 공식 출처 확인이 없으면 발행하지 않는다.
 4. 제목은 구체적인 사람의 상황·감정·이익·불안을 자연스럽게 담되 과장하거나 사실을 왜곡하지 않는다. 기계적인 번호 나열, 동일 문형 반복, 상투적인 AI 제목을 금지한다.
    - **제목은 모든 글의 최우선 텍스트 요소다.** 감성적 후킹, 궁금증, 독자의 실익을 함께 담아 실제로 클릭하고 싶게 만든다.
