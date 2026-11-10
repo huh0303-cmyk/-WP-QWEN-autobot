@@ -391,10 +391,10 @@ def test_adsense_blogger_sites_receive_gold_approval_cards():
 
 def test_locked_default_content_and_image_engines():
     assert DEFAULT_TEXT_MODEL == "gpt-5-mini"
-    assert DEFAULT_IMAGE_MODEL == "bytedance/sdxl-lightning-4step"
+    assert DEFAULT_IMAGE_MODEL == "auto"
     assert list(IMAGE_MODELS) == [
         "none",
-        "bytedance/sdxl-lightning-4step",
+        "auto",
         "black-forest-labs/flux-schnell",
     ]
 
@@ -479,10 +479,10 @@ def test_job_persists_selected_models():
         center = ControlCenter(Store(Path(tmp) / "db.sqlite3"))
         job = center.create(
             "wp_kvisa365", "Korea visa renewal checklist",
-            "gemini-2.5-flash", "bytedance/sdxl-lightning-4step",
+            "gemini-2.5-flash", "auto",
         )
         assert job["text_model"] == "gemini-2.5-flash"
-        assert job["image_model"] == "bytedance/sdxl-lightning-4step"
+        assert job["image_model"] == "auto"
 
 
 def test_quality_gate_accepts_compliant_article():
