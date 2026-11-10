@@ -1,43 +1,44 @@
+"""Single approved Gemini writer, language-aware six-stage fallback."""
 from __future__ import annotations
-
 import os
-import time
-
 import requests
+from content_engine_policy_20261110 import text_fallback_models
 
+last_writer_model = "none"
 
-def gemini_generate_text(prompt: str, *, temperature: float = 0.7) -> str:
-    api_key = os.environ.get("GEMINI_API_KEY", "").strip()
-    if not api_key:
-        raise RuntimeError("GEMINI_API_KEY is required for every Blogger article")
-    model = os.environ.get("BLOGGER_GEMINI_MODEL", "gemini-2.5-flash").strip()
-    response = None
-    for attempt in range(4):
-        response = requests.post(
-            f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
-            params={"key": api_key},
-            json={
-                "contents": [{"parts": [{"text": prompt}]}],
-                # No explicit maxOutputTokens previously meant relying on the
-                # model's implicit default, which real test runs showed cutting
-                # articles off mid-sentence well before their target length.
-                "generationConfig": {"temperature": temperature, "responseMimeType": "application/json", "maxOutputTokens": 16384},
-            },
-            timeout=120,
-        )
-        if response.status_code not in {429, 500, 502, 503, 504}:
-            break
-        if attempt < 3:
-            time.sleep(5 * (2 ** attempt))
-    assert response is not None
-    if not response.ok:
+def gemini_generate_text(prompt: str, *, temperature: float = 0.7, language: str | None = None) -> str:
+    global last_writer_model
+    from urllib.parse import urlparse
+    host = (urlparse(os.getenv("TARGET_SITE_URL", "")).hostname or "").lower()
+    lang = language or os.getenv("CONTENT_LANGUAGE") or os.getenv("SITE_LANGUAGE")
+    if not lang:
+        lang = "ko" if host in {"koreanews365.com", "k-health365.com", "koreanews365daily.blogspot.com"} else "en"
+    keys = [os.getenv(x, "").strip() for x in ("GEMINI_API_KEY", "GOOGLE_API_KEY")]
+    key = next((k for k in keys if k), "")
+    if not key:
+        raise RuntimeError("GEMINI_API_KEY missing")
+    failures = []
+    for model in text_fallback_models(lang):
         try:
-            detail = response.json().get("error", {}).get("message", "")
-        except (ValueError, AttributeError):
-            detail = ""
-        raise RuntimeError(f"Gemini request failed with HTTP {response.status_code}: {detail[:300]}")
-    data = response.json()
-    try:
-        return data["candidates"][0]["content"]["parts"][0]["text"]
-    except (KeyError, IndexError, TypeError) as exc:
-        raise RuntimeError("Gemini returned no Blogger article text") from exc
+            response = requests.post(
+                f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
+                headers={"x-goog-api-key": key},
+                json={"contents": [{"parts": [{"text": prompt}]}],
+                      "generationConfig": {"temperature": temperature, "maxOutputTokens": 16384}},
+                timeout=120,
+            )
+            response.raise_for_status()
+            payload = response.json()
+            candidate = (payload.get("candidates") or [{}])[0]
+            if candidate.get("finishReason") != "STOP":
+                raise ValueError("incomplete generation")
+            result = "".join(p.get("text", "") for p in candidate.get("content", {}).get("parts", []))
+            if not result.strip():
+                raise ValueError("empty generation")
+            last_writer_model = model
+            print(f"Gemini writer success: {lang} {model}")
+            return result.strip()
+        except (requests.RequestException, ValueError, KeyError, TypeError) as exc:
+            failures.append(f"{model}:{type(exc).__name__}")
+            print(f"Gemini writer fallback: {lang} {model} {type(exc).__name__}")
+    raise RuntimeError("WRITERS_EXHAUSTED: " + "; ".join(failures))
