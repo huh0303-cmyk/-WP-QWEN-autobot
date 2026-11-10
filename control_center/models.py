@@ -8,13 +8,12 @@ TEXT_MODELS = {
 }
 
 IMAGE_MODELS = {
-    "none": {"label": "이미지 없음", "price": "$0/장", "description": "관련 이미지가 필요 없을 때"},
-    "bytedance/sdxl-lightning-4step": {"label": "SDXL-Lightning 4-step", "price": "약 $0.0014/장", "description": "블로그 기본 이미지"},
-    "black-forest-labs/flux-schnell": {"label": "FLUX.1 Schnell", "price": "$0.003/장", "description": "SDXL 실패 시 한 번만 대체"},
+    "auto": {"label": "Pexels → Pixabay → SDXL Turbo → FLUX Schnell", "price": "free-first; paid calls billed", "description": "Shared London Project policy"},
+    "none": {"label": "No image", "price": "$0/image", "description": "Use when no relevant image is needed"},
 }
 
 DEFAULT_TEXT_MODEL = "gpt-5-mini"
-DEFAULT_IMAGE_MODEL = "bytedance/sdxl-lightning-4step"
+DEFAULT_IMAGE_MODEL = "auto"
 
 
 def require_text_model(model: str) -> str:
