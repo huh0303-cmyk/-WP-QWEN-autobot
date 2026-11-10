@@ -104,8 +104,10 @@ def main() -> None:
         text = workflow_text.get(name, "")
         if not text:
             fail(f"missing expected GitHub-native YouTube workflow {name}")
-        if any(token in text for token in ("secrets.REPLICATE_API_TOKEN", "secrets.OPENAI_API_KEY", "secrets.GEMINI_API_KEY")):
-            fail(f"{name} must not receive paid generation credentials")
+        if any(token in text for token in ("secrets.OPENAI_API_KEY", "secrets.GEMINI_API_KEY")):
+            fail(f"{name} must not receive unrelated paid generation credentials")
+        if "secrets.REPLICATE_API_TOKEN" not in text:
+            fail(f"{name} lacks the approved Replicate image fallback credential")
 
     # YouTube production is GitHub Actions-only and fail-closed until the owner releases cost hold.
     github_workflow_path = WF / "youtube-github-worker.yml"
@@ -195,7 +197,7 @@ def main() -> None:
 
     provider = (ROOT / "scripts" / "replicate_image_provider.py").read_text(encoding="utf-8")
     approved_models = (
-        "bytedance/sdxl-lightning-4step",
+        "bytonylee/sdxl-turbo",
         "black-forest-labs/flux-schnell",
     )
     for model in approved_models:
@@ -203,9 +205,11 @@ def main() -> None:
             fail(f"approved image model missing: {model}")
 
     image_policy = json.loads((ROOT / "config" / "network_image_generation_policy.json").read_text(encoding="utf-8"))
-    configured_models = tuple(item["model_id"] for item in image_policy["model_priority"])
-    if configured_models != approved_models:
-        fail(f"Replicate model policy drift: {configured_models}")
+    configured_models = tuple(item["model_id"] for item in image_policy["model_priority"][-2:])
+    configured_order = tuple(item["model"] for item in image_policy["model_priority"])
+    expected_order = ("Pexels", "Pixabay", "SDXL Turbo", "FLUX.1 Schnell")
+    if configured_models != approved_models or configured_order != expected_order:
+        fail(f"image fallback order drift: {configured_order}; paid models={configured_models}")
 
     topik = (ROOT / "scripts" / "topik_quiz_shorts.py").read_text(encoding="utf-8")
     if "generate_approved_image" not in topik or "openai_generate_image" in topik or "GEMINI_IMAGE_MODELS" in topik:
