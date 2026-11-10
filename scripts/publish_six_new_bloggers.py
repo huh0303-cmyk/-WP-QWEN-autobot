@@ -148,7 +148,7 @@ EDITORIAL BRIEF:
         raise RuntimeError(f"GPT-5 mini output failed quality gate for {site['key']}")
     image_url = generate_image_url(subject, theme=title)
     if not image_url:
-        raise RuntimeError(f"SDXL-Lightning and FLUX Schnell both failed for {site['key']}")
+        raise RuntimeError(f"Pexels, Pixabay, SDXL Turbo and FLUX Schnell all failed for {site['key']}")
     marker = f"<!-- launch-six:{site['key']}:2026-09-03 -->"
     hero = f'<figure><img src="{image_url}" alt="{title}" loading="eager"/><figcaption>Editorial image created for this guide.</figcaption></figure>'
     return title, f"{marker}\n{hero}\n{content}", labels, image_url
