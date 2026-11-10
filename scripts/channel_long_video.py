@@ -210,28 +210,30 @@ def pexels_video(query: str, used: set, key: str):
     return None
 
 
-def _has_japan_context(description: str) -> bool:
-    return bool(re.search(r"\b(?:japan(?:ese)?|tokyo|osaka|kyoto)\b|日本|東京|大阪|京都", description, re.I))
+HEALTH_IMAGE_CONTEXT = {
+    "health_japan": re.compile(r"\b(?:japan(?:ese)?|tokyo|osaka|kyoto)\b|日本|東京|大阪|京都", re.I),
+    "health_usa": re.compile(r"\b(?:united states|usa|u\.s|american|new york|los angeles|chicago|san francisco)\b", re.I),
+}
 
 
-def pexels_photo(query: str, used: set, key: str, *, japan_only: bool = False):
+def pexels_photo(query: str, used: set, key: str, *, context: re.Pattern[str] | None = None):
     r = requests.get("https://api.pexels.com/v1/search", headers={"Authorization": key},
                      params={"query": query, "orientation": "landscape", "per_page": 12}, timeout=25)
     r.raise_for_status()
     for p in r.json().get("photos", []):
-        if japan_only and not _has_japan_context(p.get("alt") or ""):
+        if context is not None and not context.search(p.get("alt") or ""):
             continue
         if f"pp{p['id']}" not in used and p.get("width", 0) >= 1280:
             return {"id": f"pp{p['id']}", "url": p["src"]["large2x"], "type": "image", "credit": "Pexels"}
     return None
 
 
-def pixabay_photo(query: str, used: set, key: str, *, japan_only: bool = False):
+def pixabay_photo(query: str, used: set, key: str, *, context: re.Pattern[str] | None = None):
     r = requests.get("https://pixabay.com/api/", params={"key": key, "q": query, "image_type": "photo", "orientation": "horizontal",
                                                            "safesearch": "true", "min_width": 1280, "per_page": 12}, timeout=25)
     r.raise_for_status()
     for p in r.json().get("hits", []):
-        if japan_only and not _has_japan_context(p.get("tags") or ""):
+        if context is not None and not context.search(p.get("tags") or ""):
             continue
         if f"px{p['id']}" not in used:
             return {"id": f"px{p['id']}", "url": p["largeImageURL"], "type": "image", "credit": "Pixabay"}
@@ -248,14 +250,14 @@ def fetch_media(query: str, want_video: bool, used: set, tmp: Path, idx: int, ki
         localized_queries = localized_queries[shift:] + localized_queries[:shift]
     pk, xk = os.getenv("PEXELS_API_KEY", ""), os.getenv("PIXABAY_KEY", "") or os.getenv("PIXABAY_API_KEY", "")
     words = query.split()
-    japan_only = channel == "health_japan"
-    queries = localized_queries if japan_only else localized_queries + [query]
-    if not japan_only and len(words) > 2:
+    context = HEALTH_IMAGE_CONTEXT.get(channel)
+    queries = localized_queries if context is not None else localized_queries + [query]
+    if context is None and len(words) > 2:
         queries.append(" ".join(words[:2]))
     queries = list(dict.fromkeys(q for q in queries if q))
     steps = []
     for q in queries:
-        if pk and want_video and not japan_only:
+        if pk and want_video and context is None:
             steps.append((pexels_video, q, pk))
         if pk:
             steps.append((pexels_photo, q, pk))
@@ -263,7 +265,7 @@ def fetch_media(query: str, want_video: bool, used: set, tmp: Path, idx: int, ki
             steps.append((pixabay_photo, q, xk))
     for fn, q, key in steps:
         try:
-            m = fn(q, used, key, japan_only=True) if japan_only else fn(q, used, key)
+            m = fn(q, used, key, context=context) if context is not None else fn(q, used, key)
         except requests.RequestException as exc:
             print(f"media source error {fn.__name__}: {type(exc).__name__}", flush=True)
             continue
@@ -349,7 +351,7 @@ async def _tts(text: str, voice: str, out: Path, elevenlabs_voice_id: str = "", 
             if fish_reference_id:
                 fish_payload["reference_id"] = fish_reference_id
             if narrator_profile and narrator_profile.get("delivery") and not fish_reference_id:
-                raise ValueError("Selected Japanese narrator has no Fish Audio reference")
+                raise ValueError("Selected narrator has no Fish Audio reference")
             response = requests.post(
                 "https://api.fish.audio/v1/tts",
                 headers={"Authorization": f"Bearer {api_key}", "model": os.getenv("FISH_AUDIO_MODEL", "s2.1-pro-free"),
@@ -425,10 +427,10 @@ def choose_health_narrator(channel: str) -> dict:
     """Choose one of four gender-balanced documentary/news narrator profiles."""
     pools = {
         "health_usa": [
-            {"name": "Guy", "gender": "male", "edge_voice": "en-US-GuyNeural", "fish_reference_env": "FISH_HEALTH_USA_MALE_1_REFERENCE_ID", "qwen_speaker_env": "QWEN_HEALTH_USA_MALE_1_SPEAKER", "qwen_speaker": "Guy"},
-            {"name": "Davis", "gender": "male", "edge_voice": "en-US-DavisNeural", "fish_reference_env": "FISH_HEALTH_USA_MALE_2_REFERENCE_ID", "qwen_speaker_env": "QWEN_HEALTH_USA_MALE_2_SPEAKER", "qwen_speaker": "Davis"},
-            {"name": "Aria", "gender": "female", "edge_voice": "en-US-AriaNeural", "fish_reference_env": "FISH_HEALTH_USA_FEMALE_1_REFERENCE_ID", "qwen_speaker_env": "QWEN_HEALTH_USA_FEMALE_1_SPEAKER", "qwen_speaker": "Aria"},
-            {"name": "Jenny", "gender": "female", "edge_voice": "en-US-JennyNeural", "fish_reference_env": "FISH_HEALTH_USA_FEMALE_2_REFERENCE_ID", "qwen_speaker_env": "QWEN_HEALTH_USA_FEMALE_2_SPEAKER", "qwen_speaker": "Jenny"},
+            {"name": "Guy", "delivery": "calm, measured documentary narration", "edge_rate": "-8%", "gender": "male", "edge_voice": "en-US-GuyNeural", "fish_reference_env": "FISH_HEALTH_USA_MALE_1_REFERENCE_ID", "qwen_speaker_env": "QWEN_HEALTH_USA_MALE_1_SPEAKER", "qwen_speaker": "Guy"},
+            {"name": "Davis", "delivery": "calm, measured documentary narration", "edge_rate": "-8%", "gender": "male", "edge_voice": "en-US-DavisNeural", "fish_reference_env": "FISH_HEALTH_USA_MALE_2_REFERENCE_ID", "qwen_speaker_env": "QWEN_HEALTH_USA_MALE_2_SPEAKER", "qwen_speaker": "Davis"},
+            {"name": "Aria", "delivery": "professional news anchor delivery, crisp and steady", "edge_rate": "+0%", "gender": "female", "edge_voice": "en-US-AriaNeural", "fish_reference_env": "FISH_HEALTH_USA_FEMALE_1_REFERENCE_ID", "qwen_speaker_env": "QWEN_HEALTH_USA_FEMALE_1_SPEAKER", "qwen_speaker": "Aria"},
+            {"name": "Jenny", "delivery": "professional news anchor delivery, crisp and steady", "edge_rate": "+0%", "gender": "female", "edge_voice": "en-US-JennyNeural", "fish_reference_env": "FISH_HEALTH_USA_FEMALE_2_REFERENCE_ID", "qwen_speaker_env": "QWEN_HEALTH_USA_FEMALE_2_SPEAKER", "qwen_speaker": "Jenny"},
         ],
         "health_japan": [
             {"name": "Keita", "delivery": "calm, measured documentary narration", "edge_rate": "-8%", "gender": "male", "edge_voice": "ja-JP-KeitaNeural", "fish_reference_env": "FISH_HEALTH_JP_MALE_1_REFERENCE_ID", "qwen_speaker_env": "QWEN_HEALTH_JP_MALE_1_SPEAKER", "qwen_speaker": "Keita"},
@@ -451,10 +453,7 @@ def fetch_media_queries(channel: str, query: str) -> list[str]:
         prefixes = ["Asian American senior", "diverse American older adults", "Asian American older woman", "Asian American older man"]
     else:
         return [base]
-    variants = [f"{prefix} {base}" for prefix in prefixes]
-    if channel != "health_japan":
-        variants.append(base)
-    return list(dict.fromkeys(v for v in variants if v))
+    return [f"{prefix} {base}" for prefix in prefixes]
 
 
 
@@ -511,12 +510,12 @@ def srt_time(t: float) -> str:
     return f"{ms // 3600000:02d}:{ms // 60000 % 60:02d}:{ms // 1000 % 60:02d},{ms % 1000:03d}"
 
 
-def make_srt(scene_texts: list[str], durations: list[float], lang: str) -> str:
+def make_srt(scene_texts: list[str], durations: list[float], lang: str, *, start_at_scene: bool = False) -> str:
     out, n, t0 = [], 1, 0.0
     for text, dur in zip(scene_texts, durations):
         chunks = split_chunks(text, lang)
         weights = [max(1, len(re.sub(r"\s", "", c))) for c in chunks]
-        total, cur = sum(weights), t0 + (0 if lang == "ja" else 0.15)
+        total, cur = sum(weights), t0 + (0 if lang == "ja" or start_at_scene else 0.15)
         usable = max(0.5, dur - 0.5)
         for c, w in zip(chunks, weights):
             span = usable * w / total
@@ -574,7 +573,7 @@ def build_video(channel: str, data: dict, outdir: Path) -> dict:
     joined = tmp / "joined.mp4"
     run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(listing), "-c", "copy", str(joined)])
     srt = outdir / "subtitles.srt"
-    srt.write_text(make_srt(texts, durs, lang), encoding="utf-8")
+    srt.write_text(make_srt(texts, durs, lang, start_at_scene=cfg["kind"] == "health"), encoding="utf-8")
     final = outdir / "video.mp4"
     size = 18 if lang == "en" else 16
     style = (f"FontName=Noto Sans CJK JP,FontSize={size},Bold=1,PrimaryColour=&H00FFFFFF,OutlineColour=&H00000000,"

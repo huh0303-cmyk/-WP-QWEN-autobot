@@ -938,3 +938,9 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - Dispatch investigation found `force_keyword` exists only under workflow_call, not workflow_dispatch, and workflow_dispatch target URL gates steps but not matrix entries. Unknown input was silently ignored in run 42661770122; run 42661956114 used declared inputs but still queued the full matrix. Both were canceled before any target publish step; checks found zero successful non-target publication steps. Do not use this workflow for isolated production publication until matrix construction and dispatch input contract are fixed and verified.
 - Prior Nov 6 code defect (`strip_title_duplicate_lead_image` NameError, run 42262070102) was already fixed on main by b26d4f258c2cf96624af6aa4992cad182c7cb7d0. Added AST wiring regression assertion in `tests/test_duplicate_lead_image_guard.py`; focused suite 10 tests passed, `git diff --check` passed.
 - Detailed receipts and next action: `docs/WORDPRESS_THREE_SITE_PUBLICATION_RECOVERY_2026-11-10.md`. Next: fix exact-target dispatch/matrix; then select an in-scope keyword and publish jobinkorea365.com only after the single-target guard passes.
+
+## health-clinic-usa-image-voice-parity-20261110
+
+- Applied the Japan photo screening policy to Health Clinic USA with U.S. context markers and rotating searches for American seniors, including Asian Americans. Unverified stock media falls back to a text card.
+- One U.S. English voice per video is selected from Guy and Davis for documentary delivery and Aria and Jenny for news-anchor delivery. The selected profile follows Fish Audio, Qwen3-TTS, then Edge TTS. Fish Audio requires that profile's reference ID. Captions begin at the scene boundary.
+- Python compilation, diff check, and mocked checks for image selection, all four voice profiles and caption timing passed. Live provider rendering and YouTube upload were not tested.
