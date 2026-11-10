@@ -12,13 +12,13 @@ ARTICLE = """
 <p>A global K-pop tour is not confirmed when an agency identifies an attractive market. It becomes credible only after venue holds, production budgets, travel arrangements and local approvals begin to align. For 2026 planning, the distinction matters: an ambitious expansion roadmap is not the same as an announced concert date.</p>
 <h2>What an agency roadmap actually covers</h2>
 <p>Tour planning typically starts with audience demand, not a list of stadiums. Promoters compare streaming activity, prior ticket sales, local purchasing power, travel accessibility and the availability of suitable venues. A strong online following may justify further research, but it cannot by itself establish that a city can support a profitable show.</p>
-<p>Agencies also weigh artist schedules, rehearsal time and the distance between stops. Adding another country can increase ticket opportunities while introducing freight costs, immigration requirements and recovery time. The practical roadmap therefore identifies candidate markets, decision deadlines and conditions that must be met before public confirmation.</p>
+
 <h2>Venue milestones: from hold to confirmed booking</h2>
 <p>A venue inquiry is an early conversation. A provisional hold reserves a possible date subject to competing requests and contract terms. A signed venue agreement is a stronger milestone, but it still does not guarantee a public performance if production, permits or commercial arrangements remain unresolved.</p>
 <p>Stadium capacity is only one consideration. Stage dimensions, loading access, roof restrictions, sound limits, audience movement and emergency plans can change the usable seating map. Fans should not treat a venue rumor or an unofficial seating diagram as proof of an upcoming tour.</p>
 <h2>Production and cross-border logistics</h2>
 <p>Touring teams must decide which equipment travels with the production and which items can be sourced locally. Lighting rigs, video walls, audio systems and stage structures require compatible specifications, trained crews and realistic setup windows. International freight can involve customs documents, temporary import arrangements and insurance.</p>
-<p>Schedule buffers are especially important for multi-city runs. Weather, border processing, equipment maintenance and transportation delays can affect rehearsals or load-in. A reliable plan includes contingencies rather than assuming every transfer will proceed without interruption.</p>
+
 <h2>Budget decisions and the announcement threshold</h2>
 <p>Ticket revenue is only part of the financial model. Agencies and promoters assess venue rental, labor, security, travel, taxes, marketing and potential currency exposure. They may adjust city selection, ticket inventory or the number of performances before committing to a route.</p>
 <p>Only an authorized agency, promoter or ticketing partner can confirm the details of a specific show. An industry planning article should not be read as a schedule announcement. Before booking flights or accommodation, fans should verify the artist, city, date, venue and official ticketing channel against primary announcements.</p>
