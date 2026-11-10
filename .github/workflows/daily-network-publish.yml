@@ -109,7 +109,7 @@ jobs:
           else:
               raise SystemExit('Explicit target_site_url is required for safe isolated publishing')
           with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
-              output.write('sites=' + json.dumps(selected) + '\\n')
+              output.write('sites=' + json.dumps(selected) + '\n')
           print('Selected matrix:', selected)
           PY
   publish:
