@@ -3,9 +3,9 @@
 """Single approved image-generation gateway for the automation repository.
 
 HARD POLICY (2026-09-02):
-- SDXL Turbo is attempted first.
-- FLUX Schnell is attempted once only when SDXL Turbo fails.
-- Only the two models in ALLOWED_MODELS may be called.
+- Matching Pexels, then Pixabay stock is attempted before paid generation.
+- Paid fallback order is SDXL Turbo, FLUX.1 [dev], then FLUX.1 Schnell.
+- Each model gets one attempt and one output maximum per content item.
 - One shared secret: REPLICATE_API_TOKEN.
 - At most one output image per content item and one attempt per model.
 - 2026-09-11: explicitly enabled article workflows try matching Pexels/Pixabay first.
@@ -28,10 +28,12 @@ import requests
 REPLICATE_API = "https://api.replicate.com/v1"
 
 PRIMARY_MODEL = "bytonylee/sdxl-turbo"
-SECONDARY_MODEL = "black-forest-labs/flux-schnell"
+SECONDARY_MODEL = "black-forest-labs/flux-dev"
+TERTIARY_MODEL = "black-forest-labs/flux-schnell"
 ALLOWED_MODELS = (
     PRIMARY_MODEL,
     SECONDARY_MODEL,
+    TERTIARY_MODEL,
 )
 
 # Cost guardrails. Deliberately hard-clamped; env vars cannot raise these limits.
@@ -96,7 +98,7 @@ def _latest_version_id(model: str, token: str) -> Optional[str]:
 
 def _input_for(model: str, prompt: str) -> dict:
     # Force exactly one output on every approved model.
-    if model == SECONDARY_MODEL:
+    if model in {SECONDARY_MODEL, TERTIARY_MODEL}:
         return {
             "prompt": prompt,
             "num_outputs": 1,
@@ -120,7 +122,7 @@ def _create_prediction(model: str, prompt: str, token: str) -> dict:
         raise RuntimeError(f"blocked image model: {model}")
 
     payload = {"input": _input_for(model, prompt)}
-    if model == SECONDARY_MODEL:
+    if model in {SECONDARY_MODEL, TERTIARY_MODEL}:
         owner, name = model.split("/", 1)
         endpoint = f"{REPLICATE_API}/models/{owner}/{name}/predictions"
     else:
@@ -184,7 +186,11 @@ def build_editorial_prompt(subject: str, theme: str = "") -> str:
 
 def _cost_receipt(model, subject, status):
     # Informational estimate, separate from the existing pre-call budget reservation.
-    amount = 0.0015 if model == PRIMARY_MODEL else 0.003
+    amount = {
+        PRIMARY_MODEL: 0.0015,
+        SECONDARY_MODEL: 0.025,
+        TERTIARY_MODEL: 0.003,
+    }.get(model, 0.0)
     receipt = {"at": datetime.now(timezone.utc).isoformat(), "category": "image",
                "provider": "Replicate", "model": model, "status": status,
                "estimated_usd": amount, "pricing_basis": "illustrative estimate only; check current Replicate pricing",
@@ -250,7 +256,7 @@ def generate_image_url(subject: str, theme: str = "", *, mode: str = "legacy") -
         return None
     _attempted_prompts.add(cache_key)
 
-    model_chain = (SECONDARY_MODEL, PRIMARY_MODEL) if mode == "replicate_flux" else ALLOWED_MODELS
+    model_chain = (SECONDARY_MODEL, TERTIARY_MODEL) if mode == "replicate_flux" else ALLOWED_MODELS
     for attempt_no, model in enumerate(model_chain, start=1):
         if attempt_no > MAX_MODEL_ATTEMPTS:
             break
@@ -269,7 +275,7 @@ def generate_image_url(subject: str, theme: str = "", *, mode: str = "legacy") -
         except Exception as exc:
             print(f"  ⚠️ approved image model error: {model} ({exc})")
 
-    print("  ℹ️ SDXL Turbo and FLUX Schnell both failed — trying the free fallback chain")
+    print("  ℹ️ SDXL Turbo, FLUX.1 [dev], and FLUX.1 Schnell failed — trying the free fallback chain")
     free = _free_image_fallback(subject, theme)
     _prompt_cache[cache_key] = free
     return free
