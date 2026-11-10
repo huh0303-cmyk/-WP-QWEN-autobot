@@ -1,26 +1,35 @@
 {
-  "version": 6,
+  "version": 7,
   "scope": [
-    "wordpress_27",
-    "blogger_33",
-    "tistory_5"
+    "wordpress",
+    "blogger",
+    "tistory",
+    "youtube_long_form",
+    "youtube_shorts"
   ],
   "provider": "replicate",
   "credential_secret": "REPLICATE_API_TOKEN",
-  "enabled_when_provider_credentials_exist": false,
+  "enabled_when_provider_credentials_exist": true,
   "model_priority": [
     {
       "priority": 1,
-      "model": "SDXL-Lightning 4-step",
-      "model_id": "bytedance/sdxl-lightning-4step",
-      "role": "primary",
-      "license_gate": "OpenRAIL++ and provider terms"
+      "model": "SDXL Turbo",
+      "model_id": "bytonylee/sdxl-turbo",
+      "role": "first paid fallback after matching stock",
+      "license_gate": "Verify current model and provider terms before generation"
     },
     {
       "priority": 2,
+      "model": "FLUX.1 [dev]",
+      "model_id": "black-forest-labs/flux-dev",
+      "role": "second paid fallback",
+      "license_gate": "FLUX.1 dev non-commercial weights license and Replicate commercial-use terms; confirm output commercial use per Replicate"
+    },
+    {
+      "priority": 3,
       "model": "FLUX.1 Schnell",
       "model_id": "black-forest-labs/flux-schnell",
-      "role": "single fallback",
+      "role": "third paid fallback",
       "license_gate": "Apache-2.0 or provider terms"
     }
   ],
@@ -28,7 +37,7 @@
     "require_article_or_video_topic_relevance": true,
     "allow_zero_images_when_all_candidates_fail": true,
     "images_per_article_min": 0,
-    "images_per_article_max": 2,
+    "images_per_article_max": 1,
     "free_stock_images_forbidden": false,
     "playlist_thumbnail_existing_frame_only": true,
     "thumbnail_video_generation_forbidden": true,
@@ -43,20 +52,25 @@
     "text_or_pseudo_text_detection_action": "REMOVE_IMAGE_AND_CONTINUE_TEXT_ONLY",
     "human_review_required_before_blogger_publication": true,
     "require_stock_subject_metadata_match": true,
-    "require_stock_self_hosting_and_credit": true
+    "require_stock_self_hosting_and_credit": true,
+    "one_output_per_paid_model_attempt": true,
+    "max_attempts_per_paid_model_per_content": 1,
+    "paid_generation_only_after_stock_miss": true,
+    "testing_limit": "One output per paid model; no automatic retries"
   },
   "failure_policy": {
     "fallback_order": [
       "Matching Pexels photo",
       "Matching Pixabay photo",
-      "SDXL-Lightning 4-step",
+      "SDXL Turbo",
+      "FLUX.1 [dev]",
       "FLUX.1 Schnell"
     ],
     "fallback_to_free_stock": false,
     "fallback_to_generic_image": false,
     "when_all_generation_models_fail": "PASS_AND_CONTINUE_WITH_ZERO_IMAGES"
   },
-  "notes": "2026-09-11 user instruction: article workflows use matching Pexels then Pixabay photos, self-host with source credits, then bounded SDXL/FLUX generation. Never use generic filler. Existing video generation cost hold remains in force.",
+  "notes": "2026-11-10 user directive: one shared stock-first and paid fallback policy for WordPress, Blogger/Blogspot, Tistory, YouTube long-form and Shorts. Pexels -> Pixabay -> SDXL Turbo -> FLUX.1 [dev] -> FLUX.1 Schnell. SDXL Lightning is excluded. One output and one attempt per paid model. Keep each workflow within its explicit image budget; never run paid generation tests more than once per model.",
   "stock_priority": [
     "Pexels",
     "Pixabay"
