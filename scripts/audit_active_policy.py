@@ -45,8 +45,12 @@ BANNED_DEPRECATED_CHANNEL_REFS = (
     "AMERICAN_ARCHIVE_TIMES",
 )
 YOUTUBE_IMAGE_WORKFLOWS = (
-    "cafe-healing-publish.yml",
     "youtube-github-worker.yml",
+    "topik-quiz-daily.yml",
+    "youtube-language-adjectives-daily.yml",
+    "youtube-health-shopping-daily.yml",
+    "seoul-journal-daily-shorts.yml",
+    "seoul-jisoo-daily-shorts.yml",
 )
 
 
