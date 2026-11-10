@@ -25,7 +25,7 @@ def test_all_blog_writers_are_gpt5_mini_or_gemini_and_images_try_free_stock_firs
     assert policy["image_generation"]["order"] == [
         "pexels",
         "pixabay",
-        "bytedance/sdxl-lightning-4step",
+        "bytonylee/sdxl-turbo",
         "black-forest-labs/flux-schnell",
         "pass_without_image",
     ]
@@ -50,7 +50,7 @@ def test_all_blog_writers_are_gpt5_mini_or_gemini_and_images_try_free_stock_firs
     image_policy = load_json("network_image_generation_policy.json")
     assert image_policy["provider"] == "replicate"
     assert [item["model_id"] for item in image_policy["model_priority"]] == [
-        "bytedance/sdxl-lightning-4step",
+        "bytonylee/sdxl-turbo",
         "black-forest-labs/flux-schnell",
     ]
 
