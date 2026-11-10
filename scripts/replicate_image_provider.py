@@ -199,63 +199,30 @@ def _cost_receipt(model, subject, status):
     print("image cost estimate: " + json.dumps(receipt))
 
 
-def _free_image_fallback(subject: str, theme: str = "") -> Optional[str]:
-    """All-free fallback: relaxed Pexels/Pixabay/Wikimedia (1:1 crop). No AI-image service (Pollinations removed 2026-10-10).
-    WordPress sideloads the returned URL into its media library. Never raises; no image is acceptable."""
-    global last_image_model
-    try:
-        if str(theme).upper().startswith("NEWS ILLUSTRATION ONLY"):
-            # Newsroom: never a stock photo that could be read as a photo of the event -> plain 1:1 topic card, hosted.
-            from image_guarantee import make_card_png
-            from stable_image_hosting import host_bytes
-            last_image_model = "GeneratedCard"
-            return host_bytes(make_card_png(subject), asset_key="news-" + hashlib.sha256(subject.encode("utf-8")).hexdigest()[:12])
-        import blogger_free_image as free
-        found = free.pick_image(subject, alternates=[theme], allow_paid_fallback=False)
-        if found:
-            last_image_model = found["provider"]
-            return found["url"]
-    except Exception as exc:
-        print(f"  ⚠️ free image fallback error: {type(exc).__name__}")
-    print("  ℹ️ no free image available — continue without an image")
-    return None
-
-
-def generate_image_url(subject: str, theme: str = "", *, mode: str = "legacy") -> Optional[str]:
-    """Use free stock first; paid generation requires an explicit mode."""
+def generate_image_url(subject: str, theme: str = "", *, mode: str = "auto") -> Optional[str]:
+    """Exactly four stages: Pexels -> Pixabay -> SDXL Turbo -> FLUX Schnell."""
     global last_image_model
     last_image_model = "none"
-    from stock_image_provider import find_stock_image
-    if mode not in {"legacy", "auto_free", "pexels", "pixabay", "none", "replicate_sdxl", "replicate_flux"}:
+    if mode == "none": return None
+    if mode not in {"auto", "legacy", "auto_free", "replicate_sdxl", "replicate_flux", "pexels", "pixabay"}:
         raise ValueError("unsupported image model")
-    if mode == "none":
-        return None
-    stock = find_stock_image(subject, theme, force=True,
-                             selected_provider=mode if mode in {"pexels", "pixabay"} else "auto")
+    from stock_image_provider import find_stock_image, METADATA
+    stock = find_stock_image(subject, theme, force=True, selected_provider="auto")
     if stock:
-        from stock_image_provider import METADATA
         last_image_model = (METADATA.get(stock) or {}).get("provider", "stock")
         return stock
-    if mode in {"pexels", "pixabay"}:
-        return None
     token = _token()
     if not token:
-        return _free_image_fallback(subject, theme)
-
-    prompt = build_editorial_prompt(subject, theme)
-    cache_key = hashlib.sha256((mode + ":" + prompt).encode("utf-8")).hexdigest()
-    if cache_key in _prompt_cache:
-        return _prompt_cache[cache_key]
-    if cache_key in _attempted_prompts:
+        print("REPLICATE_API_TOKEN missing; stages 3-4 skipped")
         return None
+    prompt = build_editorial_prompt(subject, theme)
+    cache_key = hashlib.sha256(("auto:" + prompt).encode("utf-8")).hexdigest()
+    if cache_key in _prompt_cache: return _prompt_cache[cache_key]
+    if cache_key in _attempted_prompts: return None
     _attempted_prompts.add(cache_key)
-
-    model_chain = ALLOWED_MODELS
-    for attempt_no, model in enumerate(model_chain, start=1):
-        if attempt_no > MAX_MODEL_ATTEMPTS:
-            break
+    for attempt_no, model in enumerate(ALLOWED_MODELS, 1):
         try:
-            print(f"  🖼️ Replicate approved image model {attempt_no}/{MAX_MODEL_ATTEMPTS}: {model}")
+            print(f"Replicate stage {attempt_no+2}/4: {model}")
             _cost_receipt(model, subject, "attempt_reserved")
             prediction = _await_prediction(_create_prediction(model, prompt, token), token)
             if prediction.get("status") == "succeeded":
@@ -264,15 +231,11 @@ def generate_image_url(subject: str, theme: str = "", *, mode: str = "legacy") -
                     last_image_model = model
                     _prompt_cache[cache_key] = url
                     return url
-            error = prediction.get("error") or prediction.get("status")
-            print(f"  ⚠️ approved image model failed: {model} ({error})")
         except Exception as exc:
-            print(f"  ⚠️ approved image model error: {model} ({exc})")
-
-    print("  ℹ️ SDXL Turbo and FLUX.1 Schnell failed — trying the free fallback chain")
-    free = _free_image_fallback(subject, theme)
-    _prompt_cache[cache_key] = free
-    return free
+            print(f"image stage failed: {model} ({type(exc).__name__})")
+    print("all four image stages failed; publish without image")
+    _prompt_cache[cache_key] = None
+    return None
 
 
 def generate_image_urls(subject: str, count: int = 1, theme: str = "") -> list[str]:
