@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 from scripts.economy_text import generate_text
 import gemini_text
 from scripts.kworld_weekly_affiliate_footer import replace as attach_weekly_footer
+from scripts.site_editorial_palette import style_editorial
 
 SITE="https://kworld365.com"
 AUTH=("huh0303@gmail.com",os.environ["KWORLD365COM"])
@@ -72,7 +73,7 @@ Write semantic HTML only: 1 introductory paragraph, 5-6 descriptive H2 sections 
                 if any(k in attrs for k in ("coupang","affiliate","seoul-mall","seoulmall")):
                     if not any(node in p.descendants for p in preserved):preserved.append(node)
             tail="".join(str(x) for x in preserved)
-            output=attach_weekly_footer(style(article)+tail)
+            output=attach_weekly_footer(style_editorial(article,SITE)+tail)
             if args.dry_run:
                 print("DRY_RUN",id,title,"chars",chars(article),flush=True)
                 continue
