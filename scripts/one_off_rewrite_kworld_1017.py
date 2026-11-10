@@ -47,7 +47,23 @@ assert not soup.find("img")
 old=BeautifulSoup(post["content"]["rendered"],"html.parser")
 heading=next((h for h in old.find_all(["h2","h3"]) if h.get_text(" ",strip=True).lower()=="get in touch"),None)
 tail=(str(heading)+"".join(str(x) for x in heading.next_siblings)) if heading else ""
-new_html=ARTICLE+tail
+# Scoped, lightweight inline styles survive WordPress theme CSS and keep mobile readable.
+for h in soup.find_all("h2"):
+    h["style"]="font-size:1.45rem;line-height:1.4;color:#17365d;border-left:5px solid #d9a441;padding:9px 14px;margin:32px 0 16px;background:#f4f7fb;font-weight:750"
+for h in soup.find_all("h3"):
+    h["style"]="font-size:1.12rem;line-height:1.5;color:#17365d;margin:20px 0 8px;font-weight:700"
+for p in soup.find_all("p"):
+    p["style"]="font-size:1.06rem;line-height:1.9;color:#293545;margin:0 0 19px"
+for i,h in enumerate(soup.find_all("h2")):
+    if "Frequently Asked Questions" in h.get_text():
+        h["style"]="font-size:1.5rem;color:#17365d;border-top:2px solid #d9a441;border-bottom:1px solid #dbe2e9;padding:15px 0;margin:36px 0 20px"
+        break
+first=soup.find("p")
+if first:
+    first["style"]="font-size:1.13rem;line-height:1.9;color:#18344e;background:#eef4f8;border-left:4px solid #d9a441;padding:20px 22px;margin:0 0 28px"
+wrapper=BeautifulSoup('<section class="kworld-editorial" style="max-width:780px;margin:0 auto;font-family:inherit"></section>',"html.parser")
+wrapper.section.append(soup)
+new_html=str(wrapper.section)+tail
 res=requests.post(f"{SITE}/wp-json/wp/v2/posts/{ID}",auth=auth,json={"content":new_html},timeout=40)
 res.raise_for_status()
 updated=res.json()
