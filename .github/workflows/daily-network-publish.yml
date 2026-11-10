@@ -39,7 +39,7 @@ on:
   workflow_dispatch:
     inputs:
       target_site_url:
-        description: "Optional exact WordPress target; blank runs all 25"
+        description: "Required exact WordPress target; blank is rejected for safety"
         required: false
         type: string
         default: ""
@@ -87,36 +87,38 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  select-sites:
+    runs-on: ubuntu-latest
+    outputs:
+      sites: ${{ steps.choose.outputs.sites }}
+    steps:
+      - name: Validate target and select exact site matrix
+        id: choose
+        env:
+          TARGET_SITE_URL: ${{ inputs.target_site_url }}
+        run: |
+          python - <<'PY'
+          import json, os
+          sites = ["k-health365.com","koreamedicaltour.com","koreainvest365.com","ki-korea.com","koreainsurance365.com","kfinance365.com","koreataxnlaw.com","koreacrypto365.com","krealestate365.com","ktech365.com","kskin365.com","oliveyoungkorea.com","kworld365.com","k-trip365.com","k-visa365.com","koreawedding365.com","kstudy365.com","studyinkorea365.com","kieca-korea.org","ksa-korea.org","jobkorea365.com","jobinkorea365.com","jobkoreaglobal.com","korea365.org"]
+          target = os.environ.get('TARGET_SITE_URL', '').strip().rstrip('/')
+          if target:
+              allowed = ['https://' + site for site in sites]
+              if target not in allowed:
+                  raise SystemExit('Unknown target_site_url: ' + target)
+              selected = [target.removeprefix('https://')]
+          else:
+              raise SystemExit('Explicit target_site_url is required for safe isolated publishing')
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write('sites=' + json.dumps(selected) + '\\n')
+          print('Selected matrix:', selected)
+          PY
   publish:
+    needs: select-sites
     strategy:
       fail-fast: false
-      max-parallel: 2
+      max-parallel: 1
       matrix:
-        site:
-          - k-health365.com
-          - koreamedicaltour.com
-          - koreainvest365.com
-          - ki-korea.com
-          - koreainsurance365.com
-          - kfinance365.com
-          - koreataxnlaw.com
-          - koreacrypto365.com
-          - krealestate365.com
-          - ktech365.com
-          - kskin365.com
-          - oliveyoungkorea.com
-          - kworld365.com
-          - k-trip365.com
-          - k-visa365.com
-          - koreawedding365.com
-          - kstudy365.com
-          - studyinkorea365.com
-          - kieca-korea.org
-          - ksa-korea.org
-          - jobkorea365.com
-          - jobinkorea365.com
-          - jobkoreaglobal.com
-          - korea365.org
+        site: ${{ fromJSON(needs.select-sites.outputs.sites) }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
