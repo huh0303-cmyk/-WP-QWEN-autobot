@@ -174,7 +174,7 @@ def test_combined_social_detail_uses_mobile_scrollable_table_not_cards():
 
 def test_london_agent_three_has_three_free_image_fallbacks():
     template = (ROOT / "control_center" / "templates" / "london_gpt.html").read_text(encoding="utf-8")
-    assert "A Pexels → B Pixabay → C Wikimedia" in template
+    assert "Pexels → Pixabay → SDXL Turbo → FLUX Schnell" in template
     assert 'value="wikimedia"' in template
     assert 'value="replicate_sdxl"' not in template
     assert 'value="replicate_flux"' not in template
