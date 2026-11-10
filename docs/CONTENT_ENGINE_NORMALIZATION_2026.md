@@ -7,10 +7,8 @@ Authority: `MASTER_MONETIZATION_STRATEGY_2026.md`.
 - Ordinary WordPress production is hard-routed to OpenAI/GPT and review draft.
   It has no Gemini prose fallback.
 - Blogger rewriting is hard-routed to Gemini and human-review draft.
-- Generated YouTube thumbnails use Replicate FLUX Schnell only.
-- Other generated images use the shared `REPLICATE_API_TOKEN` gateway and exactly:
-  `black-forest-labs/flux-schnell`, `bytedance/sdxl-lightning-4step`, then
-  `jyoung105/sdxl-turbo`.
+- Generated images across WordPress, Blogger, Tistory, YouTube videos and Shorts use one shared ordered gateway: Pexels → Pixabay → SDXL Turbo → FLUX.1 Schnell.
+- The only approved Replicate model IDs are `bytonylee/sdxl-turbo` and `black-forest-labs/flux-schnell`; each is attempted once with one output maximum. SDXL Lightning and FLUX.1 [dev] are excluded.
 
 ## Repairs in this pass
 
