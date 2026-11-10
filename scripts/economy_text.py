@@ -208,51 +208,10 @@ def _model_chain(choice: str) -> tuple[str, ...]:
     raise ValueError("unsupported writer model")
 
 
-def generate_text(prompt, temperature=0.7, force_gpt=False, repair=False, writer_model=None):
+def generate_text(prompt, temperature=0.7, force_gpt=False, repair=False, writer_model=None, language=None):
+    """Compatibility entrypoint: only the approved language-aware Gemini chain."""
     global last_writer_model
-    from urllib.parse import urlparse
-    target = urlparse(os.getenv("TARGET_SITE_URL", "")).hostname
-    if os.getenv("NEWSROOM_PAID_TEXT_APPROVED", "").lower() == "true" and target in {"koreanews365.com", "theseouljournal.com"}:
-        if os.getenv("OPENAI_MODEL", "") != "gpt-5-mini":
-            raise RuntimeError("Newsroom paid exception permits gpt-5-mini only")
-        import newsroom_provider_recovery as recovery
-        text = recovery.generate(prompt, temperature=temperature)
-        last_writer_model = recovery.last_model
-        return text
-
-    choice = writer_model or os.getenv("LONDON_WRITER_MODEL", "auto_free")
-    models = _model_chain(choice)
-    failures: list[str] = []
-    keys = _gemini_keys()
-    if not keys and models:
-        failures.append("gemini: no valid key (GEMINI_API_KEY*, >=20 chars)")
-    for model in models:
-        for key_id, key in keys:
-            if _parked("gemini", key_id, model):
-                continue
-            attempt_id = f"{model}@{key_id}"
-            if _article_attempts is not None:
-                if attempt_id in _article_attempts:
-                    continue
-                _article_attempts.add(attempt_id)
-            try:
-                text = _with_tries(attempt_id, lambda m=model, k=key: _try_gemini(prompt, temperature, m, k), failures,
-                                   on_error=lambda e, m=model, kid=key_id: _note_failure("gemini", kid, m, e))
-            except Exception as exc:  # never let one engine abort the chain
-                failures.append(f"{attempt_id}: {_failure_summary(exc)}")
-                text = None
-            if text:
-                return text
-
-    if os.getenv("LOCAL_TEXT_FALLBACK_ENABLED", "false").lower() in {"1", "true", "yes", "on"}:
-        try:
-            from local_text import local_generate_text
-            text = local_generate_text(prompt, temperature=temperature,
-                                       timeout=int(os.getenv("LOCAL_TEXT_TIMEOUT", "190")),
-                                       max_tokens=int(os.getenv("LOCAL_TEXT_MAX_TOKENS", "1800")))
-            last_writer_model = os.getenv("OLLAMA_MODEL", "qwen2.5:3b")
-            _record("ollama", last_writer_model)
-            return text
-        except Exception as exc:
-            failures.append(f"local: {_failure_summary(exc)}")
-    raise RuntimeError("WRITERS_EXHAUSTED: " + "; ".join(failures or ["no configured writer"]))
+    import gemini_text
+    result = gemini_text.gemini_generate_text(prompt, temperature=temperature, language=language)
+    last_writer_model = gemini_text.last_writer_model
+    return result
