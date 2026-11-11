@@ -33,12 +33,12 @@ def style(html):
 def get(url,**kwargs):
     r=requests.get(url,auth=AUTH,timeout=40,**kwargs);r.raise_for_status();return r.json()
 def clean_title(title):
-    title=re.sub(r"(?<!\\d)2026(?!\\d)","",title)
-    title=re.sub(r"\\s+([:;,.!?])",r"\\1",title)
-    title=re.sub(r"\\s{2,}"," ",title)
+    title=re.sub(r"(?<!\d)2026(?!\d)","",title)
+    title=re.sub(r"\s+([:;,.!?])",r"\1",title)
+    title=re.sub(r"\s{2,}"," ",title)
     return title.strip(" -–—:|,;")
 def title_key(t):
-    return re.sub(r"[^\\w]+", "", clean_title(t).casefold())
+    return re.sub(r"[^\w]+", "", clean_title(t).casefold())
 def image_bytes(url):
     r=requests.get(url,timeout=35,headers={"User-Agent":"Mozilla/5.0"})
     r.raise_for_status()
