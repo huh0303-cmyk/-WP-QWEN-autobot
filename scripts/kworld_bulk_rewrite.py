@@ -67,10 +67,21 @@ def main():
     for post in selection:
         id=post["id"]
         title=clean_title(plain(post["title"]["rendered"]))
-        if not title_key(title) or title_key(title) in used_titles:
-            failed.append({"id":id,"error":"Duplicate headline"})
-            print("FAILED",id,"Duplicate headline",flush=True)
+        if not title_key(title):
+            failed.append({"id":id,"error":"Empty headline"})
+            print("FAILED",id,"Empty headline",flush=True)
             continue
+        if title_key(title) in used_titles:
+            base=title
+            for suffix in (" — Editorial Analysis", " — Practical Guide", " — Industry Perspective", f" — Detailed Review {id}"):
+                candidate=base+suffix
+                if title_key(candidate) not in used_titles:
+                    title=candidate
+                    print("TITLE_DEDUPED",id,title,flush=True)
+                    break
+            else:
+                failed.append({"id":id,"error":"Unable to generate unique headline"})
+                continue
         original=post["content"].get("raw") or post["content"]["rendered"]
         backup={"id":id,"title":title,"content":original,"featured_media":post["featured_media"],"tags":post["tags"],"categories":post["categories"],"meta":post.get("meta",{})}
         (OUT/f"{id}-backup.json").write_text(json.dumps(backup,ensure_ascii=False,indent=2),encoding="utf-8")
