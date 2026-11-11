@@ -1577,10 +1577,17 @@ _used_news_ko: set = set()
 _used_news_en: set = set()
 _wp_title_cache: dict = {}
 
+def enforce_yearless_headline(title):
+    """London Project editorial rule: no standalone four-digit years in titles."""
+    title = re.sub(r"(?<!\\d)(?:19|20)\\d{2}(?!\\d)", "", str(title or ""))
+    title = re.sub(r"\\s+([,.:;!?])", r"\\1", title)
+    title = re.sub(r"\\s{2,}", " ", title)
+    return title.strip(" -–—:|,;")
+
 def _title_dup_key(t):
     # 완전히 똑같은 제목만 잡던 걸 앞 20자 기준 fuzzy 매칭으로 강화
     # (2026-08-03: 중복 제목 125건이 대부분 살짝 다른 표현이라 exact match로는 못 잡았음)
-    return re.sub(r'\s+', '', t[:20].lower())
+    return re.sub(r'\s+', '', enforce_yearless_headline(t)[:20].lower())
 
 def fetch_recent_wp_titles(site_url, wp_pass, count=None):
     if site_url in _wp_title_cache: return _wp_title_cache[site_url]
@@ -3690,6 +3697,7 @@ def process_one(site, keyword):
     # 2026-09-03: 700자 하한을 400자로 낮춤(CEO "속보중심" 방향 + 짧은 1차
     # 출처를 사실 날조 없이 억지로 부풀리다 매번 게이트 탈락하던 문제 해결).
     from automation_hub.rss_event import newsroom_article_ready
+    title = enforce_yearless_headline(title)
     newsroom_gate_ok = newsroom_article_ready(title, body, news_source, news_source_url)
     if mode in ("news", "news_en"):
         if not newsroom_gate_ok:
