@@ -57,13 +57,19 @@ def main():
     failed=[]
     selected_ids={p["id"] for p in selection}
     used_titles={title_key(plain(p["title"]["rendered"])) for p in items if p["id"] not in selected_ids}
-    used_media={p["featured_media"] for p in items if p.get("featured_media")}
+    # Retain unique existing featured images; only replace duplicated media.
+    media_owners={}
+    for existing in reversed(items):
+        mid=existing.get("featured_media") or 0
+        if mid:media_owners.setdefault(mid,[]).append(existing["id"])
+    duplicate_media={mid for mid,owners in media_owners.items() if len(owners)>1}
+    print("DUPLICATE_MEDIA_IDS",len(duplicate_media),flush=True)
     used_hashes=set()
-    for media_id in used_media:
+    for mid in duplicate_media:
         try:
-            media=get(f"{SITE}/wp-json/wp/v2/media/{media_id}")
+            media=get(f"{SITE}/wp-json/wp/v2/media/{mid}")
             used_hashes.add(image_bytes(media["source_url"])[0])
-        except Exception as exc:print("IMAGE_AUDIT_ERROR",media_id,str(exc)[:120],flush=True)
+        except Exception as exc:print("IMAGE_AUDIT_ERROR",mid,str(exc)[:120],flush=True)
     for post in selection:
         id=post["id"]
         title=clean_title(plain(post["title"]["rendered"]))
@@ -114,22 +120,28 @@ Write semantic HTML only: 1 introductory paragraph, 5-6 descriptive H2 sections 
             if args.dry_run:
                 print("DRY_RUN",id,title,"chars",chars(article),flush=True)
                 continue
-            image_id=0
-            for image_attempt in range(4):
-                url=generate_image_url(f"{title}, original K-pop editorial illustration, no lettering, variation {id}-{image_attempt}",theme="K-pop")
-                if not url:continue
-                digest,data,mime=image_bytes(url)
-                if digest in used_hashes:
-                    print("IMAGE_DUPLICATE_REJECTED",id,image_attempt,flush=True)
-                    continue
-                ext=".png" if "png" in mime else ".webp" if "webp" in mime else ".jpg"
-                uploaded=requests.post(f"{SITE}/wp-json/wp/v2/media",auth=AUTH,headers={"Content-Disposition":f'attachment; filename="kworld-{id}-{digest[:12]}{ext}"',"Content-Type":mime},data=data,timeout=60)
-                uploaded.raise_for_status()
-                image_id=uploaded.json()["id"]
-                requests.post(f"{SITE}/wp-json/wp/v2/media/{image_id}",auth=AUTH,json={"alt_text":title},timeout=20).raise_for_status()
-                used_hashes.add(digest)
-                break
-            if not image_id:raise ValueError("No unique image: publication blocked")
+            image_id=post.get("featured_media") or 0
+            needs_replacement=image_id in duplicate_media and post["id"]!=media_owners[image_id][0]
+            if needs_replacement:
+                print("DUPLICATE_IMAGE_REPLACE",id,image_id,flush=True)
+                image_id=0
+                for image_attempt in range(4):
+                    url=generate_image_url(f"{title}, original K-pop editorial illustration, no lettering, variation {id}-{image_attempt}",theme="K-pop")
+                    if not url:continue
+                    digest,data,mime=image_bytes(url)
+                    if digest in used_hashes:
+                        print("IMAGE_DUPLICATE_REJECTED",id,image_attempt,flush=True)
+                        continue
+                    ext=".png" if "png" in mime else ".webp" if "webp" in mime else ".jpg"
+                    uploaded=requests.post(f"{SITE}/wp-json/wp/v2/media",auth=AUTH,headers={"Content-Disposition":f'attachment; filename="kworld-{id}-{digest[:12]}{ext}"',"Content-Type":mime},data=data,timeout=60)
+                    uploaded.raise_for_status()
+                    image_id=uploaded.json()["id"]
+                    requests.post(f"{SITE}/wp-json/wp/v2/media/{image_id}",auth=AUTH,json={"alt_text":title},timeout=20).raise_for_status()
+                    used_hashes.add(digest)
+                    break
+                if not image_id:raise ValueError("Duplicate image replacement unavailable; this post skipped, other posts continue")
+            else:
+                print("IMAGE_PRESERVED",id,image_id,flush=True)
             response=requests.post(f"{SITE}/wp-json/wp/v2/posts/{id}",auth=AUTH,json={"content":output,"title":title,"featured_media":image_id},timeout=45)
             response.raise_for_status()
             updated=response.json()
