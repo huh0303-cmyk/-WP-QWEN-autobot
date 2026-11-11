@@ -1,5 +1,5 @@
 {
-  "checked_at_kst": "2026-11-10T13:13:26.281074+09:00",
+  "checked_at_kst": "2026-11-11T11:00:43.657980+09:00",
   "source": "YouTube Data API v3 public statistics",
   "confirmed_channels": 23,
   "connected_channels": 23,
@@ -88,16 +88,16 @@
       "name": "서울국제대학-TOPIK센터",
       "handle": "seoul_topik1",
       "subscribers": 5830,
-      "views": 413032,
-      "videos": 1334,
+      "views": 413089,
+      "videos": 1335,
       "connected": true
     },
     "UCrjkKWMHzAAvpLIFgHnwcWg": {
       "name": "English_SOS",
       "handle": "English_survival",
       "subscribers": 28,
-      "views": 14746,
-      "videos": 59,
+      "views": 14825,
+      "videos": 62,
       "connected": true
     },
     "UCOWoNH_d6p45ywQ6W0Z1Jng": {
@@ -105,7 +105,7 @@
       "handle": "seoul_japanese1",
       "subscribers": 23,
       "views": 12412,
-      "videos": 100,
+      "videos": 103,
       "connected": true
     },
     "UCGTd7RhfaUaGGbVRsNPUN6Q": {
@@ -113,7 +113,7 @@
       "handle": "SIS_ChineseSurvival",
       "subscribers": 17,
       "views": 2414,
-      "videos": 21,
+      "videos": 22,
       "connected": true
     },
     "UCKvKhETLGPaRV3qfWv2bM2g": {
@@ -121,15 +121,15 @@
       "handle": "Portuguese_survival",
       "subscribers": 6,
       "views": 1344,
-      "videos": 22,
+      "videos": 23,
       "connected": true
     },
     "UCRZ0uc_bxKDMwz3noBBi9KQ": {
       "name": "Vietnamese_SOS",
       "handle": "SIS_VietnameseSurvival",
       "subscribers": 3,
-      "views": 1207,
-      "videos": 21,
+      "views": 1219,
+      "videos": 22,
       "connected": true
     },
     "UC91BpNSb4nUwD6jrpthK7FQ": {
@@ -160,8 +160,8 @@
       "name": "French_SOS",
       "handle": "SIS_FrenchSurvival",
       "subscribers": 3,
-      "views": 659,
-      "videos": 22,
+      "views": 666,
+      "videos": 23,
       "connected": true
     },
     "UCKF98zgzm7YRWlyMaoJJKIQ": {
@@ -169,7 +169,7 @@
       "handle": "SIS_GermanSurvival",
       "subscribers": 8,
       "views": 1116,
-      "videos": 18,
+      "videos": 19,
       "connected": true
     },
     "UC9mvVEdL9Tllkit5v2Qv8UQ": {
@@ -185,7 +185,7 @@
       "handle": "SIS_ItalianSurvival",
       "subscribers": 3,
       "views": 854,
-      "videos": 18,
+      "videos": 19,
       "connected": true
     }
   }
