@@ -1,1 +1,1 @@
-{"day": "2026-11-11", "status": "DISPATCHED", "attempts": 1, "claim": "daily-2026-11-11-wp_korea365-ab669a5d", "claimed_at": "2026-11-11T10:53:33.689102+09:00", "run_id": 42942193198, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-11-11", "status": "PUBLISHED", "public_url": "https://korea365.org/semiconductor-giants-and-local-innovation-tracking-nvidia-operations-and-ecosystems-in-korea/", "published_at": "2026-11-11T01:56:23Z"}
