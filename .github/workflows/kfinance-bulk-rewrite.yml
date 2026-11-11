@@ -1,0 +1,44 @@
+name: Kfinance365 - rewrite existing posts
+on:
+  workflow_dispatch:
+    inputs:
+      start:
+        description: Start offset
+        required: true
+        default: '0'
+      limit:
+        description: Batch size
+        required: true
+        default: '10'
+permissions:
+  contents: read
+concurrency:
+  group: kfinance-existing-rewrite
+  cancel-in-progress: false
+jobs:
+  rewrite:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests beautifulsoup4
+      - name: Rewrite existing Kfinance posts
+        env:
+          PYTHONPATH: scripts:.
+          KFINANCE365COM: ${{ secrets.KFINANCE365COM }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_API_KEY_2: ${{ secrets.GEMINI_API_KEY_2 }}
+          GEMINI_API_KEY_3: ${{ secrets.GEMINI_API_KEY_3 }}
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+        run: python -m scripts.kfinance_bulk_rewrite --start ${{ inputs.start }} --limit ${{ inputs.limit }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: kfinance-rewrite-backups-${{ github.run_id }}
+          path: artifacts/kfinance-rewrites/
+          retention-days: 30
