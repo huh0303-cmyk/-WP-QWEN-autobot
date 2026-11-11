@@ -23,10 +23,13 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GEMINI_API_KEY_2: ${{ secrets.GEMINI_API_KEY_2 }}
           GEMINI_API_KEY_3: ${{ secrets.GEMINI_API_KEY_3 }}
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
         shell: bash
         run: |
           failures=0
-          for start in 13 23 33 43 53 63; do
+          for start in 10 20 30 40 50 60; do
             echo "::group::Kworld365 batch start=$start"
             python -m scripts.kworld_bulk_rewrite --start "$start" --limit 10 || failures=$((failures+1))
             echo "::endgroup::"
