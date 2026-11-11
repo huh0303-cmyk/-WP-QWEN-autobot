@@ -1,5 +1,5 @@
 """Rewrite Kworld365 existing posts in place, one at a time, with rollback backups."""
-import argparse,json,os,re,time
+import argparse,json,os,re,time,hashlib
 from pathlib import Path
 import requests
 from bs4 import BeautifulSoup
@@ -7,6 +7,7 @@ from scripts.economy_text import generate_text
 import gemini_text
 from scripts.kworld_weekly_affiliate_footer import replace as attach_weekly_footer
 from scripts.site_editorial_palette import style_editorial
+from scripts.replicate_image_provider import generate_image_url
 
 SITE="https://kworld365.com"
 AUTH=("huh0303@gmail.com",os.environ["KWORLD365COM"])
@@ -36,6 +37,13 @@ def clean_title(title):
     title=re.sub(r"\\s+([:;,.!?])",r"\\1",title)
     title=re.sub(r"\\s{2,}"," ",title)
     return title.strip(" -–—:|,;")
+def title_key(t):
+    return re.sub(r"[^\\w]+", "", clean_title(t).casefold())
+def image_bytes(url):
+    r=requests.get(url,timeout=35,headers={"User-Agent":"Mozilla/5.0"})
+    r.raise_for_status()
+    if len(r.content)<2048:raise ValueError("Invalid image")
+    return hashlib.sha256(r.content).hexdigest(),r.content,r.headers.get("Content-Type","image/jpeg").split(";")[0]
 def main():
     parser=argparse.ArgumentParser()
     parser.add_argument("--start",type=int,default=0)
@@ -47,9 +55,22 @@ def main():
     selection=items[args.start:args.start+args.limit]
     print("SELECTED",len(selection),"TOTAL",len(items),flush=True)
     failed=[]
+    selected_ids={p["id"] for p in selection}
+    used_titles={title_key(plain(p["title"]["rendered"])) for p in items if p["id"] not in selected_ids}
+    used_media={p["featured_media"] for p in items if p.get("featured_media")}
+    used_hashes=set()
+    for media_id in used_media:
+        try:
+            media=get(f"{SITE}/wp-json/wp/v2/media/{media_id}")
+            used_hashes.add(image_bytes(media["source_url"])[0])
+        except Exception as exc:print("IMAGE_AUDIT_ERROR",media_id,str(exc)[:120],flush=True)
     for post in selection:
         id=post["id"]
         title=clean_title(plain(post["title"]["rendered"]))
+        if not title_key(title) or title_key(title) in used_titles:
+            failed.append({"id":id,"error":"Duplicate headline"})
+            print("FAILED",id,"Duplicate headline",flush=True)
+            continue
         original=post["content"].get("raw") or post["content"]["rendered"]
         backup={"id":id,"title":title,"content":original,"featured_media":post["featured_media"],"tags":post["tags"],"categories":post["categories"],"meta":post.get("meta",{})}
         (OUT/f"{id}-backup.json").write_text(json.dumps(backup,ensure_ascii=False,indent=2),encoding="utf-8")
@@ -82,11 +103,28 @@ Write semantic HTML only: 1 introductory paragraph, 5-6 descriptive H2 sections 
             if args.dry_run:
                 print("DRY_RUN",id,title,"chars",chars(article),flush=True)
                 continue
-            response=requests.post(f"{SITE}/wp-json/wp/v2/posts/{id}",auth=AUTH,json={"content":output,"title":title},timeout=45)
+            image_id=0
+            for image_attempt in range(4):
+                url=generate_image_url(f"{title}, original K-pop editorial illustration, no lettering, variation {id}-{image_attempt}",theme="K-pop")
+                if not url:continue
+                digest,data,mime=image_bytes(url)
+                if digest in used_hashes:
+                    print("IMAGE_DUPLICATE_REJECTED",id,image_attempt,flush=True)
+                    continue
+                ext=".png" if "png" in mime else ".webp" if "webp" in mime else ".jpg"
+                uploaded=requests.post(f"{SITE}/wp-json/wp/v2/media",auth=AUTH,headers={"Content-Disposition":f'attachment; filename="kworld-{id}-{digest[:12]}{ext}"',"Content-Type":mime},data=data,timeout=60)
+                uploaded.raise_for_status()
+                image_id=uploaded.json()["id"]
+                requests.post(f"{SITE}/wp-json/wp/v2/media/{image_id}",auth=AUTH,json={"alt_text":title},timeout=20).raise_for_status()
+                used_hashes.add(digest)
+                break
+            if not image_id:raise ValueError("No unique image: publication blocked")
+            response=requests.post(f"{SITE}/wp-json/wp/v2/posts/{id}",auth=AUTH,json={"content":output,"title":title,"featured_media":image_id},timeout=45)
             response.raise_for_status()
             updated=response.json()
-            if updated["id"]!=id or updated["featured_media"]!=post["featured_media"] or updated["tags"]!=post["tags"] or updated["categories"]!=post["categories"]:
+            if updated["id"]!=id or updated["featured_media"]!=image_id or updated["tags"]!=post["tags"] or updated["categories"]!=post["categories"]:
                 raise RuntimeError("Post metadata changed unexpectedly")
+            used_titles.add(title_key(title))
             print("UPDATED",id,updated["link"],"chars",chars(article),flush=True)
             (OUT/f"{id}-result.json").write_text(json.dumps({"id":id,"url":updated["link"],"chars":chars(article),"model":gemini_text.last_writer_model},ensure_ascii=False),encoding="utf-8")
         except Exception as e:
