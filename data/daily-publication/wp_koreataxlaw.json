@@ -1,1 +1,1 @@
-{"day": "2026-11-11", "status": "CLAIMED", "attempts": 1, "claim": "daily-2026-11-11-wp_koreataxlaw-e75a8c20", "claimed_at": "2026-11-11T18:16:50.435379+09:00", "run_id": null, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-11-11", "status": "DISPATCHED", "attempts": 1, "claim": "daily-2026-11-11-wp_koreataxlaw-e75a8c20", "claimed_at": "2026-11-11T18:16:50.435379+09:00", "run_id": 42993877078, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
