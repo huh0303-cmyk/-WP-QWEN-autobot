@@ -87,6 +87,13 @@ def validate(manifest, root, demo=False):
                 raise ValueError("missing image/audio")
             if not shot.get("source_url") or not shot.get("rights_basis"):
                 raise ValueError("source URL and item-specific rights basis required")
+            if not demo:
+                if shot.get("event_date") not in [e.get("date") for e in events]:
+                    raise ValueError("scene event_date must match one of the verified events")
+                if not shot.get("visible_content") or not shot.get("narration_excerpt"):
+                    raise ValueError("visible content and narration-to-visual mapping are required")
+                if "example.org" in shot["source_url"]:
+                    raise ValueError("placeholder source URLs are not accepted")
             digest = hashlib.sha256(image.read_bytes()).hexdigest()
             if digest in seen:
                 raise ValueError("duplicate still image")
@@ -178,8 +185,8 @@ def render(manifest, root, out, demo=False):
             frames = math.ceil(seconds * FPS)
             target = Path(tmp) / f"clip-{i:03}.mp4"
             # Each still gently moves; motion alternates per shot.
-            zoom = "min(zoom+0.0007,1.15)" if i % 2 == 0 else "max(zoom-0.0007,1.0)"
-            initial = "1.0" if i % 2 == 0 else "1.15"
+            zoom = ("min(zoom+0.0007,1.15)" if i % 2 == 0
+                    else "if(eq(on,0),1.15,max(zoom-0.0007,1.0))")
             filt = (f"scale={w*2}:{h*2}:force_original_aspect_ratio=increase,"
                     f"crop={w*2}:{h*2},"
                     f"zoompan=z='{zoom}':x='(iw-iw/zoom)/2':y='(ih-ih/zoom)/2':"
