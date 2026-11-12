@@ -171,14 +171,14 @@ def ensure_not_duplicate(svc,uploads,day,category):
 def upload(video,news,category,svc):
     from googleapiclient.http import MediaFileUpload
     day=dt.datetime.now(KST).strftime("%Y%m%d"); tag=f"[SJ-{category.upper()}-{day}]"
-    body={"snippet":{"title":(news["title"][:75]+" #Shorts "+tag)[:100],"description":"출처: "+news["source"]+"\n원문: "+news["link"]+"\n\n서울지수 자체 제작 카드뉴스입니다.\n"+AD_DISCLOSURE+"\n"+"\n".join(f"{k}: {v}" for k,v in affiliate_urls()),"categoryId":"25" if category in ("politics","society") else "17","defaultLanguage":"ko","tags":["서울지수","카드뉴스",category,"Shorts"]},"status":{"privacyStatus":"public","selfDeclaredMadeForKids":False}}
+    body={"snippet":{"title":(news["title"][:75]+" #Shorts "+tag)[:100],"description":"출처: "+news["source"]+"\n원문: "+news["link"]+"\n\n서울지수 자체 제작 카드뉴스입니다.\n"+AD_DISCLOSURE+"\n"+"\n".join(f"{k}: {v}" for k,v in affiliate_urls()),"categoryId":"25" if category in ("politics","society") else "17","defaultLanguage":"ko","tags":["서울지수","카드뉴스",category,"Shorts"]},"status":{"privacyStatus":"private","selfDeclaredMadeForKids":False}}
     req=svc.videos().insert(part="snippet,status",body=body,media_body=MediaFileUpload(str(video),mimetype="video/mp4",resumable=True,chunksize=8*1024*1024)); result=None
     while result is None: _,result=req.next_chunk()
     vid=result.get("id")
     if not vid: raise RuntimeError("YouTube did not return a video ID")
     check=svc.videos().list(part="snippet,status",id=vid).execute().get("items",[])
-    if len(check)!=1 or check[0]["snippet"]["channelId"]!=CHANNEL_ID or check[0]["status"]["privacyStatus"]!="public": raise RuntimeError("Upload verification failed; do not retry blindly")
-    return {"video_id":vid,"url":"https://www.youtube.com/shorts/"+vid,"privacy":"public","category":category}
+    if len(check)!=1 or check[0]["snippet"]["channelId"]!=CHANNEL_ID or check[0]["status"]["privacyStatus"]!="private": raise RuntimeError("Upload verification failed; do not retry blindly")
+    return {"video_id":vid,"url":"https://www.youtube.com/shorts/"+vid,"privacy":"private","category":category}
 
 def main():
     ap=argparse.ArgumentParser(); ap.add_argument("--category",choices=tuple(FEEDS),required=True); ap.add_argument("--upload",action="store_true"); ap.add_argument("--outdir",default="artifacts/seoul-jisoo-shorts"); args=ap.parse_args()
