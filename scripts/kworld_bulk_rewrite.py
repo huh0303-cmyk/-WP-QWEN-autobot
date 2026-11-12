@@ -88,7 +88,7 @@ def main():
             continue
         if title_key(title) in used_titles:
             base=title
-            for suffix in (" — Editorial Analysis", " — Practical Guide", " — Industry Perspective", f" — Detailed Review {id}"):
+            for suffix in (f" — {post.get('slug', 'topic').replace('-', ' ').title()}",):
                 candidate=base+suffix
                 if title_key(candidate) not in used_titles:
                     title=candidate
@@ -101,9 +101,9 @@ def main():
         backup={"id":id,"title":title,"content":original,"featured_media":post["featured_media"],"tags":post["tags"],"categories":post["categories"],"meta":post.get("meta",{})}
         (OUT/f"{id}-backup.json").write_text(json.dumps(backup,ensure_ascii=False,indent=2),encoding="utf-8")
         # Do not use unsupported factual claims in old post as new facts.
-        prompt=f"""Create a fresh, original, useful English editorial article for a K-pop website, retaining this exact topic/title: {title}. Never include 2026 in the headline.
+        prompt=f"""Create a fresh, original, useful English editorial article for a K-pop website, retaining this exact topic/title: {title}. Never include any four-digit year in the headline. Avoid generic AI-sounding title formulas such as Official Guide, Ultimate Guide, Complete Guide, Guidelines, Strategic Scheduling, Comprehensive Guide or Editorial Analysis. Use a specific, distinctive reader-focused headline.
 The original article may contain incorrect or outdated claims. Do not treat it as a verified source. Do not invent announcements, confirmed tour dates, quotes, statistics, award results, tickets, or agency decisions. If the title implies unverified news, clearly distinguish the claim from verified general context and tell readers to check primary sources. Do not imply you independently researched sources.
-Write semantic HTML only: 1 introductory paragraph, 5-6 descriptive H2 sections with useful detailed paragraphs, then H2 Frequently Asked Questions with 4 H3 questions and short factual answers. No H1, no images, no footers, no product ads, no markdown fences. Vary the prose naturally and make each section distinct. Aim for 3800 characters WITHOUT whitespace (including FAQ), strict acceptable range 2500-5000. Prioritize real reader utility over keyword stuffing."""
+Write semantic HTML only: 1 introductory paragraph, 5-6 descriptive H2 sections with useful detailed paragraphs, then H2 Frequently Asked Questions with 4 H3 questions and short factual answers. No H1, no images, no footers, no product ads, no markdown fences. Vary the prose naturally and make each section distinct. Aim for 3000 characters WITHOUT whitespace (including FAQ), strict acceptable range 2500-3500. Prioritize real reader utility over keyword stuffing."""
         try:
             article=None
             for attempt in range(3):
@@ -113,7 +113,7 @@ Write semantic HTML only: 1 introductory paragraph, 5-6 descriptive H2 sections 
                 h2=soup.find_all("h2");h3=soup.find_all("h3")
                 n=chars(generated)
                 print("DRAFT",id,"attempt",attempt+1,"chars",n,"h2",len(h2),"h3",len(h3),"model",gemini_text.last_writer_model,flush=True)
-                if 2500<=n<=5000 and len(h2)>=5 and len(h3)>=4 and any("frequently asked" in h.get_text().lower() for h in h2):
+                if 2500<=n<=3500 and len(h2)>=5 and len(h3)>=4 and any("frequently asked" in h.get_text().lower() for h in h2):
                     article=generated;break
                 prompt+=f" Previous output had {n} nonwhitespace characters, {len(h2)} H2 and {len(h3)} H3. Rewrite completely to meet all limits."
             if article is None:raise ValueError("Editorial quality gate failed")
