@@ -102,7 +102,7 @@ def draft(title, body):
     raise RuntimeError(f"Could not generate a sufficiently long fact-grounded narration after 3 attempts: {last_error}")
 
 
-EDGE_VOICES = [("ko-KR-SunHiNeural","female_news"),("ko-KR-JiMinNeural","female_documentary"),("ko-KR-HyunsuNeural","male_news"),("ko-KR-InJoonNeural","male_documentary")]
+EDGE_VOICES = [("ko-KR-HyunsuNeural","male_deep"),("ko-KR-InJoonNeural","male_documentary"),("ko-KR-BongJinNeural","male_anchor"),("ko-KR-SunHiNeural","female_anchor"),("ko-KR-JiMinNeural","female_documentary"),("ko-KR-SeoHyeonNeural","female_news")]
 
 def tts(text):
     """Free-only narration: Fish Audio S2.1 Pro Free first, then Edge TTS.
@@ -209,10 +209,10 @@ def _cover_frame(headline,photo,style,index):
     draw.text((58,43),style["badge"],font=_font(42),fill=(255,255,255),stroke_width=1,stroke_fill=(0,0,0))
     draw.text((W-425,48),"SEOUL JOURNAL",font=_font(30),fill=(255,255,255))
     # Center-safe copy: large, high-contrast Korean title over translucent panel.
-    panel_top,panel_bottom=635,1270
-    draw.rounded_rectangle((38,panel_top,W-38,panel_bottom),radius=26,fill=(*style["bg"],220),outline=(*style["accent"],255),width=6)
-    words=textwrap.wrap(headline,width=9,break_long_words=True,replace_whitespace=False)[:3]
-    title_font=_font(100 if len(words)<=2 else 84)
+    panel_top,panel_bottom=900,1040
+    
+    words=[" ".join(headline.split()[:3])[:16]]
+    title_font=_font(56)
     line_heights=[]
     for line in words:
         box=draw.textbbox((0,0),line,font=title_font,stroke_width=2)
