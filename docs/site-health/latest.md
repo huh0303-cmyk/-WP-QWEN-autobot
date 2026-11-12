@@ -1,4 +1,4 @@
-# 사이트 건강도 리포트 (2026-11-10 12:36 KST)
+# 사이트 건강도 리포트 (2026-11-12 11:17 KST)
 
 - 점검 57곳 · 정상 35 · 경고 19 · 심각 3
 - 자동수정 모드: ON
@@ -31,8 +31,9 @@
   - 자동수정: {'indexnow_ping': False}
 - **https://ktech365.com** (wordpress): warn:robots_no_sitemap_line
   - 자동수정: {'indexnow_ping': False}
-- **https://oliveyoungkorea.com** (wordpress): warn:robots_no_sitemap_line
+- **https://oliveyoungkorea.com** (wordpress): warn:robots_no_sitemap_line, warn:duplicate_titles_1groups
   - 자동수정: {'indexnow_ping': False}
+  - 수동 필요: 중복 제목 그룹 검토 후 대표 1개만 공개(비공개 전환은 승인 후)
 - **https://kworld365.com** (wordpress): warn:robots_no_sitemap_line
   - 자동수정: {'indexnow_ping': False}
 - **https://k-visa365.com** (wordpress): warn:robots_no_sitemap_line
@@ -50,12 +51,13 @@
   - 자동수정: {'indexnow_ping': False}
 - **https://jobkorea365.com** (wordpress): warn:robots_no_sitemap_line
   - 자동수정: {'indexnow_ping': False}
-- **https://jobinkorea365.com** (wordpress): warn:robots_no_sitemap_line, warn:stale_9d
+- **https://jobinkorea365.com** (wordpress): warn:robots_no_sitemap_line, warn:stale_11d
   - 자동수정: {'indexnow_ping': False}
 - **https://jobkoreaglobal.com** (wordpress): warn:duplicate_titles_2groups
   - 자동수정: {'indexnow_ping': False}
   - 수동 필요: 중복 제목 그룹 검토 후 대표 1개만 공개(비공개 전환은 승인 후)
-- **https://korea365.org** (wordpress): warn:robots_no_sitemap_line, warn:duplicate_titles_1groups
+- **https://korea365.org** (wordpress): warn:robots_no_sitemap_line, warn:duplicate_titles_1groups, warn:overdue_scheduled_1
+  - 자동수정: {'published_overdue_scheduled': 1}
   - 자동수정: {'indexnow_ping': False}
   - 수동 필요: 중복 제목 그룹 검토 후 대표 1개만 공개(비공개 전환은 승인 후)
 - **https://koreanews365.com** (newsroom): warn:robots_no_sitemap_line, warn:zero_impressions_28d
@@ -65,23 +67,24 @@
 
 - https://koreacrypto365.com: wp-admin > Site Kit > 설정에서 Google 계정으로 재연결(자동 불가: 구글 로그인 필요)
 - https://kskin365.com: wp-admin > Site Kit > 설정에서 Google 계정으로 재연결(자동 불가: 구글 로그인 필요)
+- https://oliveyoungkorea.com: 중복 제목 그룹 검토 후 대표 1개만 공개(비공개 전환은 승인 후)
 - https://studyinkorea365.com: 중복 제목 그룹 검토 후 대표 1개만 공개(비공개 전환은 승인 후)
 - https://jobkoreaglobal.com: 중복 제목 그룹 검토 후 대표 1개만 공개(비공개 전환은 승인 후)
 - https://korea365.org: 중복 제목 그룹 검토 후 대표 1개만 공개(비공개 전환은 승인 후)
 
 ## 최근 28일 검색 클릭 상위
 
-- https://korea365.org: 클릭 15 / 노출 817
-- https://koreainsurance365.com: 클릭 6 / 노출 525
-- https://koreawedding365.com: 클릭 5 / 노출 401
-- https://jobkoreaglobal.com: 클릭 5 / 노출 385
-- https://kieca-korea.org: 클릭 2 / 노출 50
-- https://jobinkorea365.com: 클릭 2 / 노출 186
-- https://koreataxnlaw.com: 클릭 1 / 노출 88
-- https://oliveyoungkorea.com: 클릭 1 / 노출 573
-- https://kworld365.com: 클릭 1 / 노출 121
+- https://korea365.org: 클릭 16 / 노출 804
+- https://koreainsurance365.com: 클릭 6 / 노출 528
+- https://koreawedding365.com: 클릭 4 / 노출 400
+- https://jobkoreaglobal.com: 클릭 4 / 노출 397
+- https://kieca-korea.org: 클릭 2 / 노출 51
+- https://koreataxnlaw.com: 클릭 1 / 노출 91
+- https://oliveyoungkorea.com: 클릭 1 / 노출 597
+- https://kworld365.com: 클릭 1 / 노출 136
+- https://jobinkorea365.com: 클릭 1 / 노출 170
 - https://k-health365.com: 클릭 0 / 노출 10
 
 ## 주간 추이 (최근 7일 vs 직전 7일, 전체 사이트 합계)
 
-- 클릭 7 (직전 13) · 노출 678 (직전 1079)
+- 클릭 6 (직전 11) · 노출 626 (직전 1009)
