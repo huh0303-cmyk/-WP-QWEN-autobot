@@ -10,7 +10,6 @@ jobs:
     with:
       target_site_url: 'https://kstudy365.com'
       publication_approved: true
-      room_id: 'manual-kstudy365-com'
       image_count: '1'
       image_policy: 'auto_free'
     secrets: inherit

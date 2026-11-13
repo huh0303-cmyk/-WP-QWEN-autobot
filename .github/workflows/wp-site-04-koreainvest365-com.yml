@@ -10,7 +10,6 @@ jobs:
     with:
       target_site_url: 'https://koreainvest365.com'
       publication_approved: true
-      room_id: 'manual-koreainvest365-com'
       image_count: '1'
       image_policy: 'auto_free'
     secrets: inherit
