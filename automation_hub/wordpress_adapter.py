@@ -6,9 +6,9 @@ import os
 from .registry import SiteRegistry
 
 # Global WordPress editorial length policy: characters including spaces.
-WP_MIN_CHARS = 2800
-WP_TARGET_CHARS = 3500
-WP_MAX_CHARS = 4200
+WP_MIN_CHARS = 2500
+WP_TARGET_CHARS = 3000
+WP_MAX_CHARS = 3500
 
 
 def apply_wordpress_registry(
@@ -56,7 +56,7 @@ def apply_wordpress_registry(
         persona = deepcopy(personas.get(current["url"], {}))
         persona["persona_ko" if site.language == "ko" else "persona_en"] = site.persona
         persona["tone"] = site.tone
-        persona["min_chars"] = WP_TARGET_CHARS
+        persona["min_chars"] = WP_MIN_CHARS
         persona["max_chars"] = WP_MAX_CHARS
         personas[current["url"]] = persona
 
