@@ -3595,8 +3595,8 @@ def process_one(site, keyword):
     if url.rstrip("/").lower() == "https://kworld365.com":
         from automation_hub.repetition_guard import plain as _plain_article
         _length = len(re.sub(r"\\s+", "", _plain_article(body)))
-        if not 2500 <= _length <= 3000:
-            print(f"KWORLD_LENGTH_BLOCKED: {_length} characters; required 2500-3000")
+        if not 2500 <= _length <= 3500:
+            print(f"KWORLD_LENGTH_BLOCKED: {_length} characters; required 2500-3500")
             log(url, theme, keyword, title, "", 0, 0, "skip_kworld_length", str(_length))
             return False
     newsroom_len=newsroom_char_count(body)
