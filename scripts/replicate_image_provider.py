@@ -199,6 +199,15 @@ def _cost_receipt(model, subject, status):
     print("image cost estimate: " + json.dumps(receipt))
 
 
+def _site_safe_image(url):
+    """Shared WordPress pre-publish guard; never attach unchecked photos."""
+    site = os.getenv("WP_SITE_URL") or os.getenv("WORDPRESS_SITE_URL") or ""
+    if not site or not url:
+        return url
+    from editorial_image_guard import filter_wp_images
+    return url if filter_wp_images(site, [url]) else None
+
+
 def generate_image_url(subject: str, theme: str = "", *, mode: str = "auto") -> Optional[str]:
     """Exactly four stages: randomized free pair -> SDXL Turbo -> FLUX Schnell."""
     global last_image_model
@@ -210,7 +219,7 @@ def generate_image_url(subject: str, theme: str = "", *, mode: str = "auto") -> 
     import random
     for free_source in random.sample(("pexels", "pixabay"), 2):
         stock = find_stock_image(subject, theme, force=True, selected_provider=free_source)
-        if stock:
+        if stock and _site_safe_image(stock):
             last_image_model = (METADATA.get(stock) or {}).get("provider", free_source)
             return stock
     stock = None
@@ -233,7 +242,7 @@ def generate_image_url(subject: str, theme: str = "", *, mode: str = "auto") -> 
             prediction = _await_prediction(_create_prediction(model, prompt, token), token)
             if prediction.get("status") == "succeeded":
                 url = _first_output_url(prediction.get("output"))
-                if url:
+                if url and _site_safe_image(url):
                     last_image_model = model
                     _prompt_cache[cache_key] = url
                     return url
