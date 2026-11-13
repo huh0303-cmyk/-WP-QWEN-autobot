@@ -7,11 +7,38 @@ import os
 from pathlib import Path
 import re
 import time
+from datetime import datetime, timezone
 from urllib.parse import urlparse
 import requests
 
 CACHE = Path(os.getenv("STOCK_IMAGE_CACHE_DIR", "data/stock_image_cache"))
 METADATA = {}
+# Persist this file across CI runs (artifact/cache or repository commit) for cross-run protection.
+USAGE_LEDGER = Path(os.getenv("STOCK_IMAGE_USAGE_LEDGER", "data/stock_image_usage.json"))
+
+def _recent_image_ids(days=7):
+    try:
+        data = json.loads(USAGE_LEDGER.read_text(encoding="utf-8"))
+        cutoff = time.time() - days * 86400
+        return {str(x["key"]) for x in data if float(x.get("at", 0)) >= cutoff}
+    except (OSError, ValueError, TypeError, KeyError):
+        return set()
+
+def _record_image_id(key):
+    try:
+        data = json.loads(USAGE_LEDGER.read_text(encoding="utf-8"))
+        if not isinstance(data, list):
+            data = []
+    except (OSError, ValueError):
+        data = []
+    cutoff = time.time() - 7 * 86400
+    data = [x for x in data if isinstance(x, dict) and float(x.get("at", 0)) >= cutoff]
+    data.append({"key": key, "at": time.time()})
+    USAGE_LEDGER.parent.mkdir(parents=True, exist_ok=True)
+    temp = USAGE_LEDGER.with_suffix(".tmp")
+    temp.write_text(json.dumps(data), encoding="utf-8")
+    temp.replace(USAGE_LEDGER)
+
 STOP = set("a an the of in on at for and with photo photograph image scene editorial realistic beautiful natural lighting composition close up view illustration about related".split())
 SENSITIVE = re.compile(r"\b(war|strike|attack|casualty|cancer|disease|patient|diagnosis|crime|arrest)\b|전쟁|공습|환자|질병|범죄", re.I)
 
@@ -131,10 +158,14 @@ def find_stock_image(subject, theme="", *, force=False, selected_provider="auto"
                             continue
                         if not matches(q, item["description"]):
                             continue
+                        image_key = f"{provider.lower()}:{item['id']}"
+                        if image_key in _recent_image_ids():
+                            continue
                         from stable_image_hosting import host_permanently  # also centre-crops to 1:1
                         stable = host_permanently(item["url"], asset_key=f"stock-{provider.lower()}-{item['id']}")
                         metadata = {**item, "provider": provider, "license": item.get("license") or license_url,
                                     "query": q, "estimated_image_cost_usd": 0, "hosted_url": stable}
+                        _record_image_id(image_key)
                         METADATA[stable] = metadata
                         receipt = Path("artifacts/stock-image-receipts.jsonl")
                         receipt.parent.mkdir(parents=True, exist_ok=True)
