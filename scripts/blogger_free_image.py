@@ -130,51 +130,27 @@ _pixabay.accepts_exclude = True
 
 
 def pick_image(query: str, alternates=(), *, allow_paid_fallback: bool = True):
-    """Return {url, alt-ready desc, provider} or None.
-    Fixed stock order: Pexels, then Pixabay.
-    Within each stock source, try the specific query before its topic alternates."""
-    queries = []
-    for q in [query, *alternates]:
-        q = " ".join(str(q or "").split())[:100]
-        if _words(q) and q not in queries:
-            queries.append(q)
+    """Use the shared randomized four-provider gateway; permanently host the result."""
+    from replicate_image_provider import generate_image_url
+    import replicate_image_provider as gateway
+    from stable_image_hosting import host_permanently
+    queries = [q for q in (query, *alternates) if _words(str(q or ""))]
     if not queries:
         return None
-    exclude = used_photo_ids()
-    for fn in (_pexels, _pixabay):
-        found = None
-        for q in queries:
-            try:
-                found = fn(q, exclude)
-            except Exception as exc:  # never log request URLs (keys)
-                print(f"image source unavailable: {fn.__name__} ({type(exc).__name__})")
-                break
-            if found:
-                break
-        if not found:
-            continue
+    # The shared gateway randomizes all four engines and logs the actual winner.
+    for q in queries:
         try:
-            from stable_image_hosting import host_permanently
-            found["url"] = host_permanently(found["url"], asset_key=f"blogger-{found['provider'].lower()}-{found['id']}", folder="blogger_images")
-        except Exception as exc:
-            print(f"image hosting unavailable: {found['provider']} ({type(exc).__name__})")
-            continue
-        print(f"image selected: {found['provider']} {found['id']}")
-        return found
-
-    if not allow_paid_fallback:
-        return None
-    try:
-        from replicate_image_provider import generate_image_url, last_image_model
-        generated = generate_image_url(query, theme="Blogger article", mode="replicate_sdxl")
-        if generated:
-            from stable_image_hosting import host_permanently
-            hosted = host_permanently(generated, asset_key="blogger-replicate-" + re.sub(r"[^a-z0-9]+", "-", query.lower())[:60], folder="blogger_images")
+            source_url = generate_image_url(q, theme="Blogger article", mode="auto")
+            if not source_url:
+                continue
+            provider = gateway.last_image_model
+            asset_key = "blogger-" + re.sub(r"[^a-z0-9]+", "-", q.lower())[:45] + "-" + __import__("hashlib").sha256(source_url.encode()).hexdigest()[:12]
+            hosted = host_permanently(source_url, asset_key=asset_key, folder="blogger_images")
             if hosted:
-                print(f"image selected: {last_image_model}")
-                return {"url": hosted, "provider": last_image_model or "Replicate", "id": "generated", "desc": query}
-    except Exception as exc:
-        print(f"image generation unavailable: {type(exc).__name__}")
+                print(f"image_engine_used={provider};hosted=true")
+                return {"url": hosted, "provider": provider, "id": asset_key, "desc": q}
+        except Exception as exc:
+            print(f"image_engine_error={type(exc).__name__}")
     return None
 
 
