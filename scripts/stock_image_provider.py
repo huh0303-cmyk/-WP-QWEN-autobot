@@ -134,7 +134,8 @@ def find_stock_image(subject, theme="", *, force=False, selected_provider="auto"
                         # 1:1 crop makes orientation irrelevant; only require a usable short side.
                         if min(item["width"], item["height"]) < 800:
                             continue
-                        if not matches(q, item["description"]):
+                        # A shortened search query must never relax the original topic match.
+                        if not matches(query, item["description"]):
                             continue
                         from stable_image_hosting import host_permanently  # also centre-crops to 1:1
                         stable = host_permanently(item["url"], asset_key=f"stock-{provider.lower()}-{item['id']}")
