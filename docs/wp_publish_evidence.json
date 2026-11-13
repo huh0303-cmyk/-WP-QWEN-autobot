@@ -1,0 +1,21 @@
+{
+    "sites":  {
+                  "kfinance365.com":  {
+                                          "published_url":  "https://kfinance365.com/macroeconomic-debt-totals-and-retail-credit-conditions-personal-finance-decisions-for-resident-foreign-workers/",
+                                          "groups":  [
+                                                         "success",
+                                                         "success",
+                                                         "success",
+                                                         "unknown"
+                                                     ],
+                                          "error":  "",
+                                          "rank_math_score":  null,
+                                          "topic_keyword":  "trillion won",
+                                          "text_engine":  "gemini-3.6-flash",
+                                          "image_engine":  "Pexels / Pixabay / SDXL Turbo / FLUX Schnell: all failed; published without image",
+                                          "run_id":  43383357184,
+                                          "image_count":  0,
+                                          "run_status":  "success (SEO score not verified)"
+                                      }
+              }
+}
