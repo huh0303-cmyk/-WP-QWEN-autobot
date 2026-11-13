@@ -156,7 +156,7 @@ function cadenceFor(r){
  return '설정 미수집';
 }
 function publishElapsedFor(r){
- var v=r.latest_publish_date||r.recent_publish_date||r.published_at||r.last_publish_at;
+ var key=String(r.site||'').split('://').pop().split('/')[0].toLowerCase();var live=(window.WP_VERIFIED_PUBLISH_DATES||{})[key];var v=r.latest_publish_date||r.recent_publish_date||r.published_at||r.last_publish_at;if(live&&(!v||Date.parse(live)>Date.parse(v)))v=live;
  if(!v)return '<span class="na">⚪ 미확인</span>';
  var t=Date.parse(String(v));if(!Number.isFinite(t))return '<span class="na">⚪ 미확인</span>';
  var hours=Math.max(0,(Date.now()-t)/3600000),days=Math.floor(hours/24)+1;
@@ -470,7 +470,7 @@ function refreshWpRuns(){
   var groups=status==='completed'?(conclusion==='success'?['success','success','success','unknown']:['failed','unknown','unknown','unknown']):['running','unknown','unknown','unknown'];
   sites[site]={groups:groups,run_url:run.html_url,run_status:conclusion||status,run_id:run.id};
  });
- window.WP_LIVE_RUNS=sites;
+ window.WP_LIVE_RUNS=sites;window.WP_VERIFIED_PUBLISH_DATES=window.WP_VERIFIED_PUBLISH_DATES||{};runs.forEach(function(run){var m=String(run.display_title||'').match(/(?:https?:\/\/)?([a-z0-9-]+\.(?:com|org|net))/i);if(!m||run.status!=='completed'||run.conclusion!=='success')return;var site=m[1].toLowerCase(),at=run.updated_at||run.created_at;if(!at)return;var old=window.WP_VERIFIED_PUBLISH_DATES[site];if(!old||Date.parse(at)>Date.parse(old))window.WP_VERIFIED_PUBLISH_DATES[site]=at;});if(typeof draw==='function')draw();
  document.querySelectorAll('.wp-ops-detail').forEach(function(row){var btn=row.previousElementSibling&&row.previousElementSibling.querySelector('.wp-ops-expand');if(btn){var c=row.querySelector('td');if(c)c.innerHTML=panel(btn.dataset.site)}});
  }).catch(function(e){window.WP_LIVE_ERROR=e.message});
 }
