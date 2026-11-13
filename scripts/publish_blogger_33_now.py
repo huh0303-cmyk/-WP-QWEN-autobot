@@ -160,6 +160,13 @@ def main() -> int:
     token = access_token()
     headers = {"Authorization": f"Bearer {token}"}
     sites = load_sites()
+    # Fail fast before 33 costly AI generations if the mandatory approved
+    # affiliate catalog is expired. Never extend its validity artificially.
+    from automation_hub.coupang_partners import select_products
+    try:
+        select_products("Korean beauty and health", "Korean beauty health products", sites[0]["key"], limit=10)
+    except Exception as exc:
+        raise SystemExit(f"BLOGGER_PREFLIGHT_AFFILIATE_BLOCKED: {exc}") from exc
     requested_site = os.environ.get("BLOGGER_SITE_KEY", "").strip()
     if requested_site:
         sites = [site for site in sites if site["key"] == requested_site]
