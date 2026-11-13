@@ -4,6 +4,7 @@ from functools import lru_cache
 from io import BytesIO
 import hashlib
 from urllib.parse import urlparse
+from datetime import datetime, timedelta, timezone
 from bs4 import BeautifulSoup
 import requests
 from PIL import Image, ImageOps, ImageStat
@@ -39,10 +40,26 @@ def image_fingerprint(url):
 
 
 def recent_posts(site, auth=None):
-    r=requests.get(site.rstrip('/')+'/wp-json/wp/v2/posts',auth=auth,params={"per_page":100,"status":"publish","_embed":"wp:featuredmedia","_fields":"id,content,featured_media,_embedded"},timeout=30)
-    r.raise_for_status()
-    return r.json()
-
+    """Fetch ALL published posts within the last seven days, not just page one."""
+    cutoff = datetime.now(timezone.utc) - timedelta(days=7)
+    posts = []
+    for page in range(1, 101):
+        r = requests.get(site.rstrip('/') + '/wp-json/wp/v2/posts', auth=auth,
+            params={"per_page": 100, "page": page, "status": "publish",
+                    "after": cutoff.isoformat(), "_embed": "wp:featuredmedia",
+                    "_fields": "id,date,content,featured_media,_embedded"}, timeout=30)
+        if r.status_code == 400 and page > 1:
+            break
+        r.raise_for_status()
+        batch = r.json()
+        if not isinstance(batch, list):
+            raise ValueError("Unexpected WordPress post response")
+        posts.extend(batch)
+        if len(batch) < 100:
+            break
+    else:
+        raise RuntimeError("Recent post scan exceeded safety page limit")
+    return posts
 
 def photo_url(post):
     return next((m.get("source_url","") for m in post.get("_embedded",{}).get("wp:featuredmedia",[]) if isinstance(m,dict)),"")
