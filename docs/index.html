@@ -475,6 +475,6 @@ function refreshWpRuns(){
  }).catch(function(e){window.WP_LIVE_ERROR=e.message});
 }
 fetch('wp_publish_evidence.json?'+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw Error('not available');return r.json()}).then(function(d){window.WP_PUBLISH_EVIDENCE=d.sites||{}}).catch(function(){window.WP_PUBLISH_EVIDENCE={}}).finally(refreshWpRuns);
-setInterval(refreshWpRuns,30000);return r.json()}).then(function(d){window.WP_PUBLISH_EVIDENCE=d.sites||{}}).catch(function(){window.WP_PUBLISH_EVIDENCE={}});
+setInterval(refreshWpRuns,30000);
 })();
 </script></body></html>
