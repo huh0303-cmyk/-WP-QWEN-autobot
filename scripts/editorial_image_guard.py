@@ -1,4 +1,4 @@
-"""Compare photo content, not URLs, before a WP hero can be reused."""
+﻿"""Compare photo content, not URLs, before a WP hero can be reused."""
 from concurrent.futures import ThreadPoolExecutor
 from functools import lru_cache
 from io import BytesIO
@@ -40,8 +40,8 @@ def image_fingerprint(url):
 
 
 def recent_posts(site, auth=None):
-    """Fetch ALL published posts within the last seven days, not just page one."""
-    cutoff = datetime.now(timezone.utc) - timedelta(days=7)
+    """Fetch ALL published posts within the last fifteen days, not just page one."""
+    cutoff = datetime.now(timezone.utc) - timedelta(days=15)
     posts = []
     for page in range(1, 101):
         r = requests.get(site.rstrip('/') + '/wp-json/wp/v2/posts', auth=auth,
@@ -167,3 +167,4 @@ def strip_title_duplicate_lead_image(content, title):
             return content[:leading_ws] + source[match.end():].lstrip()
         return content
     return content
+
