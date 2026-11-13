@@ -60,7 +60,7 @@ with t1:
 with t2:
  if not st.session_state.pkg: st.info("먼저 기사·대본 탭에서 대본을 생성하세요.")
  else:
-  st.caption("세로형 영상 · 음성 속도 1.2배. 자동 자막 타이밍은 추정치이므로 반드시 검수하세요.")
+  st.caption("세로형 영상 · 음성 속도 1.2배 · 중앙 대형 자막(불투명 박스 없음). 자막 타이밍은 추정치이므로 반드시 검수하세요.")
   if st.button("음성·자막·영상 만들기",type="primary"):
    try:
     pkg=st.session_state.pkg; st.session_state.stage="영상 제작 중"
@@ -76,7 +76,7 @@ with t2:
       end=cur+duration*len(s)/total; rows.append(f"{i}\n{stamp(cur)} --> {stamp(end)}\n{s}\n"); cur=end
      srt=OUT/"captions.srt"; srt.write_text("\n".join(rows),encoding="utf-8")
      video=OUT/"seoul-journal-captioned.mp4"; ffmpeg=os.getenv("FFMPEG_BINARY","ffmpeg")
-     cmd=[ffmpeg,"-y","-i",str(base),"-vf",f"subtitles={srt.as_posix()}:force_style='FontName=Noto Sans CJK KR,FontSize=18,PrimaryColour=&H00FFFFFF,OutlineColour=&H00000000,BorderStyle=3,Outline=2,Alignment=2,MarginV=180'","-c:v","libx264","-preset","veryfast","-c:a","copy","-movflags","+faststart",str(video)]
+     cmd=[ffmpeg,"-y","-i",str(base),"-vf",f"subtitles={srt.as_posix()}:force_style='FontName=Noto Sans CJK KR,FontSize=46,PrimaryColour=&H00FFFFFF,OutlineColour=&H00000000,BorderStyle=1,Outline=3,Shadow=0,Alignment=5,MarginV=0'","-c:v","libx264","-preset","veryfast","-c:a","copy","-movflags","+faststart",str(video)]
      rr=subprocess.run(cmd,capture_output=True,text=True,timeout=300)
      if rr.returncode: raise RuntimeError("자막 렌더링 실패. FFmpeg libass/fonts 설치 확인: "+rr.stderr[-700:])
      if not video.exists() or video.stat().st_size<100000: raise RuntimeError("영상 파일 검증 실패")
