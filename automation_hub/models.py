@@ -36,9 +36,9 @@ class SiteConfig:
     min_gap_minutes: int = 30
     allowed_hours: list[int] = field(default_factory=lambda: list(range(24)))
     content_profile: str = "option_1"
-    min_chars: int = 2800
-    target_chars: int = 3500
-    max_chars: int = 4200
+    min_chars: int = 1800
+    target_chars: int = 2400
+    max_chars: int = 3200
     persona: str = ""
     tone: str = ""
     category_mode: str = "existing_only"
