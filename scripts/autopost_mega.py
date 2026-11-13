@@ -3689,6 +3689,13 @@ def process_one(site, keyword):
     score=None
 
     plain_len=newsroom_char_count(body) if mode in ("news", "news_en") else len(re.sub(r'<[^>]+>','',body).replace(' ','').replace('\n',''))
+    # Global WP publish gate: visible article text, excluding HTML and whitespace.
+    _wp_visible_chars = len(re.sub(r"\\s+", "", BeautifulSoup(body, "html.parser").get_text(" ", strip=True)))
+    print(f"WP_ARTICLE_LENGTH site={url} chars={_wp_visible_chars} required=2500-3500")
+    if not (2500 <= _wp_visible_chars <= 3500):
+        log(url, theme, keyword, title, "", 0, 0, "skip_wp_length", str(_wp_visible_chars))
+        print(f"WP_LENGTH_BLOCKED: {_wp_visible_chars}; regeneration required before publication")
+        return False
     ilinks=len(re.findall(r'<a\s+href=["\']https?://',body,re.IGNORECASE))
     tb=len(re.findall(r'<table[\s>]',body,re.IGNORECASE))
     print(f"     본문:{plain_len}자 | 링크:{ilinks} | TABLE:{tb} | META:{len(meta)}자")
