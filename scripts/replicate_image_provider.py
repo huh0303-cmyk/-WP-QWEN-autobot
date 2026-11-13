@@ -189,7 +189,11 @@ def _cost_receipt(model, subject, status):
     amount = 0.0014 if model == PRIMARY_MODEL else 0.003
     receipt = {"at": datetime.now(timezone.utc).isoformat(), "category": "image",
                "provider": "Replicate", "model": model, "status": status,
-               "estimated_usd": amount, "pricing_basis": "2026-09-11 public rate; SDXL runtime varies",
+               "estimated_usd": amount if status == 'generation_succeeded' else 0.0,
+               "reference_unit_price_usd": amount,
+               "actual_billed_usd": None,
+               "billing_verification": "not_available_from_prediction",
+               "pricing_basis": "historical reference only; verify actual invoice and runtime", 
                "subject_hash": hashlib.sha256(subject.encode()).hexdigest()[:16]}
     path = Path("artifacts/image-cost-estimates.jsonl")
     try:
@@ -263,12 +267,15 @@ def generate_image_url(subject: str, theme: str = "", *, mode: str = "legacy") -
             if prediction.get("status") == "succeeded":
                 url = _first_output_url(prediction.get("output"))
                 if url:
+                    _cost_receipt(model, subject, 'generation_succeeded')
                     last_image_model = model
                     _prompt_cache[cache_key] = url
                     return url
+            _cost_receipt(model, subject, 'generation_failed')
             error = prediction.get("error") or prediction.get("status")
             print(f"  ⚠️ approved image model failed: {model} ({error})")
         except Exception as exc:
+            _cost_receipt(model, subject, 'request_failed')
             print(f"  ⚠️ approved image model error: {model} ({exc})")
 
     print("  ℹ️ SDXL Lightning and FLUX Schnell both failed — trying the free fallback chain")
