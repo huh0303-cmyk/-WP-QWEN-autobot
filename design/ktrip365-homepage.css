@@ -1,0 +1,20 @@
+/* K-Trip365 GeneratePress: paste into Appearance > Customize > Additional CSS.
+   Front page: one full-width lead card, then responsive three-column cards. */
+body.home {background:#f5f8f7;color:#172d2a}
+body.home .site-content{max-width:1280px;margin:auto}
+body.home .content-area{width:100%;float:none}
+body.home .widget-area{display:none}
+body.home .site-main{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;background:transparent}
+body.home .site-main>article{margin:0;min-width:0;padding:0;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 8px 28px rgba(12,51,43,.08)}
+body.home .site-main>article:first-of-type{grid-column:1/-1}
+body.home .site-main>article .inside-article{padding:20px}
+body.home .site-main>article:first-of-type .inside-article{padding:28px}
+body.home .site-main .post-image img,body.home .site-main .featured-image img{width:100%;height:220px;object-fit:cover;display:block}
+body.home .site-main>article:first-of-type .post-image img,body.home .site-main>article:first-of-type .featured-image img{height:420px}
+body.home .entry-title{font-size:clamp(19px,2vw,25px);line-height:1.3;font-weight:700}
+body.home .site-main>article:first-of-type .entry-title{font-size:clamp(26px,3vw,38px)}
+body.home .entry-meta{font-size:12px;color:#657875}
+body.home .entry-summary{font-size:15px;line-height:1.7}
+body.home .site-main>.paging-navigation{grid-column:1/-1}
+@media(max-width:980px){body.home .site-main{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:640px){body.home .site-main{grid-template-columns:1fr;gap:16px}body.home .site-main>article:first-of-type .post-image img,body.home .site-main>article:first-of-type .featured-image img{height:260px}}
