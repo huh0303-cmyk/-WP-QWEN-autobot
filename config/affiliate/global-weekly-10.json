@@ -5,8 +5,8 @@
   "timezone": "Asia/Seoul",
   "lock_window": {
     "starts_at": "2026-11-05T00:00:00+09:00",
-    "ends_at": "2026-11-12T00:00:00+09:00",
-    "duration_hours": 168
+    "ends_at": "2026-11-19T00:00:00+09:00",
+    "duration_hours": 336
   },
   "status": "weekly_catalog_ready_global_rollout_approved",
   "source_of_truth": true,
@@ -52,7 +52,7 @@
     "shared_landing_page": "One weekly shelf page with 10 cards and all tracked URLs; all social profile links point to the same current weekly shelf"
   },
   "governance": {
-    "weekly_review": "Every 168 hours, replace the complete set of ten Coupang products with the next verified weekly set. Keep the three partner company logos and their affiliate tracking destinations unchanged.",
+    "weekly_review": "Owner-approved extension: retain the existing ten products until 2026-11-19 00:00 KST; thereafter rotate every 168 hours only with a separately verified set of 5 beauty and 5 health offers.",
     "no_auto_rotation": false,
     "rollback": "Keep previous dated set immutable",
     "disclosure_required": true,
@@ -211,7 +211,7 @@
     "publishing_rule": "Per-platform publishing still requires verified destination identity, required OAuth scopes and platform-supported placements."
   },
   "rotation_policy": {
-    "next_rotation_due": "2026-11-12T00:00:00+09:00",
+    "next_rotation_due": "2026-11-19T00:00:00+09:00",
     "cadence_hours": 168,
     "owner_directive_priority": true,
     "required_mix": {
@@ -219,5 +219,12 @@
       "health_functional_foods": 5
     },
     "next_set_status": "pending_verified_account_generated_products"
+  },
+  "extension": {
+    "approved_by": "owner",
+    "approved_on": "2026-11-14",
+    "extended_from": "2026-11-12T00:00:00+09:00",
+    "extended_until": "2026-11-19T00:00:00+09:00",
+    "reason": "Use existing approved products for one more week"
   }
 }
