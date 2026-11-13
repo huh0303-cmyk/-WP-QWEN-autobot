@@ -1,0 +1,38 @@
+name: "Blogger 33 Nov 6+ duplicate image cleanup"
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "true audits only; false removes duplicate images and verifies"
+        required: true
+        default: "true"
+      since_date:
+        required: true
+        default: "2026-11-06"
+permissions:
+  contents: read
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    environment: blogger
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests beautifulsoup4 -q
+      - name: Audit and remove duplicate images, retaining article text
+        env:
+          DRY_RUN: ${{ inputs.dry_run }}
+          SINCE_DATE: ${{ inputs.since_date }}
+          BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID || secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET || secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN || secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+        run: python scripts/cleanup_blogger_duplicate_images_since.py
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: blogger-duplicate-cleanup-${{ github.run_id }}
+          path: artifacts/blogger-duplicate-image-cleanup.json
+          if-no-files-found: warn
