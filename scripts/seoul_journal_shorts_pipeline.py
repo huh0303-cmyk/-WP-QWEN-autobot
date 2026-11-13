@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Build one source-grounded Seoul Journal political Short and upload PRIVATE only."""
-import os, re, json, textwrap, subprocess, sys, random
+import os, re, json, textwrap, subprocess, sys, random, hashlib
 from pathlib import Path
 from urllib.parse import urljoin, urlparse
 import requests, trafilatura
@@ -231,21 +231,81 @@ def _cover_frame(headline,photo,style,index):
     draw.text((55,1693),"핵심 발언  ·  반박  ·  확인된 사실",font=_font(31),fill=(255,255,255))
     return base.convert("RGB")
 
-def render(headline,photo,audio):
-    style=random.choice(SHORT_STYLES)
-    # Save five distinct reusable cover examples to the run artifact; select one at random.
-    for idx,template in enumerate(SHORT_STYLES,1):
-        preview=_cover_frame(headline,photo,template,idx)
-        preview.save(OUT/f"thumbnail-template-{idx:02d}.jpg",quality=93)
-    cover=_cover_frame(headline,photo,style,SHORT_STYLES.index(style)+1)
-    still=OUT/"cover.jpg"; cover.save(still,quality=94)
-    (OUT/"template.txt").write_text(style["name"],encoding="utf-8")
-    ffmpeg=os.getenv("FFMPEG_BINARY","ffmpeg")
-    video=OUT/"seoul-journal-short.mp4"
-    cmd=[ffmpeg,"-y","-loop","1","-i",str(still),"-i",str(audio),"-vf","scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,format=yuv420p","-c:v","libx264","-preset","medium","-tune","stillimage","-af","atempo=1.2","-c:a","aac","-b:a","192k","-shortest","-movflags","+faststart",str(video)]
-    p=subprocess.run(cmd,capture_output=True,text=True,timeout=240)
-    if p.returncode: raise RuntimeError("FFmpeg 렌더링 실패: "+p.stderr[-1200:])
+def render(headline, photo, audio, photos=None):
+    """Render rotating real source images; never loop a single still for a full Short."""
+    candidates = list(photos or ([] if photo is None else [photo]))
+    unique = []
+    hashes = set()
+    for candidate in candidates:
+        if not candidate or not Path(candidate).is_file():
+            continue
+        with Image.open(candidate) as im:
+            digest = hashlib.sha256(im.convert("RGB").resize((64, 64)).tobytes()).hexdigest()
+        if digest not in hashes:
+            unique.append(Path(candidate)); hashes.add(digest)
+    if len(unique) < 5:
+        raise RuntimeError(f"Visual quality gate: {len(unique)}/5 distinct photos; private upload blocked to prevent single-image video")
+    style = random.choice(SHORT_STYLES)
+    for idx, template in enumerate(SHORT_STYLES, 1):
+        _cover_frame(headline, unique[0], template, idx).save(OUT/f"thumbnail-template-{idx:02d}.jpg", quality=93)
+    _cover_frame(headline, unique[0], style, 1).save(OUT/"cover.jpg", quality=94)
+    (OUT/"template.txt").write_text(style["name"], encoding="utf-8")
+    ffmpeg = os.getenv("FFMPEG_BINARY", "ffmpeg")
+    probe = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", str(audio)], capture_output=True, text=True, check=True)
+    duration = float(probe.stdout.strip()) / 1.2
+    segment = max(2.5, duration / len(unique))
+    frames = []
+    for idx, source in enumerate(unique):
+        frame = OUT/f"scene-{idx:02d}.jpg"
+        _cover_frame(headline, source, style, idx+1).save(frame, quality=92)
+        frames.append(frame)
+    cmd = [ffmpeg, "-y"]
+    for frame in frames:
+        cmd += ["-loop", "1", "-t", str(segment), "-i", str(frame)]
+    cmd += ["-i", str(audio)]
+    inputs = "".join(f"[{i}:v]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1,format=yuv420p[v{i}];" for i in range(len(frames)))
+    inputs += "".join(f"[v{i}]" for i in range(len(frames))) + f"concat=n={len(frames)}:v=1:a=0[outv]"
+    video = OUT/"seoul-journal-short.mp4"
+    cmd += ["-filter_complex", inputs, "-map", "[outv]", "-map", f"{len(frames)}:a", "-c:v", "libx264", "-preset", "medium", "-af", "atempo=1.2", "-c:a", "aac", "-shortest", "-movflags", "+faststart", str(video)]
+    result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+    if result.returncode:
+        raise RuntimeError("FFmpeg multi-scene render failed: " + result.stderr[-1200:])
     return video
+
+
+def fetch_article_photos(url, lead_url):
+    """Use only actual images from the cited article, deduplicated by pixel hash."""
+    response = requests.get(url, headers=UA, timeout=25)
+    response.raise_for_status()
+    soup = BeautifulSoup(response.text, "html.parser")
+    urls = [lead_url] if lead_url else []
+    for im in soup.select("#dic_area img, #newsct_article img, article img"):
+        source = im.get("data-src") or im.get("data-lazy-src") or im.get("src")
+        if source and not source.startswith("data:"):
+            urls.append(urljoin(url, source))
+    photos = []
+    hashes = set()
+    for image_url in dict.fromkeys(urls):
+        if len(photos) >= 12:
+            break
+        try:
+            r = requests.get(image_url, headers=UA, timeout=15)
+            r.raise_for_status()
+            from io import BytesIO
+            im = Image.open(BytesIO(r.content)).convert("RGB")
+            if min(im.size) < 220:
+                continue
+            digest = hashlib.sha256(im.resize((64, 64)).tobytes()).hexdigest()
+            if digest in hashes:
+                continue
+            hashes.add(digest)
+            target = OUT/f"source-photo-{len(photos):02d}.jpg"
+            im.save(target, quality=90)
+            photos.append(target)
+        except Exception as exc:
+            log(f"Photo fetch skipped: {type(exc).__name__}")
+    log(f"DISTINCT_ARTICLE_PHOTOS: {len(photos)}")
+    return photos
 
 def upload_private(video,meta,source_url):
     client_id=os.getenv("YOUTUBE_OAUTH_CLIENT_ID","").strip()
@@ -328,8 +388,8 @@ def main():
     (OUT/"narration.txt").write_text(meta["narration"],encoding="utf-8")
     log("SCRIPT_READY: "+meta["youtube_title"])
     audio=tts(meta["narration"])
-    photo=fetch_photo(img)
-    video=render(meta["headline"],photo,audio)
+    photos=fetch_article_photos(url,img)
+    video=render(meta["headline"],photos[0] if photos else None,audio,photos=photos)
     log("VIDEO_RENDERED: "+str(video))
     result=upload_private(video,meta,url)
     (OUT/"upload_receipt.json").write_text(json.dumps(result,ensure_ascii=False,indent=2),encoding="utf-8")
