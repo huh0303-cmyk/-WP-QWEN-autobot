@@ -3161,7 +3161,17 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
     if url.rstrip("/").lower() == "https://k-health365.com":
         from scripts.khealth365_sitewide_coupang_10 import load_products as load_khealth_fixed_products
         load_khealth_fixed_products()
-    final = apply_footer(final, title, site.get("site_id", url), site.get("lang", "ko"))
+    try:
+        final = apply_footer(final, title, site.get("site_id", url), site.get("lang", "ko"))
+    except RuntimeError as exc:
+        # Finance is an editorial-first category: expired commercial catalog
+        # must not prevent a verified financial article from being published.
+        if url.rstrip("/").lower() == "https://kfinance365.com" and (
+            "outside its 168-hour lock window" in str(exc)
+        ):
+            print("Affiliate weekly catalog expired: omit product footer for Kfinance365 only")
+        else:
+            raise
     # Append the SeoulMall store CTA once, after editorial and affiliate sections.
     if url.rstrip("/").lower() == "https://k-visa365.com":
         from automation_hub.seoulmall_widget import append_widget
