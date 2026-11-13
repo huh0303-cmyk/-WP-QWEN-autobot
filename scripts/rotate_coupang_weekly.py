@@ -5,6 +5,7 @@ Never fabricate affiliate links or extend expired offers automatically.
 """
 import json
 import os
+import random
 from datetime import datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -21,6 +22,33 @@ if now < end:
 if not candidate_path.exists():
     raise SystemExit("ROTATION_BLOCKED: missing independently verified next-weekly-10-verified.json")
 next_set = json.loads(candidate_path.read_text(encoding="utf-8"))
+# SeoulMall storefront export must contain verified popularity ranks.
+# Weighted sampling favors popular products while varying each weekly set.
+if next_set.get("source") != "seoulmall_verified_popularity_export":
+    raise SystemExit("ROTATION_BLOCKED: require a verified SeoulMall popularity export")
+if next_set.get("storefront_url") not in (
+    "https://influencers.coupang.com/s/seoulmall",
+    "https://influencers.coupang.com/s/seoulshop",
+):
+    raise SystemExit("ROTATION_BLOCKED: unknown SeoulMall storefront URL")
+pool = next_set.get("items", [])
+if len(pool) < 10:
+    raise SystemExit("ROTATION_BLOCKED: fewer than 10 ranked products")
+seed = now.strftime("%Y-%m-%d") + ":" + current["set_id"]
+rng = random.Random(seed)
+selected = []
+for category in ("k_beauty_skincare", "health_functional_foods"):
+    eligible = [x for x in pool if x.get("category") == category
+                and isinstance(x.get("popularity_rank"), int)
+                and x["popularity_rank"] > 0]
+    if len(eligible) < 5:
+        raise SystemExit(f"ROTATION_BLOCKED: fewer than 5 ranked SeoulMall products in {category}")
+    for _ in range(5):
+        weights = [1.0 / (x["popularity_rank"] ** 0.7) for x in eligible]
+        pick = rng.choices(eligible, weights=weights, k=1)[0]
+        selected.append(pick)
+        eligible.remove(pick)
+next_set["items"] = selected
 if next_set.get("owner_approved") is not True or next_set.get("source_of_truth") is not True:
     raise SystemExit("ROTATION_BLOCKED: next set not approved")
 items = next_set.get("items", [])
@@ -41,7 +69,7 @@ if len(items) != 10 or counts != {"k_beauty_skincare": 5, "health_functional_foo
 archive = ROOT / "config/affiliate/archive"
 archive.mkdir(parents=True, exist_ok=True)
 (archive / (current["set_id"] + ".json")).write_text(json.dumps(current, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-current["items"] = items
+current["items"] = [{k: v for k, v in x.items() if k != "popularity_rank"} for x in items]
 current["set_id"] = "global-week-" + now.strftime("%Y-%m-%d")
 current["lock_window"] = {"starts_at": now.isoformat(), "ends_at": (now + timedelta(days=7)).isoformat(), "duration_hours": 168}
 current["rotation_policy"]["next_rotation_due"] = current["lock_window"]["ends_at"]
