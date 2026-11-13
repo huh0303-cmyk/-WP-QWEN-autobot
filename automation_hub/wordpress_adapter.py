@@ -5,6 +5,11 @@ import os
 
 from .registry import SiteRegistry
 
+# Global WordPress editorial length policy: characters including spaces.
+WP_MIN_CHARS = 2800
+WP_TARGET_CHARS = 3500
+WP_MAX_CHARS = 4200
+
 
 def apply_wordpress_registry(
     legacy_sites: list[dict],
@@ -37,9 +42,9 @@ def apply_wordpress_registry(
             automation_site_id=site.site_id,
             content_profile=site.content_profile,
             publish_mode=site.publish_mode,
-            min_chars=site.min_chars,
-            target_chars=site.target_chars,
-            max_chars=site.max_chars,
+            min_chars=WP_MIN_CHARS,
+            target_chars=WP_TARGET_CHARS,
+            max_chars=WP_MAX_CHARS,
             default_category=site.default_category,
             image_mode=site.image_mode,
             no_image=site.image_mode == "none" or site.image_max == 0,
@@ -51,8 +56,8 @@ def apply_wordpress_registry(
         persona = deepcopy(personas.get(current["url"], {}))
         persona["persona_ko" if site.language == "ko" else "persona_en"] = site.persona
         persona["tone"] = site.tone
-        persona["min_chars"] = site.target_chars
-        persona["max_chars"] = site.max_chars
+        persona["min_chars"] = WP_TARGET_CHARS
+        persona["max_chars"] = WP_MAX_CHARS
         personas[current["url"]] = persona
 
     return configured, personas
