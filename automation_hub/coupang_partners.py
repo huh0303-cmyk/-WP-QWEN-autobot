@@ -194,7 +194,7 @@ def select_products(title, article_text, site_id="", limit=10):
         if not isinstance(raw, dict) or raw.get("enabled") is not True or raw.get("affiliate_confirmed") is not True:
             continue
         category = str(raw.get("category", "")).lower()
-        if category not in counts:
+        if not category:
             continue
         item = _candidate(raw, "global_weekly")
         if not item:
@@ -209,12 +209,10 @@ def select_products(title, article_text, site_id="", limit=10):
         item["category"] = category
         seen_urls.add(item["url"])
         seen_images.add(image_key)
-        counts[category] += 1
+        counts[category] = counts.get(category, 0) + 1
         fixed.append(item)
-    if len(fixed) != 10 or counts != {"health_functional_foods": 5, "k_beauty_skincare": 5}:
-        raise ValueError(f"Global weekly catalog must contain 10 unique verified Coupang offers (5 health + 5 beauty); found {len(fixed)} and {counts}.")
-    # The owner-approved weekly display order is K-Beauty first, then K-Health.
-    fixed.sort(key=lambda item: 0 if item.get("category") == "k_beauty_skincare" else 1)
+    if len(fixed) != 10:
+        raise ValueError(f"Global weekly catalog must contain 10 unique verified Coupang offers; found {len(fixed)} and {counts}.")
     return fixed
 
 def render_header(site_id=""):
