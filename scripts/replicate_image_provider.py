@@ -217,39 +217,44 @@ def generate_image_url(subject: str, theme: str = "", *, mode: str = "auto") -> 
         raise ValueError("unsupported image model")
     from stock_image_provider import find_stock_image, METADATA
     import random
-    for free_source in random.sample(("pexels", "pixabay"), 2):
-        stock = find_stock_image(subject, theme, force=True, selected_provider=free_source)
-        if stock and _site_safe_image(stock):
-            last_image_model = (METADATA.get(stock) or {}).get("provider", free_source)
-            return stock
-    stock = None
-    if stock:
-        last_image_model = (METADATA.get(stock) or {}).get("provider", "stock")
-        return stock
+    # Randomize all four providers independently for each image request.
+    providers = random.sample(("pexels", "pixabay", PRIMARY_MODEL, SECONDARY_MODEL), 4)
+    print("image_engine_attempt_order=" + ",".join(providers))
     token = _token()
-    if not token:
-        print("REPLICATE_API_TOKEN missing; stages 3-4 skipped")
-        return None
     prompt = build_editorial_prompt(subject, theme)
     cache_key = hashlib.sha256(("auto:" + prompt).encode("utf-8")).hexdigest()
-    if cache_key in _prompt_cache: return _prompt_cache[cache_key]
-    if cache_key in _attempted_prompts: return None
-    _attempted_prompts.add(cache_key)
-    for attempt_no, model in enumerate(ALLOWED_MODELS, 1):
+    for position, provider in enumerate(providers, 1):
         try:
-            print(f"Replicate stage {attempt_no+2}/4: {model}")
-            _cost_receipt(model, subject, "attempt_reserved")
-            prediction = _await_prediction(_create_prediction(model, prompt, token), token)
+            if provider in ("pexels", "pixabay"):
+                stock = find_stock_image(subject, theme, force=True, selected_provider=provider)
+                if stock and _site_safe_image(stock):
+                    last_image_model = (METADATA.get(stock) or {}).get("provider", provider)
+                    print(f"image_engine_used={last_image_model};stage={position}")
+                    return stock
+                continue
+            if not token:
+                print(f"image_engine_skipped={provider};reason=missing_token")
+                continue
+            if cache_key in _prompt_cache and _prompt_cache[cache_key]:
+                last_image_model = "cached_image"
+                print("image_engine_used=cached_image")
+                return _prompt_cache[cache_key]
+            attempt_key = cache_key + ":" + provider
+            if attempt_key in _attempted_prompts:
+                continue
+            _attempted_prompts.add(attempt_key)
+            _cost_receipt(provider, subject, "attempt_reserved")
+            prediction = _await_prediction(_create_prediction(provider, prompt, token), token)
             if prediction.get("status") == "succeeded":
                 url = _first_output_url(prediction.get("output"))
                 if url and _site_safe_image(url):
-                    last_image_model = model
+                    last_image_model = provider
                     _prompt_cache[cache_key] = url
+                    print(f"image_engine_used={provider};stage={position}")
                     return url
         except Exception as exc:
-            print(f"image stage failed: {model} ({type(exc).__name__})")
-    print("all four image stages failed; publish without image")
-    _prompt_cache[cache_key] = None
+            print(f"image_engine_failed={provider};error={type(exc).__name__}")
+    print("image_engine_used=none;all_four_failed")
     return None
 
 
