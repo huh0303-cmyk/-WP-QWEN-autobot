@@ -477,4 +477,88 @@ function refreshWpRuns(){
 fetch('wp_publish_evidence.json?'+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw Error('not available');return r.json()}).then(function(d){window.WP_PUBLISH_EVIDENCE=d.sites||{}}).catch(function(){window.WP_PUBLISH_EVIDENCE={}}).finally(refreshWpRuns);
 setInterval(refreshWpRuns,30000);
 })();
-</script></body></html>
+</script>
+<style>
+.yt-detail-toggle{border:1px solid #2563eb;background:#eff6ff;color:#1d4ed8;border-radius:6px;padding:4px 8px;font-weight:700;cursor:pointer}
+.yt-detail-panel{padding:12px;text-align:left;white-space:normal;background:#f8fafc;min-width:580px}
+.yt-stage-grid{display:grid;grid-template-columns:repeat(4,minmax(125px,1fr));gap:8px}
+.yt-stage{border:1px solid #cbd5e1;border-radius:8px;background:#fff;padding:10px}
+.yt-stage strong{display:block;margin-bottom:5px}
+.yt-stage[data-state="success"]{border-color:#16a34a;background:#f0fdf4;color:#166534}
+.yt-stage[data-state="running"]{border-color:#2563eb;background:#eff6ff;color:#1d4ed8}
+.yt-stage[data-state="failed"]{border-color:#dc2626;background:#fef2f2;color:#991b1b}
+.yt-stage[data-state="blocked"]{border-color:#d97706;background:#fffbeb;color:#92400e}
+.yt-stage[data-state="unknown"]{color:#64748b}
+.yt-detail-note{font-size:12px;margin-top:8px;color:#475569;white-space:normal}
+@media(max-width:720px){.yt-stage-grid{grid-template-columns:repeat(2,minmax(125px,1fr))}.yt-detail-panel{min-width:0}}
+</style>
+<script>
+(function(){
+'use strict';
+const tbody=document.getElementById('social-rows-youtube');if(!tbody)return;
+const api='https://api.github.com/repos/huh0303-cmyk/-WP-QWEN-autobot/actions/runs?per_page=100';
+let runs=[],fetchError='',fetchedAt='';
+const esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const labels=['① 기획·대본','② 이미지·음성','③ 영상·검수','④ 비공개 업로드'];
+const words=[/topic|research|script|history|대본|기획/i,/image|asset|audio|tts|voice|이미지|음성/i,/render|video|caption|thumbnail|ffmpeg|검수|영상/i,/upload|publish|youtube|업로드|발행/i];
+function stateLabel(s){return ({success:'● 완료',running:'● 진행 중',failed:'● 실패',blocked:'● 차단',unknown:'● 확인 필요'})[s]||'● 확인 필요'}
+function stagesFor(run,jobs){
+ const out=labels.map(()=>({state:'unknown',detail:'단계별 실행 증거 없음'}));
+ if(!run)return out;
+ const relevant=(jobs||[]).filter(j=>j&&j.name);
+ relevant.forEach(j=>{const name=String(j.name);words.forEach((rx,i)=>{if(!rx.test(name))return;
+ let state=j.status==='completed'?(j.conclusion==='success'?'success':'failed'):'running';
+ if(j.conclusion==='skipped')state='blocked';
+ out[i]={state,detail:name+' · '+(j.conclusion||j.status||'미확인')};
+ });});
+ // Workflow completion is NOT proof of production or YouTube upload.
+ if(run.status==='completed'&&run.conclusion==='failure'&&!relevant.length)out[0]={state:'failed',detail:'워크플로 실패 · 단계별 로그 확인 필요'};
+ return out;
+}
+async function refresh(){
+ try{const r=await fetch(api,{cache:'no-store'});if(!r.ok)throw Error('GitHub API '+r.status);
+ const d=await r.json();runs=d.workflow_runs||[];fetchError='';fetchedAt=new Date().toLocaleString('ko-KR');
+ }catch(e){fetchError=e.message;runs=[];}
+ document.querySelectorAll('.yt-detail-toggle[aria-expanded="true"]').forEach(b=>render(b));
+}
+function matchRun(name){
+ const key=String(name||'').toLowerCase().replace(/[^a-z0-9가-힣]/g,'');
+ if(key.length<5)return null;
+ return runs.find(r=>{const title=String(r.display_title||'').toLowerCase().replace(/[^a-z0-9가-힣]/g,'');return title.includes(key)})||null;
+}
+async function render(button){
+ const row=button.closest('tr'),panel=row.nextElementSibling?.querySelector('.yt-detail-panel');if(!panel)return;
+ const name=button.dataset.channel,run=matchRun(name);
+ panel.innerHTML='<strong>'+esc(name)+' · 발행 상세</strong><p class="yt-detail-note">실행 로그 확인 중…</p>';
+ let jobs=[];
+ if(run){try{const res=await fetch('https://api.github.com/repos/huh0303-cmyk/-WP-QWEN-autobot/actions/runs/'+run.id+'/jobs?per_page=100',{cache:'no-store'});if(!res.ok)throw Error('jobs API '+res.status);jobs=(await res.json()).jobs||[];}catch(e){fetchError=e.message;}}
+ if(!panel.isConnected)return;
+ const stages=stagesFor(run,jobs);
+ panel.innerHTML='<strong>'+esc(name)+' · 발행 상세</strong><div class="yt-stage-grid">'+stages.map((s,i)=>'<div class="yt-stage" data-state="'+s.state+'"><strong>'+labels[i]+'</strong><span>'+stateLabel(s.state)+'</span><div class="yt-detail-note">'+esc(s.detail)+'</div></div>').join('')+'</div>'+
+ '<div class="yt-detail-note">'+(run?'<a href="'+esc(run.html_url)+'" target="_blank" rel="noopener noreferrer">GitHub 실행 로그 #'+esc(run.id)+'</a> · 전체 상태: '+esc(run.conclusion||run.status):'채널과 일치하는 실행 기록 미확인')+
+ ' · 갱신: '+esc(fetchedAt||'미수집')+(fetchError?' · 수집 오류: '+esc(fetchError):'')+
+ '<br>초록색은 해당 단계의 성공 증거가 있을 때만 표시합니다. 워크플로 성공만으로 YouTube 업로드 성공을 인정하지 않습니다. 업로드 완료는 영상 ID·비공개 상태 확인이 추가로 필요합니다.</div>';
+}
+function attach(){
+ tbody.querySelectorAll('tr').forEach(row=>{
+ if(row.dataset.ytDetailReady)return;
+ const cells=row.querySelectorAll('td');if(cells.length<3)return;
+ const name=(cells[2].textContent||'').trim();if(!name)return;
+ row.dataset.ytDetailReady='1';
+ const cell=document.createElement('td'),button=document.createElement('button');
+ button.type='button';button.className='yt-detail-toggle';button.textContent='발행 상세';button.dataset.channel=name;button.setAttribute('aria-expanded','false');
+ cell.append(button);row.append(cell);
+ button.addEventListener('click',()=>{
+ const next=row.nextElementSibling;
+ if(next&&next.classList.contains('yt-detail-row')){next.remove();button.setAttribute('aria-expanded','false');return;}
+ const tr=document.createElement('tr');tr.className='yt-detail-row';const td=document.createElement('td');td.colSpan=row.cells.length;
+ const div=document.createElement('div');div.className='yt-detail-panel';td.append(div);tr.append(td);row.after(tr);button.setAttribute('aria-expanded','true');render(button);
+ });
+ });
+ const table=tbody.closest('table'),head=table?.querySelector('thead tr');
+ if(head&&!head.querySelector('.yt-detail-head')){const th=document.createElement('th');th.className='yt-detail-head';th.textContent='발행 상세';head.append(th);}
+}
+const observer=new MutationObserver(()=>attach());observer.observe(tbody,{childList:true});attach();refresh();setInterval(refresh,60000);
+})();
+</script>
+</body></html>
