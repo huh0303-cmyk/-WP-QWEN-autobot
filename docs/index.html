@@ -260,7 +260,7 @@ function draw(){
     var dupImages=observed(audit&&audit.reused_featured_media);
     if(!wp){gaUsers=gaGrowth=seoAverage=seoBelow=dupTitles=dupImages='<span class="na">—</span>';}
 
-    var publishUrl='https://blog.korea365.org/publish?site='+encodeURIComponent(r.site||'')+'&mode=manual';
+    var publishUrl=wp?'https://github.com/huh0303-cmyk/-WP-QWEN-autobot/actions/workflows/daily-network-publish.yml':'https://blog.korea365.org/publish?site='+encodeURIComponent(r.site||'')+'&mode=manual';
     var p=blogPlatformOf(r);return '<tr class="platform-'+esc(p)+'"><td>'+(rankValue===null?'—':rankValue+'위')+'</td><td>'+platformCell(p)+'</td><td><a href="'+esc(safeUrl(r.url,r.site))+'" target="_blank" rel="noopener">'+esc(r.display_name||r.site)+'</a>'+(wp?' <button class="wp-ops-expand" data-site="'+esc(r.site)+'" type="button">진행 상세</button>':'')+'</td><td>'+vis+'</td><td>'+metricNumber(r.content,'글')+(Number.isFinite(r.content_delta)?d(r.content_delta):'')+'</td><td>'+indexedCell(r)+'</td><td>'+esc(cadence)+'</td><td>'+publishElapsedFor(r)+'</td><td><a class="publish-link" href="'+esc(publishUrl)+'" target="_blank" rel="noopener" title="사이트별 수동 발행 화면; 예약 작업 변경 없음">즉시발행 ↗</a></td></tr>';
   }).join('');
 }
