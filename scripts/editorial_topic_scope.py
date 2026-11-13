@@ -46,4 +46,9 @@ def choose_scoped_keyword(site_url, proposed, candidates):
         if candidate and not candidate.startswith('#') and topic_fits(site_url, candidate):
             print('Off-topic trend replaced with a keyword from this site pool')
             return candidate
+    evergreen = {'jobinkorea365.com': 'Korea job interview preparation and employment contract checklist', 'jobkorea365.com': 'Korea employment application and job interview checklist', 'jobkoreaglobal.com': 'Korea international recruitment and worker onboarding checklist'}
+    host = urlparse(site_url).hostname
+    if host in evergreen:
+        print('No scoped keyword in feed; using curated in-scope evergreen fallback')
+        return evergreen[host]
     raise ValueError('No in-scope keyword available; preserve job instead of writing an unrelated article')
