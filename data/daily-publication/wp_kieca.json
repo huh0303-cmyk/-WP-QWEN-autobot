@@ -1,1 +1,1 @@
-{"day": "2026-11-13", "status": "DISPATCHED", "attempts": 1, "claim": "daily-2026-11-13-wp_kieca-da21cff0", "claimed_at": "2026-11-13T11:35:13.179673+09:00", "run_id": 43353226503, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-11-13", "status": "CLAIMED", "attempts": 2, "claim": "daily-2026-11-13-wp_kieca-89101608", "claimed_at": "2026-11-13T18:58:23.718616+09:00", "run_id": null, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
