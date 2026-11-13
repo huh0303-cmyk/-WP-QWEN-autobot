@@ -42,7 +42,7 @@ for p in all_posts:
         has_korea = any(kw in title or kw in body.lower() for kw in KOREA)
         if not has_korea: bad = True
 
-    if bad:
+    if bad and os.getenv("KTRIP_ALLOW_DELETION", "false").lower() == "true":
         dr = requests.delete(base+"/posts/"+str(p["id"]), auth=auth,
                             params={"force":True}, timeout=10)
         if dr.status_code in (200,201):
@@ -54,49 +54,12 @@ for p in all_posts:
 
 print("Keep:" + str(keep) + " Deleted:" + str(delete))
 
-# 2. Pixabay 한국 사진
-PIXABAY_KEY = "48405185-db4f0c77ac28099db1d63de37"
-photo_url = None
-for q in ["Gyeongbokgung Palace Seoul Korea","Korean temple Korea","Jeju island Korea travel"]:
-    try:
-        r2 = requests.get("https://pixabay.com/api/",
-                         params={"key":PIXABAY_KEY,"q":q,"image_type":"photo",
-                                 "orientation":"horizontal","min_width":1280,
-                                 "per_page":3,"safesearch":"true"}, timeout=10)
-        hits = r2.json().get("hits",[])
-        if hits:
-            photo_url = hits[0]["largeImageURL"]
-            print("Photo found: " + q)
-            break
-    except: pass
-
-if photo_url:
-    img_data = requests.get(photo_url, timeout=20).content
-    print("Downloaded: " + str(len(img_data)) + " bytes")
-    files = {"file": ("korea-hero.jpg", img_data, "image/jpeg")}
-    r3 = requests.post(base+"/media", auth=auth, files=files,
-                      data={"title":"Korea Travel Hero",
-                            "alt_text":"Korea travel guide - Gyeongbokgung Palace Seoul"},
-                      timeout=30)
-    if r3.status_code in (200,201):
-        media_id  = r3.json()["id"]
-        media_url = r3.json()["source_url"]
-        print("Uploaded media ID: " + str(media_id))
-        print("URL: " + media_url)
-        # 최신 글에 대표이미지 설정
-        r4 = requests.get(base+"/posts", auth=auth,
-                         params={"per_page":10,"status":"publish",
-                                 "_fields":"id,featured_media"}, timeout=10)
-        for post in r4.json():
-            if not post.get("featured_media"):
-                requests.post(base+"/posts/"+str(post["id"]), auth=auth,
-                             json={"featured_media":media_id}, timeout=10)
-                print("Featured set: post " + str(post["id"]))
-                time.sleep(0.2)
-    else:
-        print("Upload failed: " + str(r3.status_code))
-else:
-    print("No photo found")
+# 2. SAFETY: Never assign one shared hero image to multiple posts.
+# This script previously uploaded one Pixabay image and assigned the same media ID
+# to every recent post missing featured_media. That caused visible duplicates.
+# Image repairs must use a per-post topic-specific selection with a persistent
+# uniqueness ledger and must verify each media ID before updating WordPress.
+print("Shared hero image backfill disabled: prevents duplicate featured images")
 
 # 3. Google ping
 try:
