@@ -67,10 +67,10 @@ def strip_hangul_parentheticals(text: str) -> str:
 def generate(site: dict, hint: str = "", recent_titles: list[str] | None = None) -> tuple[str, str, list[str], str, str]:
     if str(site["language"]).lower().startswith("ko"):
         lang_rule = ("반드시 한국어로만 작성하세요. 제목·본문·소제목·라벨 전부 한글이어야 하며 영어 문장은 절대 쓰지 않습니다 "
-                     "(고유명사·약어만 예외). 본문 분량은 한글 2400~3500자. 영어로 쓰면 폐기됩니다. "
+                     "(고유명사·약어만 예외). 본문 분량은 HTML 태그와 공백을 제외한 한글 2500~3500자. 영어로 쓰면 폐기됩니다. "
                      "image_subject 만 영어 단어 2~5개로 씁니다.")
     else:
-        lang_rule = ("English: 1400-1800 words (never fewer than 1200; count them). For English articles use Latin script only: "
+        lang_rule = ("English: 2500-3500 visible characters excluding spaces and HTML tags (count them). For English articles use Latin script only: "
                      "write Korean names and terms in romanization (e.g. Gyeongbokgung), with no Hangul characters anywhere in title, body or labels.")
     requested_topic = os.environ.get("BLOGGER_TOPIC_HINT", "").strip()
     topic = requested_topic or site["theme"]
@@ -122,7 +122,11 @@ Provide 1-3 short, highly relevant labels only.{hint}"""
     body_issues = body_cliches(body)
     if body_issues:
         raise RuntimeError("body quality gate: AI filler phrasing rejected: " + "; ".join(body_issues[:5]))
-    if not title or len(body) < 1500 or not (1 <= len(labels) <= 3):
+    visible_body = html.unescape(re.sub(r"<[^>]*>", " ", body))
+    visible_chars = len(re.sub(r"\\s+", "", visible_body))
+    if not (2500 <= visible_chars <= 3500):
+        raise RuntimeError(f"body length quality gate: {visible_chars} visible characters; required 2500-3500")
+    if not title or not (1 <= len(labels) <= 3):
         raise RuntimeError("Gemini Flash output failed quality gate")
     issues = structure_issues(body, site["theme"], site["language"])
     if issues:
@@ -174,6 +178,7 @@ def main() -> int:
             raise SystemExit(f"unknown BLOGGER_SITE_KEY: {requested_site}")
     expected_count = len(sites)
     results, failed = [], False
+    run_image_urls = set()
     RESULT.parent.mkdir(parents=True, exist_ok=True)
     pace = float(os.environ.get("BLOGGER_PACE_SECONDS", "0") or 0)
     for site_no, site in enumerate(sites):
@@ -221,7 +226,7 @@ def main() -> int:
                     print(f"generation retry {attempt + 1} for {site['key']}: {str(gate_exc)[:120]}")
                     if "too short" in str(gate_exc):
                         hint = ("\nIMPORTANT: your previous draft was too short (" + str(gate_exc).split("(")[-1].rstrip(")") +
-                                "). Write a clearly LONGER article: at least 1500 words in English or 3000 characters in Korean, "
+                                "). Write a clearly LONGER article: 2500-3500 visible characters in either language, "
                                 "with fuller paragraphs of practical detail under every heading.")
                     else:
                         hint = "\nIMPORTANT: your previous draft failed a deterministic editorial quality gate. Correct this exact issue before returning new JSON: " + str(gate_exc) + ". Use a concrete subject-led title; never use a generic gerund opener or stock AI phrasing. Return one valid JSON object only."
