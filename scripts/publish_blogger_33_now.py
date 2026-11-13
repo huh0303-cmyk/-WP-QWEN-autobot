@@ -309,7 +309,7 @@ def main() -> int:
                         pass
                     ok = api_status == "LIVE" and bool(post.get("id"))
                     print(f"verify {site['key']}: public HTTP {check.status_code}, api status {api_status}")
-                results.append({"site": site["key"], "status": "published" if ok else "verification_failed", "url": url, "post_id": post.get("id", ""), "http": check.status_code})
+                results.append({"site": site["key"], "status": "published" if ok else "verification_failed", "image_engine": image_engine_used, "url": url, "post_id": post.get("id", ""), "http": check.status_code})
             failed = failed or not ok
         except Exception as exc:
             failed = True
