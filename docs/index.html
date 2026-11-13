@@ -440,4 +440,25 @@ function updateControlClock(){
 }
 updateControlClock();setInterval(updateControlClock,1000);
 
+</script><style>
+.wp-ops-expand{margin-left:5px;border:1px solid #a5b4fc;background:#eef2ff;color:#3730a3;border-radius:7px;padding:5px 8px;cursor:pointer;font-size:11px;font-weight:700}
+.wp-ops-detail td{background:#f8fafc!important;text-align:left!important;padding:12px!important}
+.wp-ops-panel{border:1px solid #cbd5e1;border-radius:12px;background:white;padding:14px;max-width:1050px}
+.wp-ops-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:12px 0}
+.wp-ops-stage{border:1px solid #e2e8f0;border-radius:9px;padding:10px;font-size:12px}
+.wp-ops-stage small{display:block;color:#64748b;margin-top:7px}
+.wp-ops-meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.wp-ops-meta div{background:#f1f5f9;padding:9px;border-radius:8px;overflow-wrap:anywhere;font-size:12px}
+.wp-ops-meta b{display:block;color:#64748b;font-size:11px}
+@media(max-width:700px){.wp-ops-grid,.wp-ops-meta{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
+<script>
+(function(){
+function clean(x){return String(x==null?'':x).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+var stages=['기획·AI 글쓰기','이미지·품질 검수','워드프레스 업로드','게시·SEO 검증'];
+var fields=[['text_engine','글쓰기 엔진'],['image_engine','이미지 엔진'],['character_count','최종 글자 수'],['rank_math_score','Rank Math SEO'],['published_url','발행 URL'],['error','오류']];
+function panel(site){var d=(window.WP_PUBLISH_EVIDENCE||{})[site]||{};return '<div class="wp-ops-panel"><strong>'+clean(site)+' · 발행 8단계 추적</strong><div class="wp-ops-grid">'+stages.map(function(s,i){var state=(d.groups||[])[i]||'unknown';var color={success:'#16a34a',running:'#2563eb',failed:'#dc2626'}[state]||'#94a3b8';return '<div class="wp-ops-stage"><span style="color:'+color+'">●</span> 0'+(i+1)+' '+s+'<small>'+({success:'완료',running:'진행 중',failed:'실패'}[state]||'확인 필요')+'</small></div>'}).join('')+'</div><div class="wp-ops-meta">'+fields.map(function(x){var v=d[x[0]];return '<div><b>'+x[1]+'</b>'+(v==null||v===''?'확인 필요':clean(v))+'</div>'}).join('')+'</div><p style="font-size:11px;color:#64748b">실제 확인된 데이터만 표시 · <a href="operations-live.html" target="_blank" rel="noopener">GitHub 실행 로그</a></p></div>'}
+document.addEventListener('click',function(e){var b=e.target.closest('.wp-ops-expand');if(!b)return;var tr=b.closest('tr'),next=tr.nextElementSibling;if(next&&next.classList.contains('wp-ops-detail')){next.remove();return}document.querySelectorAll('.wp-ops-detail').forEach(function(x){x.remove()});var row=document.createElement('tr'),cell=document.createElement('td');row.className='wp-ops-detail';cell.colSpan=tr.children.length;cell.innerHTML=panel(b.dataset.site);row.appendChild(cell);tr.after(row)});
+fetch('wp_publish_evidence.json?'+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw Error('not available');return r.json()}).then(function(d){window.WP_PUBLISH_EVIDENCE=d.sites||{}}).catch(function(){window.WP_PUBLISH_EVIDENCE={}});
+})();
 </script></body></html>
