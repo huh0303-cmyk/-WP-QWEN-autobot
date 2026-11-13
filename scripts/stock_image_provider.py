@@ -156,7 +156,8 @@ def find_stock_image(subject, theme="", *, force=False, selected_provider="auto"
                         # 1:1 crop makes orientation irrelevant; only require a usable short side.
                         if min(item["width"], item["height"]) < 800:
                             continue
-                        if not matches(q, item["description"]):
+                        # A shortened search query must never relax the original topic match.
+                        if not matches(query, item["description"]):
                             continue
                         image_key = f"{provider.lower()}:{item['id']}"
                         if image_key in _recent_image_ids():
