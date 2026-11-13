@@ -9,6 +9,7 @@ def attach_weekly_footer(html):
     return html
 from scripts.site_editorial_palette import style_editorial
 from scripts.replicate_image_provider import generate_image_url
+from scripts.editorial_image_guard import image_fingerprint, same_photo
 
 SITE="https://kfinance365.com"
 AUTH=("huh0303@gmail.com",os.environ["KFINANCE365COM"])
@@ -58,19 +59,27 @@ def main():
     failed=[]
     selected_ids={p["id"] for p in selection}
     used_titles={title_key(plain(p["title"]["rendered"])) for p in items if p["id"] not in selected_ids}
-    # Retain unique existing featured images; only replace duplicated media.
-    media_owners={}
+    # Compare actual photo pixels across distinct WordPress media IDs.
+    known_images=[]
+    duplicate_post_ids=set()
     for existing in reversed(items):
         mid=existing.get("featured_media") or 0
-        if mid:media_owners.setdefault(mid,[]).append(existing["id"])
-    duplicate_media={mid for mid,owners in media_owners.items() if len(owners)>1}
-    print("DUPLICATE_MEDIA_IDS",len(duplicate_media),flush=True)
-    used_hashes=set()
-    for mid in duplicate_media:
+        if not mid: continue
         try:
             media=get(f"{SITE}/wp-json/wp/v2/media/{mid}")
-            used_hashes.add(image_bytes(media["source_url"])[0])
-        except Exception as exc:print("IMAGE_AUDIT_ERROR",mid,str(exc)[:120],flush=True)
+            url=media.get("source_url","")
+            if not url: continue
+            candidate=image_fingerprint(url)
+            match=next((entry for entry in known_images if same_photo(candidate,entry["fingerprint"])),None)
+            if match:
+                duplicate_post_ids.add(existing["id"])
+                print("DUPLICATE_IMAGE_CONTENT",existing["id"],"matches_post",match["post_id"],flush=True)
+            else:
+                known_images.append({"post_id":existing["id"],"fingerprint":candidate})
+        except Exception as exc:
+            print("IMAGE_AUDIT_ERROR",mid,str(exc)[:120],flush=True)
+            raise RuntimeError("Image audit incomplete; refusing unchecked rewrite") from exc
+    print("DUPLICATE_IMAGE_POSTS",len(duplicate_post_ids),flush=True)
     for post in selection:
         id=post["id"]
         title=clean_title(plain(post["title"]["rendered"]))
@@ -122,7 +131,7 @@ Write semantic HTML only: 1 introductory paragraph, 5-6 descriptive H2 sections 
                 print("DRY_RUN",id,title,"chars",chars(article),flush=True)
                 continue
             image_id=post.get("featured_media") or 0
-            needs_replacement=image_id in duplicate_media and post["id"]!=media_owners[image_id][0]
+            needs_replacement=post["id"] in duplicate_post_ids
             if needs_replacement:
                 print("DUPLICATE_IMAGE_REPLACE",id,image_id,flush=True)
                 image_id=0
@@ -130,7 +139,8 @@ Write semantic HTML only: 1 introductory paragraph, 5-6 descriptive H2 sections 
                     url=generate_image_url(f"{title}, original finance editorial illustration, no lettering, variation {id}-{image_attempt}",theme="finance")
                     if not url:continue
                     digest,data,mime=image_bytes(url)
-                    if digest in used_hashes:
+                    candidate=image_fingerprint(url)
+                    if any(same_photo(candidate,entry["fingerprint"]) for entry in known_images):
                         print("IMAGE_DUPLICATE_REJECTED",id,image_attempt,flush=True)
                         continue
                     ext=".png" if "png" in mime else ".webp" if "webp" in mime else ".jpg"
@@ -138,7 +148,7 @@ Write semantic HTML only: 1 introductory paragraph, 5-6 descriptive H2 sections 
                     uploaded.raise_for_status()
                     image_id=uploaded.json()["id"]
                     requests.post(f"{SITE}/wp-json/wp/v2/media/{image_id}",auth=AUTH,json={"alt_text":title},timeout=20).raise_for_status()
-                    used_hashes.add(digest)
+                    known_images.append({"post_id":id,"fingerprint":candidate})
                     break
                 if not image_id:raise ValueError("Duplicate image replacement unavailable; this post skipped, other posts continue")
             else:
