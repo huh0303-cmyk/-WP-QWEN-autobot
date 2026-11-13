@@ -60,32 +60,12 @@ base.AI_TEXT_PROVIDER = _TEXT_PROVIDER
 # on the legacy two-pass Gemini consensus review. Newsroom paths keep their own review.
 os.environ["CHATGPT_SINGLE_MODEL_PIPELINE"] = "true"
 
-# Images use the shared stock-first gateway; legacy helpers remain bypassed.
-base.PIXABAY_KEY = None
-base.PEXELS_KEY = None
+# Restore the actual stock-photo functions instead of replacing them with empty stubs.
+# Existing publisher image checks and no-paid policy remain in force.
+base.PIXABAY_KEY = os.getenv("PIXABAY_KEY") or None
+base.PEXELS_KEY = os.getenv("PEXELS_API_KEY") or None
 base.AUTOMATED_IMAGE_PUBLISHING_ENABLED = True
 base.WP_IMAGE_COUNT = 0 if os.environ.get("WP_IMAGE_COUNT", "1").strip() == "0" else 1
-
-
-def _blocked_stock(*args, **kwargs):
-    return []
-
-
-def _no_paid_images(keyword, count=1, theme=""):
-    return []
-
-
-def _pass_generated_images(urls, *args, **kwargs):
-    # Images are generated from the article subject itself. Do not spend OpenAI/Gemini
-    # vision calls to re-score them; this also closes another legacy image-related cost path.
-    return list(urls or [])[:base.WP_IMAGE_COUNT]
-
-
-base.get_images_pixabay = _blocked_stock
-base.get_images_pexels = _blocked_stock
-base.get_multiple_images = _no_paid_images
-base.filter_relevant_images = _pass_generated_images
-base.get_fallback_infographic_image = _blocked_stock
 
 # kskin365.com was restored to the active 25-blog network. The legacy module still carried
 # a stale 'Retired Site' author label, which must never reach newly published content.
