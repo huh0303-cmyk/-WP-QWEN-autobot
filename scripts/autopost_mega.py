@@ -3530,7 +3530,7 @@ def process_one(site, keyword):
         repeat_errors = repetition_issues(title, body, history)
         if repeat_errors:
             print("REWRITE_REQUIRED " + "; ".join(repeat_errors))
-            prompt = base_prompt + "\nRewrite the headline and opening from the article facts.\n" + "\n".join(repeat_errors)
+            prompt = (base_prompt + "\nMANDATORY HEADLINE REPAIR: Start TITLE: with a specific financial subject (e.g. Credit Score, Fixed Mortgage Rate, Bank Deposit Insurance), followed by a concrete outcome or comparison. Do not begin with How, Understanding, Managing, Navigating, Saving, Choosing, or any generic gerund. Do not copy the previous title structure. Preserve verifiable facts and write a fresh opening.\n" + "\n".join(repeat_errors))
             continue
         pre=None
         print(f"  📝 {attempt+1}회차 작성 완료")
