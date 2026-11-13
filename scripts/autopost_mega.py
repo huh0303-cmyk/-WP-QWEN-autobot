@@ -3164,15 +3164,13 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
     try:
         final = apply_footer(final, title, site.get("site_id", url), site.get("lang", "ko"))
     except RuntimeError as exc:
-        # Finance is an editorial-first category: expired commercial catalog
-        # must not prevent a verified financial article from being published.
-        if url.rstrip("/").lower() == "https://kfinance365.com" and (
-            "outside its 168-hour lock window" in str(exc)
-        ):
-            print("Affiliate weekly catalog expired: omit product footer for Kfinance365 only")
+        # Expired weekly affiliate data must never be silently reused.
+        # Publish editorial content without the commercial footer while
+        # retaining the original exception for all unrelated failures.
+        if "outside its 168-hour lock window" in str(exc):
+            print(f"Expired affiliate weekly catalog for {url}: omit commercial footer; refresh catalog separately")
         else:
-            raise
-    # Append the SeoulMall store CTA once, after editorial and affiliate sections.
+            raise    # Append the SeoulMall store CTA once, after editorial and affiliate sections.
     if url.rstrip("/").lower() == "https://k-visa365.com":
         from automation_hub.seoulmall_widget import append_widget
         final = append_widget(final)
