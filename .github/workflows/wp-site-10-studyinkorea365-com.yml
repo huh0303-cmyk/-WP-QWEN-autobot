@@ -1,0 +1,16 @@
+name: 'WP 10 studyinkorea365.com isolated publish'
+run-name: 'WP 10 studyinkorea365.com manual'
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  publish-one:
+    uses: ./.github/workflows/daily-network-publish.yml
+    with:
+      target_site_url: 'https://studyinkorea365.com'
+      publication_approved: true
+      room_id: 'manual-studyinkorea365-com'
+      image_count: '1'
+      image_policy: 'auto_free'
+    secrets: inherit

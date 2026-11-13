@@ -1,0 +1,16 @@
+name: 'WP 06 koreacrypto365.com isolated publish'
+run-name: 'WP 06 koreacrypto365.com manual'
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  publish-one:
+    uses: ./.github/workflows/daily-network-publish.yml
+    with:
+      target_site_url: 'https://koreacrypto365.com'
+      publication_approved: true
+      room_id: 'manual-koreacrypto365-com'
+      image_count: '1'
+      image_policy: 'auto_free'
+    secrets: inherit

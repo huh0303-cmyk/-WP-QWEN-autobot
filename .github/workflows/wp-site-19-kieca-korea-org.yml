@@ -1,0 +1,16 @@
+name: 'WP 19 kieca-korea.org isolated publish'
+run-name: 'WP 19 kieca-korea.org manual'
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  publish-one:
+    uses: ./.github/workflows/daily-network-publish.yml
+    with:
+      target_site_url: 'https://kieca-korea.org'
+      publication_approved: true
+      room_id: 'manual-kieca-korea-org'
+      image_count: '1'
+      image_policy: 'auto_free'
+    secrets: inherit
