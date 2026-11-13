@@ -1,0 +1,31 @@
+name: Audit K-Trip365 Images
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '25 2 * * *'
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: python -m pip install requests
+      - name: Audit all published K-Trip365 posts (read-only)
+        env:
+          WP_SITE_URL: https://k-trip365.com
+          WP_USER: ${{ secrets.KTRIP_WP_USER }}
+          WP_APP_PASSWORD: ${{ secrets.KTRIP365COM }}
+        run: python scripts/audit_ktrip_images.py
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ktrip-image-audit
+          path: artifacts/ktrip_image_audit.json
+          if-no-files-found: warn
