@@ -1452,9 +1452,9 @@ def _run_youtube_publish(channel_key: str, label: str) -> None:
     state: dict[str, object] = {"status": "dispatching", "started_at": datetime.now(timezone.utc).isoformat(), "finished_at": None, "items": []}
     _bulk_write(group, state)
     try:
-        job = dispatch_youtube_job(channel_key, label, group, run_now=True)
+        job = dispatch_youtube_job(channel_key)
         item = {"job_id": job["job_id"], "label": label, "platform": "youtube", "site_id": channel_key,
-                "workflow": "youtube-github-worker", "run_id": None, "run_url": "", "status": "queued",
+                "workflow": job["workflow"], "run_id": None, "run_url": job["run_url"], "status": "queued",
                 "conclusion": None, "reason": "GitHub Actions 실행 대기"}
         state.update(status="polling", items=[item])
     except RuntimeError as exc:

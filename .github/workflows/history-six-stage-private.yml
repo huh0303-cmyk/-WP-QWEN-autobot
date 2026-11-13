@@ -1,0 +1,214 @@
+name: TODAY IN HISTORY Six-Stage Private Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_private_upload:
+        description: Confirm PRIVATE-only upload; no public release
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: today-in-history-private
+  cancel-in-progress: false
+
+jobs:
+  no-upload:
+    if: ${{ inputs.confirm_private_upload != true }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "No upload attempted. Dispatch again with confirm_publication=true only after cost hold and channel credentials are reviewed."
+
+  publish:
+    if: ${{ inputs.confirm_private_upload == true }}
+    runs-on: ubuntu-latest
+    environment: youtube-channels
+    timeout-minutes: 180
+    env:
+      PYTHONUNBUFFERED: "1"
+      HISTORY_PRIVATE_ONLY: "1"
+      CHANNEL: history
+      YOUTUBE_COST_HOLD: ${{ vars.YOUTUBE_COST_HOLD }}
+      FISH_AUDIO_API_KEY: ${{ secrets.FISH_AUDIO_API_KEY }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+      PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
+      REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+      SHEET_ID: ${{ secrets.SHEET_ID }}
+      GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+      GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+      GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+      MUSIC_SOURCE_FOLDER_ID_GLOBALMUSIC: ${{ secrets.MUSIC_SOURCE_FOLDER_ID_GLOBALMUSIC }}
+      MUSIC_SOURCE_FOLDER_ID_HEALING: ${{ secrets.MUSIC_SOURCE_FOLDER_ID_HEALING }}
+      MUSIC_SOURCE_FOLDER_ID_KPOP: ${{ secrets.MUSIC_SOURCE_FOLDER_ID_KPOP || vars.MUSIC_SOURCE_FOLDER_ID_KPOP }}
+      MUSIC_SOURCE_FOLDER_ID_MBB: ${{ secrets.MUSIC_SOURCE_FOLDER_ID_MBB }}
+      MUSIC_SOURCE_FOLDER_ID_STARBUCKS: ${{ secrets.MUSIC_SOURCE_FOLDER_ID_STARBUCKS || vars.MUSIC_SOURCE_FOLDER_ID_STARBUCKS }}
+      OUTPUT_FOLDER_ID_GLOBALMUSIC: ${{ secrets.OUTPUT_FOLDER_ID_GLOBALMUSIC }}
+      OUTPUT_FOLDER_ID_HEALING: ${{ secrets.OUTPUT_FOLDER_ID_HEALING }}
+      OUTPUT_FOLDER_ID_KPOP: ${{ secrets.OUTPUT_FOLDER_ID_KPOP }}
+      OUTPUT_FOLDER_ID_MBB: ${{ secrets.OUTPUT_FOLDER_ID_MBB }}
+      OUTPUT_FOLDER_ID_STARBUCKS: ${{ secrets.OUTPUT_FOLDER_ID_STARBUCKS }}
+      THUMBNAIL_FOLDER_ID_GLOBALMUSIC: ${{ secrets.THUMBNAIL_FOLDER_ID_GLOBALMUSIC }}
+      THUMBNAIL_FOLDER_ID_HEALING: ${{ secrets.THUMBNAIL_FOLDER_ID_HEALING }}
+      THUMBNAIL_FOLDER_ID_KPOP: ${{ secrets.THUMBNAIL_FOLDER_ID_KPOP }}
+      THUMBNAIL_FOLDER_ID_MBB: ${{ secrets.THUMBNAIL_FOLDER_ID_MBB }}
+      THUMBNAIL_FOLDER_ID_STARBUCKS: ${{ secrets.THUMBNAIL_FOLDER_ID_STARBUCKS }}
+      YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
+      YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN }}
+      YOUTUBE_OAUTH_CLIENT_ID_GLOBALMUSIC: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_GLOBALMUSIC }}
+      YOUTUBE_OAUTH_CLIENT_SECRET_GLOBALMUSIC: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_GLOBALMUSIC }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_GLOBALMUSIC: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_GLOBALMUSIC }}
+      YOUTUBE_OAUTH_CLIENT_ID_HEALING: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_HEALING }}
+      YOUTUBE_OAUTH_CLIENT_SECRET_HEALING: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_HEALING }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_HEALING: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_HEALING }}
+      YOUTUBE_OAUTH_CLIENT_ID_STARBUCKS: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_STARBUCKS }}
+      YOUTUBE_OAUTH_CLIENT_SECRET_STARBUCKS: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_STARBUCKS }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_STARBUCKS: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_STARBUCKS }}
+      YOUTUBE_OAUTH_CLIENT_ID_MBB: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_MBB }}
+      YOUTUBE_OAUTH_CLIENT_SECRET_MBB: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_MBB }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_MBB: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_MBB }}
+      YOUTUBE_OAUTH_CLIENT_ID_KPOP: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_KPOP }}
+      YOUTUBE_OAUTH_CLIENT_SECRET_KPOP: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_KPOP }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_KPOP: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_KPOP }}
+      YOUTUBE_OAUTH_CLIENT_ID_NASA_SPACE_TIMES: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_NASA_SPACE_TIMES }}
+      YOUTUBE_OAUTH_CLIENT_SECRET_NASA_SPACE_TIMES: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_NASA_SPACE_TIMES }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_NASA_SPACE_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_NASA_SPACE_TIMES }}
+      YOUTUBE_OAUTH_CLIENT_ID_HISTORY_TODAY_TIMES: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_HISTORY_TODAY_TIMES }}
+      YOUTUBE_OAUTH_CLIENT_SECRET_HISTORY_TODAY_TIMES: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_HISTORY_TODAY_TIMES }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_HISTORY_TODAY_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_HISTORY_TODAY_TIMES }}
+      YOUTUBE_OAUTH_CLIENT_ID_INVENTION_TIMES: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_INVENTION_TIMES }}
+      YOUTUBE_OAUTH_CLIENT_SECRET_INVENTION_TIMES: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_INVENTION_TIMES }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_INVENTION_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_INVENTION_TIMES }}
+      YOUTUBE_OAUTH_CLIENT_ID_SILENT_ERA_TIMES: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_SILENT_ERA_TIMES }}
+      YOUTUBE_OAUTH_CLIENT_SECRET_SILENT_ERA_TIMES: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_SILENT_ERA_TIMES }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_SILENT_ERA_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_SILENT_ERA_TIMES }}
+      YOUTUBE_OAUTH_CLIENT_ID_RETRO_REELS_TIMES: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_RETRO_REELS_TIMES }}
+      YOUTUBE_OAUTH_CLIENT_SECRET_RETRO_REELS_TIMES: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_RETRO_REELS_TIMES }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_RETRO_REELS_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_RETRO_REELS_TIMES }}
+    steps:
+      - name: "1/6 - Checkout and freeze history channel"
+        uses: actions/checkout@v4
+      - name: "2/6 - Prepare English documentary writer and tools"
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install free runner tools
+        env:
+          CHANNEL: history
+        run: |
+          set -euo pipefail
+          if ! command -v ffmpeg >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq ffmpeg
+          fi
+          python -m pip install --upgrade pip
+          if [[ "history" == "globalmusic" ]]; then
+            # Playlist-only path: no Gemini, Edge TTS, or paid-generation SDKs are needed.
+            python -m pip install --disable-pip-version-check requests Pillow google-api-python-client google-auth google-auth-httplib2 google-auth-oauthlib pydub mutagen numpy scipy moviepy
+          else
+            python -m pip install --disable-pip-version-check requests Pillow google-api-python-client google-auth google-auth-httplib2 google-auth-oauthlib google-genai google-generativeai edge-tts pydub mutagen numpy scipy moviepy
+          fi
+      - name: Configure strict free-only CAFE_ROMANTIC run
+        if: ${{ inputs.channel == 'globalmusic' }}
+        run: |
+          set -euo pipefail
+          {
+            echo "PLAYLIST_FREE_ONLY_CHANNEL=globalmusic"
+            echo "PLAYLIST_MUSIC_SOURCE=owner_drive"
+            echo "PLAYLIST_IMAGE_SOURCE=pexels_api"
+            echo "PLAYLIST_PAID_API_ENABLED=false"
+            echo "GEMINI_API_KEY="
+            echo "OPENAI_API_KEY="
+            echo "LYRIA_API_KEY="
+            echo "FISH_AUDIO_API_KEY="
+            echo "AUTO_TOPIC=false"
+            echo "CAPTION_TEXT=French and Japanese love songs for a quiet cafe evening."
+          } >> "$GITHUB_ENV"
+          echo "CAFE_ROMANTIC free-only mode configured; paid image/music/TTS keys are disabled for this run."
+      - name: Verify explicit cost-hold release or strict free-only exception
+        env:
+          COST_HOLD: ${{ vars.YOUTUBE_COST_HOLD }}
+          CHANNEL: history
+        run: |
+          set -euo pipefail
+          if [[ "${COST_HOLD,,}" == "false" ]]; then
+            echo "Cost hold explicitly released; secret values are not printed."
+          elif [[ "history" == "globalmusic" \
+              && "${PLAYLIST_FREE_ONLY_CHANNEL:-}" == "globalmusic" \
+              && "${PLAYLIST_MUSIC_SOURCE:-}" == "owner_drive" \
+              && "${PLAYLIST_IMAGE_SOURCE:-}" == "pexels_api" \
+              && "${PLAYLIST_PAID_API_ENABLED:-true}" == "false" \
+              && -z "${GEMINI_API_KEY:-}" \
+              && -z "${OPENAI_API_KEY:-}" \
+              && -z "${LYRIA_API_KEY:-}" \
+              && "${AUTO_TOPIC:-true}" == "false" \
+              && -n "${CAPTION_TEXT:-}" \
+              && -n "${PEXELS_API_KEY:-}" \
+              && -n "${MUSIC_SOURCE_FOLDER_ID_GLOBALMUSIC:-}" \
+              && -n "${THUMBNAIL_FOLDER_ID_GLOBALMUSIC:-}" ]]; then
+            echo "Globalmusic free-only exception validated; no paid APIs can be called by this playlist path."
+          else
+            echo "::error::Publishing blocked. Other channels remain held until owner-approved cost review."
+            exit 1
+          fi
+      - name: "3/6 - Choose one of six documentary voices (3 male / 3 female)"
+        shell: bash
+        run: |
+          python - <<'PY'
+          import os, secrets
+          voices = ["en-US-GuyNeural", "en-US-ChristopherNeural", "en-GB-RyanNeural", "en-US-AriaNeural", "en-US-JennyNeural", "en-GB-SoniaNeural"]
+          chosen = secrets.choice(voices)
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as out:
+              out.write("HISTORY_NARRATOR_VOICE=" + chosen + "\n")
+          print("Documentary narrator selected:", chosen)
+          PY
+      - name: "4/6 - Verify private-only policy and history credentials"
+        shell: bash
+        run: |
+          python - <<'PY'
+          import os
+          from automation_hub.youtube_release import upload_privacy_status
+          assert os.environ.get("HISTORY_PRIVATE_ONLY") == "1"
+          assert upload_privacy_status() == "private", "Private-only safety gate failed"
+          print("Private-only upload enforced; missing credentials checked by worker")
+          PY
+      - name: Preflight selected channel credentials
+        env:
+          CHANNEL: history
+        run: |
+          python - <<'PY'
+          import os, sys
+          channel = os.environ['CHANNEL']
+          if channel == 'nasa':
+              required = ['SHEET_ID', 'GEMINI_API_KEY', 'YOUTUBE_OAUTH_REFRESH_TOKEN_NASA_SPACE_TIMES']
+              missing = [key for key in required if not os.environ.get(key, '').strip()]
+              if missing:
+                  print('::error::NASA preflight missing secrets: ' + ', '.join(missing))
+                  sys.exit(1)
+              print('NASA secrets present (values hidden); calendar eligibility checked by worker.')
+          PY
+      - name: "5/6 - Write script, synthesize TTS, render video and attempt PRIVATE upload"
+        env:
+          CHANNEL: history
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          python scripts/youtube_github_worker.py --enqueue-channel "history"
+      - name: "6/6 - Save production logs and upload evidence"
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: history-six-stage-private-${{ github.run_id }}
+          path: |
+            artifacts/youtube_playlist_result.json
+            artifacts/youtube_curio_result.json
+            data/youtube_github_queue/logs/
+          if-no-files-found: warn
+          retention-days: 30

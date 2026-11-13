@@ -412,7 +412,7 @@ def elevenlabs_tts(text, out_path):
         voice = {"ko":"ko-KR-SunHiNeural","en":"en-US-AriaNeural","ja":"ja-JP-NanamiNeural",
                  "vi":"vi-VN-HoaiMyNeural","zh":"zh-CN-XiaoxiaoNeural"}.get(lang, "en-US-AriaNeural")
         async def save():
-            await edge_tts.Communicate(text, voice).save(str(out_path))
+            await edge_tts.Communicate(text, os.getenv("HISTORY_NARRATOR_VOICE", voice) if lang == "en" else voice).save(str(out_path))
         asyncio.run(save())
         if os.path.exists(out_path) and os.path.getsize(out_path) > 2000:
             log(f"   TTS_ENGINE=edge_tts voice={voice} bytes={os.path.getsize(out_path)}")

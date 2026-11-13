@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 
 
@@ -18,6 +19,8 @@ def load_release_policy(path: str | Path = POLICY_PATH) -> dict:
         raise ValueError("YouTube channel identity verification cannot be disabled")
     if policy.get("require_post_upload_privacy_verification") is not True:
         raise ValueError("YouTube post-upload privacy verification cannot be disabled")
+    if os.environ.get("HISTORY_PRIVATE_ONLY") == "1":
+        policy = {**policy, "upload_privacy_status": "private", "public_allowed": False}
     return policy
 
 

@@ -29,8 +29,9 @@ def dispatch_youtube_job(channel_key: str) -> dict:
             "to the control-center environment; no local queue was created."
         )
 
+    workflow = "history-six-stage-private.yml" if channel_key == "history" else WORKFLOW
     ref = os.environ.get("LONDON_PROJECT_GITHUB_REF", "main").strip() or "main"
-    url = f"https://api.github.com/repos/{REPOSITORY}/actions/workflows/{quote(WORKFLOW, safe='')}/dispatches"
+    url = f"https://api.github.com/repos/{REPOSITORY}/actions/workflows/{quote(workflow, safe='')}/dispatches"
     response = requests.post(
         url,
         headers={
@@ -38,7 +39,7 @@ def dispatch_youtube_job(channel_key: str) -> dict:
             "Authorization": f"Bearer {token}",
             "X-GitHub-Api-Version": "2022-11-28",
         },
-        json={"ref": ref, "inputs": {"channel": channel_key, "confirm_publication": "true"}},
+        json={"ref": ref, "inputs": ({"confirm_private_upload": "true"} if channel_key == "history" else {"channel": channel_key, "confirm_publication": "true"})},
         timeout=30,
     )
     if response.status_code != 204:
@@ -49,7 +50,7 @@ def dispatch_youtube_job(channel_key: str) -> dict:
         "job_id": f"gh-dispatch-{channel_key}-{int(time.time())}",
         "channel_key": channel_key,
         "runner": "github-actions",
-        "workflow": WORKFLOW,
-        "run_url": f"https://github.com/{REPOSITORY}/actions/workflows/{WORKFLOW}",
+        "workflow": workflow,
+        "run_url": f"https://github.com/{REPOSITORY}/actions/workflows/{workflow}",
         "status": "queued",
     }
