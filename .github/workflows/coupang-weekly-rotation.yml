@@ -1,0 +1,31 @@
+name: "Coupang verified weekly catalog rotation"
+on:
+  schedule:
+    - cron: '5 15 * * *' # 00:05 KST daily; rotates only when due
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: coupang-weekly-rotation
+  cancel-in-progress: false
+jobs:
+  rotate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Rotate only to ten independently approved products
+        run: python scripts/rotate_coupang_weekly.py
+      - name: Commit approved rotation and immutable archive
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add config/affiliate/global-weekly-10.json config/affiliate/archive config/affiliate/next-weekly-10-verified.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Rotate verified weekly Coupang product catalog"
+            git push
+          fi
