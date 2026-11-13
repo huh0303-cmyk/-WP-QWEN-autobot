@@ -446,7 +446,7 @@ updateControlClock();setInterval(updateControlClock,1000);
 .wp-ops-panel{border:1px solid #cbd5e1;border-radius:12px;background:white;padding:14px;max-width:1050px}
 .wp-ops-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:12px 0}
 .wp-ops-stage{border:1px solid #e2e8f0;border-radius:9px;padding:10px;font-size:12px}
-.wp-ops-stage small{display:block;color:#64748b;margin-top:7px}
+.wp-ops-stage:has(span[style*="#16a34a"]){background:#15803d!important;border:2px solid #166534!important;color:white!important;box-shadow:0 2px 8px #15803d55}.wp-ops-stage:has(span[style*="#16a34a"]) small,.wp-ops-stage:has(span[style*="#16a34a"]) span{color:white!important}@keyframes wpCardFlash{0%,100%{background:#1d4ed8;box-shadow:0 0 0 2px #2563eb55}50%{background:#93c5fd;box-shadow:0 0 0 7px #2563eb22}}.wp-ops-stage:has(span[style*="#2563eb"]){animation:wpCardFlash 1.15s ease-in-out infinite!important;border:2px solid #1d4ed8!important;color:white!important}.wp-ops-stage:has(span[style*="#2563eb"]) small,.wp-ops-stage:has(span[style*="#2563eb"]) span{color:inherit!important}.wp-ops-stage:has(span[style*="#dc2626"]){background:#fee2e2!important;border:2px solid #dc2626!important}@media(prefers-reduced-motion:reduce){.wp-ops-stage:has(span[style*="#2563eb"]){animation:none!important;background:#2563eb!important}}.wp-ops-stage small{display:block;color:#64748b;margin-top:7px}
 .wp-ops-meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .wp-ops-meta div{background:#f1f5f9;padding:9px;border-radius:8px;overflow-wrap:anywhere;font-size:12px}
 .wp-ops-meta b{display:block;color:#64748b;font-size:11px}
