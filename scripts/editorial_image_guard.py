@@ -3,6 +3,7 @@ from concurrent.futures import ThreadPoolExecutor
 from functools import lru_cache
 from io import BytesIO
 import hashlib
+from datetime import datetime, timedelta, timezone
 from urllib.parse import urlparse
 import requests
 from PIL import Image, ImageOps, ImageStat
@@ -37,10 +38,27 @@ def image_fingerprint(url):
     return fingerprint(bytes(data))
 
 
+IMAGE_REUSE_BLOCK_DAYS = 15
+
+
 def recent_posts(site, auth=None):
-    r=requests.get(site.rstrip('/')+'/wp-json/wp/v2/posts',auth=auth,params={"per_page":50,"status":"publish","_embed":"wp:featuredmedia"},timeout=30)
-    r.raise_for_status()
-    return r.json()
+    """Read all published posts from the 15-day image reuse exclusion window."""
+    cutoff = datetime.now(timezone.utc) - timedelta(days=IMAGE_REUSE_BLOCK_DAYS)
+    posts = []
+    page = 1
+    while True:
+        r = requests.get(site.rstrip('/')+'/wp-json/wp/v2/posts', auth=auth,
+            params={"per_page":100, "page":page, "after":cutoff.isoformat(),
+                    "status":"publish", "_embed":"wp:featuredmedia"}, timeout=30)
+        r.raise_for_status()
+        batch = r.json()
+        posts.extend(batch)
+        total_pages = int(r.headers.get('X-WP-TotalPages', '1'))
+        if page >= total_pages:
+            return posts
+        page += 1
+        if page > 100:
+            raise RuntimeError('Image history pagination limit reached; block unchecked reuse')
 
 
 def photo_url(post):
