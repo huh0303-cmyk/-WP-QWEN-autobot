@@ -92,6 +92,17 @@ def _claim(job: dict) -> tuple[object, str]:
         if not any(row["key"] == "history" and row["when"].date() == now.date() for row in rows):
             _prepare_history_today(service, sid, now)
             rows = read_calendar(service, sid)
+        today_rows = [row for row in rows if row["key"] == "history" and row["when"].date() == now.date()]
+        if len(today_rows) == 1:
+            previous = today_rows[0]
+            if (previous["status"] == "실패" and not previous["url"]
+                    and "[yt-worker:" in previous["notes"] and "[yt-upload:" not in previous["notes"]):
+                retained_notes = "\n".join(
+                    line for line in previous["notes"].splitlines()
+                    if "[yt-calendar:" not in line and "[yt-worker:" not in line
+                )
+                update_row(service, sid, previous, READY, "", retained_notes)
+                rows = read_calendar(service, sid)
     rows = [
         row for row in rows
         if row["key"] != "history" or row["when"].date() == now.date()
