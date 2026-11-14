@@ -18,8 +18,8 @@ TAG_RE = re.compile(r"<[^>]*>", re.S)
 
 
 def visible_length(article_html):
-    text = TAG_RE.sub(" ", re.sub(r"(?is)<(script|style)\\b.*?</\\1>", "", article_html or ""))
-    return len(re.sub(r"\\s+", "", html.unescape(text)))
+    text = TAG_RE.sub(" ", re.sub(r"(?is)<(script|style)\b.*?</\1>", "", article_html or ""))
+    return len(re.sub(r"\s+", "", html.unescape(text)))
 
 
 def validate_article_length(article_html, min_chars=MIN_CHARS, max_chars=MAX_CHARS):
@@ -41,37 +41,37 @@ def format_article(article_html, site_url="", *, include_faq=True):
     accent = accent_for(site_url)
     article = article_html
     article = re.sub(
-        r"<h2(\\s[^>]*)?>",
+        r"<h2(\s[^>]*)?>",
         lambda m: '<h2 style="font-size:1.55rem;line-height:1.4;margin:2rem 0 1rem;'
         f'padding:.65rem .85rem;border-left:5px solid {accent};'
         'background:#f8fafc;border-radius:0 8px 8px 0;color:#172033;">',
         article, flags=re.I,
     )
     article = re.sub(
-        r"<h3(\\s[^>]*)?>",
+        r"<h3(\s[^>]*)?>",
         lambda m: '<h3 style="font-size:1.2rem;line-height:1.5;margin:1.5rem 0 .75rem;'
         f'padding-bottom:.4rem;border-bottom:1px solid {accent};color:#1f2937;">',
         article, flags=re.I,
     )
     article = re.sub(
-        r"<blockquote(\\s[^>]*)?>",
+        r"<blockquote(\s[^>]*)?>",
         lambda m: '<blockquote style="margin:1.5rem 0;padding:1rem 1.25rem;'
         f'border-left:4px solid {accent};background:#f8fafc;border-radius:6px;">',
         article, flags=re.I,
     )
     article = re.sub(
-        r"<p(\\s[^>]*)?>",
+        r"<p(\s[^>]*)?>",
         '<p style="margin:0 0 1.15rem;line-height:1.85;">',
         article, flags=re.I,
     )
     article = re.sub(
-        r"<hr(\\s[^>]*)?/?>",
+        r"<hr(\s[^>]*)?/?>",
         f'<hr style="border:0;border-top:1px solid {accent};opacity:.35;margin:2rem 0;">',
         article, flags=re.I,
     )
     # Lead paragraph becomes a restrained summary highlight; no text is duplicated.
     article = re.sub(
-        r"<p style=\\\"margin:0 0 1\\.15rem;line-height:1\\.85;\\\">",
+        r"<p style=\\"margin:0 0 1\.15rem;line-height:1\.85;\\">",
         f'<p style="margin:0 0 1.3rem;line-height:1.85;padding:1rem 1.15rem;'
         f'border-left:4px solid {accent};background:#f8fafc;border-radius:6px;">',
         article, count=1, flags=re.I,
