@@ -493,7 +493,7 @@ function lastPostQuality(platform,site){
  field('writer','1. 글쓰기 엔진',first(['text_engine','writing_engine','llm_model']))+
  field('image','2. 이미지 엔진',first(['image_engine','image_provider','image_source']))+
  field('chars','3. 콘텐츠 길이',first(['character_count','char_count','body_char_count'])==null?null:Number(first(['character_count','char_count','body_char_count'])).toLocaleString('ko-KR')+'자')+
- field('title','4. 최신 글 제목',first(['title','post_title']))+
+ field('title','4. 최신 콘텐츠 제목',first(['title','post_title']))+
  field('url','5. 게시물 URL',first(['published_url','post_url']),true)+
  field('published','6. 발행 시각',first(['published_at_kst','post_published_at_kst']))+
  '</div>';
@@ -519,7 +519,7 @@ function socialLatestQuality(platform,name,handle){
   length=hms?(hms+':'+String(mins).padStart(2,'0')+':'+String(secs).padStart(2,'0')):(mins+':'+String(secs).padStart(2,'0'));
  }else if(Number.isFinite(textLength)){length=Number(textLength).toLocaleString('ko-KR')+'자';}
  var publishedText='⚪ 확인 필요';
- if(published){var dt=new Date(published);if(!isNaN(dt.getTime()))publishedText=dt.toLocaleString('ko-KR',{timeZone:'Asia/Seoul',hour12:false,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'})+' KST';}
+ if(published){if(/^\\d{4}-\\d{2}-\\d{2}$/.test(String(published)))publishedText=String(published)+' (시각 미제공)';else{var dt=new Date(published);if(!isNaN(dt.getTime()))publishedText=dt.toLocaleString('ko-KR',{timeZone:'Asia/Seoul',hour12:false,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'})+' KST';}}
  function field(id,label,value,link){
   var display=value===null||value===undefined||value===''?'⚪ 확인 필요':clean(value);
   if(link&&value&&/^https?:\\/\\//i.test(String(value)))display='<a href="'+clean(value)+'" target="_blank" rel="noopener">'+clean(value)+'</a>';
