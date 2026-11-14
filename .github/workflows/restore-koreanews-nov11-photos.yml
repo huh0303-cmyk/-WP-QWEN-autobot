@@ -1,0 +1,41 @@
+name: Restore November 11 KoreaNews365 photos
+on: workflow_dispatch
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          WP_PASSWORD: ${{ secrets.KOREANEWS365COM }}
+        run: |
+          python - <<'PY'
+          import base64,json,os,urllib.request,urllib.parse
+          root="https://koreanews365.com/wp-json/wp/v2/"
+          auth=base64.b64encode(("huh0303@gmail.com:"+os.environ["WP_PASSWORD"]).encode()).decode()
+          def wp(path,payload=None,photo=None,filename=None):
+              headers={"Authorization":"Basic "+auth}
+              if photo:
+                  headers.update({"Content-Type":"image/jpeg","Content-Disposition":f"attachment; filename={filename}"})
+              if payload is not None:
+                  photo=json.dumps(payload,ensure_ascii=False).encode()
+                  headers["Content-Type"]="application/json"
+              with urllib.request.urlopen(urllib.request.Request(root+path,photo,headers),timeout=45) as response:
+                  return json.load(response)
+          items=[
+              (7477,"Pete Hegseth Official Portrait (3x4).jpg","pete-hegseth-nov11.jpg","피트 헤그세스 미 국방장관 공식 초상 자료사진","미 국방부, 2025년 1월. 퍼블릭 도메인."),
+              (7478,"The Pentagon January 2008.jpg","pentagon-nov11.jpg","미 국방부 청사 펜타곤 항공 자료사진","David B. Gleason, 2008년 1월. CC BY-SA 2.0. https://creativecommons.org/licenses/by-sa/2.0/"),
+          ]
+          for post_id,file,filename,alt,credit in items:
+              post=wp(f"posts/{post_id}?_fields=id,date,link,featured_media")
+              assert post["date"].startswith("2026-11-11")
+              file=urllib.parse.quote(file.replace(" ","_"))
+              url="https://commons.wikimedia.org/wiki/Special:FilePath/"+file
+              req=urllib.request.Request(url,headers={"User-Agent":"KoreaNews365 Editorial Image Fetch/1.0 (https://koreanews365.com/)"})
+              with urllib.request.urlopen(req,timeout=40) as response:
+                  photo=response.read()
+              assert photo.startswith(bytes.fromhex("ffd8ff"))
+              media=wp("media",photo=photo,filename=filename)
+              wp(f"media/{media['id']}",dict(alt_text=alt,caption=alt+" · "+credit,description=credit+" https://commons.wikimedia.org/wiki/File:"+file))
+              saved=wp(f"posts/{post_id}",dict(featured_media=media["id"]))
+              assert saved["featured_media"]==media["id"]
+              print(saved["id"],saved["link"],saved["featured_media"])
+          PY
