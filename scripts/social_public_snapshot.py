@@ -433,16 +433,18 @@ def receipt_metadata(row: dict[str, Any]) -> dict[str, Any]:
     platform = str(row.get("platform") or "").lower()
     handle = str(row.get("handle") or "").strip().lstrip("@").lower()
     name = str(row.get("name") or "").strip().lower()
+    role = str(row.get("role") or "").strip().lower()
     matches = []
     for receipt in payload.get("publications", []):
         if not isinstance(receipt, dict) or str(receipt.get("platform") or "").lower() != platform:
             continue
         receipt_handle = str(receipt.get("handle") or "").strip().lstrip("@").lower()
+        receipt_role = str(receipt.get("role") or "").strip().lower()
         account_name = str(receipt.get("account_name") or "").strip().lower()
-        if handle and receipt_handle != handle:
-            if platform != "facebook" or not (account_name and name and (account_name in name or name in account_name)):
-                continue
-        elif not handle and platform == "facebook" and account_name and name and account_name not in name and name not in account_name:
+        role_match = bool(role and receipt_role and role == receipt_role)
+        handle_match = bool(handle and receipt_handle and handle == receipt_handle)
+        name_match = bool(platform == "facebook" and account_name and name and (account_name in name or name in account_name))
+        if not (role_match or handle_match or name_match):
             continue
         matches.append(receipt)
     receipt = max(matches, key=lambda item: str(item.get("published_at") or "")) if matches else {}
