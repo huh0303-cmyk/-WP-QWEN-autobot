@@ -1,0 +1,28 @@
+name: Deploy KoreaNews365 masthead
+on: workflow_dispatch
+permissions:
+  contents: read
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - env:
+          WP_PASSWORD: ${{ secrets.KOREANEWS365COM }}
+        run: |
+          python - <<'PY'
+          import os,json,base64,urllib.request
+          from pathlib import Path
+          url="https://koreanews365.com/wp-json/code-snippets/v1/snippets"
+          token=base64.b64encode(("huh0303@gmail.com:"+os.environ["WP_PASSWORD"]).encode()).decode()
+          headers={"Authorization":"Basic "+token,"Content-Type":"application/json"}
+          def api(url,method="GET",body=None):
+              with urllib.request.urlopen(urllib.request.Request(url,body,headers,method=method),timeout=30) as response:
+                  return json.load(response)
+          name="KoreaNews365 bilingual newspaper masthead"
+          code=Path("scripts/koreanews_bilingual_masthead.php").read_text(encoding="utf-8").removeprefix("<?php")
+          prior=next((item for item in api(url) if item["name"]==name),None)
+          body=json.dumps(dict(name=name,code=code,scope="global",active=True)).encode()
+          result=api(url+"/"+str(prior["id"]),"PUT",body) if prior else api(url,"POST",body)
+          assert result["active"]
+          PY
