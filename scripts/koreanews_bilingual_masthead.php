@@ -35,6 +35,10 @@ add_action('wp_head', function () {
       .kn365-left{justify-self:start;text-align:left}
       .kn365-right{justify-self:end;text-align:right}
       @media(max-width:575px){.mg-headwidget a.kn365-brand{grid-template-columns:1fr 1fr;row-gap:12px}.kn365-center{grid-column:1/-1;grid-row:1}.kn365-side{font-size:11px}}
+      body.home,body.blog,body.archive,body.single{background:#f1f2f3!important}
+      #page.site{background:#fff!important;border-inline-color:#dedfe1!important}
+      header.mg-headwidget,.mg-headwidget .mg-nav-widget-area,.mg-headwidget .mg-nav-widget-area-back,.mg-headwidget .mg-nav-widget-area-back .inner{background:#fff!important;background-image:none!important}
+      header.mg-headwidget::before{content:"";display:block;height:13px;background:radial-gradient(circle at 7px 6px,#e4e6e8 0 2px,transparent 2.6px) 0 0/14px 13px repeat-x,#fff;border-top:1px solid #eceef0;pointer-events:none}
     </style>
     <?php
 }, 100);
