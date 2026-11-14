@@ -1,21 +1,70 @@
 {
-    "sites":  {
-                  "kfinance365.com":  {
-                                          "published_url":  "https://kfinance365.com/macroeconomic-debt-totals-and-retail-credit-conditions-personal-finance-decisions-for-resident-foreign-workers/",
-                                          "groups":  [
-                                                         "success",
-                                                         "success",
-                                                         "success",
-                                                         "unknown"
-                                                     ],
-                                          "error":  "",
-                                          "rank_math_score":  null,
-                                          "topic_keyword":  "trillion won",
-                                          "text_engine":  "gemini-3.6-flash",
-                                          "image_engine":  "Pexels / Pixabay / SDXL Turbo / FLUX Schnell: all failed; published without image",
-                                          "run_id":  43383357184,
-                                          "image_count":  0,
-                                          "run_status":  "success (SEO score not verified)"
-                                      }
-              }
+  "sites": {
+    "kfinance365.com": {
+      "published_url": "https://kfinance365.com/macroeconomic-debt-totals-and-retail-credit-conditions-personal-finance-decisions-for-resident-foreign-workers/",
+      "groups": [
+        "success",
+        "success",
+        "success",
+        "unknown"
+      ],
+      "error": "",
+      "rank_math_score": null,
+      "topic_keyword": "trillion won",
+      "text_engine": "gemini-3.6-flash",
+      "image_engine": "Pexels / Pixabay / SDXL Turbo / FLUX Schnell: all failed; published without image",
+      "run_id": 43383357184,
+      "image_count": 0,
+      "run_status": "success (SEO score not verified)"
+    },
+    "k-trip365.com": {
+      "published_url": "https://k-trip365.com/maximizing-seoul-short-term-transit-passes-for-urban-mobility-and-attraction-logistics/",
+      "title": "Maximizing Seoul Short-Term Transit Passes for Urban Mobility and Attraction Logistics",
+      "text_engine": "Google Gemini 3.5 Flash Lite (gemini-3.5-flash-lite)",
+      "text_engine_attempts": [
+        {
+          "model": "gemini-3.6-flash",
+          "result": "failed",
+          "error": "HTTPError"
+        },
+        {
+          "model": "gemini-3.5-flash",
+          "result": "failed",
+          "error": "HTTPError"
+        },
+        {
+          "model": "gemini-3.5-flash-lite",
+          "result": "success"
+        }
+      ],
+      "image_engine": "No image published — Pexels/Pixabay/SDXL Turbo/FLUX Schnell all failed",
+      "image_engine_attempts": [
+        {
+          "provider": "Pexels",
+          "result": "failed"
+        },
+        {
+          "provider": "Pixabay",
+          "result": "failed"
+        },
+        {
+          "provider": "bytonylee/sdxl-turbo",
+          "result": "failed",
+          "error": "HTTPError"
+        },
+        {
+          "provider": "black-forest-labs/flux-schnell",
+          "result": "failed",
+          "error": "HTTPError"
+        }
+      ],
+      "image_count": 0,
+      "character_count": 6059,
+      "published_at_kst": "2026-11-14T07:50:52+09:00",
+      "run_id": 43522012340,
+      "run_status": "success",
+      "evidence_source": "GitHub Actions job log 132218420143",
+      "evidence_checked_at": "2026-11-15T01:15:00+09:00"
+    }
+  }
 }
