@@ -3,7 +3,7 @@
  "reference_date": "2026-11-11",
  "blogspot_content_metadata_checked_at": "2026-11-14T20:47:26.270872+09:00",
  "blogger_pageviews": {
-  "generated_at": "2026-11-13T11:38:13.882303+09:00",
+  "generated_at": "2026-11-14T20:49:34.668136+09:00",
   "source": "Rendered public Blogger Total Pageviews widget; approximate dashboard signal, not analytics-grade",
   "blogs": [
    {
@@ -471,7 +471,7 @@
     "last_verified_total_pageviews": null,
     "total_pageviews": null,
     "daily_pageviews": null,
-    "last_attempt_at": "2026-11-13T11:38:13.882303+09:00",
+    "last_attempt_at": "2026-11-14T20:49:34.668136+09:00",
     "last_attempt_status": "HTTP_429",
     "status": "HTTP_429",
     "source": null
@@ -1057,8 +1057,8 @@
     "checked_at": "2026-11-13T11:38:13.882303+09:00"
    }
   ],
-  "successful": 30,
-  "failed": 3
+  "successful": 0,
+  "failed": 1
  },
  "basis": "매일 07:00 KST 갱신 · GSC 검색 클릭·노출 기준일은 3일 전(GSC 지연 반영) · 클릭수는 사이트 방문자 수가 아님 · 색인수는 GSC 사이트맵 보고값이며 노출 페이지 수가 아님.",
  "rows": [
