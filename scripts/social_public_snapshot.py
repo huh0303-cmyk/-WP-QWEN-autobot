@@ -423,9 +423,13 @@ def read_previous() -> dict[str, dict[str, Any]]:
 def receipt_metadata(row: dict[str, Any]) -> dict[str, Any]:
     """Use the newest verified publication receipt as a fallback, never as a guessed post."""
     try:
+        evidence = json.loads((ROOT / "data" / "social_content_evidence.json").read_text(encoding="utf-8")).get("accounts", {}).get(account_key(row), {})
+    except (OSError, ValueError, TypeError, AttributeError):
+        evidence = {}
+    try:
         payload = json.loads((ROOT / "data" / "social_publication_receipts.json").read_text(encoding="utf-8"))
     except (OSError, ValueError, TypeError):
-        return {}
+        payload = {"publications": []}
     platform = str(row.get("platform") or "").lower()
     handle = str(row.get("handle") or "").strip().lstrip("@").lower()
     name = str(row.get("name") or "").strip().lower()
@@ -441,9 +445,7 @@ def receipt_metadata(row: dict[str, Any]) -> dict[str, Any]:
         elif not handle and platform == "facebook" and account_name and name and account_name not in name and name not in account_name:
             continue
         matches.append(receipt)
-    if not matches:
-        return {}
-    receipt = max(matches, key=lambda item: str(item.get("published_at") or ""))
+    receipt = max(matches, key=lambda item: str(item.get("published_at") or "")) if matches else {}
     content_id = str(receipt.get("content_id") or "")
     spec = {}
     if content_id:
@@ -453,18 +455,13 @@ def receipt_metadata(row: dict[str, Any]) -> dict[str, Any]:
             spec = {}
     section = spec.get(platform, {}) if isinstance(spec, dict) else {}
     caption = str(section.get("caption") or section.get("text") or "")
-    evidence = {}
-    try:
-        evidence = json.loads((ROOT / "data" / "social_content_evidence.json").read_text(encoding="utf-8")).get("accounts", {}).get(account_key(row), {})
-    except (OSError, ValueError, TypeError, AttributeError):
-        evidence = {}
     return {
-        "latest_content_title": first_line(caption) or evidence.get("title"),
-        "latest_content_url": receipt.get("url") or None,
-        "latest_content_published_at": receipt.get("published_at") or None,
-        "latest_content_text_length": len(caption) if caption else None,
-        "latest_text_engine": evidence.get("text_engine") or spec.get("text_engine"),
-        "latest_image_engine": evidence.get("image_engine") or spec.get("image_engine"),
+        "latest_content_title": receipt.get("title") or first_line(caption) or evidence.get("title"),
+        "latest_content_url": receipt.get("url") or evidence.get("url") or None,
+        "latest_content_published_at": receipt.get("published_at") or evidence.get("published_at") or None,
+        "latest_content_text_length": receipt.get("character_count") or (len(caption) if caption else evidence.get("character_count")),
+        "latest_text_engine": receipt.get("text_engine") or evidence.get("text_engine") or spec.get("text_engine"),
+        "latest_image_engine": receipt.get("image_engine") or evidence.get("image_engine") or spec.get("image_engine"),
     }
 
 
