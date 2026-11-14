@@ -1897,7 +1897,7 @@ def make_site_prompt(keyword, site, reporter, tag_count=None, min_chars_override
 - 간결한 신문 기사체를 사용하고 과장, 감탄, 지어낸 인용·수치·인명·날짜·반응을 금지한다.
 - RSS 원문을 문단별로 번역·치환·재서술하지 않는다. 과거 연도와 수치를 현재 값으로 바꾸지 않는다.
 - 정보가 부족하면 사실을 지어내지 말고 공식 자료와 추가 출처를 더 대조해 2,500자 이상으로 확장한다. 검증 가능한 내용이 부족하면 완성본을 출력하지 않는다.
-- 끝에 META_DESC: 100~140자, FAQ_START~FAQ_END 3개, TAGS: 짧은 명사 6~10개를 쓴다. TITLE은 출력하지 않는다."""
+- 출력 첫 줄은 반드시 `TITLE: 완성된 기사 제목`으로 시작한다. 그 뒤 본문 HTML, META_DESC: 100~140자, FAQ_START~FAQ_END 3개, TAGS: 짧은 명사 6~10개 순서로 쓴다."""
         return f"""[THE SEOUL JOURNAL NEWSROOM ONLY]\nRole: {persona}\nReporting lead: {keyword}\nEditorial scope: {scope}\n
 - Use only p, h2, blockquote, ul and li HTML tags.
 - There is no minimum length. Write 1–3 short paragraphs supported by the supplied excerpt. Do not add context or speculation to fill space.
@@ -3385,7 +3385,7 @@ def resize_newsroom_body(body, lang, source_summary, min_chars=400, max_chars=15
     pushed the model toward padding a thin gov.uk source past what it
     could support without inventing facts. Target a modest margin above
     whatever floor the caller actually asked for."""
-    target_lo, target_hi = min_chars + 100, min(max_chars - 100, 1400)
+    target_lo, target_hi = min_chars + 100, max_chars - 100
     instruction = (
         "아래 뉴스 기사 HTML을 공백 제외 " if lang == "ko" else
         "Edit the news article HTML below to "
@@ -3527,6 +3527,12 @@ def process_one(site, keyword):
         time.sleep(SLEEP_BETWEEN_POSTS)
         body_raw,title,meta,faq=extract_meta_and_faq(raw)
         body,tags=extract_tags(body_raw,keyword,theme,lang,is_news=(mode in ("news","news_en")),tag_count=tag_count)
+        if mode in ("news", "news_en") and not title:
+            # The RSS headline is already source-grounded. If the model omits the
+            # required TITLE line, recover a concise newsroom headline instead of
+            # discarding an otherwise usable article.
+            title = build_news_headline(keyword, lang)
+            print(f"  🛠 뉴스 제목 자동 복구: {title}")
 
         # A news brief stays as long as its verified source warrants. Never
         # pad or truncate it solely to satisfy a generic character target.
@@ -3592,6 +3598,22 @@ def process_one(site, keyword):
         return False
 
     body,title,meta,faq,tags=best_result
+
+    # Koreanews365 uses the same 2,500–3,500 character publication standard as
+    # the other WordPress sites. Run a dedicated fact-bounded expansion pass
+    # because newsroom models often stop around 1,500 characters even when the
+    # main prompt asks for more. Never invent facts, figures, quotes, or sources.
+    if url.rstrip("/").lower() == "https://koreanews365.com":
+        for _resize_attempt in range(2):
+            _visible = newsroom_char_count(body)
+            if 2500 <= _visible <= 3500:
+                break
+            if _visible < 2500:
+                print(f"  🧩 뉴스 본문 확장 {_resize_attempt + 1}/2: {_visible}자 → 2,500~3,500자")
+                body = resize_newsroom_body(body, lang, news_source_summary, min_chars=2500, max_chars=3500)
+            else:
+                body = trim_newsroom_body(body, 3500)
+
     if url.rstrip("/").lower() == "https://kworld365.com":
         from automation_hub.repetition_guard import plain as _plain_article
         _length = len(re.sub(r"\\s+", "", _plain_article(body)))
