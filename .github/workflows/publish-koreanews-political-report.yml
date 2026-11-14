@@ -1,0 +1,50 @@
+name: Publish KoreaNews365 political report
+on: workflow_dispatch
+permissions:
+  contents: read
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          WP_PASSWORD: ${{ secrets.KOREANEWS365COM }}
+        run: |
+          python - <<'PY'
+          import base64,json,os,urllib.request
+          root="https://koreanews365.com/wp-json/wp/v2/"
+          token=base64.b64encode(("huh0303@gmail.com:"+os.environ["WP_PASSWORD"]).encode()).decode()
+          def wp(path, payload=None, raw=None):
+              headers={"Authorization":"Basic "+token}
+              if raw is not None:
+                  headers.update({"Content-Type":"image/jpeg","Content-Disposition":"attachment; filename=lee-jae-myung-white-house-2025.jpg"})
+              elif payload is not None:
+                  raw=json.dumps(payload,ensure_ascii=False).encode()
+                  headers["Content-Type"]="application/json"
+              with urllib.request.urlopen(urllib.request.Request(root+path,raw,headers),timeout=45) as response:
+                  return json.load(response)
+          slug="lee-han-jang-election-trial-special-counsel-nov14"
+          existing=wp("posts?slug="+slug)
+          if existing:
+              print(existing[0]["link"],existing[0]["featured_media"])
+              raise SystemExit
+          url="https://commons.wikimedia.org/wiki/Special:FilePath/Lee_Jae_Myung_portrait.jpg"
+          with urllib.request.urlopen(urllib.request.Request(url,headers={"User-Agent":"KoreaNews365 Editorial Image Fetch/1.0 (https://koreanews365.com/)"}),timeout=40) as response:
+              photo=response.read()
+          assert photo.startswith(bytes.fromhex("ffd8ff"))
+          media=wp("media",raw=photo)
+          credit="이재명 대통령 자료사진. 2025년 10월 29일 경주 국립경주박물관. 사진 백악관 / 위키미디어 공용."
+          wp(f"media/{media['id']}",dict(alt_text="이재명 대통령의 2025년 경주 방문 당시 자료사진",caption=credit))
+          article="""<p>이재명 대통령 관련 사법 현안을 두고 14일 정치권에서 두 갈래 공방이 벌어졌다. 한동훈 무소속 의원과 최민희 더불어민주당 의원은 공직선거법 재판을 놓고 소셜미디어에서 맞섰다. 장동혁 국민의힘 대표는 부산역 광장 집회에서 이른바 ‘조작기소 특검법’을 비판하며 이 대통령에게 거부권 행사를 촉구했다.</p>
+          <div style="background:#f5f0eb;border-left:4px solid #783a33;padding:12px 16px"><strong>핵심 요약</strong><p>한동훈·최민희 의원의 공방은 재판에 대한 발언에서 시작됐다. 장동혁 대표가 참석한 부산 집회의 요구는 특검법에 대한 대통령의 거부권 행사였다.</p></div>
+          <h2>한동훈·최민희, 선거법 재판 발언 두고 공방</h2>
+          <p>연합뉴스와 한겨레에 따르면, 두 의원의 설전은 이재명 대통령과 윤석열 전 대통령의 공직선거법 재판을 비교한 최 의원의 발언이 알려지면서 시작됐다. 한 의원은 자신의 페이스북에서 이 대통령의 재판이 열릴 경우 유죄가 나올 것이라는 견해를 밝혔다. 최 의원은 한 의원의 주장을 반박하고 이 대통령 사건을 두고 검찰 수사와 기소에 문제가 있었다는 입장을 폈다.</p>
+          <hr>
+          <h2>장동혁, 부산역 집회서 특검법 거부권 촉구</h2>
+          <p>같은 날 국민의힘은 부산역 광장에서 특검법 규탄 집회를 열었다. 장 대표와 정점식 원내대표 등 지도부가 참석했다. 국민의힘은 민주당의 법안 처리를 비판하고 이 대통령의 재의요구권 행사를 요구했다. 민주당은 국민의힘의 장외집회를 두고 예산국회에 집중해야 한다고 비판했다.</p>
+          <p>두 공방은 쟁점이 다르다. 한 의원과 최 의원은 개별 선거법 사건에 대한 평가를 놓고 대립했다. 부산 집회에선 국회를 통과한 특검법에 대한 대통령의 대응이 쟁점이었다.</p>
+          <p><strong>보도 출처</strong> <a href="https://www.yna.co.kr/view/AKR20261114037800001">연합뉴스 · 선거법 재판 공방</a> · <a href="https://www.hani.co.kr/arti/politics/politics_general/1287338.html">한겨레 · 양측 발언</a> · <a href="https://www.yna.co.kr/view/AKR20261114041600001">연합뉴스 · 부산 집회</a></p>"""
+          article+='<p><small>'+credit+' <a href="https://commons.wikimedia.org/wiki/File:Lee_Jae_Myung_portrait.jpg">사진 원본</a></small></p>'
+          post=wp("posts",dict(title="이재명 재판 놓고 한동훈·최민희 공방…장동혁은 부산서 특검법 규탄",slug=slug,content=article,categories=[788],featured_media=media["id"],status="publish"))
+          assert post["status"]=="publish" and post["featured_media"]==media["id"]
+          print(post["id"],post["link"],post["featured_media"])
+          PY
