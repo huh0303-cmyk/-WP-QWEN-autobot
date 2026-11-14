@@ -36,6 +36,26 @@ def main() -> None:
             "checked_at": str(row.get("checked_at") or checked_at),
         }
 
+    # Merge authenticated cumulative WordPress visitor totals from the latest
+    # Core Metrics snapshot; keep the previous-day visitor counter separate.
+    core_path = ROOT / "data" / "core_metrics_latest.json"
+    if core_path.exists():
+        try:
+            core = json.loads(core_path.read_text(encoding="utf-8"))
+            for row in core.get("records", []):
+                if row.get("platform") not in {"wordpress", "news"}:
+                    continue
+                domain = str(row.get("url") or "").lower().replace("https://", "").replace("http://", "").strip("/")
+                total = row.get("total_visitors")
+                if domain and isinstance(total, int) and total >= 0:
+                    sites.setdefault(domain, {})
+                    sites[domain].update({"total_visitors": total,
+                        "total_visitors_delta": None,
+                        "total_visitors_source": "authenticated WordPress site-stats counter",
+                        "total_visitors_checked_at": row.get("visitor_checked_at") or core.get("generated_at")})
+        except (OSError, ValueError, TypeError):
+            pass
+
     # Include Blogger native visitor statistics only when their snapshot is current.
     blogger_path = ROOT / "data" / "blogger_traffic_latest.json"
     if blogger_path.exists():

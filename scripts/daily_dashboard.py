@@ -301,6 +301,12 @@ def one(h, props, platform, url, display_name, ref, prev_hist):
            "status": "OK"}
     prop = prop_for(url, props)
     row["gsc_property"] = prop
+    # Fetch indexed URL count independently: Search Analytics may return no rows
+    # for a day even when Search Console has indexed URLs for the property.
+    row["google_indexed"] = indexed_sitemap_count(h, prop) if prop else None
+    row["google_indexed_status"] = "GSC_SITEMAPS_API" if row["google_indexed"] is not None else "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE"
+    previous_indexed = prev_hist.get(row["site"], {}).get("google_indexed", prev_hist.get(row["site"], {}).get("google_pages"))
+    row["google_indexed_delta"] = (row["google_indexed"] - previous_indexed) if row["google_indexed"] is not None and previous_indexed is not None else None
     day = ref.isoformat()
     before = (ref - dt.timedelta(days=1)).isoformat()
     content_meta = content_metadata(url, platform)
@@ -351,13 +357,6 @@ def one(h, props, platform, url, display_name, ref, prev_hist):
     row["impressions"] = int(im[day]) if has_day else None
     row["impressions_delta"] = int(im[day] - im.get(before, 0)) if has_day else None
     row["cumulative_impressions"] = int(sum(r.get("impressions", 0) for r in tot)) if tot is not None else None
-    row["google_indexed"] = indexed_sitemap_count(h, prop)
-    row["google_indexed_status"] = "GSC_SITEMAPS_API" if row["google_indexed"] is not None else "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE"
-    previous_indexed = p.get("google_indexed", p.get("google_pages"))
-    if row["google_indexed"] is not None and previous_indexed is not None:
-        row["google_indexed_delta"] = row["google_indexed"] - previous_indexed
-    else:
-        row["google_indexed_delta"] = None
     return row
 
 
@@ -407,6 +406,20 @@ def main():
     prev = hist[prev_dates[-1]] if prev_dates else {}
     with ThreadPoolExecutor(max_workers=8) as ex:
         rows = list(ex.map(lambda t: one(h, props, t[0], t[1], t[2], ref, prev), targets))
+    # Attach independently verified cumulative WP visitor totals from the
+    # authenticated site-stats collector. Blogger cumulative pageviews remain
+    # sourced from the Blogger Total Pageviews widget/API, not conflated here.
+    try:
+        metrics = json.loads((ROOT / "data" / "core_metrics_latest.json").read_text(encoding="utf-8"))
+        visitor_by_url = {str(x.get("url", "")).rstrip("/").lower(): x for x in metrics.get("records", [])}
+        for row in rows:
+            metric = visitor_by_url.get(str(row.get("url", "")).rstrip("/").lower(), {})
+            if metric.get("total_visitors") is not None:
+                row["total_visitors"] = metric.get("total_visitors")
+                row["total_visitors_delta"] = metric.get("total_delta")
+                row["visitor_total_checked_at"] = metric.get("visitor_checked_at") or metrics.get("generated_at")
+    except (OSError, ValueError, TypeError):
+        pass
     rows.sort(key=lambda r: (r["clicks"] is None, -(r["clicks"] or 0), -(r["impressions"] or 0), r["site"]))
     for i, r in enumerate(rows, 1):
         r["rank"] = i
