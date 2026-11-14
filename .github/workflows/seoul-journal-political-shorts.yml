@@ -36,7 +36,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Validate OAuth secrets before spending build time
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           FISH_AUDIO_API_KEY: ${{ secrets.FISH_AUDIO_API_KEY }}
           FISH_AUDIO_VOICE_IDS: ${{ secrets.FISH_AUDIO_VOICE_IDS }}
           YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_CLIENT_ID }}
@@ -51,7 +51,7 @@ jobs:
             exit 1
           fi
           missing=""
-          for name in OPENAI_API_KEY FISH_AUDIO_API_KEY YOUTUBE_OAUTH_CLIENT_ID YOUTUBE_OAUTH_CLIENT_SECRET SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID; do
+          for name in GEMINI_API_KEY FISH_AUDIO_API_KEY YOUTUBE_OAUTH_CLIENT_ID YOUTUBE_OAUTH_CLIENT_SECRET SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID; do
             eval 'value=${'"$name"'-}'
             if [ -z "$value" ]; then
               echo "::error title=Missing GitHub secret::$name is not configured. Check the repository secret or the FISH_AUDIO_API_KEY environment secret."
