@@ -3269,6 +3269,8 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
     real_photo = site.get("_newsroom_real_photo") if is_newsroom else None
     featured_url = real_photo["image_url"] if real_photo else (images[0] if images else "")
     featured_media_id = ensure_featured_media(url, pw, featured_url, real_photo["caption_ko" if site.get("lang") == "ko" else "caption_en"] if real_photo else title)
+    if url.rstrip("/").lower() in {"https://koreanews365.com", "http://koreanews365.com"} and not featured_media_id:
+        return {"ok": False, "error": "KOREANEWS365_IMAGE_UPLOAD_FAILED: no WordPress featured media ID"}
     if featured_media_id:
         data["featured_media"] = featured_media_id
     if author_id and author_id>0: data["author"]=author_id
