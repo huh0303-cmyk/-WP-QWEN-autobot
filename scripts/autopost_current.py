@@ -67,6 +67,23 @@ base.PEXELS_KEY = os.getenv("PEXELS_API_KEY") or None
 base.AUTOMATED_IMAGE_PUBLISHING_ENABLED = True
 base.WP_IMAGE_COUNT = 0 if os.environ.get("WP_IMAGE_COUNT", "1").strip() == "0" else 1
 
+# Enforce editorial length and a consistent, site-colored reader layout for all
+# WordPress sites routed through this entrypoint. Commercial footers are excluded
+# from the count because this check runs on the editorial body only.
+from automation_hub.editorial_readability import format_article, validate_article_length
+_original_wp_post = base.wp_post
+
+def _readable_wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, reporter, category_hint=""):
+    try:
+        count = validate_article_length(body_html)
+    except ValueError as exc:
+        return {"ok": False, "error": str(exc)}
+    print(f"EDITORIAL_LENGTH_OK: {count} characters (2500-4000)")
+    body_html = format_article(body_html, site.get("url", ""), include_faq=False)
+    return _original_wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, reporter, category_hint)
+
+base.wp_post = _readable_wp_post
+
 # kskin365.com was restored to the active 25-blog network. The legacy module still carried
 # a stale 'Retired Site' author label, which must never reach newly published content.
 kskin_author = {
