@@ -1247,8 +1247,8 @@ SITE_PERSONA = {
             "확인된 사실과 미확인 사항",
             "원문 출처 링크·작성 시각·수정 이력"
         ],
-        "min_chars": 400,
-        "max_chars": 1500,
+        "min_chars": 2500,
+        "max_chars": 3500,
         "tables": 0,
         "lang": "ko",
         "cta": ""
@@ -1888,16 +1888,16 @@ def make_site_prompt(keyword, site, reporter, tag_count=None, min_chars_override
         )
         if lang == "ko":
             return f"""[한국신문 뉴스룸 전용]\n역할: {persona}\n취재 단서: {keyword}\n편집 범위: {scope}\n
-- HTML은 p, h2, blockquote, ul, li만 사용한다.
-- 최소 글자 수는 없다. 확인된 사실만 1~3개 짧은 문단으로 쓰고 길이를 채우기 위한 배경·추측을 추가하지 않는다.
+- HTML은 p, h2, h3, blockquote, ul, li만 사용한다.
+- 본문은 공백 제외 2,500~3,500자로 작성한다. 확인된 사실, 공식 자료, 추가 출처의 배경과 독자 영향을 충분히 설명하되 추측으로 분량을 채우지 않는다.
 - 역피라미드 구조: 핵심 사실 리드, 확인된 경위, 배경·맥락, 영향, 미확인 사항.
-- 첫 문단은 2~3문장, 각 문단은 1~3문장으로 짧게 쓴다. 소제목은 최대 2개다.
-- 표, FAQ, 체크리스트, 상담 CTA, 결론 요약을 쓰지 않는다.
+- 첫 문단은 2~3문장으로 쓰고, 이후 4~7개의 h2/h3 구획과 짧은 문단·목록으로 가독성을 확보한다.
+- 표와 상담 CTA는 쓰지 않는다. 기사 끝에는 독자가 사실관계를 이해하는 데 필요한 FAQ 3개를 FAQ_START~FAQ_END 형식으로 작성한다.
 - '알아보겠습니다·추천·꿀팁·총정리·도움이 되셨다면' 같은 블로그 표현과 독자 질문을 금지한다.
 - 간결한 신문 기사체를 사용하고 과장, 감탄, 지어낸 인용·수치·인명·날짜·반응을 금지한다.
 - RSS 원문을 문단별로 번역·치환·재서술하지 않는다. 과거 연도와 수치를 현재 값으로 바꾸지 않는다.
-- 정보가 부족하면 억지로 늘리지 말고 확인된 범위의 짧은 기사로 쓴다.
-- 끝에 META_DESC: 100~140자와 TAGS: 짧은 명사 6~10개를 쓴다. FAQ와 TITLE은 출력하지 않는다."""
+- 정보가 부족하면 사실을 지어내지 말고 공식 자료와 추가 출처를 더 대조해 2,500자 이상으로 확장한다. 검증 가능한 내용이 부족하면 완성본을 출력하지 않는다.
+- 끝에 META_DESC: 100~140자, FAQ_START~FAQ_END 3개, TAGS: 짧은 명사 6~10개를 쓴다. TITLE은 출력하지 않는다."""
         return f"""[THE SEOUL JOURNAL NEWSROOM ONLY]\nRole: {persona}\nReporting lead: {keyword}\nEditorial scope: {scope}\n
 - Use only p, h2, blockquote, ul and li HTML tags.
 - There is no minimum length. Write 1–3 short paragraphs supported by the supplied excerpt. Do not add context or speculation to fill space.
