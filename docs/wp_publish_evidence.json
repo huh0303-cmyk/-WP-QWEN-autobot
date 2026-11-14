@@ -37,7 +37,7 @@
           "result": "success"
         }
       ],
-      "image_engine": "No image published — Pexels/Pixabay/SDXL Turbo/FLUX Schnell all failed",
+      "image_engine": "Pexels → Pixabay → SDXL Turbo → FLUX Schnell (4단계 모두 실패, 이미지 미발행)",
       "image_engine_attempts": [
         {
           "provider": "Pexels",
