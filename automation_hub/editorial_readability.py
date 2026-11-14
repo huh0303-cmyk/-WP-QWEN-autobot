@@ -71,7 +71,7 @@ def format_article(article_html, site_url="", *, include_faq=True):
     )
     # Lead paragraph becomes a restrained summary highlight; no text is duplicated.
     article = re.sub(
-        r"<p style=\\"margin:0 0 1\.15rem;line-height:1\.85;\\">",
+        r'<p style="margin:0 0 1\\.15rem;line-height:1\\.85;">',
         f'<p style="margin:0 0 1.3rem;line-height:1.85;padding:1rem 1.15rem;'
         f'border-left:4px solid {accent};background:#f8fafc;border-radius:6px;">',
         article, count=1, flags=re.I,
