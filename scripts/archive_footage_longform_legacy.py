@@ -255,7 +255,13 @@ def fetch_archive_clips(topic, channel_key, workdir, n_target=16):
     core_words = " ".join(topic.split()[:3])
     if core_words and core_words != topic:
         attempts.append(core_words)
-    attempts.append(_FALLBACK_QUERY.get(channel_key, channel_key))
+    keywords = _extract_keywords(topic)
+    if channel_key == "history":
+        keyword_query = " ".join(sorted(keywords))
+        if keyword_query and keyword_query not in attempts:
+            attempts.append(keyword_query)
+    else:
+        attempts.append(_FALLBACK_QUERY.get(channel_key, channel_key))
 
     # 2026-08-21: topic/core_words 단계는 주제와 실제로 무관한 결과(느슨한 텍스트
     # 매칭 때문에 Baywatch, 사탕광고, 감옥 다큐 같은 게 섞여 들어옴)를 걸러내야
@@ -270,7 +276,6 @@ def fetch_archive_clips(topic, channel_key, workdir, n_target=16):
     # (즉 이 주제로 쓸 수 있는 실제 자료가 진짜 하나도 없으면) 빈 리스트를
     # 반환해서 main()이 그대로 중단하게 한다 — 무관한 영상을 억지로 쓰는 것보다
     # 그 주제를 스킵하는 게 낫다.
-    keywords = _extract_keywords(topic)
     docs = []
     used_query = None
     for i, q in enumerate(attempts):
@@ -284,11 +289,11 @@ def fetch_archive_clips(topic, channel_key, workdir, n_target=16):
             used_query = q
             break
         log(f"   (검색 결과 없음: \"{q}\" — 범위를 넓혀 재시도)")
-    if not docs:
+    if not docs and channel_key != "history":
         log("   ❌ 모든 검색 단계에서 이 주제와 실제로 관련된 퍼블릭도메인 영상을 못 찾음 "
             "— 무관한 영상을 억지로 쓰지 않고 여기서 포기함")
         return []
-    if used_query != topic:
+    if used_query and used_query != topic:
         log(f"   ℹ️ 정확한 주제로는 못 찾아서 \"{used_query}\"로 대체 검색함")
 
     clips = []
@@ -328,7 +333,7 @@ def fetch_archive_clips(topic, channel_key, workdir, n_target=16):
     # 미의회도서관(LOC) National Screening Room도 항상 같이 시도해서 섞는다
     # (Internet Archive만으로 충분해도 사용자가 명시적으로 요청한 소스라 매번 시도).
     if len(clips) < n_target:
-        loc_clips = fetch_loc_clips(used_query, workdir, n_target=n_target - len(clips))
+        loc_clips = fetch_loc_clips(used_query or attempts[-1], workdir, n_target=n_target - len(clips))
         if loc_clips:
             log(f"   + LOC(미의회도서관)에서 {len(loc_clips)}개 클립 추가 확보")
         clips.extend(loc_clips)
