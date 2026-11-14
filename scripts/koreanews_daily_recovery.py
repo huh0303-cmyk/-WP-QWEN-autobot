@@ -29,11 +29,13 @@ def main():
         if len(current) >= target:
             break
         day = datetime.now(timezone(timedelta(hours=9))).date().toordinal()
-        politics, sports, world = ("정치", "스포츠", "글로벌")
-        # Seven Korean politics slots across each two-day cycle.
-        desks = (politics, politics, sports, politics, world) if day % 2 else (
-            politics, politics, world if (day // 2) % 2 else sports, politics, politics
+        politics, sports, society, world = ("정치", "스포츠", "사회", "글로벌")
+        desks = (politics, politics, sports, politics, society) if day % 2 else (
+            politics, politics, sports if (day // 2) % 2 else world, politics, politics
         )
+        # Sports slots occur on three of every four days.
+        sports_ordinal = day - (day + 3) // 4
+        env["KOREANEWS_SPORT"] = "야구" if sports_ordinal % 2 else "축구"
         if not env.get("NEWSROOM_SOURCE_URL") and not env.get("NEWSROOM_PREFERRED_CATEGORY"):
             env["NEWSROOM_SUGGESTED_CATEGORY"] = desks[len(current)]
         result = subprocess.run([sys.executable, "-u", "scripts/autopost_current.py"], env=env)

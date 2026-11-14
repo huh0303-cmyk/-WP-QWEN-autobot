@@ -1730,6 +1730,14 @@ def crawl_rss_news(lang="ko", site_url=""):
             print(f"   NEWS SOURCE GATE: no fresh rights-cleared RSS item for requested desk {forced_preferred}")
             return "", "", None, ""
         pool = candidates if exact_source_url else preferred_candidates or candidates
+        if not exact_source_url and os.getenv("TARGET_SITE_URL", "").rstrip("/") == "https://koreanews365.com":
+            sports = os.getenv("KOREANEWS_SPORT", "")
+            people = ("이재명", "한동훈", "오세훈", "추미애", "이진숙", "김민석", "정청래", "장동혁", "최고위원")
+            terms = (sports, "KBO", "프로야구") if sports == "야구" else (sports, "K리그", "프로축구")
+            if preferred == "정치":
+                terms = (*people, "공소취소", "특검")
+            matched = [item for item in pool if terms[0] and any(term in item[0] for term in terms)]
+            pool = matched or pool
         ch = max(pool, key=lambda item: priorities[(item[0], item[3])])
         used.add(ch[0].strip().lower())
         print(f"   📰 RSS: {ch[2]} — {ch[0][:40]}")
@@ -3631,15 +3639,17 @@ def process_one(site, keyword):
     # because newsroom models often stop around 1,500 characters even when the
     # main prompt asks for more. Never invent facts, figures, quotes, or sources.
     if url.rstrip("/").lower() == "https://koreanews365.com":
-        for _resize_attempt in range(2):
-            _visible = newsroom_char_count(body)
-            if 2500 <= _visible <= 4000:
-                break
-            if _visible < 2500:
-                print(f"  🧩 뉴스 본문 확장 {_resize_attempt + 1}/2: {_visible}자 → 2,500~4,000자")
-                body = resize_newsroom_body(body, lang, news_source_summary, min_chars=2500, max_chars=4000)
-            else:
-                body = trim_newsroom_html(body, 4000)
+        _visible = newsroom_char_count(body)
+        if _visible < 2000:
+            original_body = body
+            try:
+                expanded = resize_newsroom_body(body, lang, news_source_summary, min_chars=2000, max_chars=3500)
+                if newsroom_char_count(expanded) > _visible:
+                    body = expanded
+            except Exception as exc:
+                print(f"KoreaNews365 optional expansion failed: {type(exc).__name__}")
+                body = original_body
+        print(f"KoreaNews365 editorial length: {newsroom_char_count(body)} (recommended 2000-3500)")
 
     if url.rstrip("/").lower() == "https://kworld365.com":
         from automation_hub.repetition_guard import plain as _plain_article
