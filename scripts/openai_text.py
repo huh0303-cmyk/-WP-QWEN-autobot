@@ -85,10 +85,10 @@ def _looks_like_model_unavailable(status_code, text):
     )
 
 
-def openai_generate_image(prompt, out_path, size="1024x1024", max_retries=3):
+def openai_generate_image(prompt, out_path, size="1024x1024", max_retries=3, *, approved=False):
     import time as _time
     global _image_model_fallback_active
-    if not openai_image_available():
+    if not (openai_image_available() or (approved and OPENAI_API_KEY)):
         print("  BLOCKED: OpenAI paid image generation is disabled (OPENAI_IMAGE_ENABLED=false)")
         return False
 

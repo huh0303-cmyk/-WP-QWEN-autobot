@@ -175,6 +175,7 @@ jobs:
           # 폴백이라 추가 비용 없음.
           GH_ASSET_TOKEN: ${{ secrets.GH_ASSET_TOKEN || github.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
           AUTOMATED_IMAGE_PUBLISHING_ENABLED: "true"
           WP_IMAGE_COUNT: ${{ inputs.image_count || '1' }}

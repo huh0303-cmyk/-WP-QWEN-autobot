@@ -3270,7 +3270,31 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
     featured_url = real_photo["image_url"] if real_photo else (images[0] if images else "")
     featured_media_id = ensure_featured_media(url, pw, featured_url, real_photo["caption_ko" if site.get("lang") == "ko" else "caption_en"] if real_photo else title)
     if url.rstrip("/").lower() in {"https://koreanews365.com", "http://koreanews365.com"} and not featured_media_id:
-        return {"ok": False, "error": "KOREANEWS365_IMAGE_UPLOAD_FAILED: no WordPress featured media ID"}
+        from tempfile import TemporaryDirectory
+        from pathlib import Path
+        from openai_text import openai_generate_image
+        from replicate_image_provider import build_editorial_prompt
+
+        with TemporaryDirectory() as temp:
+            artwork = Path(temp) / "illustration.png"
+            prompt = build_editorial_prompt(title, "NEWS ILLUSTRATION ONLY")
+            if openai_generate_image(prompt, artwork, size="1536x1024", max_retries=1, approved=True):
+                caption = "AI-generated editorial illustration"
+                try:
+                    uploaded = requests.post(
+                        f"{url}/wp-json/wp/v2/media", auth=(WP_USER, pw), timeout=35,
+                        files={"file": ("news-illustration.png", artwork.read_bytes(), "image/png")},
+                        data={"alt_text": f"{caption}: {title}", "caption": caption},
+                    )
+                    uploaded.raise_for_status()
+                    featured_media_id = uploaded.json().get("id", 0)
+                except (requests.RequestException, ValueError) as exc:
+                    print(f"KOREANEWS365_ILLUSTRATION_UPLOAD_FAILED: {type(exc).__name__}")
+                if featured_media_id:
+                    data["content"] = f"<p><small>{caption}</small></p>" + data["content"]
+                    print("image_engine_used=OpenAI editorial illustration")
+        if not featured_media_id:
+            return {"ok": False, "error": "KOREANEWS365_IMAGE_REQUIRED: no WordPress featured media ID"}
     if featured_media_id:
         data["featured_media"] = featured_media_id
     if author_id and author_id>0: data["author"]=author_id
@@ -3727,12 +3751,6 @@ def process_one(site, keyword):
             print(f"WP_LENGTH_BLOCKED: {_wp_visible_chars}; regeneration required before publication")
             return False
 
-    # Breaking news must never be published without an editorially relevant image.
-    # The shared image chain tries both free sources in randomized order, then paid SDXL/FLUX.
-    if is_koreanews365 and not images and not site.get("_newsroom_real_photo"):
-        log(url, theme, keyword, title, "", 0, 0, "skip_newsroom_image", "all image providers exhausted")
-        print("KOREANEWS365_IMAGE_REQUIRED: no verified relevant image; publication blocked")
-        return False
     ilinks=len(re.findall(r'<a\s+href=["\']https?://',body,re.IGNORECASE))
     tb=len(re.findall(r'<table[\s>]',body,re.IGNORECASE))
     print(f"     본문:{plain_len}자 | 링크:{ilinks} | TABLE:{tb} | META:{len(meta)}자")
