@@ -184,9 +184,9 @@ function drawBloggerRanking(){
   var hist=(v.history||[]).filter(function(h){return h&&/^\\d{4}-\\d{2}-\\d{2}$/.test(h.date)&&Number.isFinite(h.daily_pageviews)}).sort(function(a,b){return String(b.date).localeCompare(String(a.date))});
   var latest=hist[0];
   var daily=Number.isFinite(v.daily_pageviews)?v.daily_pageviews:(latest?latest.daily_pageviews:null);
-  var total=Number.isFinite(v.total_pageviews)?v.total_pageviews:(Number.isFinite(v.last_verified_total_pageviews)?v.last_verified_total_pageviews:null);
-  return {r:r,v:v,total:total,daily:daily,historyDaily:latest||null};
- }).sort(function(a,b){if(a.daily===null&&b.daily!==null)return 1;if(a.daily!==null&&b.daily===null)return -1;if(a.daily!==null&&b.daily!==null&&a.daily!==b.daily)return b.daily-a.daily;if(a.total!==null&&b.total!==null&&a.total!==b.total)return b.total-a.total;if(a.total===null&&b.total!==null)return 1;if(a.total!==null&&b.total===null)return -1;return String(a.r.site||'').localeCompare(String(b.r.site||''));});
+  var sortTotal=Number.isFinite(v.total_pageviews)?v.total_pageviews:(Number.isFinite(v.last_verified_total_pageviews)?v.last_verified_total_pageviews:null);
+  return {r:r,v:v,total:Number.isFinite(v.total_pageviews)?v.total_pageviews:null,sortTotal:sortTotal,daily:daily,historyDaily:latest||null};
+ }).sort(function(a,b){if(a.daily===null&&b.daily!==null)return 1;if(a.daily!==null&&b.daily===null)return -1;if(a.daily!==null&&b.daily!==null&&a.daily!==b.daily)return b.daily-a.daily;if(a.sortTotal!==null&&b.sortTotal!==null&&a.sortTotal!==b.sortTotal)return b.sortTotal-a.sortTotal;if(a.sortTotal===null&&b.sortTotal!==null)return 1;if(a.sortTotal!==null&&b.sortTotal===null)return -1;return String(a.r.site||'').localeCompare(String(b.r.site||''));});
  var rank=0;
  tbody.innerHTML=rows.map(function(x){
   var r=x.r,v=x.v;rank++;
