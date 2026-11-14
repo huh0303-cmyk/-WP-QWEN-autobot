@@ -167,7 +167,7 @@ def _font(size):
     try: return ImageFont.truetype(fp,size) if fp else ImageFont.load_default()
     except Exception: return ImageFont.load_default()
 
-def _cover_frame(headline,photo,style,index):
+def _cover_frame(headline,photo,style,index,caption="",poll=False):
     W,H=1080,1920
     base=Image.new("RGB",(W,H),style["bg"])
     if photo:
@@ -206,9 +206,22 @@ def _cover_frame(headline,photo,style,index):
         color=style["highlight"] if i in (0,len(words)-1) else (255,255,255)
         draw.text((x,y),line,font=title_font,fill=color,stroke_width=4,stroke_fill=(0,0,0))
         y+=line_heights[i]+gap
+    # Mid-screen subtitles: concise narration highlights, never full-paragraph captions.
+    if caption or poll:
+        panel_top, panel_bottom = 760, 1160
+        draw.rounded_rectangle((55,panel_top,W-55,panel_bottom), radius=24, fill=(0,0,0,170), outline=style["highlight"], width=3)
+        text = "어떻게 생각하시나요?\nA 찬성   B 반대   C 더 지켜보기" if poll else caption
+        lines = textwrap.wrap(text, width=18)
+        font = _font(48 if poll else 43)
+        y = panel_top + 55
+        for line in lines[:4]:
+            box = draw.textbbox((0,0), line, font=font, stroke_width=2)
+            draw.text(((W-(box[2]-box[0]))//2,y), line, font=font, fill=style["highlight"] if poll else (255,255,255), stroke_width=2, stroke_fill=(0,0,0))
+            y += 66
     # bottom editorial label; safe margin remains clear for Shorts controls
     draw.rectangle((0,1670,W,1760),fill=(*style["bg"],232))
-    draw.text((55,1693),"핵심 발언  ·  반박  ·  확인된 사실",font=_font(31),fill=(255,255,255))
+    footer = "댓글로 A·B·C를 눌러 참여하세요" if poll else "핵심 발언  ·  반박  ·  확인된 사실"
+    draw.text((55,1693),footer,font=_font(31),fill=(255,255,255))
     return base.convert("RGB")
 
 def render(headline, photo, audio, photos=None):
@@ -227,18 +240,26 @@ def render(headline, photo, audio, photos=None):
         raise RuntimeError(f"Visual quality gate: {len(unique)}/5 distinct photos; private upload blocked to prevent single-image video")
     style = random.choice(SHORT_STYLES)
     for idx, template in enumerate(SHORT_STYLES, 1):
-        _cover_frame(headline, unique[0], template, idx).save(OUT/f"thumbnail-template-{idx:02d}.jpg", quality=93)
-    _cover_frame(headline, unique[0], style, 1).save(OUT/"cover.jpg", quality=94)
+        _cover_frame(headline, unique[0], template, idx, caption=headline).save(OUT/f"thumbnail-template-{idx:02d}.jpg", quality=93)
+    _cover_frame(headline, unique[0], style, 1, caption=headline).save(OUT/"cover.jpg", quality=94)
     (OUT/"template.txt").write_text(style["name"], encoding="utf-8")
     ffmpeg = os.getenv("FFMPEG_BINARY", "ffmpeg")
     probe = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", str(audio)], capture_output=True, text=True, check=True)
     duration = float(probe.stdout.strip()) / 1.2
     segment = max(2.5, duration / len(unique))
     frames = []
+    narration_path = OUT/"narration.txt"
+    narration = narration_path.read_text(encoding="utf-8") if narration_path.exists() else headline
+    caption_chunks = [x.strip() for x in re.split(r"\\n+|(?<=[.!?。！？])\\s+", narration) if x.strip()]
+    caption_chunks = (caption_chunks + [headline] * len(unique))[:len(unique)]
     for idx, source in enumerate(unique):
         frame = OUT/f"scene-{idx:02d}.jpg"
-        _cover_frame(headline, source, style, idx+1).save(frame, quality=92)
+        _cover_frame(headline, source, style, idx+1, caption=caption_chunks[idx][:42]).save(frame, quality=92)
         frames.append(frame)
+    # Final hold frame gives viewers time to answer a poll in the comments.
+    poll_frame = OUT/"scene-poll.jpg"
+    _cover_frame(headline, unique[-1], style, len(unique)+1, poll=True).save(poll_frame, quality=92)
+    frames.append(poll_frame)
     cmd = [ffmpeg, "-y"]
     for frame in frames:
         cmd += ["-loop", "1", "-t", str(segment), "-i", str(frame)]
