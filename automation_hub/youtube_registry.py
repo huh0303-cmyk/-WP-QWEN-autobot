@@ -44,7 +44,7 @@ class YouTubeChannel:
             errors.append("invalid interval range")
         if not 0 <= self.allowed_hour_start <= self.allowed_hour_end <= 23:
             errors.append("invalid allowed hour range")
-        expected = "curio-longform-daily.yml" if self.channel_type == "knowledge" else "youtube-github-worker.yml"
+        # All active playlist and knowledge channels use the GitHub worker.\n        # Do not revive the retired curio-longform-daily.yml workflow.\n        expected = "youtube-github-worker.yml"
         if self.workflow != expected:
             errors.append(f"workflow must be {expected}")
         return errors
