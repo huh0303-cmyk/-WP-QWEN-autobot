@@ -193,7 +193,7 @@ def test_blog_and_social_are_lightweight_publishing_sheets():
     assert '<table id="socialTable" class="account-table">' in social
     assert "Korea365 · YOUTUBE + SNS" in social
     assert "로그인·권한 필요" in social
-    assert "<th>번호</th><th>플랫폼</th>" in social
+    assert "<th>순위</th><th>플랫폼</th>" in social
     assert "<td>{{loop.index}}</td><td>" in social
     assert "상태를 구분해 표시합니다" in social
     assert "생산·발행 트리거" in social
@@ -202,13 +202,14 @@ def test_blog_and_social_are_lightweight_publishing_sheets():
         assert f'a[data-platform="{platform}"]' in social
     assert '<a data-platform="{{p}}"' in social
     assert "<th>구분</th><th>채널/계정</th><th>채널 주제</th><th>운영 역할</th>" in social
-    assert "<th>구독자수(증감)</th><th>어제 방문·조회수(증감)</th><th>콘텐츠수(증감)</th><th>누적 수익 (USD)</th><th>개설일자</th><th>최근 발행일</th>" in social
+    assert "<th>구독자수(증감)</th><th>일일 방문자(증감)</th><th>콘텐츠수(증감)</th><th>누적 수익 (USD)</th><th>개설일자</th><th>최근 발행일</th>" in social
     assert "return '🏅 US$'+new Intl.NumberFormat('ko-KR').format(revenue.amount)" in social
     assert "<th>생산·발행 트리거</th><th>계정 ID</th>" in social
     assert "fetch('/api/control/social-ranking'" in social
     assert "item.content_count_delta" in social
-    assert "k365-social-column-widths-v6" in social
-    assert "item.yesterday_views,item.yesterday_views_delta" in social
+    assert "k365-social-column-widths-v8" in social
+    assert "item.daily_visitors,item.daily_visitors_delta" in social
+    assert "metric-daily-visitors" in social
     assert "return '🏅'" in social
     assert 'class="metric-revenue">—' in social
     assert 'class="metric-opening">미확인' in social
@@ -290,6 +291,10 @@ def test_youtube_ranking_prefers_full_public_api_snapshot(monkeypatch, tmp_path)
         '{"checked_at_kst":"2026-09-29T09:00:00+09:00","channels":{"UC-test":{"name":"French Survival","subscribers":7,"views":321,"videos":4,"connected":true}}}',
         encoding="utf-8",
     )
+    (tmp_path / "data" / "youtube_public_metrics_history.json").write_text(
+        '{"snapshots":[{"checked_at_kst":"2026-09-28T09:00:00+09:00","channels":{"UC-test":{"subscribers":6,"views":300,"videos":3}}}]}',
+        encoding="utf-8",
+    )
     monkeypatch.setattr(control_home, "ROOT", tmp_path)
     monkeypatch.setattr(control_home, "opening_recent_info", lambda *args: {})
     result = control_home.build_youtube_ranking(1)
@@ -298,9 +303,11 @@ def test_youtube_ranking_prefers_full_public_api_snapshot(monkeypatch, tmp_path)
     assert result["rows"][0]["name"] == "French Survival"
     assert result["rows"][0]["subscribers"] == 7
     assert result["rows"][0]["views"] == 321
-    # A first public snapshot has no valid daily comparison; do not use stale legacy history.
-    assert result["rows"][0]["view_delta"] is None
-    assert result["rows"][0]["video_delta"] is None
+    # Rank by daily visitor increase from the prior official API snapshot.
+    assert result["rows"][0]["view_delta"] == 21
+    assert result["rows"][0]["daily_visitors"] == 21
+    assert result["rows"][0]["rank"] == 1
+    assert result["rows"][0]["video_delta"] == 1
 
 
 def test_sns_ranking_uses_persisted_official_probe(monkeypatch, tmp_path):
@@ -314,10 +321,17 @@ def test_sns_ranking_uses_persisted_official_probe(monkeypatch, tmp_path):
         '{"rows":[{"platform":"Instagram","brand":"TOPIK","followers":3555,"status":"조회 성공"}]}',
         encoding="utf-8",
     )
+    (tmp_path / "data" / "account-audience-metrics.json").write_text(
+        '{"accounts":{"sis_topik1":{"views":84,"delta":6,"content_count":17,"content_delta":1}}}',
+        encoding="utf-8",
+    )
     monkeypatch.setattr(control_home, "ROOT", tmp_path)
     result = control_home.build_sns_ranking(1)
     assert result["ranked"] == 1
     assert result["rows"][0]["followers"] == 3555
+    assert result["rows"][0]["yesterday_views"] == 84
+    assert result["rows"][0]["rank"] == 1
+    assert result["ranked"] == 1
     assert result["rows"][0]["metric_status"] == "조회 성공"
 
 
