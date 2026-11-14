@@ -44,7 +44,7 @@ def test_irrelevant_goes_to_next_provider(monkeypatch,tmp_path):
         for c in search.call_args_list:  # shuffled Pexels/Pixabay order; shorter query variants repeat a provider
             if c.args[0] not in providers:
                 providers.append(c.args[0])
-        assert set(providers[:2]) == {"Pexels", "Pixabay"} and providers[2] == "Wikimedia"
+        assert set(providers) == {"Pexels", "Pixabay"}  # only the two approved free sources
         host.assert_not_called()
 
 

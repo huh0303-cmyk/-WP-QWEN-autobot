@@ -217,8 +217,10 @@ def generate_image_url(subject: str, theme: str = "", *, mode: str = "auto") -> 
         raise ValueError("unsupported image model")
     from stock_image_provider import find_stock_image, METADATA
     import random
-    # Randomize all four providers independently for each image request.
-    providers = random.sample(("pexels", "pixabay", PRIMARY_MODEL, SECONDARY_MODEL), 4)
+    # User-approved policy: randomize the two free sources first, then use
+    # SDXL Turbo and FLUX Schnell only as paid fallbacks, in that order.
+    free_pair = random.sample(("pexels", "pixabay"), 2)
+    providers = free_pair + [PRIMARY_MODEL, SECONDARY_MODEL]
     print("image_engine_attempt_order=" + ",".join(providers))
     token = _token()
     prompt = build_editorial_prompt(subject, theme)
@@ -253,7 +255,8 @@ def generate_image_url(subject: str, theme: str = "", *, mode: str = "auto") -> 
                     print(f"image_engine_used={provider};stage={position}")
                     return url
         except Exception as exc:
-            print(f"image_engine_failed={provider};error={type(exc).__name__}")
+            status = getattr(getattr(exc, "response", None), "status_code", None)
+            print(f"image_engine_failed={provider};error={type(exc).__name__};http_status={status or 'n/a'}")
     print("image_engine_used=none;all_four_failed")
     return None
 

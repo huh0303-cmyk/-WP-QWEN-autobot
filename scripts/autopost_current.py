@@ -83,7 +83,8 @@ def _readable_wp_post(site, title, body_html, meta, tags, faq, images, keyword, 
             except ValueError:
                 if attempt == 2:
                     break
-                body_html = base.resize_newsroom_body(body_html, "en", body_html, min_chars=2800, max_chars=3800)
+                article_lang = site.get("lang") or ("ko" if "koreanews365.com" in site.get("url", "") else "en")
+                body_html = base.resize_newsroom_body(body_html, article_lang, body_html, min_chars=2800, max_chars=3900)
                 print(f"KOREANEWS365_LENGTH_REWRITE: attempt={attempt + 1}")
     try:
         count = validate_article_length(body_html)

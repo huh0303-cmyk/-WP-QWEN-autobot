@@ -1889,7 +1889,7 @@ def make_site_prompt(keyword, site, reporter, tag_count=None, min_chars_override
         if lang == "ko":
             return f"""[한국신문 뉴스룸 전용]\n역할: {persona}\n취재 단서: {keyword}\n편집 범위: {scope}\n
 - HTML은 p, h2, h3, blockquote, ul, li만 사용한다.
-- 본문은 공백 제외 2,500~3,500자로 작성한다. 확인된 사실, 공식 자료, 추가 출처의 배경과 독자 영향을 충분히 설명하되 추측으로 분량을 채우지 않는다.
+- 본문은 공백 제외 2,500~4,000자로 작성한다. 확인된 사실, 공식 자료, 추가 출처의 배경과 독자 영향을 충분히 설명하되 추측으로 분량을 채우지 않는다.
 - 역피라미드 구조: 핵심 사실 리드, 확인된 경위, 배경·맥락, 영향, 미확인 사항.
 - 첫 문단은 2~3문장으로 쓰고, 이후 4~7개의 h2/h3 구획과 짧은 문단·목록으로 가독성을 확보한다.
 - 표와 상담 CTA는 쓰지 않는다. 기사 끝에는 독자가 사실관계를 이해하는 데 필요한 FAQ 3개를 FAQ_START~FAQ_END 형식으로 작성한다.
@@ -3407,7 +3407,8 @@ def resize_newsroom_body(body, lang, source_summary, min_chars=400, max_chars=15
 def newsroom_char_count(body):
     """Editorial character count: visible text including ordinary spaces."""
     plain = BeautifulSoup(body, "html.parser").get_text(" ", strip=True)
-    return len(re.sub(r'\s+', ' ', plain))
+    # Match automation_hub.editorial_readability.visible_length exactly.
+    return len(re.sub(r'\s+', '', plain))
 
 def trim_newsroom_html(body, target_chars=1500):
     """Trim visible text from the end while preserving valid HTML."""
@@ -3606,13 +3607,13 @@ def process_one(site, keyword):
     if url.rstrip("/").lower() == "https://koreanews365.com":
         for _resize_attempt in range(2):
             _visible = newsroom_char_count(body)
-            if 2500 <= _visible <= 3500:
+            if 2500 <= _visible <= 4000:
                 break
             if _visible < 2500:
-                print(f"  🧩 뉴스 본문 확장 {_resize_attempt + 1}/2: {_visible}자 → 2,500~3,500자")
-                body = resize_newsroom_body(body, lang, news_source_summary, min_chars=2500, max_chars=3500)
+                print(f"  🧩 뉴스 본문 확장 {_resize_attempt + 1}/2: {_visible}자 → 2,500~4,000자")
+                body = resize_newsroom_body(body, lang, news_source_summary, min_chars=2500, max_chars=4000)
             else:
-                body = trim_newsroom_body(body, 3500)
+                body = trim_newsroom_html(body, 4000)
 
     if url.rstrip("/").lower() == "https://kworld365.com":
         from automation_hub.repetition_guard import plain as _plain_article
@@ -3712,9 +3713,9 @@ def process_one(site, keyword):
 
     plain_len=newsroom_char_count(body) if mode in ("news", "news_en") else len(re.sub(r'<[^>]+>','',body).replace(' ','').replace('\n',''))
     # Global WP publish gate: visible article text, excluding HTML and whitespace.
-    _wp_visible_chars = len(re.sub(r"\\s+", "", BeautifulSoup(body, "html.parser").get_text(" ", strip=True)))
-    print(f"WP_ARTICLE_LENGTH site={url} chars={_wp_visible_chars} required=2500-3500")
-    if not (2500 <= _wp_visible_chars <= 3500):
+    _wp_visible_chars = len(re.sub(r"\s+", "", BeautifulSoup(body, "html.parser").get_text(" ", strip=True)))
+    print(f"WP_ARTICLE_LENGTH site={url} chars={_wp_visible_chars} required=2500-4000")
+    if not (2500 <= _wp_visible_chars <= 4000):
         log(url, theme, keyword, title, "", 0, 0, "skip_wp_length", str(_wp_visible_chars))
         print(f"WP_LENGTH_BLOCKED: {_wp_visible_chars}; regeneration required before publication")
         return False

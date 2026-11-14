@@ -176,7 +176,8 @@ def find_stock_image(subject, theme="", *, force=False, selected_provider="auto"
                         return stable
         except Exception as exc:
             # Never log the request URL: Pixabay's query includes its secret key.
-            print(f"stock search/hosting unavailable: {provider} ({type(exc).__name__})")
+            status = getattr(getattr(exc, "response", None), "status_code", None)
+            print(f"stock search/hosting unavailable: {provider} ({type(exc).__name__}; http_status={status or 'n/a'})")
     return None
 
 
