@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from automation_hub.youtube_calendar import KST, read_calendar, select_due, select_next_ready, update_row
+from automation_hub.youtube_calendar import KST, READY, TAB, read_calendar, select_due, select_next_ready, update_row
 from automation_hub.youtube_registry import load_channels
 from automation_hub.youtube_github_runtime import enqueue, queue_root, cost_hold_active, check_cost_hold
 from gsheets_direct import get_sheets_service
@@ -53,6 +53,24 @@ def _update_dashboard(job: dict, status: str, conclusion=None, reason="") -> Non
     os.replace(tmp, path)
 
 
+def _prepare_history_today(service, spreadsheet_id, now) -> None:
+    from pick_knowledge_topic import history_today
+
+    topic = history_today(now)
+    cells = [""] * 15
+    cells[0] = f"HISTORY-{now:%Y%m%d}"
+    cells[1] = now.strftime("%Y-%m-%d %H:%M KST")
+    cells[2:4] = ["YouTube Knowledge", "history"]
+    cells[5] = "en"
+    cells[7] = topic
+    cells[12] = READY
+    service.spreadsheets().values().append(
+        spreadsheetId=spreadsheet_id, range=f"'{TAB}'!A:O",
+        valueInputOption="RAW", insertDataOption="INSERT_ROWS",
+        body={"values": [cells]},
+    ).execute()
+
+
 def _claim(job: dict) -> tuple[object, str]:
     sid = os.environ["SHEET_ID"]
     service = get_sheets_service()
@@ -69,7 +87,16 @@ def _claim(job: dict) -> tuple[object, str]:
         raise RuntimeError(f"YouTube channel is disabled in the control Sheet: {requested}")
     rows = read_calendar(service, sid)
     selector = select_next_ready if job.get("run_now") and requested else select_due
-    selected, _ = selector(rows, dt.datetime.now(KST), enabled, 1)
+    now = dt.datetime.now(KST)
+    if requested == "history" and job.get("run_now"):
+        if not any(row["key"] == "history" and row["when"].date() == now.date() for row in rows):
+            _prepare_history_today(service, sid, now)
+            rows = read_calendar(service, sid)
+    rows = [
+        row for row in rows
+        if row["key"] != "history" or row["when"].date() == now.date()
+    ]
+    selected, _ = selector(rows, now, enabled, 1)
     if not selected:
         raise RuntimeError(
             f"CALENDAR_NOT_READY: No eligible calendar row for {requested or 'current due channels'}. "
