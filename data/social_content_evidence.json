@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "updated_at": null,
+  "description": "Per-account generation evidence for the latest published social content. Keys use platform|normalized_handle (or platform|profile_url). Record engine names only when confirmed from the actual content-generation run; include url or post_id to tie the evidence to a specific published item.",
+  "accounts": {}
+}
