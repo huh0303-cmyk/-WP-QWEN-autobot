@@ -180,8 +180,8 @@ function drawBloggerRanking(){
  var rows=(J.rows||[]).filter(function(r){return blogPlatformOf(r)==='blogspot'&&!/^(jobkorea365|k-health365-edu)\.blogspot\.com$/i.test(String(r.site||'').replace(/^https?:\/\//,'').replace(/\/$/,''));}).map(function(r){
   var key=String(r.url||'').replace(/\/$/,'').toLowerCase();
   var v=byUrl[key]||{};
-  return {r:r,v:v,total:Number.isFinite(v.total_pageviews)?v.total_pageviews:null};
- }).sort(function(a,b){if(a.total===null&&b.total!==null)return 1;if(a.total!==null&&b.total===null)return -1;if(a.total!==null&&b.total!==null&&a.total!==b.total)return b.total-a.total;return String(a.r.site||'').localeCompare(String(b.r.site||''));});
+  return {r:r,v:v,total:Number.isFinite(v.total_pageviews)?v.total_pageviews:null,daily:Number.isFinite(v.daily_pageviews)?v.daily_pageviews:null};
+ }).sort(function(a,b){if(a.daily===null&&b.daily!==null)return 1;if(a.daily!==null&&b.daily===null)return -1;if(a.daily!==null&&b.daily!==null&&a.daily!==b.daily)return b.daily-a.daily;return String(a.r.site||'').localeCompare(String(b.r.site||''));});
  var rank=0;
  tbody.innerHTML=rows.map(function(x){
   var r=x.r,v=x.v;rank++;
