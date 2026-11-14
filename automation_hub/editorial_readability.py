@@ -69,15 +69,13 @@ def format_article(article_html, site_url="", *, include_faq=True):
         f'<hr style="border:0;border-top:1px solid {accent};opacity:.35;margin:2rem 0;">',
         article, flags=re.I,
     )
-    if include_faq:
-        article = re.sub(
-            r'(<div[^>]*itemtype=["\\\']https://schema.org/FAQPage["\\\'][^>]*>)',
-            lambda m: m.group(1) + '<div style="background:#f8fafc;border-radius:10px;'
-            'padding:1rem 1.25rem;margin:1rem 0;">',
-            article, count=1, flags=re.I,
-        )
-        if 'itemtype="https://schema.org/FAQPage"' in article:
-            article += "</div>"
+    # Lead paragraph becomes a restrained summary highlight; no text is duplicated.
+    article = re.sub(
+        r"<p style=\\\"margin:0 0 1\\.15rem;line-height:1\\.85;\\\">",
+        f'<p style="margin:0 0 1.3rem;line-height:1.85;padding:1rem 1.15rem;'
+        f'border-left:4px solid {accent};background:#f8fafc;border-radius:6px;">',
+        article, count=1, flags=re.I,
+    )
     return (f'<div data-london-readability="1" style="font-family:'
             "'Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;"
             'font-size:17px;line-height:1.8;color:#1f2937;overflow-wrap:anywhere;">'
