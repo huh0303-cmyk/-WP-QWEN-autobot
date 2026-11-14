@@ -75,7 +75,6 @@ def _history_date_overlay(path: str) -> str:
 
 
 def _gemini_thumbnail(topic: str, channel_key: str, hero_frame_path: str, workdir: str):
-    del hero_frame_path
     channel_theme = {
         "history": "world history, source-grounded international events, one clear editorial subject, minimal text",
         "invention": "history of inventions documentary",
@@ -84,8 +83,7 @@ def _gemini_thumbnail(topic: str, channel_key: str, hero_frame_path: str, workdi
         "american_archive": "American archive history documentary",
     }.get(channel_key, "archival history documentary")
     del channel_theme
-    source_path = _reviewed_image(channel_key, workdir)
-    result = base._legacy_build_thumbnail(topic, channel_key, source_path, workdir)
+    # Use a frame from the actual archival footage first. The old daily PNG\n    # requirement unnecessarily blocked production even when valid footage exists.\n    # The caller must ensure that the source footage is cleared for reuse.\n    source_path = hero_frame_path if hero_frame_path and Path(hero_frame_path).is_file() else _reviewed_image(channel_key, workdir)\n    result = base._legacy_build_thumbnail(topic, channel_key, source_path, workdir)
     return _history_date_overlay(result) if channel_key == "history" else result
 
 
