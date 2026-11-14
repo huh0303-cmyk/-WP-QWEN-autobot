@@ -29,6 +29,7 @@ REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if REPO_ROOT not in sys.path:
     sys.path.insert(0, REPO_ROOT)
 from automation_hub.public_verifier import verify_publication
+from automation_hub.unified_content_policy import load_policy, validate_content, record_publish_result
 from email.utils import parsedate_to_datetime
 from pathlib import Path
 from datetime import datetime, timezone, timedelta
@@ -78,8 +79,10 @@ AUTOMATED_IMAGE_PUBLISHING_ENABLED = os.getenv("AUTOMATED_IMAGE_PUBLISHING_ENABL
 WP_IMAGE_COUNT = 0 if os.getenv("WP_IMAGE_COUNT", "1").strip() == "0" else 1
 
 gemini_client         = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
-GEMINI_MODEL_PRIMARY  = os.getenv("GEMINI_REVIEW_MODEL", "gemini-2.5-flash")
-GEMINI_MODEL_FALLBACK = "gemini-2.5-flash"
+UNIFIED_POLICY = load_policy()
+GEMINI_CHAIN = UNIFIED_POLICY["writing"]["chains"]
+GEMINI_MODEL_PRIMARY  = os.getenv("GEMINI_REVIEW_MODEL", GEMINI_CHAIN["en"][0])
+GEMINI_MODEL_FALLBACK = GEMINI_CHAIN["en"][1]
 GEMINI_MODEL          = GEMINI_MODEL_PRIMARY
 _gemini_fallback_active = False
 # 나노바나나(Nano Banana) — Pixabay/Pexels 검색이 실패했을 때 인포그래픽 카드 대신
@@ -3862,8 +3865,9 @@ def main():
         return
     print(f"\n{'='*60}")
     print(f"🚀 autopost_mega.py v2.0 — SLOT {RUN_SLOT} | {now_kst().strftime('%Y-%m-%d %H:%M:%S')} KST")
-    provider = os.getenv("AI_TEXT_PROVIDER", "auto").strip().lower()
-    model = os.getenv("OPENAI_MODEL", "gpt-5-mini") if provider == "openai" else GEMINI_MODEL
+    provider = "gemini"
+    model = GEMINI_MODEL_PRIMARY
+    print(f"   UNIFIED_POLICY={UNIFIED_POLICY["version"]} | legacy text providers disabled")
     print(f"   AI: {provider}/{model} | SEO 목표: {SEO_TARGET}점 | 재생성: {MAX_REGEN}회")
     print(f"   ✅ 카테고리 생성 금지 — 기존 카테고리 중에서만 매칭 (pick_best_category)")
     print(f"   ✅ 27개 사이트별 독립 페르소나 (SITE_PERSONA)")
