@@ -137,7 +137,7 @@ def publish_facebook(spec: dict) -> dict:
     }
 
 
-def save_receipts(content_id: str, rows: list[dict]) -> None:
+def save_receipts(content_id: str, rows: list[dict], spec: dict | None = None) -> None:
     try:
         payload = json.loads(RECEIPTS.read_text(encoding="utf-8"))
     except (OSError, ValueError):
@@ -147,6 +147,14 @@ def save_receipts(content_id: str, rows: list[dict]) -> None:
     for row in rows:
         row["content_id"] = content_id
         row["published_at"] = now
+        section = (spec or {}).get(str(row.get("platform") or "").lower(), {})
+        caption = str(section.get("caption") or section.get("text") or "")
+        row["title"] = next((line.strip() for line in caption.splitlines() if line.strip()), None)
+        row["character_count"] = len(caption) if caption else None
+        if (spec or {}).get("text_engine"):
+            row["text_engine"] = spec["text_engine"]
+        if (spec or {}).get("image_engine"):
+            row["image_engine"] = spec["image_engine"]
         publications[:] = [
             old for old in publications
             if not (old.get("content_id") == content_id and old.get("platform") == row.get("platform"))
@@ -165,7 +173,7 @@ def main() -> None:
     rows = []
     for publisher in (publish_instagram, publish_facebook):
         rows.append(publisher(spec))
-        save_receipts(spec["content_id"], rows)
+        save_receipts(spec["content_id"], rows, spec)
     print(json.dumps({"published": rows}, ensure_ascii=False))
 
 
