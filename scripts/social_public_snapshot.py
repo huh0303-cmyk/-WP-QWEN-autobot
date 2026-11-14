@@ -420,6 +420,54 @@ def read_previous() -> dict[str, dict[str, Any]]:
         return {}
 
 
+def receipt_metadata(row: dict[str, Any]) -> dict[str, Any]:
+    """Use the newest verified publication receipt as a fallback, never as a guessed post."""
+    try:
+        payload = json.loads((ROOT / "data" / "social_publication_receipts.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError, TypeError):
+        return {}
+    platform = str(row.get("platform") or "").lower()
+    handle = str(row.get("handle") or "").strip().lstrip("@").lower()
+    name = str(row.get("name") or "").strip().lower()
+    matches = []
+    for receipt in payload.get("publications", []):
+        if not isinstance(receipt, dict) or str(receipt.get("platform") or "").lower() != platform:
+            continue
+        receipt_handle = str(receipt.get("handle") or "").strip().lstrip("@").lower()
+        account_name = str(receipt.get("account_name") or "").strip().lower()
+        if handle and receipt_handle != handle:
+            if platform != "facebook" or not (account_name and name and (account_name in name or name in account_name)):
+                continue
+        elif not handle and platform == "facebook" and account_name and name and account_name not in name and name not in account_name:
+            continue
+        matches.append(receipt)
+    if not matches:
+        return {}
+    receipt = max(matches, key=lambda item: str(item.get("published_at") or ""))
+    content_id = str(receipt.get("content_id") or "")
+    spec = {}
+    if content_id:
+        try:
+            spec = json.loads((ROOT / "data" / "social_publication_specs" / f"{content_id}.json").read_text(encoding="utf-8"))
+        except (OSError, ValueError, TypeError):
+            spec = {}
+    section = spec.get(platform, {}) if isinstance(spec, dict) else {}
+    caption = str(section.get("caption") or section.get("text") or "")
+    evidence = {}
+    try:
+        evidence = json.loads((ROOT / "data" / "social_content_evidence.json").read_text(encoding="utf-8")).get("accounts", {}).get(account_key(row), {})
+    except (OSError, ValueError, TypeError, AttributeError):
+        evidence = {}
+    return {
+        "latest_content_title": first_line(caption) or evidence.get("title"),
+        "latest_content_url": receipt.get("url") or None,
+        "latest_content_published_at": receipt.get("published_at") or None,
+        "latest_content_text_length": len(caption) if caption else None,
+        "latest_text_engine": evidence.get("text_engine") or spec.get("text_engine"),
+        "latest_image_engine": evidence.get("image_engine") or spec.get("image_engine"),
+    }
+
+
 def collect() -> dict[str, Any]:
     inventory = json.loads(INVENTORY_PATH.read_text(encoding="utf-8"))
     rows = inventory.get("accounts", [])
@@ -507,6 +555,10 @@ def collect() -> dict[str, Any]:
             item["status"] = "stale" if old.get("last_successful_at") else fresh.get("status", "api_error")
             item["error"] = fresh.get("error", "")
             item["last_stats_checked_at"] = now
+        receipt = receipt_metadata(row)
+        for field, value in receipt.items():
+            if item.get(field) in (None, "") and value not in (None, ""):
+                item[field] = value
         item.setdefault("status", fresh.get("status", "not_checked"))
         item["error"] = str(item.get("error") or "")[:220]
         platform = item["platform"]
