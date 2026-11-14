@@ -1,0 +1,136 @@
+{
+  "version": "2026-11-14",
+  "status": "LOCKED_SINGLE_SOURCE_OF_TRUTH",
+  "platforms": [
+    "wordpress",
+    "blogspot",
+    "naver_blog",
+    "tistory",
+    "instagram",
+    "threads",
+    "facebook",
+    "tiktok",
+    "youtube"
+  ],
+  "writing": {
+    "provider": "gemini",
+    "free_only": true,
+    "chains": {
+      "en": [
+        "gemini-3.6-flash",
+        "gemini-3.5-flash",
+        "gemini-3.5-flash-lite",
+        "gemini-3.1-flash-lite",
+        "gemini-2.0-flash",
+        "gemini-3.8-flash"
+      ],
+      "ko": [
+        "gemini-3.0-flash-lite",
+        "gemini-3.1-flash-lite",
+        "gemini-3.0-flash",
+        "gemini-2.0-flash",
+        "gemini-3.6-flash",
+        "gemini-3.8-flash"
+      ]
+    },
+    "failure": "cancel_publication",
+    "runtime_model_ids_must_be_verified": true
+  },
+  "length": {
+    "min_chars": 2500,
+    "max_chars": 4000,
+    "recommended_chars": [
+      3000,
+      3500
+    ],
+    "exclude": [
+      "html",
+      "whitespace",
+      "affiliate_cards"
+    ]
+  },
+  "images": {
+    "max_images": 1,
+    "free": [
+      "pexels",
+      "pixabay"
+    ],
+    "paid_fallback": [
+      "sdxl-turbo",
+      "flux-schnell"
+    ],
+    "free_order": "random_once_per_item",
+    "duplicate_window_days": 14,
+    "keys": [
+      "url",
+      "filename",
+      "sha256"
+    ],
+    "featured_body_must_differ": true,
+    "alt_required": true,
+    "all_failed": "publish_without_image_and_record_failure"
+  },
+  "structure": [
+    "title",
+    "introduction",
+    "key_takeaways",
+    "h2_h3_detail",
+    "tips_warnings_checklist",
+    "official_sources_internal_links",
+    "faq_3_to_5",
+    "conclusion",
+    "affiliate_policy"
+  ],
+  "readability": {
+    "font": "Noto Sans KR",
+    "body_px": 17,
+    "line_height": 1.8,
+    "h2_px": 25,
+    "h3_px": 19,
+    "components": [
+      "accent_box",
+      "left_color_line",
+      "short_paragraphs",
+      "divider",
+      "faq_card"
+    ],
+    "colors": {
+      "finance": "#2563EB",
+      "health": "#0F766E",
+      "travel": "#D97706",
+      "education": "#7C3AED",
+      "general": "#334155"
+    }
+  },
+  "seo": {
+    "title_duplicate": "block",
+    "year_in_title": "forbid",
+    "similarity_threshold": 0.85,
+    "official_sources_for_sensitive_topics": true,
+    "unique_meta_description": true,
+    "internal_links": true
+  },
+  "logging": [
+    "post_id",
+    "url",
+    "selected_model",
+    "model_attempts",
+    "body_char_count",
+    "image_provider",
+    "image_url",
+    "image_duplicate_check",
+    "image_failure_reason",
+    "validation_result"
+  ],
+  "pipeline": [
+    "topic_and_duplicate_check",
+    "language_gemini_chain",
+    "content_quality_validation",
+    "shared_html_template",
+    "image_fallback_chain",
+    "seo_duplicate_final_check",
+    "platform_publish",
+    "post_publish_verification"
+  ],
+  "legacy_policy": "ignored"
+}
