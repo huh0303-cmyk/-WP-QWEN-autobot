@@ -467,13 +467,13 @@ function loadLatestPublicPost(platform,site,id){
   var body='',title='',url='',date='';
   if(platform==='Blogspot'){var e=data.feed&&data.feed.entry&&data.feed.entry[0];if(!e)throw Error('no public post');title=e.title&&e.title.$t||'';body=e.content&&e.content.$t||e.summary&&e.summary.$t||'';url=((e.link||[]).find(function(x){return x.rel==='alternate'})||{}).href||'';date=e.published&&e.published.$t||''}
   else{var e=Array.isArray(data)&&data[0];if(!e)throw Error('no public post');title=e.title&&e.title.rendered||'';body=e.content&&e.content.rendered||'';url=e.link||'';date=e.date||''}
-  var doc=new DOMParser().parseFromString(body,'text/html'),plain=(doc.body.textContent||'').replace(/\s+/g,'');var el=document.getElementById(id);if(!el)return;
+  var doc=new DOMParser().parseFromString(body,'text/html'),plain=(doc.body.textContent||'').replace(/\s+/g,'');if(!document.getElementById(id+'-title'))return;
   function setField(name,value,link){var target=document.getElementById(id+'-'+name);if(!target)return;target.innerHTML=value?(link?'<a href="'+clean(value)+'" target="_blank" rel="noopener">'+clean(value)+'</a>':clean(value)):'⚪ 확인 필요';}
   setField('title',title);
   setField('url',url,true);
   setField('published',date?new Date(date).toLocaleString('ko-KR',{timeZone:'Asia/Seoul',hour12:false,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'})+' KST':'');
   setField('chars',plain.length.toLocaleString('ko-KR')+'자');
- }).catch(function(err){var el=document.getElementById(id);if(el)el.innerHTML='<div><b>Public post lookup</b>'+clean(err.message)+'</div>'})
+ }).catch(function(err){var titleField=document.getElementById(id+'-title');if(titleField)titleField.title='공개 게시물 조회 실패: '+clean(err.message)})
 }
 function lastPostQuality(platform,site){
  var rows=(window.J&&window.J.rows)||[];
