@@ -119,6 +119,10 @@ def history_prompt(history):
 def fetch_wp_history(session, url, auth):
     response = session.get(url.rstrip('/') + '/wp-json/wp/v2/posts', auth=auth,
         params={'per_page': 100, 'orderby': 'date', 'order': 'desc', 'status': 'publish,future,draft,pending,private', '_fields': 'id,status,date,title,content,link'}, timeout=30)
+    if response.status_code == 400:
+        # Retry with public history when a WordPress site rejects combined statuses.
+        response = session.get(url.rstrip('/') + '/wp-json/wp/v2/posts', auth=auth,
+            params={'per_page': 100, 'orderby': 'date', 'order': 'desc', 'status': 'publish', '_fields': 'id,status,date,title,content,link'}, timeout=30)
     response.raise_for_status()
     rows = response.json()
     if not isinstance(rows, list): raise ValueError('Invalid publication history response')
