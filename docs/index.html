@@ -69,9 +69,9 @@ tr.platform-youtube{background:#fff7f7}tr.platform-tiktok{background:#f2fcfd}tr.
 <div class="table-wrap"><table><thead><tr><th>순위</th><th>구분</th><th>사이트</th><th>일 방문자(증감)</th><th>누적 방문자</th><th>콘텐츠 수(증감)</th><th>GSC 색인 수(증감)</th><th>발행주기 (GitHub)</th><th>발행경과</th><th>즉시발행</th></tr></thead>
 <tbody id="b"></tbody></table></div>
 <section id="blogger-pageviews" style="margin:18px 0 10px;padding:12px;background:#fff;border:1px solid #cbd5e1;border-radius:8px">
-<h2 id="blogger-pageviews-title" style="margin:0 0 4px;font-size:1.05rem;color:#0f172a">Blogspot (31개) · 누적 페이지뷰 순위</h2>
+<h2 id="blogger-pageviews-title" style="margin:0 0 4px;font-size:1.05rem;color:#0f172a">Blogspot (31개) · 일일 페이지뷰 순위</h2>
 <div class="sub" id="blogger-pageviews-meta">등록된 블로그 방문자·게시물 정보를 수집 중...</div>
-<div class="bar"><span>정렬 기준: 누적 방문자 수 내림차순</span><span class="na">방문자 수를 확인할 수 없는 블로그는 아래쪽에 표시</span></div>
+<div class="bar"><span>정렬 기준: 일일 페이지뷰 내림차순 (최근 확인된 값 우선)</span><span class="na">최근 수치가 없는 블로그는 아래쪽에 표시</span></div>
 <div class="table-wrap"><table><thead><tr><th>순위</th><th>플랫폼</th><th>블로그</th><th>누적 페이지뷰(증감)</th><th>일일 페이지뷰(전일 대비 증감)</th><th>콘텐츠 수(증감)</th><th>GSC 색인 수(증감)</th><th>발행주기 (GitHub)</th><th>발행경과</th><th>즉시발행</th></tr></thead><tbody id="blogger-pageviews-rows"><tr><td colspan="9" class="na">데이터 수집 전</td></tr></tbody></table></div>
 </section>
 <section id="social-all-sections" style="margin-top:22px">
@@ -181,13 +181,17 @@ function drawBloggerRanking(){
  var rows=(J.rows||[]).filter(function(r){return blogPlatformOf(r)==='blogspot'&&isActiveBlogspot(r);}).map(function(r){
   var key=String(r.url||'').replace(/\/$/,'').toLowerCase();
   var v=byUrl[key]||{};
-  return {r:r,v:v,total:Number.isFinite(v.total_pageviews)?v.total_pageviews:null,daily:Number.isFinite(v.daily_pageviews)?v.daily_pageviews:null};
- }).sort(function(a,b){if(a.daily===null&&b.daily!==null)return 1;if(a.daily!==null&&b.daily===null)return -1;if(a.daily!==null&&b.daily!==null&&a.daily!==b.daily)return b.daily-a.daily;return String(a.r.site||'').localeCompare(String(b.r.site||''));});
+  var hist=(v.history||[]).filter(function(h){return h&&/^\\d{4}-\\d{2}-\\d{2}$/.test(h.date)&&Number.isFinite(h.daily_pageviews)}).sort(function(a,b){return String(b.date).localeCompare(String(a.date))});
+  var latest=hist[0];
+  var daily=Number.isFinite(v.daily_pageviews)?v.daily_pageviews:(latest?latest.daily_pageviews:null);
+  var total=Number.isFinite(v.total_pageviews)?v.total_pageviews:(Number.isFinite(v.last_verified_total_pageviews)?v.last_verified_total_pageviews:null);
+  return {r:r,v:v,total:total,daily:daily,historyDaily:latest||null};
+ }).sort(function(a,b){if(a.daily===null&&b.daily!==null)return 1;if(a.daily!==null&&b.daily===null)return -1;if(a.daily!==null&&b.daily!==null&&a.daily!==b.daily)return b.daily-a.daily;if(a.total!==null&&b.total!==null&&a.total!==b.total)return b.total-a.total;if(a.total===null&&b.total!==null)return 1;if(a.total!==null&&b.total===null)return -1;return String(a.r.site||'').localeCompare(String(b.r.site||''));});
  var rank=0;
  tbody.innerHTML=rows.map(function(x){
   var r=x.r,v=x.v;rank++;
   var delta=v.daily_pageviews===null||v.daily_pageviews===undefined?'<span class="na">증감 확인 필요</span>':d(v.daily_pageviews);
-  var dailyHistory=(v.history||[]).filter(function(h){return h&&/^\d{4}-\d{2}-\d{2}$/.test(h.date)&&Number.isFinite(h.daily_pageviews)}).sort(function(a,b){return String(b.date).localeCompare(String(a.date))});var latestDaily=dailyHistory[0];var previousDaily=dailyHistory[1];var consecutive=latestDaily&&previousDaily&&Math.round((Date.parse(latestDaily.date+'T00:00:00Z')-Date.parse(previousDaily.date+'T00:00:00Z'))/86400000)===1;var dailyValue=Number.isFinite(v.daily_pageviews)?v.daily_pageviews:null;var dailyChange=consecutive&&dailyValue===latestDaily.daily_pageviews?dailyValue-previousDaily.daily_pageviews:null;var dailyVisitorCell=dailyValue===null?'<span class="na">일일 페이지뷰 미수집</span>':'<b>'+f(dailyValue)+'</b>'+(dailyChange===null?' <span class="na">(전일 비교 자료 없음)</span>':d(dailyChange));
+  var dailyHistory=(v.history||[]).filter(function(h){return h&&/^\d{4}-\d{2}-\d{2}$/.test(h.date)&&Number.isFinite(h.daily_pageviews)}).sort(function(a,b){return String(b.date).localeCompare(String(a.date))});var latestDaily=dailyHistory[0];var previousDaily=dailyHistory[1];var consecutive=latestDaily&&previousDaily&&Math.round((Date.parse(latestDaily.date+'T00:00:00Z')-Date.parse(previousDaily.date+'T00:00:00Z'))/86400000)===1;var dailyValue=Number.isFinite(v.daily_pageviews)?v.daily_pageviews:(latestDaily&&Number.isFinite(latestDaily.daily_pageviews)?latestDaily.daily_pageviews:null);var dailyChange=consecutive&&dailyValue===latestDaily.daily_pageviews?dailyValue-previousDaily.daily_pageviews:null;var dailyVisitorCell=dailyValue===null?'<span class="na">일일 페이지뷰 미수집</span>':'<b>'+f(dailyValue)+'</b> <span class="na">('+esc(latestDaily?latestDaily.date:'오늘 기준')+')</span>'+(dailyChange===null?' <span class="na">(전일 비교 자료 없음)</span>':d(dailyChange));
   var history=(v.history||[]).filter(function(h){return Number.isFinite(h.total_pageviews)&&h.date;}).sort(function(a,b){return String(b.date).localeCompare(String(a.date));});
   var previous=history.length?history[0]:null;
   var historical=x.total===null?(Number.isFinite(v.last_verified_total_pageviews)?v.last_verified_total_pageviews:previous&&previous.total_pageviews):null;
