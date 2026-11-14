@@ -181,7 +181,7 @@ function drawBloggerRanking(){
  var rows=(J.rows||[]).filter(function(r){return blogPlatformOf(r)==='blogspot'&&isActiveBlogspot(r);}).map(function(r){
   var key=String(r.url||'').replace(/\/$/,'').toLowerCase();
   var v=byUrl[key]||{};
-  var hist=(v.history||[]).filter(function(h){return h&&/^\\d{4}-\\d{2}-\\d{2}$/.test(h.date)&&Number.isFinite(h.daily_pageviews)}).sort(function(a,b){return String(b.date).localeCompare(String(a.date))});
+  var hist=(v.history||[]).filter(function(h){return h&&/^\d{4}-\d{2}-\d{2}$/.test(h.date)&&Number.isFinite(h.daily_pageviews)}).sort(function(a,b){return String(b.date).localeCompare(String(a.date))});
   var latest=hist[0];
   var daily=Number.isFinite(v.daily_pageviews)?v.daily_pageviews:(latest?latest.daily_pageviews:null);
   var sortTotal=Number.isFinite(v.total_pageviews)?v.total_pageviews:(Number.isFinite(v.last_verified_total_pageviews)?v.last_verified_total_pageviews:null);
