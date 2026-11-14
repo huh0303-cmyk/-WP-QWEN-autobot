@@ -24,6 +24,7 @@ from review_sheet import append_review_rows
 from repair_blogger_images import stabilize_html_images
 from blogger_free_image import pick_image, insert_image
 from blogger_adsense_structure import rules_for, structure_issues
+from automation_hub.editorial_readability import format_article, validate_article_length
 
 RESULT = ROOT / "artifacts" / "blogger-33-public-results.json"
 
@@ -215,12 +216,13 @@ def main() -> int:
             for attempt in range(4):
                 try:
                     title, body, labels, description, image_subject = generate(site, hint, recent_titles)
+                    validate_article_length(body)
                     if normalize_title(title) in recent_title_keys:
                         raise RuntimeError("duplicate title gate: exact or normalized duplicate title")
                     break
                 except (RuntimeError, ValueError) as gate_exc:  # ValueError covers JSONDecodeError (empty/non-JSON model output)
                     retriable = isinstance(gate_exc, ValueError) or any(
-                        k in str(gate_exc) for k in ("adsense structure gate", "language mismatch", "quality gate", "duplicate title gate"))
+                        k in str(gate_exc) for k in ("adsense structure gate", "language mismatch", "quality gate", "duplicate title gate", "ARTICLE_LENGTH_BLOCKED"))
                     if not retriable or attempt == 3:
                         raise
                     print(f"generation retry {attempt + 1} for {site['key']}: {str(gate_exc)[:120]}")
@@ -241,6 +243,7 @@ def main() -> int:
                     body = insert_image(body, found, title)
             except Exception as exc:
                 print(f"image step skipped: {type(exc).__name__}")
+            body = format_article(body, site["url"])
             body = f"<!-- {marker} -->\n{body}"
             schedule_at_raw = os.environ.get("BLOGGER_SCHEDULE_AT", "").strip()
             scheduled_kst = None
