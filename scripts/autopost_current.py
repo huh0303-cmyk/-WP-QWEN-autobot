@@ -74,6 +74,17 @@ from automation_hub.editorial_readability import format_article, validate_articl
 _original_wp_post = base.wp_post
 
 def _readable_wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, reporter, category_hint=""):
+    # Retry short Koreanews365 drafts using only the supplied article facts.
+    if site.get("url", "").rstrip("/").lower() == "https://koreanews365.com":
+        for attempt in range(3):
+            try:
+                validate_article_length(body_html)
+                break
+            except ValueError:
+                if attempt == 2:
+                    break
+                body_html = base.resize_newsroom_body(body_html, "en", body_html, min_chars=2800, max_chars=3800)
+                print(f"KOREANEWS365_LENGTH_REWRITE: attempt={attempt + 1}")
     try:
         count = validate_article_length(body_html)
     except ValueError as exc:

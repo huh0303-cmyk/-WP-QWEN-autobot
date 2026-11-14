@@ -26,7 +26,6 @@ WP25 = [
     "https://k-health365.com",
     "https://koreamedicaltour.com",
     "https://koreainvest365.com",
-    "https://ki-korea.com",
     "https://koreainsurance365.com",
     "https://kfinance365.com",
     "https://koreataxnlaw.com",
