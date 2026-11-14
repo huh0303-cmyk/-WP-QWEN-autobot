@@ -186,11 +186,11 @@ def build_youtube_ranking(bucket: int) -> dict:
         except (TypeError, ValueError):
             return 0
 
-    # Ranking order requested by the control room:
-    # subscribers/followers ↓, cumulative views ↓, content count ↓,
-    # recent content views ↓, recent publish date ↓. Unknown subscriber
-    # counts remain at the bottom; missing tie-break metrics sort last.
+    # Rank channels by the latest verified daily view increase (daily visitors).
+    # A missing prior-day snapshot is unknown, never treated as zero.
     rows.sort(key=lambda r: (
+        r["view_delta"] is None,
+        -(r["view_delta"] or 0),
         r["subscribers"] is None,
         -(r["subscribers"] or 0),
         -(r["views"] or 0),
@@ -201,7 +201,7 @@ def build_youtube_ranking(bucket: int) -> dict:
     ))
     rank = 0
     for row in rows:
-        if row["subscribers"] is None:
+        if row["view_delta"] is None:
             row["rank"] = None
         else:
             rank += 1
@@ -297,15 +297,16 @@ def build_sns_ranking(bucket: int) -> dict:
     platform_order = {"Facebook": 0, "Threads": 1, "Instagram": 2, "TikTok": 3}
     rows.sort(key=lambda r: (
         platform_order.get(str(r["platform"]), 99),
+        r["yesterday_views"] is None,
+        -(r["yesterday_views"] or 0),
         r["followers"] is None,
         -(r["followers"] or 0),
-        -(r["yesterday_views"] or 0),
         str(r["name"]).casefold(),
     ))
     platform_rank: dict[str, int] = {}
     for row in rows:
         platform = str(row["platform"] or "")
-        if not row["active_role"] or not row["identity_verified"] or row["followers"] is None:
+        if not row["active_role"] or not row["identity_verified"] or row["yesterday_views"] is None:
             row["rank"] = None
         else:
             platform_rank[platform] = platform_rank.get(platform, 0) + 1
@@ -346,6 +347,8 @@ def build_social_ranking(bucket: int) -> dict:
             # cumulative views separate so the UI never labels it as yesterday.
             "yesterday_views": item.get("view_delta"),
             "yesterday_views_delta": None,
+            "daily_visitors": item.get("view_delta"),
+            "daily_visitors_delta": None,
             "content_count": item.get("videos"),
             "content_count_delta": item.get("video_delta"),
             "revenue": item.get("revenue") or {},
@@ -356,7 +359,7 @@ def build_social_ranking(bucket: int) -> dict:
             "infrastructure": item.get("infrastructure") or infrastructure_info("youtube"),
             "connected": item.get("connected", False),
             "metric_status": "조회 성공" if item.get("connected", False) else "YouTube 공개 API 갱신 필요",
-            "views_status": "조회 성공" if item.get("connected", False) else "YouTube 공개 API 갱신 필요",
+            "views_status": "일일 방문자 수집 완료" if isinstance(item.get("view_delta"), (int, float)) else "일일 방문자 통계 미수집",
         })
     for item in sns["rows"]:
         rows.append({
@@ -376,6 +379,8 @@ def build_social_ranking(bucket: int) -> dict:
             "views_delta": item.get("views_delta"),
             "yesterday_views": item.get("yesterday_views"),
             "yesterday_views_delta": item.get("views_delta"),
+            "daily_visitors": item.get("yesterday_views"),
+            "daily_visitors_delta": item.get("views_delta"),
             "content_count": item.get("content_count"),
             "content_count_delta": item.get("content_delta"),
             "revenue": item.get("revenue") or {},
@@ -386,21 +391,22 @@ def build_social_ranking(bucket: int) -> dict:
             "infrastructure": infrastructure_info(str(item.get("platform") or "").lower()),
             "connected": item.get("connected", False),
             "metric_status": item.get("metric_status") or "플랫폼 API 인증 필요",
-            "views_status": "인사이트 API 인증 필요",
+            "views_status": "일일 방문자 수집 완료" if isinstance(item.get("yesterday_views"), (int, float)) else "일일 방문자 통계 미수집",
         })
     platform_order = {"YouTube": 0, "Facebook": 1, "Threads": 2, "Instagram": 3, "TikTok": 4}
     rows.sort(key=lambda r: (
         platform_order.get(str(r["platform"]), 99),
+        r["daily_visitors"] is None,
+        -(r["daily_visitors"] or 0),
         r["audience"] is None,
         -(r["audience"] or 0),
-        -(r["views"] or 0),
         str(r["name"]).casefold(),
     ))
     platform_rank: dict[str, int] = {}
     for row_number, row in enumerate(rows, 1):
         row["row_number"] = row_number
         platform = str(row["platform"] or "")
-        if not row.get("active_role") or not row.get("identity_verified") or row["audience"] is None:
+        if not row.get("active_role") or not row.get("identity_verified") or row["daily_visitors"] is None:
             row["rank"] = None
         else:
             platform_rank[platform] = platform_rank.get(platform, 0) + 1
