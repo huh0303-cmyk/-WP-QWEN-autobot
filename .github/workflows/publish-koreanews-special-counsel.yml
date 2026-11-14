@@ -32,10 +32,10 @@ jobs:
               photo=response.read()
           assert photo.startswith(bytes.fromhex("ffd8ff"))
           media=wp("media",raw=photo)
-          credit="부산역 자료사진(2012년 10월). 사진 장표기: Flickr 원저작자 / 위키미디어 공용, CC BY-SA 2.0."
+          credit="부산역 자료사진(2012년 10월). 사진 calflier001 / 위키미디어 공용, CC BY-SA 2.0."
           wp(f"media/{media['id']}",dict(alt_text="2012년 10월 부산역 자료사진",caption=credit))
           article="""<p>14일 부산역 광장에서 장동혁 국민의힘 대표가 이재명 대통령에게 특검법 거부권 행사를 요구했다. 같은 날 민주당은 법안에 공소취소 권한이 없다고 맞받았다. 이미 국회를 통과한 법안을 놓고 왜 양당은 다시 ‘공소취소’를 꺼냈을까.</p><div style="background:#f5f0eb;border-left:4px solid #783a33;padding:12px 16px"><strong>쟁점 한눈에</strong><p>국민의힘은 특검이 이 대통령 관련 사건에 영향을 줄 수 있다고 주장한다. 민주당은 의결된 법안에 특검의 공소취소 권한이 없다고 반박한다.</p></div><h2>장동혁의 부산 집회, 요구는 대통령 거부권</h2><p>장 대표와 정점식 원내대표 등 국민의힘 지도부는 부산역 광장에서 집회를 열었다. 국민의힘은 민주당이 주도해 처리한 특검법을 비판하며 이 대통령에게 법안을 국회로 돌려보내 달라고 요구했다.</p><hr><h2>민주당의 반박, 공소취소 권한은 빠졌다</h2><p>민주당은 특검법이 수사·기소 과정의 의혹을 밝히기 위한 것이며, 의결된 법안에 특검이 공소를 취소할 권한은 없다고 설명했다. 국민의힘은 조항이 빠졌더라도 특검 수사가 이 대통령 관련 사건에 영향을 줄 수 있다는 우려를 제기했다.</p><h3>다음으로 확인할 것은</h3><p>당장 확인할 대목은 정부가 법안을 공포하는지, 대통령이 국회에 재의를 요구하는지다. 부산 집회에서 나온 요구와 정부의 공식 결정은 별개의 단계다.</p><p><a href="https://www.yna.co.kr/view/AKR20261114041600001">연합뉴스 부산 집회 보도</a> · <a href="https://m.dailian.co.kr/news/view/1714949">데일리안 여야 입장 보도</a></p>"""
-          article+='<p><small>'+credit+' <a href="https://commons.wikimedia.org/wiki/File:BUSAN_STATION_SOUTH_KOREA_OCT_2012_(8229698980).jpg">사진 원본</a></small></p>'
+          article+='<p><small>'+credit+' <a href="https://commons.wikimedia.org/wiki/File:BUSAN_STATION_SOUTH_KOREA_OCT_2012_(8229698980).jpg">사진 원본</a> · <a href="https://creativecommons.org/licenses/by-sa/2.0/">이용 조건</a></small></p>'
           post=wp("posts",dict(title="장동혁은 부산서 거부권 요구, 민주당은 “공소취소 권한 없다”",slug=slug,content=article,categories=[788],featured_media=media["id"],status="publish"))
           assert post["status"]=="publish" and post["featured_media"]==media["id"]
           print(post["id"],post["link"],post["featured_media"])
