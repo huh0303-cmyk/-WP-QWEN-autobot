@@ -2,7 +2,7 @@
 /** Bilingual masthead for the Newsup desktop and mobile logo slots. */
 add_filter('get_custom_logo', function ($logo) {
     return sprintf(
-        '<a class="kn365-brand" href="%s" rel="home"><span class="kn365-brand-ko" lang="ko">한국신문</span><span class="kn365-brand-en" lang="en">Korea Newspaper</span><span class="kn365-brand-domain" lang="en">Koreanews365.com</span><span class="kn365-brand-imprint"><span>민족정론지</span><span>편집인: Chris Huh</span></span></a>',
+        '<a class="kn365-brand" href="%s" rel="home"><span class="kn365-brand-ko" lang="ko">한국신문</span><span class="kn365-brand-en" lang="en">Korea Newspaper</span><span class="kn365-brand-domain" lang="en">Koreanews365.com</span><span class="kn365-brand-imprint"><span>민족정론지</span><span>편집인: Chris Huh</span></span><span class="kn365-brand-imprint">창간일: 2020.11.02 · 서울, 대한민국</span></a>',
         esc_url(home_url('/'))
     );
 }, PHP_INT_MAX);
