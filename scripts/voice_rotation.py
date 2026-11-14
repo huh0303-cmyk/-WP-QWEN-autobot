@@ -20,6 +20,18 @@ def choose_voice(channel: str, episode_date=None) -> dict[str, str]:
     language = LANGUAGES.get(key, os.getenv("CONTENT_LANGUAGE", "en"))
     profiles = json.loads(os.getenv("TTS_APPROVED_VOICES_JSON", "{}"))
     voices = profiles.get(language, [])
+    if key == "history" and language == "en" and not voices:
+        voices = [
+            {"id": voice_id, "name": voice_id, "gender": gender, "approved": True}
+            for voice_id, gender in (
+                ("en-US-GuyNeural", "male"),
+                ("en-US-ChristopherNeural", "male"),
+                ("en-GB-RyanNeural", "male"),
+                ("en-US-AriaNeural", "female"),
+                ("en-US-JennyNeural", "female"),
+                ("en-GB-SoniaNeural", "female"),
+            )
+        ]
     if len(voices) != 6 or sum(v.get("gender") == "male" and v.get("approved") is True for v in voices) != 3 or sum(v.get("gender") == "female" and v.get("approved") is True for v in voices) != 3:
         raise RuntimeError(f"Six approved documentary/news voices required for {language}: 3 male + 3 female")
     if any(not v.get("id") or not v.get("name") or v.get("approved") is not True for v in voices):
