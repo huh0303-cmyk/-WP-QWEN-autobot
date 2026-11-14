@@ -1,7 +1,7 @@
-from pathlib import Path
+﻿from pathlib import Path
 p=Path(__file__).resolve().parents[1]/'docs'/'index.html'
 s=p.read_text(encoding='utf-8')
-anchor=" document.addEventListener('click',function(e){var b=e.target.closest('.wp-ops-expand');"
+anchor="document.addEventListener('click',function(e){var b=e.target.closest('.wp-ops-expand');"
 assert anchor in s
 patch='''
 // Connect every WordPress and Blogspot publish action to its own detail row.
@@ -20,7 +20,7 @@ document.addEventListener('click',function(e){
   var cell=row.querySelector('td');
   var note=document.createElement('p');note.className='publish-dispatch-note';
   note.style.cssText='border-left:4px solid #2563eb;padding:8px;background:#eff6ff';
-  note.textContent='발행 화면을 열었습니다. 실제 실행 접수 및 단계별 성공은 GitHub 실행 로그와 게시 URL로 확인합니다.';
+  note.textContent='諛쒗뻾 ?붾㈃???댁뿀?듬땲?? ?ㅼ젣 ?ㅽ뻾 ?묒닔 諛??④퀎蹂??깃났? GitHub ?ㅽ뻾 濡쒓렇? 寃뚯떆 URL濡??뺤씤?⑸땲??';
   var old=cell.querySelector('.publish-dispatch-note');if(old)old.remove();
   cell.prepend(note);row.scrollIntoView({behavior:'smooth',block:'nearest'});
  }
@@ -32,3 +32,4 @@ s=s.replace(anchor,patch+anchor,1)
 s=s.replace("if(c)c.innerHTML=panel(btn.dataset.site)","if(c)c.innerHTML=btn.dataset.platform==='WordPress'?panel(btn.dataset.site):socialPanel(btn.dataset.platform,btn.dataset.account||btn.dataset.site,btn.dataset.site)")
 p.write_text(s,encoding='utf-8')
 print('patched',p)
+
