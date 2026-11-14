@@ -27,10 +27,14 @@ def main():
         current = inventory()
         if len(current) >= target:
             break
-        desks = ["정치", "경제", "사회", "문화", "금융", "부동산", "국방", "예술", "스포츠", "글로벌"]
-        env = dict(os.environ)
-        day = datetime.now(timezone(timedelta(hours=9))).timetuple().tm_yday
-        env["NEWSROOM_SUGGESTED_CATEGORY"] = desks[(day * 5 + len(current)) % len(desks)]
+        day = datetime.now(timezone(timedelta(hours=9))).date().toordinal()
+        politics, sports, world = ("정치", "스포츠", "글로벌")
+        # Seven Korean politics slots across each two-day cycle.
+        desks = (politics, politics, sports, politics, world) if day % 2 else (
+            politics, politics, world if (day // 2) % 2 else sports, politics, politics
+        )
+        if not env.get("NEWSROOM_SOURCE_URL"):
+            env["NEWSROOM_SUGGESTED_CATEGORY"] = desks[len(current)]
         result = subprocess.run([sys.executable, "-u", "scripts/autopost_current.py"], env=env)
         attempts.append({"attempt": i + 1, "returncode": result.returncode})
         if Path("newsroom_publish_result.json").exists():
