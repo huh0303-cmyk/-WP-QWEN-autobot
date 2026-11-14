@@ -110,6 +110,15 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+      - name: Validate channel registry before installing dependencies
+        run: |
+          python - <<'PY'
+          from automation_hub.youtube_registry import load_channels
+          channels = load_channels()
+          assert channels, "YouTube channel registry is empty"
+          assert all(c.workflow == "youtube-github-worker.yml" for c in channels)
+          print(f"Validated {len(channels)} YouTube channel configurations")
+          PY
       - name: Install free runner tools
         env:
           CHANNEL: ${{ (inputs.channel || 'history') }}
