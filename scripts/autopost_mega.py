@@ -3712,12 +3712,24 @@ def process_one(site, keyword):
     score=None
 
     plain_len=newsroom_char_count(body) if mode in ("news", "news_en") else len(re.sub(r'<[^>]+>','',body).replace(' ','').replace('\n',''))
-    # Global WP publish gate: visible article text, excluding HTML and whitespace.
+    # Koreanews365 is a breaking-news desk: do not impose a fixed character-count gate.
+    # All other WordPress sites retain the shared 2,500-4,000 visible-character gate.
+    is_koreanews365 = url.rstrip("/").lower() in {"https://koreanews365.com", "http://koreanews365.com"}
     _wp_visible_chars = len(re.sub(r"\s+", "", BeautifulSoup(body, "html.parser").get_text(" ", strip=True)))
-    print(f"WP_ARTICLE_LENGTH site={url} chars={_wp_visible_chars} required=2500-4000")
-    if not (2500 <= _wp_visible_chars <= 4000):
-        log(url, theme, keyword, title, "", 0, 0, "skip_wp_length", str(_wp_visible_chars))
-        print(f"WP_LENGTH_BLOCKED: {_wp_visible_chars}; regeneration required before publication")
+    if is_koreanews365:
+        print(f"WP_ARTICLE_LENGTH site={url} chars={_wp_visible_chars} gate=disabled_breaking_news")
+    else:
+        print(f"WP_ARTICLE_LENGTH site={url} chars={_wp_visible_chars} required=2500-4000")
+        if not (2500 <= _wp_visible_chars <= 4000):
+            log(url, theme, keyword, title, "", 0, 0, "skip_wp_length", str(_wp_visible_chars))
+            print(f"WP_LENGTH_BLOCKED: {_wp_visible_chars}; regeneration required before publication")
+            return False
+
+    # Breaking news must never be published without an editorially relevant image.
+    # The shared image chain tries both free sources in randomized order, then paid SDXL/FLUX.
+    if is_koreanews365 and not images and not site.get("_newsroom_real_photo"):
+        log(url, theme, keyword, title, "", 0, 0, "skip_newsroom_image", "all image providers exhausted")
+        print("KOREANEWS365_IMAGE_REQUIRED: no verified relevant image; publication blocked")
         return False
     ilinks=len(re.findall(r'<a\s+href=["\']https?://',body,re.IGNORECASE))
     tb=len(re.findall(r'<table[\s>]',body,re.IGNORECASE))
