@@ -7,7 +7,7 @@ from urllib.parse import urljoin, urlparse
 import requests, trafilatura
 from bs4 import BeautifulSoup
 from PIL import Image, ImageDraw, ImageFont
-from openai import OpenAI
+import google.generativeai as genai
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
@@ -51,56 +51,36 @@ def extract(url):
     return title,text,image_url
 
 def draft(title, body):
-    key = os.getenv("OPENAI_API_KEY", "").strip()
+    key = os.getenv("GEMINI_API_KEY", "").strip()
     if not key:
-        raise RuntimeError("OPENAI_API_KEY GitHub Actions secret이 없습니다.")
-    client = OpenAI(api_key=key)
-    base_prompt = f"""당신은 서울저널의 한국어 정치 뉴스 기자 겸 팩트체커입니다.
+        raise RuntimeError("GEMINI_API_KEY GitHub Actions secret이 없습니다.")
+    genai.configure(api_key=key)
+    models = [os.getenv("SEOUL_JOURNAL_GEMINI_MODEL", "").strip(), "gemini-3.0-flash-lite", "gemini-3.1-flash-lite", "gemini-3.0-flash", "gemini-2.0-flash", "gemini-3.6-flash", "gemini-3.8-flash"]
+    models = list(dict.fromkeys(x for x in models if x))
+    prompt = f"""당신은 서울저널의 한국어 정치 뉴스 기자 겸 팩트체커입니다.
 기사 제목: {title}
 기사 본문:
 {body[:12000]}
-
-약 55~60초 세로 쇼츠 패키지를 작성하세요. 내레이션은 공백 포함 한국어 450~650자 정도로 충분히 작성하고, 최소 4개의 짧은 문단으로 구성하세요. 첫 문장은 핵심 사실을 바로 제시하고, 중간에는 기사에 나온 배경·당사자 발언·확인된 사실을 구체적으로 설명하며, 마지막에는 확인된 사실과 아직 확인되지 않은 점을 구분하고 '서울저널이 알려드립니다. 여러분은 어떻게 생각하십니까?'로 마무리하세요. 기사에 없는 사실을 채우기 위해 분량을 늘리지 마세요. 결과는 JSON 객체 하나:
-{{"headline":"썸네일용 10~18자 헤드라인","youtube_title":"사실에 근거한 제목 100자 이내","narration":"공백 포함 한국어 450~650자, 약 55~60초 분량의 자연스러운 기자 내레이션","description":"기사 핵심을 중립적으로 요약하고 원문 출처가 들어갈 자리 [원문 기사]를 포함한 설명","source_note":"기사에서 확인한 핵심 사실과 확인 한계"}}
-규칙:
-- 기사 본문에 있는 정보만 말한다. 논평·주장은 발언자에게 귀속한다.
-- 혐의/의혹/수사/재판/여론조사는 확정 사실로 과장하지 않는다.
-- 강한 호기심은 만들되 허위·모욕·선동적 프레이밍을 쓰지 않는다.
-- 헤드라인은 모바일에서 크게 읽히도록 짧게 작성한다.
-- 발언을 직접 인용할 때 원문과 일치하는 표현만 사용한다.
-- JSON 이외 텍스트 금지."""
-    last_error = ""
-    for attempt in range(3):
-        retry_note = ""
-        if attempt:
-            retry_note = (
-                "\\n\\n수정 요청: 직전 응답이 최소 길이를 충족하지 못했습니다. "
-                "기사에 실제로 있는 배경·당사자 발언·확인된 수치를 더 구체적으로 설명해 "
-                "내레이션을 반드시 450~650자로 작성하세요. 반복 문장이나 추측은 추가하지 마세요."
-            )
-        res = client.chat.completions.create(
-            model=os.getenv("SEOUL_JOURNAL_MODEL", "gpt-4o-mini"),
-            temperature=0.35,
-            messages=[
-                {"role": "system", "content": "Return valid JSON only. Be factually conservative."},
-                {"role": "user", "content": base_prompt + retry_note},
-            ],
-        )
-        raw = (res.choices[0].message.content or "").strip()
-        raw = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw)
+약 55~60초 세로 쇼츠 패키지를 작성하세요. 내레이션은 공백 포함 450~650자, 최소 4개 문단으로 작성하세요.
+기사에 있는 배경·당사자 발언·확인된 사실을 구체적으로 설명하고 마지막은 '서울저널이 알려드립니다. 여러분은 어떻게 생각하십니까?'로 마무리하세요.
+기사에 없는 사실·추측·숫자·인용은 만들지 마세요. JSON 객체 하나만 반환:
+{{"headline":"썸네일용 10~18자 헤드라인","youtube_title":"사실에 근거한 제목 100자 이내","narration":"450~650자 기자 내레이션","description":"중립적 요약과 [원문 기사] 자리","source_note":"확인된 사실과 한계"}}"""
+    errors = []
+    for model_name in models:
         try:
+            model = genai.GenerativeModel(model_name)
+            result = model.generate_content(prompt, generation_config={"temperature": 0.35, "response_mime_type": "application/json"})
+            raw = (result.text or "").strip().strip("`")
             data = json.loads(raw)
-            data["narration"] = data["narration"].strip()
-        except (ValueError, KeyError, TypeError) as exc:
-            last_error = f"JSON/field validation failed: {type(exc).__name__}"
-            log(f"Draft attempt {attempt + 1} rejected: {last_error}")
-            continue
-        if len(data["narration"]) >= 420:
-            return data
-        last_error = f"narration too short: {len(data['narration'])} characters"
-        log(f"Draft attempt {attempt + 1} rejected: {last_error}; retrying with fact-based expansion.")
-    raise RuntimeError(f"Could not generate a sufficiently long fact-grounded narration after 3 attempts: {last_error}")
-
+            narration = str(data.get("narration", "")).strip()
+            if len(narration) >= 420:
+                data["narration"] = narration
+                log(f"WRITER_ENGINE=gemini model={model_name} narration_chars={len(narration)}")
+                return data
+            errors.append(f"{model_name}:{len(narration)}")
+        except Exception as exc:
+            errors.append(f"{model_name}:{type(exc).__name__}")
+    raise RuntimeError("Gemini writing chain failed or narration too short: " + ", ".join(errors))
 
 EDGE_VOICES = [("ko-KR-HyunsuNeural","male_deep"),("ko-KR-InJoonNeural","male_documentary"),("ko-KR-BongJinNeural","male_anchor"),("ko-KR-SunHiNeural","female_anchor"),("ko-KR-JiMinNeural","female_documentary"),("ko-KR-SeoHyeonNeural","female_news")]
 
