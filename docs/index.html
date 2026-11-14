@@ -457,7 +457,9 @@ updateControlClock();setInterval(updateControlClock,1000);
 .wp-ops-meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .wp-ops-meta div{background:#f1f5f9;padding:9px;border-radius:8px;overflow-wrap:anywhere;font-size:12px}
 .wp-ops-meta b{display:block;color:#64748b;font-size:11px}
-@media(max-width:700px){.wp-ops-grid,.wp-ops-meta{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.social-content-meta{grid-template-columns:repeat(6,minmax(0,1fr))}
+@media(max-width:1000px){.social-content-meta{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:700px){.wp-ops-grid,.wp-ops-meta,.social-content-meta{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 <script>
 (function(){
