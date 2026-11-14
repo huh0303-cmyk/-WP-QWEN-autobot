@@ -20,8 +20,9 @@ def inventory():
 def main():
     if os.getenv("TARGET_SITE_URL", "").rstrip("/") != SITE:
         raise RuntimeError("Koreanews-only runner")
+    env = os.environ.copy()
     before = inventory()
-    target = min(5, len(before) + int(os.getenv("KOREANEWS_RECOVERY_BATCH", "1")))
+    target = min(5, len(before) + 1)
     attempts = []
     for i in range(10):
         current = inventory()
@@ -33,7 +34,7 @@ def main():
         desks = (politics, politics, sports, politics, world) if day % 2 else (
             politics, politics, world if (day // 2) % 2 else sports, politics, politics
         )
-        if not env.get("NEWSROOM_SOURCE_URL"):
+        if not env.get("NEWSROOM_SOURCE_URL") and not env.get("NEWSROOM_PREFERRED_CATEGORY"):
             env["NEWSROOM_SUGGESTED_CATEGORY"] = desks[len(current)]
         result = subprocess.run([sys.executable, "-u", "scripts/autopost_current.py"], env=env)
         attempts.append({"attempt": i + 1, "returncode": result.returncode})
