@@ -16,7 +16,7 @@ def test_youtube_latest_item_includes_title_url_publish_time_and_duration(monkey
         if url.endswith("/youtube/v3/channels"):
             return {
                 "items": [{
-                    "id": "UC-test",
+                    "id": "UC1234567890123456789012",
                     "snippet": {"title": "Test channel", "publishedAt": "2025-01-01T00:00:00Z"},
                     "statistics": {"subscriberCount": "10", "viewCount": "500", "videoCount": "2"},
                     "contentDetails": {"relatedPlaylists": {"uploads": "PL-test"}},
@@ -52,7 +52,7 @@ def test_youtube_latest_item_includes_title_url_publish_time_and_duration(monkey
     result = snapshot.fetch_youtube([{
         "platform": "YouTube",
         "handle": "test_channel",
-        "url": "https://www.youtube.com/channel/UC-test",
+        "url": "https://www.youtube.com/channel/UC1234567890123456789012",
     }], "test-api-key")
     row = result["youtube|test_channel"]
     assert row["latest_content_title"] == "Latest published title"
