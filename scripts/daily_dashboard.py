@@ -377,7 +377,7 @@ def main():
     # The Seoul Journal Blogspot property remains a distinct Blogspot destination.
     wp25_sites = {s.rstrip("/") for s in WP25}
     targets = [("wordpress", s.rstrip("/"),
-                "한국신문 Koreanews24" if "koreanews365.com" in s.lower() else s.split("://", 1)[-1].rstrip("/"))
+                "Koreanews365.com" if "koreanews365.com" in s.lower() else s.split("://", 1)[-1].rstrip("/"))
                for s in WP25 if "ksa-korea.org" not in s.lower() and "theseouljournal.com" not in s.lower()]
     targets += [("blogspot", item["blogspot"].rstrip("/"), item["blogspot"].rstrip("/").split("://", 1)[-1])
                 for item in blogger_portfolio["channels"]]
@@ -400,7 +400,7 @@ def main():
     if newsroom_targets:
         chosen = next((t for t in newsroom_targets if "koreanews365.com" in t[1].lower()), newsroom_targets[0])
         targets = [t for t in targets if t[0] != "newsroom"]
-        targets.append((chosen[0], chosen[1], "한국신문 Koreanews24"))
+        targets.append((chosen[0], chosen[1], "Koreanews365.com"))
     targets = list(dict.fromkeys(targets))
     hist = json.loads(HIST.read_text(encoding="utf-8")) if HIST.exists() else {}
     prev_dates = sorted(k for k in hist if k < ref.isoformat())
