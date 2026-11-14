@@ -50,6 +50,19 @@ def as_int(value: Any) -> int | None:
         return None
 
 
+def first_line(value: Any) -> str | None:
+    text = str(value or "").strip()
+    return next((line.strip() for line in text.splitlines() if line.strip()), None)
+
+
+def duration_seconds(value: Any) -> int | None:
+    match = re.fullmatch(r"P(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?)?", str(value or ""))
+    if not match:
+        return as_int(value)
+    days, hours, minutes, seconds = match.groups()
+    return int(float(days or 0) * 86400 + int(hours or 0) * 3600 + int(minutes or 0) * 60 + float(seconds or 0))
+
+
 def account_key(row: dict[str, Any]) -> str:
     handle = str(row.get("handle") or "").strip().lstrip("@").lower()
     identity = handle or str(row.get("url") or "").strip().lower()
@@ -113,6 +126,13 @@ def base_record(row: dict[str, Any]) -> dict[str, Any]:
         "latest_content_views": None,
         "latest_content_likes": None,
         "latest_content_comments": None,
+        "latest_content_title": None,
+        "latest_content_url": None,
+        "latest_content_published_at": None,
+        "latest_content_duration_seconds": None,
+        "latest_content_text_length": None,
+        "latest_text_engine": None,
+        "latest_image_engine": None,
         "last_stats_checked_at": iso_now(),
         "last_successful_at": None,
         "data_source": None,
@@ -170,10 +190,14 @@ def fetch_youtube(rows: list[dict[str, Any]], api_key: str) -> dict[str, dict[st
                     items = latest.get("items", [])
                     if items:
                         details = items[0].get("contentDetails", {})
-                        metrics["last_publish"] = date_part(details.get("videoPublishedAt") or items[0].get("snippet", {}).get("publishedAt"))
-                        video_id = details.get("videoId") or (items[0].get("snippet", {}).get("resourceId") or {}).get("videoId")
+                        snippet = items[0].get("snippet", {})
+                        metrics["last_publish"] = date_part(details.get("videoPublishedAt") or snippet.get("publishedAt"))
+                        metrics["latest_content_title"] = snippet.get("title") or None
+                        metrics["latest_content_published_at"] = details.get("videoPublishedAt") or snippet.get("publishedAt")
+                        video_id = details.get("videoId") or (snippet.get("resourceId") or {}).get("videoId")
                         if video_id:
                             latest_video_ids[key] = video_id
+                            metrics["latest_content_url"] = f"https://www.youtube.com/watch?v={video_id}"
                 except Exception as exc:
                     metrics["last_publish_error"] = str(exc)[:180]
             collected[key] = metrics
@@ -185,13 +209,20 @@ def fetch_youtube(rows: list[dict[str, Any]], api_key: str) -> dict[str, dict[st
         batch = video_ids[offset:offset + 50]
         try:
             data = get_json("https://www.googleapis.com/youtube/v3/videos",
-                            params={"part": "statistics", "id": ",".join(batch), "key": api_key})
+                            params={"part": "snippet,contentDetails,statistics", "id": ",".join(batch), "key": api_key})
             for item in data.get("items", []):
                 key = key_by_video.get(item.get("id"))
                 if not key or key not in collected:
                     continue
                 stats = item.get("statistics", {})
+                snippet = item.get("snippet", {})
+                content = item.get("contentDetails", {})
                 collected[key].update({
+                    "latest_content_title": snippet.get("title") or collected[key].get("latest_content_title"),
+                    "latest_content_url": f"https://www.youtube.com/watch?v={item.get('id')}" if item.get("id") else collected[key].get("latest_content_url"),
+                    "latest_content_published_at": snippet.get("publishedAt") or collected[key].get("latest_content_published_at"),
+                    "latest_content_duration_seconds": duration_seconds(content.get("duration")),
+                    "latest_content_text_length": len(str(snippet.get("description") or "")),
                     "latest_content_views": as_int(stats.get("viewCount")),
                     "latest_content_likes": as_int(stats.get("likeCount")),
                     "latest_content_comments": as_int(stats.get("commentCount")),
@@ -217,7 +248,7 @@ def fetch_facebook(row: dict[str, Any], auth: dict[str, Any]) -> dict[str, Any]:
     post_count = None
     try:
         posts = get_json(base + "/published_posts", params={
-            "fields": "created_time,permalink_url,shares,likes.summary(true),comments.summary(true)",
+            "fields": "created_time,message,permalink_url,shares,likes.summary(true),comments.summary(true)",
             "limit": 1, "summary": "true", "access_token": token,
         })
         post_count = as_int((posts.get("summary") or {}).get("total_count"))
@@ -226,10 +257,15 @@ def fetch_facebook(row: dict[str, Any], auth: dict[str, Any]) -> dict[str, Any]:
     except Exception:
         # The Page profile metrics can still be used if post-list permission is narrower.
         pass
+    message = str(latest_post.get("message") or "")
     return {
         "status": "ok", "followers": as_int(data.get("followers_count")),
         "total_likes": as_int(data.get("fan_count")), "total_metric_label": "페이지 좋아요", "content_count": post_count,
         "last_publish": date_part(latest_post.get("created_time")) or None,
+        "latest_content_title": first_line(message),
+        "latest_content_url": latest_post.get("permalink_url") or None,
+        "latest_content_published_at": latest_post.get("created_time") or None,
+        "latest_content_text_length": len(message) if message else None,
         "latest_content_likes": as_int((latest_post.get("likes") or {}).get("summary", {}).get("total_count")),
         "latest_content_comments": as_int((latest_post.get("comments") or {}).get("summary", {}).get("total_count")),
         "data_source": f"Meta Graph API {META_VERSION}", "last_successful_at": iso_now(),
@@ -249,16 +285,21 @@ def fetch_instagram(row: dict[str, Any], auth: dict[str, Any]) -> dict[str, Any]
     latest_post: dict[str, Any] = {}
     try:
         media = get_json(base + "/media", params={
-            "fields": "timestamp,permalink,like_count,comments_count", "limit": 1, "access_token": token,
+            "fields": "caption,timestamp,permalink,media_type,like_count,comments_count", "limit": 1, "access_token": token,
         })
         if media.get("data"):
             latest_post = media["data"][0]
     except Exception:
         pass
+    caption = str(latest_post.get("caption") or "")
     return {
         "status": "ok", "followers": as_int(data.get("followers_count")),
         "following": as_int(data.get("follows_count")), "content_count": as_int(data.get("media_count")),
         "last_publish": date_part(latest_post.get("timestamp")) or None,
+        "latest_content_title": first_line(caption),
+        "latest_content_url": latest_post.get("permalink") or None,
+        "latest_content_published_at": latest_post.get("timestamp") or None,
+        "latest_content_text_length": len(caption) if caption else None,
         "latest_content_likes": as_int(latest_post.get("like_count")),
         "latest_content_comments": as_int(latest_post.get("comments_count")),
         "data_source": f"Instagram Graph API / Meta {META_VERSION}",
@@ -293,7 +334,7 @@ def fetch_threads(row: dict[str, Any], auth: dict[str, Any]) -> dict[str, Any]:
     content_count = None
     try:
         media = get_json(root + "/threads", params={
-            "fields": "id,timestamp,permalink,views,likes,replies,reposts,quotes", "limit": 100, "access_token": token,
+            "fields": "id,text,timestamp,permalink,views,likes,replies,reposts,quotes", "limit": 100, "access_token": token,
         })
         items = media.get("data", [])
         if items:
@@ -312,10 +353,15 @@ def fetch_threads(row: dict[str, Any], auth: dict[str, Any]) -> dict[str, Any]:
         values["_media_error"] = str(exc)[:180]
     if not values and not latest_post:
         raise RuntimeError(values.get("_insights_error") or values.get("_media_error") or "Threads API에서 측정값을 반환하지 않음")
+    post_text = str(latest_post.get("text") or "")
     return {
         "status": "ok", "followers": as_int(values.get("followers_count")),
         "total_views": as_int(values.get("views")), "total_metric_label": "계정 조회(인사이트)", "content_count": content_count,
         "last_publish": date_part(latest_post.get("timestamp")) or None,
+        "latest_content_title": first_line(post_text),
+        "latest_content_url": latest_post.get("permalink") or None,
+        "latest_content_published_at": latest_post.get("timestamp") or None,
+        "latest_content_text_length": len(post_text) if post_text else None,
         "latest_content_views": as_int(latest_post.get("views")),
         "latest_content_likes": as_int(latest_post.get("likes")),
         "latest_content_comments": as_int(latest_post.get("replies")),
@@ -336,7 +382,7 @@ def fetch_tiktok(row: dict[str, Any], auth: dict[str, Any]) -> dict[str, Any]:
     latest: dict[str, Any] = {}
     try:
         video_data = get_json("https://open.tiktokapis.com/v2/video/list/",
-                              params={"fields": "id,create_time,view_count,like_count,comment_count,share_count,video_description"},
+                              params={"fields": "id,create_time,view_count,like_count,comment_count,share_count,video_description,duration,share_url"},
                               headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
                               method="POST", body={"max_count": 1})
         videos = video_data.get("data", {}).get("videos", [])
@@ -346,11 +392,17 @@ def fetch_tiktok(row: dict[str, Any], auth: dict[str, Any]) -> dict[str, Any]:
         pass
     if not user:
         raise RuntimeError("TikTok API returned no user data")
+    description = str(latest.get("video_description") or "")
     return {
         "status": "ok", "followers": as_int(user.get("follower_count")),
         "following": as_int(user.get("following_count")), "total_likes": as_int(user.get("likes_count")),
         "total_metric_label": "누적 좋아요", "content_count": as_int(user.get("video_count")),
         "last_publish": date_part(latest.get("create_time")) or None,
+        "latest_content_title": first_line(description),
+        "latest_content_url": latest.get("share_url") or (f"https://www.tiktok.com/@{user.get('username')}/video/{latest.get('id')}" if latest.get("id") and user.get("username") else None),
+        "latest_content_published_at": datetime.fromtimestamp(int(latest["create_time"]), timezone.utc).astimezone(KST).isoformat(timespec="seconds") if latest.get("create_time") else None,
+        "latest_content_duration_seconds": as_int(latest.get("duration")),
+        "latest_content_text_length": len(description) if description else None,
         "latest_content_views": as_int(latest.get("view_count")),
         "latest_content_likes": as_int(latest.get("like_count")),
         "latest_content_comments": as_int(latest.get("comment_count")),
@@ -442,7 +494,9 @@ def collect() -> dict[str, Any]:
         else:
             keep = ("followers", "following", "subscribers", "total_views", "total_likes", "content_count",
                     "account_created_at", "creation_date_note", "total_metric_label", "last_publish", "latest_content_views",
-                    "latest_content_likes", "latest_content_comments", "data_source", "last_successful_at")
+                    "latest_content_likes", "latest_content_comments", "latest_content_title", "latest_content_url",
+                    "latest_content_published_at", "latest_content_duration_seconds", "latest_content_text_length",
+                    "latest_text_engine", "latest_image_engine", "data_source", "last_successful_at")
             for field in keep:
                 if old.get(field) is not None:
                     item[field] = old[field]
