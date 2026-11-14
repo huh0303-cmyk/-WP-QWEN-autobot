@@ -1,1 +1,1 @@
-{"day": "2026-11-11", "status": "DISPATCHED", "attempts": 2, "claim": "daily-2026-11-11-wp_jobinkorea-4c2b54b4", "claimed_at": "2026-11-11T18:16:50.435379+09:00", "run_id": 42993867190, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-11-14", "status": "PUBLISHED", "public_url": "https://jobinkorea365.com/mastering-korea-job-interview-preparation-and-employment-contract-checklist-for-foreign-applicants/", "published_at": "2026-11-13T16:37:35Z"}
