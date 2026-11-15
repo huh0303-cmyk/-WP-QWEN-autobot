@@ -96,9 +96,11 @@ def indexed_sitemap_count(h, prop):
                 continue
             for content in detail.json().get("contents", []) or []:
                 value = content.get("indexed")
-                if isinstance(value, (int, float)):
-                    total += int(value)
-                    found = True
+                try:
+                    total += int(str(value).replace(",", "").strip())
+                    found = value is not None
+                except (TypeError, ValueError):
+                    pass
         if found:
             return total, "GSC_SITEMAPS_API_PARTIAL" if failed else "GSC_SITEMAPS_API"
         return None, "GSC_SITEMAP_DETAIL_UNAVAILABLE" if failed else "GSC_INDEX_COUNT_NOT_REPORTED"

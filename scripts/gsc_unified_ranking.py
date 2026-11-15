@@ -160,13 +160,17 @@ def sitemap_coverage(headers: dict[str, str], prop: str) -> dict:
                 continue
             for content in detail.json().get("contents", []) or []:
                 value = content.get("indexed")
-                if isinstance(value, (int, float)):
-                    indexed_total += int(value)
-                    found_indexed = True
+                try:
+                    indexed_total += int(str(value).replace(",", "").strip())
+                    found_indexed = value is not None
+                except (TypeError, ValueError):
+                    pass
                 value = content.get("submitted")
-                if isinstance(value, (int, float)):
-                    submitted_total += int(value)
-                    found_submitted = True
+                try:
+                    submitted_total += int(str(value).replace(",", "").strip())
+                    found_submitted = value is not None
+                except (TypeError, ValueError):
+                    pass
         if not found_indexed:
             result["index_status"] = "SITEMAP_DETAIL_UNAVAILABLE" if failed_details else "INDEX_COUNT_NOT_REPORTED"
             return result
