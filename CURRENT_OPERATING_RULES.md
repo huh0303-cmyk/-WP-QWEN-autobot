@@ -1,3 +1,5 @@
+> **⚠️ 우선 확인 (2026-11-15):** 현재 통합 지침은 [LONDON_PROJECT_START_HERE.md](LONDON_PROJECT_START_HERE.md)와 `config/LONDON_PROJECT_UNIFIED_CONTENT_POLICY_20261114.json`입니다. 아래 내용 중 과거 글쓰기 엔진·VPS·사이트 수·이미지 규칙 등 충돌 항목은 이전 기록이며 최신 지침으로 대체됩니다.
+
 # London Project — Current Operating Rules
 
 **Effective:** 2026-11-06 (Asia/Seoul)  
