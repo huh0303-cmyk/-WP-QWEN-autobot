@@ -6,7 +6,7 @@
   "duplicate_guard": true,
   "network_daily_posts": 3,
   "daily_max_per_site": 1,
-  "randomization_policy": "Select exactly three distinct enabled sites once per KST day, persist that selection, and assign non-round publishing minutes at least 90 minutes apart.",
+  "randomization_policy": "Select three enabled sites per KST day and dispatch one post in each fixed slot: morning, lunch, evening. Persist the selection before dispatch.",
   "sites": [
     {
       "site_id": "tistory_finance_housing",
@@ -316,11 +316,110 @@
       "publish_target": "0_or_1_public_post_when_randomly_selected"
     }
   ],
-  "network_window_kst": ["08:10", "22:50"],
+  "network_window_kst": [
+    "08:10",
+    "22:50"
+  ],
   "minimum_network_gap_minutes": 90,
   "owner_login_checkpoint": {
     "reported_at": "2026-09-25",
     "state": "OWNER_REPORTED_ALREADY_LOGGED_IN",
     "instruction": "Do not ask the owner to log in again unless an actual runtime check detects an expired session or CAPTCHA."
-  }
+  },
+  "publish_slots_kst": [
+    {
+      "name": "morning",
+      "window": [
+        "07:30",
+        "09:30"
+      ],
+      "purpose": "전일·당일 검색 수요와 정부·공공기관 새 공고"
+    },
+    {
+      "name": "lunch",
+      "window": [
+        "11:30",
+        "13:30"
+      ],
+      "purpose": "점심 검색 수요와 예약·교통·건강 생활 정보"
+    },
+    {
+      "name": "evening",
+      "window": [
+        "18:30",
+        "20:30"
+      ],
+      "purpose": "퇴근 후 비교·신청·예약·여행 검색 수요"
+    }
+  ],
+  "topic_strategy": {
+    "korea_life": {
+      "site_id": "tistory_life365",
+      "focus": [
+        "정부지원금",
+        "보조금24",
+        "근로·자녀장려금",
+        "청년·주거지원",
+        "신청기간·지급일",
+        "예약·예매·시간표"
+      ],
+      "december_early_priority": [
+        "연말정산 준비",
+        "겨울철 난방비·에너지 지원",
+        "동절기 지자체 지원금",
+        "12월 교통·여행 예약",
+        "연말 공연·축제 예매"
+      ]
+    },
+    "korea_health": {
+      "site_id": "tistory_health_info",
+      "focus": [
+        "건강검진",
+        "혈압·혈당",
+        "겨울철 건강관리",
+        "영양·생활습관"
+      ],
+      "commerce_link": "k-health365.com 및 승인된 쿠팡파트너스 상품을 관련 문맥에서만 연결"
+    },
+    "korea_insurance": {
+      "site_id": "tistory_insurance_lab",
+      "focus": [
+        "자동차보험",
+        "생명보험",
+        "실손·건강보험",
+        "보험금 청구",
+        "갱신·비교"
+      ],
+      "official_sources": [
+        "금융감독원 파인",
+        "손해보험협회 소비자포털"
+      ]
+    },
+    "korea_travel": {
+      "site_id": "tistory_ktrip365",
+      "focus": [
+        "항공권 예약",
+        "호텔 예약",
+        "Trip.com",
+        "국내 교통·숙소·여행 일정"
+      ],
+      "affiliate_link": "Trip.com 및 승인된 항공·호텔 제휴 링크"
+    },
+    "korea_realestate_finance": {
+      "site_id": "tistory_finance_housing",
+      "focus": [
+        "대출 금리·이자 비교",
+        "전월세",
+        "청약",
+        "부동산 시세",
+        "신용·생활금융"
+      ],
+      "official_sources": [
+        "금융감독원 파인",
+        "한국주택금융공사",
+        "국토교통부"
+      ]
+    }
+  },
+  "never_publish_without_official_source": true
 }
