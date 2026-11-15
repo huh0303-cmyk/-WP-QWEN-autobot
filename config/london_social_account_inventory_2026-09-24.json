@@ -3,10 +3,10 @@
   "timezone": "Asia/Seoul",
   "confirmed_counts": {
     "youtube": 20,
-    "tiktok": 3,
+    "tiktok": 4,
     "instagram": 4,
     "threads": 3,
-    "total": 30
+    "total": 31
   },
   "youtube": [
     {
@@ -213,18 +213,31 @@
   "tiktok": [
     {
       "name": "SIS Korean · TOPIK",
-      "handle": "sis_topik",
-      "state": "profile_verified_publish_auth_missing"
+      "handle": "seoultopik",
+      "state": "profile_verified_authenticated_browser_2026-11-15",
+      "followers_snapshot": 31100,
+      "likes_snapshot": 505700
     },
     {
       "name": "SIS English · Survival",
       "handle": "sis_languagecenter",
-      "state": "profile_verified_login_required"
+      "state": "profile_verified_publish_auth_unverified_2026-11-15",
+      "followers_snapshot": 102,
+      "likes_snapshot": 1758
     },
     {
       "name": "지수의 하루 · Jisoo Picks",
       "handle": "sis_languageccenter",
-      "state": "profile_verified_account_transition_in_progress"
+      "state": "profile_verified_publish_auth_unverified_2026-11-15",
+      "followers_snapshot": 42,
+      "likes_snapshot": 508
+    },
+    {
+      "name": "Rosies Picks",
+      "handle": "rosiespicks",
+      "state": "profile_verified_publish_auth_unverified_2026-11-15",
+      "followers_snapshot": 3,
+      "likes_snapshot": 29
     }
   ],
   "instagram": [
