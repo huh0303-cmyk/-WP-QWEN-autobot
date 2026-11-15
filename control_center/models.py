@@ -8,7 +8,7 @@ TEXT_MODELS = {
     "gemini-3.5-flash-lite": {"label": "Gemini 3.5 Flash Lite", "price": "free-tier", "description": "English fallback"},
     "gemini-3.1-flash-lite": {"label": "Gemini 3.1 Flash Lite", "price": "free-tier", "description": "English fallback"},
     "gemini-3.0-flash-lite": {"label": "Gemini 3.0 Flash Lite", "price": "free-tier", "description": "Korean primary"},
-    "gemini-3.1-flash": {"label": "Gemini 3.1 Flash", "price": "free-tier", "description": "Korean fallback"},
+    "gemini-3.1-flash-lite": {"label": "Gemini 3.1 Flash Lite", "price": "free-tier", "description": "Korean fallback"},
     "gemini-3.0-flash": {"label": "Gemini 3.0 Flash", "price": "free-tier", "description": "Korean fallback"},
     "gemini-2.0-flash": {"label": "Gemini 2.0 Flash", "price": "free-tier", "description": "Universal fallback"},
     "gemini-3.8-flash": {"label": "Gemini 3.8 Flash", "price": "free-tier", "description": "Final fallback"},
