@@ -1,1 +1,1 @@
-{"day": "2026-11-15", "status": "DISPATCHED", "attempts": 1, "claim": "daily-2026-11-15-wp_kworld365-cf033ede", "claimed_at": "2026-11-15T10:50:07.372731+09:00", "run_id": 43664957208, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-11-15", "status": "PUBLISHED", "public_url": "https://kworld365.com/global-k-pop-tour-logistics-and-agency-schedule-confirmations-for-2026/", "published_at": "2026-11-15T03:12:00Z"}
