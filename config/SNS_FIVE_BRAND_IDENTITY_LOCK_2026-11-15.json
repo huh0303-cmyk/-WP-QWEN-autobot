@@ -93,11 +93,12 @@
       "display_name": "서울저널",
       "role": "Korean politics and current-affairs Shorts and long-form",
       "handles": {
-        "TikTok": "@seouljournal",
-        "Instagram": "@seouljournal",
-        "Threads": "@seouljournal",
-        "Facebook": "@seouljournal"
+        "TikTok": "@seoul_journal",
+        "Instagram": "@seoul_journal",
+        "Threads": "@seoul_journal",
+        "Facebook": "@seoul_journal"
       },
+      "reserved_unavailable_handle": "@seouljournal",
       "verification": {
         "TikTok": "account not yet identified or created",
         "Instagram": "account not yet identified or created",
