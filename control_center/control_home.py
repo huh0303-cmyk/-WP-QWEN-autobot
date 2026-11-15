@@ -21,6 +21,10 @@ def _read(path: Path, default):
         return default
 
 
+def _youtube_operations_status() -> dict:
+    status = _read(ROOT / "data" / "youtube_operations_status.json", {})
+    return status if isinstance(status, dict) else {}
+
 def _norm(value: object) -> str:
     return "".join(ch.lower() for ch in str(value or "") if ch.isalnum())
 
@@ -137,6 +141,7 @@ ROLE_TO_PROBE_BRAND = {
 
 def build_youtube_ranking(bucket: int) -> dict:
     inventory = _read(ROOT / "config" / "london_social_account_inventory_2026-09-24.json", {})
+    operations = _youtube_operations_status()
     current_map, previous_map, updated_at = _youtube_stats_by_identity(bucket)
     public_stats, public_updated_at, previous_public_stats, previous_public_updated_at = _youtube_public_stats()
     rows = []
@@ -178,6 +183,14 @@ def build_youtube_ranking(bucket: int) -> dict:
             "last_post_id": timeline.get("recent_video_id") or "",
             "infrastructure": infrastructure_info("youtube"),
             "connected": isinstance(subs, (int, float)),
+            "publish_status": operations.get("status", "unknown"),
+            "publish_status_label": operations.get("status_label", "상태 확인 필요"),
+            "writer_engine": operations.get("writer_engine", "Gemini unified chain"),
+            "tts_engine": operations.get("tts_engine", "Fish Audio → Edge TTS"),
+            "image_policy": operations.get("image_policy", "5 relevant real photos"),
+            "subtitle_policy": operations.get("subtitle_policy", "centered concise captions"),
+            "engagement_policy": operations.get("engagement_policy", "A/B/C poll ending"),
+            "last_failure": operations.get("last_failure", ""),
         })
     # UC ID가 없는 계획 슬롯은 실제 채널 순위/개수에 포함하지 않는다.
     def recent_date_order(value: object) -> int:
