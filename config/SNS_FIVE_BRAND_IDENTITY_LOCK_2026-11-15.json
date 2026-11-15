@@ -1,0 +1,128 @@
+{
+  "version": 1,
+  "effective_date": "2026-11-15",
+  "timezone": "Asia/Seoul",
+  "status": "current_authoritative_identity_map",
+  "supersedes": [
+    "SNS structures that define more than the five approved operating brands",
+    "Legacy TikTok handles sis_topik, sis_languagecenter, sis_languageccenter, and rosiespicks as public brand identities"
+  ],
+  "rules": {
+    "base_brand_count": 5,
+    "optional_sixth_brand": "Chinese_SOS only after an existing owned account is verified",
+    "same_brand_identity_across_platforms": true,
+    "public_handle_change_requires_account_login_and_prechange_review": true,
+    "public_publish_requires_platform_write_authorization_and_receipt": true
+  },
+  "brands": [
+    {
+      "order": 1,
+      "key": "topik",
+      "display_name": "SeoulTOPIK",
+      "role": "Korean and TOPIK learning for international learners",
+      "handles": {
+        "TikTok": "@seoultopik",
+        "Instagram": "@seoul_topik",
+        "Threads": "@seoul_topik",
+        "Facebook": "@seoul_topik"
+      },
+      "verification": {
+        "TikTok": "live profile and authenticated browser verified; 31.1K followers",
+        "Instagram": "existing handle recorded; publication authorization unverified",
+        "Threads": "existing handle recorded; publication authorization unverified",
+        "Facebook": "target handle only; actual page username must be verified"
+      }
+    },
+    {
+      "order": 2,
+      "key": "english_pick",
+      "display_name": "English Pick",
+      "role": "English basics and United States topics",
+      "handles": {
+        "TikTok": "@english_pick1",
+        "Instagram": "@english_pick1",
+        "Threads": "@english_pick1",
+        "Facebook": "@english_pick1"
+      },
+      "verification": {
+        "TikTok": "rename target for verified legacy @sis_languagecenter profile",
+        "Instagram": "existing handle recorded; publication authorization unverified",
+        "Threads": "existing handle recorded; publication authorization unverified",
+        "Facebook": "target handle only; actual page username must be verified"
+      }
+    },
+    {
+      "order": 3,
+      "key": "japanese_pick",
+      "display_name": "Japanese Pick",
+      "role": "Japanese basics and Japan topics",
+      "handles": {
+        "TikTok": "@japanese_pick",
+        "Instagram": "@japanese_pick",
+        "Threads": "@japanese_pick",
+        "Facebook": "@japanese_pick"
+      },
+      "verification": {
+        "TikTok": "rename target for verified legacy @sis_languageccenter profile",
+        "Instagram": "existing handle recorded; publication authorization unverified",
+        "Threads": "existing handle recorded; publication authorization unverified",
+        "Facebook": "target handle only; actual page username must be verified"
+      }
+    },
+    {
+      "order": 4,
+      "key": "seoul_jisoo",
+      "display_name": "Seoul Jisoo",
+      "role": "Shopping",
+      "handles": {
+        "TikTok": "@seoul_jisoo",
+        "Instagram": "@seoul_jisoo",
+        "Threads": "@seoul_jisoo",
+        "Facebook": "@seoul_jisoo"
+      },
+      "verification": {
+        "TikTok": "rename target for verified legacy @rosiespicks profile",
+        "Instagram": "existing handle recorded; publication authorization unverified",
+        "Threads": "existing handle recorded; publication authorization unverified",
+        "Facebook": "target handle only; actual page username must be verified"
+      }
+    },
+    {
+      "order": 5,
+      "key": "seoul_journal",
+      "display_name": "서울저널",
+      "role": "Korean politics and current-affairs Shorts and long-form",
+      "handles": {
+        "TikTok": "@seouljournal",
+        "Instagram": "@seouljournal",
+        "Threads": "@seouljournal",
+        "Facebook": "@seouljournal"
+      },
+      "verification": {
+        "TikTok": "account not yet identified or created",
+        "Instagram": "account not yet identified or created",
+        "Threads": "account not yet identified or created",
+        "Facebook": "account not yet identified or created"
+      }
+    },
+    {
+      "order": 6,
+      "key": "chinese_sos",
+      "display_name": "Chinese_SOS",
+      "role": "Chinese basics and China-related content",
+      "activation": "Only after an existing owned account is verified",
+      "handles": {
+        "TikTok": "@chinese_sos",
+        "Instagram": "@chinese_sos",
+        "Threads": "@chinese_sos",
+        "Facebook": "@chinese_sos"
+      },
+      "verification": {
+        "TikTok": "not active until an existing owned account is verified",
+        "Instagram": "not active until an existing owned account is verified",
+        "Threads": "not active until an existing owned account is verified",
+        "Facebook": "not active until an existing owned account is verified"
+      }
+    }
+  ]
+}
