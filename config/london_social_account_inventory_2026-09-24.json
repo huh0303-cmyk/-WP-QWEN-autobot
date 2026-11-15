@@ -9,9 +9,8 @@
     "total": 31
   },
   "tiktok_target_portfolio": {
-    "base_count": 5,
-    "base_roles": ["TOPIK", "English", "Japanese", "Shopping", "Politics and current affairs"],
-    "optional_sixth_role": "Chinese, only when an existing account is identified"
+    "base_count": 6,
+    "base_roles": ["TOPIK", "English", "Japanese", "Chinese", "Shopping", "Politics and current affairs"]
   },
   "youtube": [
     {

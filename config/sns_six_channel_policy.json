@@ -1,8 +1,8 @@
 {
   "version": 1,
   "effective_date": "2026-11-06",
-  "canonical_identity_map": "config/SNS_FIVE_BRAND_IDENTITY_LOCK_2026-11-15.json",
-  "identity_precedence": "The canonical five-brand identity map controls display names and public handles across every SNS platform.",
+  "canonical_identity_map": "config/SNS_SIX_BRAND_IDENTITY_LOCK_2026-11-15.json",
+  "identity_precedence": "The canonical six-brand identity map controls display names and public handles across every SNS platform.",
   "timezone": "Asia/Seoul",
   "cadence": "1_public_post_per_account_per_day_after_publish_auth_verified",
   "schedule": {

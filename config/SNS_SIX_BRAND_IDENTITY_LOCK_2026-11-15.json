@@ -8,8 +8,8 @@
     "Legacy TikTok handles sis_topik, sis_languagecenter, sis_languageccenter, and rosiespicks as public brand identities"
   ],
   "rules": {
-    "base_brand_count": 5,
-    "optional_sixth_brand": "Chinese_SOS only after an existing owned account is verified",
+    "base_brand_count": 6,
+    "sixth_brand": "Chinese_SOS",
     "same_brand_identity_across_platforms": true,
     "public_handle_change_requires_account_login_and_prechange_review": true,
     "public_publish_requires_platform_write_authorization_and_receipt": true
@@ -114,7 +114,7 @@
       "key": "chinese_sos",
       "display_name": "Chinese_SOS",
       "role": "Chinese basics and China-related content",
-      "activation": "Only after an existing owned account is verified",
+      "activation": "Core brand; account and publishing authorization are still required",
       "handles": {
         "TikTok": "@chinese_sos",
         "Instagram": "@chinese_sos",
@@ -122,10 +122,10 @@
         "Facebook": "@chinese_sos"
       },
       "verification": {
-        "TikTok": "not active until an existing owned account is verified",
-        "Instagram": "not active until an existing owned account is verified",
-        "Threads": "not active until an existing owned account is verified",
-        "Facebook": "not active until an existing owned account is verified"
+        "TikTok": "account and publishing authorization required",
+        "Instagram": "account and publishing authorization required",
+        "Threads": "account and publishing authorization required",
+        "Facebook": "account and publishing authorization required"
       }
     }
   ]
