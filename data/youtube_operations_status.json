@@ -1,0 +1,12 @@
+{
+  "status": "blocked",
+  "status_label": "코드 수정 완료 · OAuth/Environment 검증 및 실제 발행 대기",
+  "checked_at": "2026-11-15T10:00:00+09:00",
+  "writer_engine": "Gemini language-specific six-stage fallback",
+  "tts_engine": "Fish Audio → Edge TTS, six voice rotation",
+  "image_policy": "Five relevant real political-person photos per Seoul Journal Short",
+  "subtitle_policy": "Short centered captions synchronized to narration highlights",
+  "engagement_policy": "Final A/B/C viewer poll hold frame",
+  "last_failure": "Previous Seoul Journal run failed at narration length gate: 343/382/368 characters",
+  "next_action": "Run channel OAuth preflight, then private canary upload and verify receipt"
+}
