@@ -743,7 +743,10 @@
       "following_delta": null,
       "content_count_delta": 0,
       "total_views_delta": 0,
-      "total_likes_delta": null
+      "total_likes_delta": null,
+      "watch_hours": 9943.5,
+      "watch_hours_delta": null,
+      "watch_time_source": "YouTube Analytics estimatedMinutesWatched through 2026-11-14"
     },
     {
       "key": "youtube|starbucksvibes",
