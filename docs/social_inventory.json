@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-09",
-  "basis": "SNS names aligned with 2026-11-06 policy; public names not independently verified in this run. Legacy profiles retained for identity reconciliation; never count unverified followers as zero.",
+  "generated_at": "2026-11-15",
+  "basis": "Owner confirmed English_SOS display branding for YouTube, Instagram and Threads. Existing platform usernames and destination IDs are retained pending exact live verification; do not infer handle rename from display name.",
   "accounts": [
     {
       "platform": "YouTube",
@@ -15,14 +15,16 @@
     },
     {
       "platform": "YouTube",
-      "name": "English Survival",
+      "name": "English_SOS",
       "handle": "English_survival",
       "url": "https://www.youtube.com/channel/UCrjkKWMHzAAvpLIFgHnwcWg",
       "status": "analytics_connected",
       "exists": true,
       "followers": null,
       "views": null,
-      "last_publish": ""
+      "last_publish": "",
+      "display_name_source": "owner_confirmed_2026-11-15",
+      "handle_verification": "pending_live_handle_check; do not change OAuth mapping based on display name"
     },
     {
       "platform": "YouTube",
@@ -338,7 +340,7 @@
     },
     {
       "platform": "Instagram",
-      "name": "English Pick",
+      "name": "English_SOS",
       "handle": "english_pick",
       "url": "https://www.instagram.com/english_pick/",
       "role": "english",
@@ -347,7 +349,9 @@
       "status": "registry_profile_unverified_metrics_pending",
       "followers": null,
       "views": null,
-      "last_publish": ""
+      "last_publish": "",
+      "display_name_source": "owner_confirmed_2026-11-15",
+      "handle_verification": "pending_live_handle_check; do not change OAuth mapping based on display name"
     },
     {
       "platform": "Instagram",
@@ -403,7 +407,7 @@
     },
     {
       "platform": "Threads",
-      "name": "English Pick",
+      "name": "English_SOS",
       "handle": "english_pick",
       "url": "https://www.threads.com/@english_pick",
       "role": "english",
@@ -412,7 +416,9 @@
       "status": "registry_profile_unverified_metrics_pending",
       "followers": null,
       "views": null,
-      "last_publish": ""
+      "last_publish": "",
+      "display_name_source": "owner_confirmed_2026-11-15",
+      "handle_verification": "pending_live_handle_check; do not change OAuth mapping based on display name"
     },
     {
       "platform": "Threads",
