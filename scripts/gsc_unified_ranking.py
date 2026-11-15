@@ -120,14 +120,19 @@ def query_range(headers: dict[str, str], prop: str, start: dt.date, end: dt.date
 
 
 def sitemap_coverage(headers: dict[str, str], prop: str) -> dict:
-    """Read indexed/submitted URL totals from each Search Console sitemap detail."""
+    """Collect valid sitemap submission counts; GSC Page Indexing totals are UI-only.
+
+    Search Console documents contents[].indexed as deprecated. Do not read it
+    or present it as the Page Indexing report total. That aggregate is not
+    exposed by the supported Search Console API.
+    """
     base = "https://www.googleapis.com/webmasters/v3/sites/" + quote(prop, safe="")
     result = {
         "indexed": None,
         "submitted": None,
         "unindexed": None,
         "index_rate": None,
-        "index_status": "NOT_CHECKED",
+        "index_status": "PAGE_INDEXING_REPORT_UI_ONLY",
         "index_checked_at": dt.datetime.now(KST).isoformat(),
         "sitemap_count": 0,
     }
@@ -141,8 +146,8 @@ def sitemap_coverage(headers: dict[str, str], prop: str) -> dict:
         if not sitemaps:
             result["index_status"] = "NO_SITEMAPS_SUBMITTED"
             return result
-        indexed_total = submitted_total = 0
-        found_indexed = found_submitted = False
+        submitted_total = 0
+        found_submitted = False
         failed_details = 0
         seen = set()
         for sitemap in sitemaps:
@@ -159,30 +164,22 @@ def sitemap_coverage(headers: dict[str, str], prop: str) -> dict:
                 failed_details += 1
                 continue
             for content in detail.json().get("contents", []) or []:
-                value = content.get("indexed")
-                try:
-                    indexed_total += int(str(value).replace(",", "").strip())
-                    found_indexed = value is not None
-                except (TypeError, ValueError):
-                    pass
                 value = content.get("submitted")
                 try:
                     submitted_total += int(str(value).replace(",", "").strip())
                     found_submitted = value is not None
                 except (TypeError, ValueError):
                     pass
-        if not found_indexed:
-            result["index_status"] = "SITEMAP_DETAIL_UNAVAILABLE" if failed_details else "INDEX_COUNT_NOT_REPORTED"
-            return result
-        result["indexed"] = indexed_total
         result["submitted"] = submitted_total if found_submitted else None
-        result["unindexed"] = max(submitted_total - indexed_total, 0) if found_submitted else None
-        result["index_rate"] = round(indexed_total / submitted_total * 100, 2) if found_submitted and submitted_total else None
-        result["index_status"] = "OK_PARTIAL" if failed_details else "OK"
+        if failed_details:
+            result["index_status"] = "PAGE_INDEXING_REPORT_UI_ONLY_PARTIAL_SITEMAPS"
+        elif not found_submitted:
+            result["index_status"] = "PAGE_INDEXING_REPORT_UI_ONLY"
         return result
     except (requests.RequestException, ValueError, TypeError) as exc:
         result["index_status"] = "SITEMAPS_API_ERROR_" + type(exc).__name__
         return result
+
 
 
 def query_site(headers: dict[str, str], site: str, prop: str | None, end: dt.date) -> dict:

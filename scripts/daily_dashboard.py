@@ -63,49 +63,13 @@ def prop_for(url, props):
 
 
 def indexed_sitemap_count(h, prop):
-    """Return (indexed URL count, status) from each official GSC sitemap detail.
+    """Do not substitute deprecated sitemap indexed counts for Page Indexing totals.
 
-    The collection endpoint lists sitemap paths; indexed/submitted counts are
-    returned by the per-sitemap detail endpoint. A missing report is never
-    converted into a fabricated zero.
+    Exact Page Indexing report totals must be captured from the Search Console UI.
+    The supported API does not expose that aggregate.
     """
-    base = "https://www.googleapis.com/webmasters/v3/sites/" + quote(prop, safe="")
-    try:
-        response = requests.get(base + "/sitemaps", headers=h, timeout=25)
-        if response.status_code != 200:
-            return None, f"GSC_SITEMAPS_HTTP_{response.status_code}"
-        sitemaps = response.json().get("sitemap", []) or []
-        if not sitemaps:
-            return None, "GSC_NO_SITEMAPS"
-        total = 0
-        found = False
-        failed = 0
-        seen = set()
-        for sitemap in sitemaps:
-            path = str(sitemap.get("path") or "").strip()
-            if not path or path in seen:
-                continue
-            seen.add(path)
-            detail = requests.get(
-                base + "/sitemaps/" + quote(path, safe=""),
-                headers=h,
-                timeout=25,
-            )
-            if detail.status_code != 200:
-                failed += 1
-                continue
-            for content in detail.json().get("contents", []) or []:
-                value = content.get("indexed")
-                try:
-                    total += int(str(value).replace(",", "").strip())
-                    found = value is not None
-                except (TypeError, ValueError):
-                    pass
-        if found:
-            return total, "GSC_SITEMAPS_API_PARTIAL" if failed else "GSC_SITEMAPS_API"
-        return None, "GSC_SITEMAP_DETAIL_UNAVAILABLE" if failed else "GSC_INDEX_COUNT_NOT_REPORTED"
-    except (requests.RequestException, ValueError, TypeError) as exc:
-        return None, "GSC_SITEMAPS_API_ERROR_" + type(exc).__name__
+    return None, "GSC_PAGE_INDEXING_REPORT_UI_ONLY"
+
 
 def content_metadata(url, platform):
     """Return published content count and latest publish date using lightweight public endpoints."""
@@ -433,6 +397,24 @@ def main():
     prev = hist[prev_dates[-1]] if prev_dates else {}
     with ThreadPoolExecutor(max_workers=8) as ex:
         rows = list(ex.map(lambda t: one(h, props, t[0], t[1], t[2], ref, prev), targets))
+    # Overlay only manually verified Page Indexing report values exported/read
+    # from the GSC UI. Never infer these totals from the deprecated Sitemaps API.
+    try:
+        ui_snapshot = json.loads((ROOT / "data" / "gsc_page_indexing_ui_snapshot.json").read_text(encoding="utf-8"))
+        ui_sites = ui_snapshot.get("sites", {})
+        for row in rows:
+            evidence = ui_sites.get(str(row.get("site", "")).lower())
+            if not evidence or evidence.get("indexed") is None:
+                continue
+            row["google_indexed"] = int(evidence["indexed"])
+            row["google_not_indexed"] = int(evidence["not_indexed"]) if evidence.get("not_indexed") is not None else None
+            row["google_indexed_delta"] = None
+            row["google_indexed_status"] = "GSC_UI_VERIFIED"
+            row["google_indexed_checked_at"] = evidence.get("checked_at") or ui_snapshot.get("collected_at")
+            row["google_indexed_report_updated_at"] = evidence.get("report_updated_at")
+            row["google_indexed_source"] = "Google Search Console Page Indexing UI"
+    except (OSError, ValueError, TypeError):
+        pass
     # Attach independently verified cumulative WP visitor totals from the
     # authenticated site-stats collector. Blogger cumulative pageviews remain
     # sourced from the Blogger Total Pageviews widget/API, not conflated here.

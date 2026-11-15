@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - "scripts/daily_dashboard.py"
+      - "data/gsc_page_indexing_ui_snapshot.json"
       - "docs/index.html"
       - ".github/workflows/daily-dashboard.yml"
   workflow_dispatch: {}

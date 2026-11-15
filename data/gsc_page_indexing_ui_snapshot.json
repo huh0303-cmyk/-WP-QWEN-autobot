@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "source": "Google Search Console Page Indexing report UI",
+  "collected_at": "2026-11-15T09:30:00+09:00",
+  "note": "UI value read from the currently open kworld365.com Search Console Page indexing report. API sitemap indexed field is deprecated and is not used.",
+  "sites": {
+    "kworld365.com": {
+      "property": "sc-domain:kworld365.com",
+      "indexed": 63,
+      "not_indexed": 490,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:30:00+09:00"
+    }
+  }
+}
