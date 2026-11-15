@@ -1,15 +1,333 @@
 {
   "schema": 1,
   "source": "Google Search Console Page Indexing report UI",
-  "collected_at": "2026-11-15T09:30:00+09:00",
-  "note": "UI value read from the currently open kworld365.com Search Console Page indexing report. API sitemap indexed field is deprecated and is not used.",
+  "collected_at": "2026-11-15T09:42:11+09:00",
+  "note": "Verified indexed page totals from Search Console for 23 WordPress and 31 Blogspot sites.",
   "sites": {
     "kworld365.com": {
       "property": "sc-domain:kworld365.com",
       "indexed": 63,
       "not_indexed": 490,
       "report_updated_at": "2026-11-09",
-      "checked_at": "2026-11-15T09:30:00+09:00"
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "glow.k-health365.com": {
+      "property": "https://glow.k-health365.com/",
+      "indexed": 0,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "jobinkorea365.blogspot.com": {
+      "property": "https://jobinkorea365.blogspot.com/",
+      "indexed": 21,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "jobinkorea365.com": {
+      "property": "sc-domain:jobinkorea365.com",
+      "indexed": 23,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "jobkorea365.com": {
+      "property": "sc-domain:jobkorea365.com",
+      "indexed": 10,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "jobkoreaglobal.blogspot.com": {
+      "property": "https://jobkoreaglobal.blogspot.com/",
+      "indexed": 12,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "jobkoreaglobal.com": {
+      "property": "sc-domain:jobkoreaglobal.com",
+      "indexed": 9,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "k-health365.blogspot.com": {
+      "property": "sc-domain:k-health365.blogspot.com",
+      "indexed": 4,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "k-health365.com": {
+      "property": "sc-domain:k-health365.com",
+      "indexed": 1,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "k-trip365.blogspot.com": {
+      "property": "https://k-trip365.blogspot.com/",
+      "indexed": 31,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "k-trip365.com": {
+      "property": "sc-domain:k-trip365.com",
+      "indexed": 6,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "k-visa365.blogspot.com": {
+      "property": "https://k-visa365.blogspot.com/",
+      "indexed": 15,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "k-visa365.com": {
+      "property": "sc-domain:k-visa365.com",
+      "indexed": 13,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "kfinance365.blogspot.com": {
+      "property": "https://kfinance365.blogspot.com/",
+      "indexed": 41,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "kfinance365.com": {
+      "property": "sc-domain:kfinance365.com",
+      "indexed": 12,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "ki-korea.blogspot.com": {
+      "property": "https://ki-korea.blogspot.com/",
+      "indexed": 37,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "kieca-korea.blogspot.com": {
+      "property": "https://kieca-korea.blogspot.com/",
+      "indexed": 5,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "kieca-korea.org": {
+      "property": "sc-domain:kieca-korea.org",
+      "indexed": 79,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "korea-life-support365.blogspot.com": {
+      "property": "https://korea-life-support365.blogspot.com/",
+      "indexed": 11,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "korea365.org": {
+      "property": "sc-domain:korea365.org",
+      "indexed": 174,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "korea365guide.blogspot.com": {
+      "property": "https://korea365guide.blogspot.com/",
+      "indexed": 9,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "koreacrypto365.blogspot.com": {
+      "property": "https://koreacrypto365.blogspot.com/",
+      "indexed": 3,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "koreacrypto365.com": {
+      "property": "sc-domain:koreacrypto365.com",
+      "indexed": 10,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "koreainsurance365.blogspot.com": {
+      "property": "https://koreainsurance365.blogspot.com/",
+      "indexed": 2,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "koreainsurance365.com": {
+      "property": "sc-domain:koreainsurance365.com",
+      "indexed": 111,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "koreainvest365.blogspot.com": {
+      "property": "https://koreainvest365.blogspot.com/",
+      "indexed": 34,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "koreainvest365.com": {
+      "property": "sc-domain:koreainvest365.com",
+      "indexed": 13,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "koreamedicaltour.com": {
+      "property": "sc-domain:koreamedicaltour.com",
+      "indexed": 5,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "koreamedicaltour1.blogspot.com": {
+      "property": "https://koreamedicaltour1.blogspot.com/",
+      "indexed": 25,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "koreamedicaltour365.blogspot.com": {
+      "property": "https://koreamedicaltour365.blogspot.com/",
+      "indexed": 0,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "koreanews365.com": {
+      "property": "sc-domain:koreanews365.com",
+      "indexed": 30,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "koreanews365daily.blogspot.com": {
+      "property": "https://koreanews365daily.blogspot.com/",
+      "indexed": 1,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "koreataxnlaw.blogspot.com": {
+      "property": "https://koreataxnlaw.blogspot.com/",
+      "indexed": 10,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "koreataxnlaw.com": {
+      "property": "sc-domain:koreataxnlaw.com",
+      "indexed": 18,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "koreawedding365.blogspot.com": {
+      "property": "https://koreawedding365.blogspot.com/",
+      "indexed": 5,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "koreawedding365.com": {
+      "property": "sc-domain:koreawedding365.com",
+      "indexed": 95,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "krealestate365.blogspot.com": {
+      "property": "https://krealestate365.blogspot.com/",
+      "indexed": 8,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "krealestate365.com": {
+      "property": "sc-domain:krealestate365.com",
+      "indexed": 5,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "ksa-korea.blogspot.com": {
+      "property": "https://ksa-korea.blogspot.com/",
+      "indexed": 4,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "kskin365.com": {
+      "property": "sc-domain:kskin365.com",
+      "indexed": 69,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "kstudy365.blogspot.com": {
+      "property": "https://kstudy365.blogspot.com/",
+      "indexed": 15,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "kstudy365.com": {
+      "property": "sc-domain:kstudy365.com",
+      "indexed": 3,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "ktech365.blogspot.com": {
+      "property": "https://ktech365.blogspot.com/",
+      "indexed": 32,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "ktech365.com": {
+      "property": "sc-domain:ktech365.com",
+      "indexed": 83,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "kworld365.blogspot.com": {
+      "property": "https://kworld365.blogspot.com/",
+      "indexed": 2,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "kworld365seoul.blogspot.com": {
+      "property": "https://kworld365seoul.blogspot.com/",
+      "indexed": 4,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "oliveyoungkorea.blogspot.com": {
+      "property": "https://oliveyoungkorea.blogspot.com/",
+      "indexed": 5,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "oliveyoungkorea.com": {
+      "property": "sc-domain:oliveyoungkorea.com",
+      "indexed": 2,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "seoulintlschoolguide.blogspot.com": {
+      "property": "https://seoulintlschoolguide.blogspot.com/",
+      "indexed": 31,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "sis-korea.blogspot.com": {
+      "property": "https://sis-korea.blogspot.com/",
+      "indexed": 20,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "skin.k-health365.com": {
+      "property": "https://skin.k-health365.com/",
+      "indexed": 0,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "studyinkorea365.blogspot.com": {
+      "property": "https://studyinkorea365.blogspot.com/",
+      "indexed": 13,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "studyinkorea365.com": {
+      "property": "sc-domain:studyinkorea365.com",
+      "indexed": 114,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
+    },
+    "theseouljournal.blogspot.com": {
+      "property": "https://theseouljournal.blogspot.com/",
+      "indexed": 14,
+      "report_updated_at": "2026-11-09",
+      "checked_at": "2026-11-15T09:42:11+09:00"
     }
   }
 }
