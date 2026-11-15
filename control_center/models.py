@@ -1,18 +1,25 @@
 from __future__ import annotations
 
+# Single source of truth: config/LONDON_PROJECT_UNIFIED_CONTENT_POLICY_20261114.json
+# Legacy GPT/OpenAI writer entries are intentionally removed from the control UI.
 TEXT_MODELS = {
-    "gemini-2.5-flash-lite": {"label": "Gemini 2.5 Flash-Lite", "price": "$0.0007/글", "description": "일반 글 · 최저비용"},
-    "gemini-2.5-flash": {"label": "Gemini 2.5 Flash", "price": "$0.0041/글", "description": "비자·금융·의료 검토"},
-    "gpt-5-mini": {"label": "GPT-5 mini", "price": "$0.0033/글", "description": "전체 블로그 기본 작성 엔진"},
-    "gpt-5.4-mini": {"label": "GPT-5.4 mini", "price": "$0.0075/글", "description": "최중요 글"},
+    "gemini-3.6-flash": {"label": "Gemini 3.6 Flash", "price": "free-tier", "description": "English primary"},
+    "gemini-3.5-flash": {"label": "Gemini 3.5 Flash", "price": "free-tier", "description": "English fallback"},
+    "gemini-3.5-flash-lite": {"label": "Gemini 3.5 Flash Lite", "price": "free-tier", "description": "English fallback"},
+    "gemini-3.1-flash-lite": {"label": "Gemini 3.1 Flash Lite", "price": "free-tier", "description": "English fallback"},
+    "gemini-3.0-flash-lite": {"label": "Gemini 3.0 Flash Lite", "price": "free-tier", "description": "Korean primary"},
+    "gemini-3.1-flash": {"label": "Gemini 3.1 Flash", "price": "free-tier", "description": "Korean fallback"},
+    "gemini-3.0-flash": {"label": "Gemini 3.0 Flash", "price": "free-tier", "description": "Korean fallback"},
+    "gemini-2.0-flash": {"label": "Gemini 2.0 Flash", "price": "free-tier", "description": "Universal fallback"},
+    "gemini-3.8-flash": {"label": "Gemini 3.8 Flash", "price": "free-tier", "description": "Final fallback"},
 }
 
 IMAGE_MODELS = {
-    "auto": {"label": "Pexels → Pixabay → SDXL Turbo → FLUX Schnell", "price": "free-first; paid calls billed", "description": "Shared London Project policy"},
-    "none": {"label": "No image", "price": "$0/image", "description": "Use when no relevant image is needed"},
+    "auto": {"label": "Pexels → Pixabay → SDXL Turbo → FLUX Schnell", "price": "free-first", "description": "Unified London Project image policy"},
+    "none": {"label": "No image", "price": "$0/image", "description": "Only when all relevant image providers fail"},
 }
 
-DEFAULT_TEXT_MODEL = "gpt-5-mini"
+DEFAULT_TEXT_MODEL = "gemini-3.0-flash-lite"
 DEFAULT_IMAGE_MODEL = "auto"
 
 
