@@ -2,7 +2,7 @@
   "project": "london-project",
   "timezone": "Asia/Seoul",
   "schedule_policy": {
-    "cadence_lock": "youtube_23_each_channel_daily_tistory_network_3_random_daily_other_enabled_sites_and_accounts_1_per_day",
+    "cadence_lock": "youtube_23_each_channel_daily_tistory_three_fixed_daily_slots_naver_two_daily_blocked_other_enabled_sites_and_accounts_1_per_day",
     "cost_lock": "free_only_no_paid_fallback",
     "planned_jitter_minutes": 60,
     "forbid_exact_hour": true,
@@ -23,7 +23,21 @@
     "minimum_same_platform_gap_minutes": 30,
     "avoid_repeating_same_day_time_pattern": true,
     "spread_targets_across_distinct_minutes": true,
-    "no_same_slot_for_parallel_channels": true
+    "no_same_slot_for_parallel_channels": true,
+    "fixed_tistory_slots_kst": [
+      [
+        "07:30",
+        "09:30"
+      ],
+      [
+        "11:30",
+        "13:30"
+      ],
+      [
+        "18:30",
+        "20:30"
+      ]
+    ]
   },
   "cadence": {
     "wordpress_general": {
@@ -60,13 +74,19 @@
     },
     "tistory": {
       "site_count": 5,
-      "target": "3_public_posts_per_day_across_three_randomly_selected_distinct_sites",
+      "target": "3_public_posts_per_day_across_three_distinct_sites_in_morning_lunch_evening_slots",
       "network_daily_total": 3,
       "daily_max_per_site": 1,
       "selection_is_persisted_before_dispatch": true,
-      "minimum_network_gap_minutes": 90,
-      "randomized_time": true,
-      "public_requires_local_write_verification": true
+      "slots_kst": [
+        "morning",
+        "lunch",
+        "evening"
+      ],
+      "minimum_network_gap_minutes": 120,
+      "randomized_time_within_slot": true,
+      "public_requires_local_write_verification": true,
+      "topic_strategy_ref": "config/tistory_portfolio.json"
     },
     "youtube_playlist": {
       "channel_count": 5,
@@ -148,25 +168,22 @@
       "randomized_time": true
     },
     "naver": {
-      "active_site_ids": ["naver_n1", "naver_n2", "naver_n3"],
-      "target": "naver_n1_and_n2_three_to_four_each_daily_plus_naver_n3_eight_to_ten_reviewed_public_posts_daily",
-      "network_daily_min": 14,
-      "network_daily_max": 18,
-      "weekly_target_min": 98,
-      "weekly_target_max": 126,
-      "per_site_minimum_interval_minutes": {"naver_n1": 180, "naver_n2": 180, "naver_n3": 75},
-      "randomized_time": true,
-      "public_requires_local_write_verification": true,
-      "official_source_required_for_policy_posts": true,
-      "copyright_safe_original_image_required": true,
-      "monthly_keyword_calendar": "config/naver_monthly_keyword_calendar.json",
-      "monthly_keyword_catalog": "config/naver_monthly_keyword_100.json",
-      "monthly_keyword_candidates": 100,
-      "morning_trend_research_start_kst": "07:07",
-      "morning_trend_research_deadline_kst": "07:50",
-      "publishing_window_kst": ["08:17", "23:17"],
-      "google_indexing_api_for_general_posts": false,
-      "never_bulk_publish": true
+      "active_site_ids": [
+        "naver_n1",
+        "naver_n2",
+        "naver_n3"
+      ],
+      "status": "BLOCKED_LOGIN_OR_ACCOUNT_ACCESS",
+      "target": "2_prepared_posts_per_day_when_access_restored",
+      "network_daily_total": 2,
+      "public_publish_enabled": false,
+      "reason": "네이버 계정 접속 불가. 콘텐츠 준비와 큐 적재만 허용.",
+      "topic_sites": [
+        "헬스",
+        "부",
+        "생활"
+      ],
+      "public_requires_local_write_verification": true
     },
     "youtube_daily_additional": {
       "channel_count": 3,
