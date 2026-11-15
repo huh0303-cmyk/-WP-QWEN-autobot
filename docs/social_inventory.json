@@ -360,26 +360,30 @@
       "name": "Seoul Jisoo",
       "handle": "seoul_jisoo",
       "url": "https://www.instagram.com/seoul_jisoo/",
-      "status": "registry_profile_unverified_metrics_pending",
+      "status": "public_profile_verified_write_scope_unconfirmed_2026-11-15",
       "exists": true,
       "followers": null,
       "views": null,
       "last_publish": "",
       "role": "health_shop",
-      "identity_verified": false
+      "identity_verified": true,
+      "current_public_display_name": "Seoul_Jisoo",
+      "brand_name_target": "Seoul_Jisoo"
     },
     {
       "platform": "Instagram",
       "name": "Seoul Chris",
-      "handle": "seoul_chris",
-      "url": "https://www.instagram.com/seoul_chris/",
+      "handle": "seoul_chris1",
+      "url": "https://www.instagram.com/seoul_chris1/",
       "role": "hot_item_shop",
-      "identity_verified": false,
+      "identity_verified": true,
       "exists": true,
-      "status": "registry_profile_unverified_metrics_pending",
+      "status": "public_profile_verified_write_scope_unconfirmed_2026-11-15",
       "followers": null,
       "views": null,
-      "last_publish": ""
+      "last_publish": "",
+      "current_public_display_name": "seoul_chris",
+      "brand_name_target": "Seoul_Chris"
     },
     {
       "platform": "Instagram",
@@ -387,12 +391,14 @@
       "handle": "japanese_pick",
       "url": "https://www.instagram.com/japanese_pick/",
       "role": "japanese",
-      "identity_verified": false,
+      "identity_verified": true,
       "exists": true,
-      "status": "registry_profile_unverified_metrics_pending",
+      "status": "public_profile_verified_write_scope_unconfirmed_2026-11-15",
       "followers": null,
       "views": null,
-      "last_publish": ""
+      "last_publish": "",
+      "current_public_display_name": "Japanese_pick",
+      "brand_name_target": "Japanese_SOS"
     },
     {
       "platform": "Instagram",
@@ -400,12 +406,14 @@
       "handle": "seoul_topik",
       "url": "https://www.instagram.com/seoul_topik/",
       "role": "korean_topik",
-      "identity_verified": false,
+      "identity_verified": true,
       "exists": true,
-      "status": "registry_profile_unverified_metrics_pending",
+      "status": "public_profile_verified_write_scope_unconfirmed_2026-11-15",
       "followers": null,
       "views": null,
-      "last_publish": ""
+      "last_publish": "",
+      "current_public_display_name": "Seoul Topik",
+      "brand_name_target": "Seoul_TOPIK"
     },
     {
       "platform": "Threads",
@@ -432,23 +440,27 @@
       "role": "health_shop",
       "identity_verified": true,
       "exists": true,
-      "status": "registry_identity_verified_metrics_pending",
+      "status": "public_profile_verified_write_scope_unconfirmed_2026-11-15",
       "followers": null,
       "views": null,
-      "last_publish": ""
+      "last_publish": "",
+      "current_public_display_name": "Seoul_Jisoo",
+      "brand_name_target": "Seoul_Jisoo"
     },
     {
       "platform": "Threads",
       "name": "Seoul Chris",
-      "handle": "seoul_chris",
-      "url": "https://www.threads.com/@seoul_chris",
+      "handle": "seoul_chris1",
+      "url": "https://www.threads.com/@seoul_chris1",
       "role": "hot_item_shop",
-      "identity_verified": false,
+      "identity_verified": true,
       "exists": true,
-      "status": "registry_profile_unverified_metrics_pending",
+      "status": "public_profile_verified_write_scope_unconfirmed_2026-11-15",
       "followers": null,
       "views": null,
-      "last_publish": ""
+      "last_publish": "",
+      "current_public_display_name": "seoul_chris",
+      "brand_name_target": "Seoul_Chris"
     },
     {
       "platform": "Threads",
@@ -458,10 +470,11 @@
       "role": "japanese",
       "identity_verified": false,
       "exists": true,
-      "status": "registry_profile_unverified_metrics_pending",
+      "status": "login_redirect_public_profile_unverified_2026-11-15",
       "followers": null,
       "views": null,
-      "last_publish": ""
+      "last_publish": "",
+      "brand_name_target": "Japanese_SOS"
     },
     {
       "platform": "Threads",
@@ -469,12 +482,14 @@
       "handle": "seoul_topik",
       "url": "https://www.threads.com/@seoul_topik",
       "role": "korean_topik",
-      "identity_verified": false,
+      "identity_verified": true,
       "exists": true,
-      "status": "registry_profile_unverified_metrics_pending",
+      "status": "public_profile_verified_write_scope_unconfirmed_2026-11-15",
       "followers": null,
       "views": null,
-      "last_publish": ""
+      "last_publish": "",
+      "current_public_display_name": "Seoul_Topik",
+      "brand_name_target": "Seoul_TOPIK"
     },
     {
       "platform": "TikTok",
