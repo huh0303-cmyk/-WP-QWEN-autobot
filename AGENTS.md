@@ -1,8 +1,12 @@
 # AGENTS.md
 
+## Mandatory first read — current single entrypoint (2026-11-15)
+
+**Read `LONDON_PROJECT_START_HERE.md` first.** For editorial/image/SEO work, then read `config/LONDON_PROJECT_UNIFIED_CONTENT_POLICY_20261114.json` and only the relevant active code. Do not load the entire repository or old ledgers by default. Use GitHub connector first; save Desktop Commander usage for essential PC/browser-auth work.
+
 ## Canonical project continuity rule
 
-Before performing project work, read:
+For material changes, consult these records **when relevant**, not unconditionally:
 - `docs/GITHUB_OPERATION_RECORD_POLICY_2026-09-25.md`
 - `docs/LONDON_PROJECT_ACTIVITY_LEDGER.md`
 - `docs/PROJECT_WORKING_AGREEMENT.md`
@@ -19,7 +23,7 @@ Never commit passwords, API keys, tokens or private credentials.
 
 ## Mandatory PC execution and continuity rule — 2026-10-31
 
-- Use Desktop Commander (DC) and PowerShell together for local PC, browser, filesystem, terminal, and verification work.
+- Prefer Chat + GitHub connector/Actions; use Desktop Commander (DC) and PowerShell **only when local PC, browser login, or filesystem access is genuinely needed**, to conserve the remaining DC quota.
 - When Work/Codex is unavailable or has no token, continue in the current ChatGPT conversation through the connected DC device and PowerShell; do not block or redirect the user to Work/Codex.
 - Use direct WordPress REST API or the approved local deployment workflow for WordPress operations. Do not route WordPress work through third-party WordPress MCP plugins.
 - Keep project execution and verification independent of any optional WordPress connector.
