@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-09-25",
+  "as_of": "2026-11-15",
   "timezone": "Asia/Seoul",
   "confirmed_counts": {
     "youtube": 20,
@@ -99,11 +99,14 @@
     },
     {
       "group": "language",
-      "name": "English Survival",
+      "name": "English_SOS",
       "channel_id": "UCrjkKWMHzAAvpLIFgHnwcWg",
-      "state": "analytics_connected",
-      "handle": "English_survival",
-      "identity_verified_live": true
+      "state": "public_handle_verified_channel_id_match_2026-11-15",
+      "handle": "english_sos1",
+      "identity_verified_live": true,
+      "previous_name": "English Survival",
+      "previous_handle": "English_survival",
+      "handle_verified_url": "https://www.youtube.com/@English_SOS1"
     },
     {
       "group": "language",
@@ -288,5 +291,8 @@
       "Health Clinic USA = US/English-speaking health channel",
       "Health_Clinic_Japan = Japan/Japanese-speaking health channel"
     ]
-  }
+  },
+  "identity_notes": [
+    "English_SOS YouTube channel (UCrjkKWMHzAAvpLIFgHnwcWg) is separate from English Pick One on Instagram/Threads. @English_SOS is owned by an unrelated 505영어그림책 channel; @English_SOS1 resolves to the user's English_SOS channel."
+  ]
 }
