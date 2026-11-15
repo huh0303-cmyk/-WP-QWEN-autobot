@@ -74,6 +74,14 @@ tr.platform-youtube{background:#fff7f7}tr.platform-tiktok{background:#f2fcfd}tr.
 <div class="bar"><span>정렬 기준: 일일 페이지뷰 내림차순 (최근 확인된 값 우선)</span><span class="na">최근 수치가 없는 블로그는 아래쪽에 표시</span></div>
 <div class="table-wrap"><table><thead><tr><th>순위</th><th>플랫폼</th><th>블로그</th><th>누적 페이지뷰(전일 대비 증감)</th><th>일일 페이지뷰(전일 대비 증감)</th><th>콘텐츠 수(증감)</th><th>GSC 색인 수(증감)</th><th>발행주기 (GitHub)</th><th>발행경과</th><th>즉시발행</th></tr></thead><tbody id="blogger-pageviews-rows"><tr><td colspan="9" class="na">데이터 수집 전</td></tr></tbody></table></div>
 </section>
+<section id="tistory-ranking" style="margin:18px 0"><h2>티스토리 (5개) · 일 방문자 순위</h2>
+<div class="sub">전일 방문자 내림차순 · 미수집 계정은 하단 표시</div>
+<div class="table-wrap"><table><thead><tr><th>순위</th><th>구분</th><th>블로그</th><th>일 방문자(증감)</th><th>누적 방문자(증감)</th><th>콘텐츠 수(증감)</th><th>발행주기 (GitHub)</th><th>발행경과</th></tr></thead>
+<tbody id="tistory-ranking-rows"><tr><td colspan="8" class="na">데이터 수집 중</td></tr></tbody></table></div></section>
+<section id="naver-ranking" style="margin:18px 0"><h2>네이버 블로그 (3개) · 일 방문자 순위</h2>
+<div class="sub">전일 방문자 내림차순 · 미수집 계정은 하단 표시</div>
+<div class="table-wrap"><table><thead><tr><th>순위</th><th>구분</th><th>블로그</th><th>일 방문자(증감)</th><th>누적 방문자(증감)</th><th>콘텐츠 수(증감)</th><th>발행주기 (GitHub)</th><th>발행경과</th></tr></thead>
+<tbody id="naver-ranking-rows"><tr><td colspan="8" class="na">데이터 수집 중</td></tr></tbody></table></div></section>
 <section id="social-all-sections" style="margin-top:22px">
 <h2 style="margin:0 0 8px">SNS 전체 채널 현황 · 아래로 스크롤</h2>
 <div class="sub">YouTube → TikTok → Facebook → Instagram → Threads 순서로 모든 계정을 펼쳐 표시합니다. 각 플랫폼별 정렬 기준은 공통으로 적용됩니다.</div>
@@ -230,17 +238,37 @@ function drawBlogTabs(){
   b.setAttribute('aria-pressed',String(p===blogPlatform));
  });
 }
-function draw(){
-  if(!J)return;
-  updateAllPlatformSummary();
-  drawBlogTabs();
-  drawBloggerRanking();
-  var rows=(J.rows||[]).filter(function(r){return blogPlatformOf(r)===blogPlatform&&(blogPlatform!=='blogspot'||isActiveBlogspot(r));}).slice().sort(function(a,b){
+function rankedBlogRows(platform){
+  return (J.rows||[]).filter(function(r){return blogPlatformOf(r)===platform&&(platform!=='blogspot'||isActiveBlogspot(r));}).slice().sort(function(a,b){
     var av=visitorFor(a),bv=visitorFor(b),an=av&&Number.isFinite(av.yesterday_visitors),bn=bv&&Number.isFinite(bv.yesterday_visitors);
     if(an!==bn)return an?-1:1;
     if(an&&bn&&av.yesterday_visitors!==bv.yesterday_visitors)return bv.yesterday_visitors-av.yesterday_visitors;
     return String(a.site||'').localeCompare(String(b.site||''),'ko');
   });
+}
+function drawHostedBlogRankings(){
+  ['tistory','naver'].forEach(function(platform){
+    document.getElementById(platform+'-ranking-rows').innerHTML=rankedBlogRows(platform).map(function(r,index){
+      var visitor=visitorFor(r);
+      function metric(value,delta,unit){
+        return metricNumber(value,unit)+(Number.isFinite(value)&&Number.isFinite(delta)?d(delta):'');
+      }
+      return '<tr class="platform-'+platform+'"><td>'+(index+1)+'위</td><td>'+platformCell(platform)+'</td>'+
+        '<td style="text-align:left"><a href="'+esc(safeUrl(r.url,r.site))+'" target="_blank" rel="noopener">'+esc(r.display_name||r.site)+'</a></td>'+
+        '<td>'+metric(visitor&&visitor.yesterday_visitors,visitor&&visitor.yesterday_delta,'')+'</td>'+
+        '<td>'+metric(visitor&&visitor.total_visitors,visitor&&visitor.total_visitors_delta,'')+'</td>'+
+        '<td>'+metric(r.content,r.content_delta,'글')+'</td>'+
+        '<td>'+esc(cadenceFor(r))+'</td><td>'+publishElapsedFor(r)+'</td></tr>';
+    }).join('')||'<tr><td colspan="8" class="na">등록 데이터 확인 필요</td></tr>';
+  });
+}
+function draw(){
+  if(!J)return;
+  updateAllPlatformSummary();
+  drawBlogTabs();
+  drawBloggerRanking();
+  drawHostedBlogRankings();
+  var rows=rankedBlogRows(blogPlatform);
   var referenceDate=VISITOR_DATA&&VISITOR_DATA.reference_date||'확인된 기준일 없음';
   document.getElementById('blog-ranking-meta').textContent=({wordpress:'WordPress (뉴스룸 2곳 포함)',blogspot:'Blogspot',tistory:'Tistory',naver:'Naver'})[blogPlatform]+' · '+rows.length+'개 · 기준일 '+referenceDate+' · 확인된 전일 방문자 기준 · 미수집은 순위 없음';
   var hasImp=rows.some(function(r){return Number.isFinite(r.impressions)});
