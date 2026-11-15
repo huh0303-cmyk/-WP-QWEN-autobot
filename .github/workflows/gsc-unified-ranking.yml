@@ -1,4 +1,4 @@
-name: Unified GSC ranking · WP25 + Blogspot33
+name: Unified GSC ranking · WP23 + Blogspot31
 
 on:
   push:
@@ -54,15 +54,15 @@ jobs:
           p = Path("data/gsc_unified_ranking.json")
           d = json.loads(p.read_text(encoding="utf-8"))
           assert d["metric"] == "gsc_clicks"
-          assert d["counts"]["wordpress"] == 25
-          assert d["counts"]["blogspot"] == 33
-          assert len(d["records"]) == 58
+          assert d["counts"]["wordpress"] == 23
+          assert d["counts"]["blogspot"] == 31
+          assert len(d["records"]) == 54
           assert len({r["requested_date"] for r in d["records"]}) == 1
           a = json.loads(Path("data/gsc_target_property_audit.json").read_text(encoding="utf-8"))
-          assert a["counts"]["target_total"] == 58
-          assert len(a["targets"]) == 58
-          assert len({r["site"] for r in a["targets"]}) == 58
-          assert d["policy"].startswith("WP25 + Blogspot33 unified ranking uses only Google Search Console")
+          assert a["counts"]["target_total"] == 54
+          assert len(a["targets"]) == 54
+          assert len({r["site"] for r in a["targets"]}) == 54
+          assert d["policy"].startswith("WP23 + Blogspot31 unified ranking uses only Google Search Console")
           print("validated", d["confirmed_date"], d["counts"], "property_audit", a["counts"])
           PY
 

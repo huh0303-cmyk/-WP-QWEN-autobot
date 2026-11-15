@@ -22,7 +22,7 @@ from urllib.parse import quote, urlparse
 import requests
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from gsc_unified_ranking import WP25
+from gsc_unified_ranking import WP23, BLOGSPOT31
 
 ROOT = Path(__file__).resolve().parents[1]
 KST = dt.timezone(dt.timedelta(hours=9))
@@ -31,7 +31,10 @@ HIST = ROOT / "data" / "dashboard_history.json"
 PAGEVIEWS_HIST = ROOT / "data" / "blogger_pageviews_history.json"
 EMPTY = dict(clicks=None, clicks_delta=None, impressions=None, impressions_delta=None,
              cumulative=None, cumulative_delta=None, cumulative_impressions=None,
-             google_indexed=None, google_indexed_delta=None, google_indexed_status="GSC_INDEX_COUNT_UNAVAILABLE")
+             google_indexed=None, google_indexed_delta=None, google_indexed_status="GSC_INDEX_COUNT_UNAVAILABLE",
+             google_indexed_checked_at=None)
+SEARCH_EMPTY = dict(clicks=None, clicks_delta=None, impressions=None, impressions_delta=None,
+                    cumulative=None, cumulative_delta=None, cumulative_impressions=None)
 
 
 def token():
@@ -60,27 +63,47 @@ def prop_for(url, props):
 
 
 def indexed_sitemap_count(h, prop):
-    """Return the indexed URL count reported by Search Console Sitemaps API.
+    """Return (indexed URL count, status) from each official GSC sitemap detail.
 
-    Search Analytics does not expose an index count. The Sitemaps endpoint
-    exposes per-sitemap contents indexed values, so sum those values across
-    the property. Return None only when the API is unavailable or no sitemap
-    has a numeric indexed value; never fabricate zero.
+    The collection endpoint lists sitemap paths; indexed/submitted counts are
+    returned by the per-sitemap detail endpoint. A missing report is never
+    converted into a fabricated zero.
     """
-    endpoint = "https://www.googleapis.com/webmasters/v3/sites/" + quote(prop, safe="") + "/sitemaps"
-    response = requests.get(endpoint, headers=h, timeout=30)
-    if response.status_code != 200:
-        return None
-    payload = response.json()
-    total = 0
-    found = False
-    for sitemap in payload.get("sitemap", []):
-        for content in sitemap.get("contents", []) or []:
-            value = content.get("indexed")
-            if isinstance(value, (int, float)):
-                total += int(value)
-                found = True
-    return total if found else None
+    base = "https://www.googleapis.com/webmasters/v3/sites/" + quote(prop, safe="")
+    try:
+        response = requests.get(base + "/sitemaps", headers=h, timeout=25)
+        if response.status_code != 200:
+            return None, f"GSC_SITEMAPS_HTTP_{response.status_code}"
+        sitemaps = response.json().get("sitemap", []) or []
+        if not sitemaps:
+            return None, "GSC_NO_SITEMAPS"
+        total = 0
+        found = False
+        failed = 0
+        seen = set()
+        for sitemap in sitemaps:
+            path = str(sitemap.get("path") or "").strip()
+            if not path or path in seen:
+                continue
+            seen.add(path)
+            detail = requests.get(
+                base + "/sitemaps/" + quote(path, safe=""),
+                headers=h,
+                timeout=25,
+            )
+            if detail.status_code != 200:
+                failed += 1
+                continue
+            for content in detail.json().get("contents", []) or []:
+                value = content.get("indexed")
+                if isinstance(value, (int, float)):
+                    total += int(value)
+                    found = True
+        if found:
+            return total, "GSC_SITEMAPS_API_PARTIAL" if failed else "GSC_SITEMAPS_API"
+        return None, "GSC_SITEMAP_DETAIL_UNAVAILABLE" if failed else "GSC_INDEX_COUNT_NOT_REPORTED"
+    except (requests.RequestException, ValueError, TypeError) as exc:
+        return None, "GSC_SITEMAPS_API_ERROR_" + type(exc).__name__
 
 def content_metadata(url, platform):
     """Return published content count and latest publish date using lightweight public endpoints."""
@@ -303,8 +326,8 @@ def one(h, props, platform, url, display_name, ref, prev_hist):
     row["gsc_property"] = prop
     # Fetch indexed URL count independently: Search Analytics may return no rows
     # for a day even when Search Console has indexed URLs for the property.
-    row["google_indexed"] = indexed_sitemap_count(h, prop) if prop else None
-    row["google_indexed_status"] = "GSC_SITEMAPS_API" if row["google_indexed"] is not None else "GSC_SITEMAPS_EMPTY_OR_UNAVAILABLE"
+    row["google_indexed"], row["google_indexed_status"] = indexed_sitemap_count(h, prop) if prop else (None, "GSC_INDEX_COUNT_UNAVAILABLE")
+    row["google_indexed_checked_at"] = dt.datetime.now(KST).isoformat() if prop else None
     previous_indexed = prev_hist.get(row["site"], {}).get("google_indexed", prev_hist.get(row["site"], {}).get("google_pages"))
     row["google_indexed_delta"] = (row["google_indexed"] - previous_indexed) if row["google_indexed"] is not None and previous_indexed is not None else None
     day = ref.isoformat()
@@ -331,13 +354,13 @@ def one(h, props, platform, url, display_name, ref, prev_hist):
     days = gsc(h, prop, {"startDate": (ref - dt.timedelta(days=10)).isoformat(), "endDate": day,
                          "dimensions": ["date"], "dataState": "all", "rowLimit": 20})
     if days is None:
-        row.update(EMPTY)
+        row.update(SEARCH_EMPTY)
         row["status"] = "QUERY_ERROR"
         return row
     if not days:
         # GSC returns no rows when the property/date has no reportable data.
         # Do not turn that absence into a fake numeric zero that sorts as a real result.
-        row.update(EMPTY)
+        row.update(SEARCH_EMPTY)
         row["status"] = "NO_DATA"
         return row
     d = {r["keys"][0]: r["clicks"] for r in days}
@@ -371,15 +394,17 @@ def main():
     rooms = json.loads((ROOT / "config" / "automation_rooms.json").read_text(encoding="utf-8"))
     hub = json.loads((ROOT / "config" / "automation_hub_sites.json").read_text(encoding="utf-8"))
 
-    # Build inventory from canonical registries. Display labels never determine identity.
-    # The CONTROL WordPress group includes both canonical WordPress newsrooms.
-    # The Seoul Journal Blogspot property remains a distinct Blogspot destination.
-    wp25_sites = {s.rstrip("/") for s in WP25}
+    # Exact active CONTROL scope: WordPress 23 + Blogspot 31.
+    # These lists are derived from the canonical registries and the same two
+    # Blogspot exclusions used by the visible CONTROL table.
+    wp23_sites = {s.rstrip("/") for s in WP23}
+    blogspot31_sites = {s.rstrip("/") for s in BLOGSPOT31}
     targets = [("wordpress", s.rstrip("/"),
                 "Koreanews365.com" if "koreanews365.com" in s.lower() else s.split("://", 1)[-1].rstrip("/"))
-               for s in WP25 if "ksa-korea.org" not in s.lower() and "theseouljournal.com" not in s.lower()]
+               for s in WP23]
     targets += [("blogspot", item["blogspot"].rstrip("/"), item["blogspot"].rstrip("/").split("://", 1)[-1])
-                for item in blogger_portfolio["channels"]]
+                for item in blogger_portfolio["channels"]
+                if item.get("blogspot") and item["blogspot"].rstrip("/") in blogspot31_sites]
     targets += [("tistory", item["url"].rstrip("/"), item.get("current_label", item.get("title", item["url"])))
                 for item in tistory_portfolio["sites"] if item.get("launch_enabled")]
     targets += [("naver", "https://blog.naver.com/" + str(room.get("destination_id", "")).strip(),
@@ -387,11 +412,11 @@ def main():
                 for room in rooms.get("rooms", [])
                 if room.get("platform") == "naver" and room.get("enabled") and room.get("destination_id")]
     targets += [("newsroom", item["url"].rstrip("/"), item.get("name", item.get("url", ""))) for item in hub.get("sites", [])
-                if item.get("platform") == "wordpress" and item.get("url", "").rstrip("/") not in wp25_sites
+                if item.get("platform") == "wordpress" and item.get("url", "").rstrip("/") not in wp23_sites
                 and "ksa-korea.org" not in item.get("url", "").lower()
                 and "theseouljournal.com" not in item.get("url", "").lower()]
     # Retired destinations: exclude from dashboard inventory without deleting any site content.
-    # Exclude retired WordPress newsroom domains, but keep all 33 registered Blogger destinations.
+    # Exclude retired WordPress newsroom domains; only the 31 visible active Blogger destinations are included.
     targets = [t for t in targets if "ksa-korea.org" not in t[1].lower()
                and "theseouljournal.com" not in t[1].lower()]
     # Only one newsroom is active in the control-room inventory.

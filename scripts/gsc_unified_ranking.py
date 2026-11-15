@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Unified GSC ranking evidence for WP25 + Blogspot33.
+"""Unified GSC ranking evidence for WP23 + Blogspot31.
 
 This is the canonical statistics source for the London Project blog ranking.
-The only targets are WP25 + Blogspot33. Property access is derived from the
+The only targets are WP23 + Blogspot31. Property access is derived from the
 live Search Console sites.list response; saved inventory is never treated as
 proof of access. Every site is queried for the same fixed KST reporting date.
 """
@@ -22,31 +22,39 @@ ROOT = Path(__file__).resolve().parents[1]
 KST = dt.timezone(dt.timedelta(hours=9))
 OUT = ROOT / "data" / "gsc_unified_ranking.json"
 
-WP25 = [
-    "https://k-health365.com",
-    "https://koreamedicaltour.com",
-    "https://koreainvest365.com",
-    "https://koreainsurance365.com",
-    "https://kfinance365.com",
-    "https://koreataxnlaw.com",
-    "https://koreacrypto365.com",
-    "https://krealestate365.com",
-    "https://ktech365.com",
-    "https://kskin365.com",
-    "https://oliveyoungkorea.com",
-    "https://kworld365.com",
-    "https://k-trip365.com",
-    "https://k-visa365.com",
-    "https://koreawedding365.com",
-    "https://kstudy365.com",
-    "https://studyinkorea365.com",
-    "https://kieca-korea.org",
-    "https://ksa-korea.org",
-    "https://jobkorea365.com",
-    "https://jobinkorea365.com",
-    "https://jobkoreaglobal.com",
-    "https://korea365.org",
-]
+INACTIVE_BLOGSPOT_URLS = {
+    "https://jobkorea365.blogspot.com",
+    "https://k-health365-edu.blogspot.com",
+}
+
+
+def load_active_targets():
+    registry = json.loads((ROOT / "config" / "automation_hub_sites.json").read_text(encoding="utf-8"))
+    wordpress = [
+        str(item.get("url") or "").rstrip("/")
+        for item in registry.get("sites", [])
+        if item.get("platform") == "wordpress"
+        and item.get("enabled") is not False
+        and item.get("retired") is not True
+        and item.get("url")
+    ]
+    portfolio = json.loads((ROOT / "config" / "blogger_portfolio.json").read_text(encoding="utf-8"))
+    blogspot = [
+        str(item.get("blogspot") or "").rstrip("/")
+        for item in portfolio.get("channels", [])
+        if item.get("blogspot")
+        and str(item.get("blogspot") or "").rstrip("/") not in INACTIVE_BLOGSPOT_URLS
+    ]
+    wordpress = list(dict.fromkeys(wordpress))
+    blogspot = list(dict.fromkeys(blogspot))
+    if len(wordpress) != 23:
+        raise RuntimeError(f"Expected 23 active WordPress targets, found {len(wordpress)}")
+    if len(blogspot) != 31:
+        raise RuntimeError(f"Expected 31 active Blogspot targets, found {len(blogspot)}")
+    return wordpress, blogspot
+
+
+WP23, BLOGSPOT31 = load_active_targets()
 
 
 def token_from_service_account() -> str:
@@ -111,6 +119,68 @@ def query_range(headers: dict[str, str], prop: str, start: dt.date, end: dt.date
     return rows[0] if rows else None
 
 
+def sitemap_coverage(headers: dict[str, str], prop: str) -> dict:
+    """Read indexed/submitted URL totals from each Search Console sitemap detail."""
+    base = "https://www.googleapis.com/webmasters/v3/sites/" + quote(prop, safe="")
+    result = {
+        "indexed": None,
+        "submitted": None,
+        "unindexed": None,
+        "index_rate": None,
+        "index_status": "NOT_CHECKED",
+        "index_checked_at": dt.datetime.now(KST).isoformat(),
+        "sitemap_count": 0,
+    }
+    try:
+        response = requests.get(base + "/sitemaps", headers=headers, timeout=20)
+        if response.status_code != 200:
+            result["index_status"] = f"SITEMAPS_HTTP_{response.status_code}"
+            return result
+        sitemaps = response.json().get("sitemap", []) or []
+        result["sitemap_count"] = len(sitemaps)
+        if not sitemaps:
+            result["index_status"] = "NO_SITEMAPS_SUBMITTED"
+            return result
+        indexed_total = submitted_total = 0
+        found_indexed = found_submitted = False
+        failed_details = 0
+        seen = set()
+        for sitemap in sitemaps:
+            path = str(sitemap.get("path") or "").strip()
+            if not path or path in seen:
+                continue
+            seen.add(path)
+            detail = requests.get(
+                base + "/sitemaps/" + quote(path, safe=""),
+                headers=headers,
+                timeout=20,
+            )
+            if detail.status_code != 200:
+                failed_details += 1
+                continue
+            for content in detail.json().get("contents", []) or []:
+                value = content.get("indexed")
+                if isinstance(value, (int, float)):
+                    indexed_total += int(value)
+                    found_indexed = True
+                value = content.get("submitted")
+                if isinstance(value, (int, float)):
+                    submitted_total += int(value)
+                    found_submitted = True
+        if not found_indexed:
+            result["index_status"] = "SITEMAP_DETAIL_UNAVAILABLE" if failed_details else "INDEX_COUNT_NOT_REPORTED"
+            return result
+        result["indexed"] = indexed_total
+        result["submitted"] = submitted_total if found_submitted else None
+        result["unindexed"] = max(submitted_total - indexed_total, 0) if found_submitted else None
+        result["index_rate"] = round(indexed_total / submitted_total * 100, 2) if found_submitted and submitted_total else None
+        result["index_status"] = "OK_PARTIAL" if failed_details else "OK"
+        return result
+    except (requests.RequestException, ValueError, TypeError) as exc:
+        result["index_status"] = "SITEMAPS_API_ERROR_" + type(exc).__name__
+        return result
+
+
 def query_site(headers: dict[str, str], site: str, prop: str | None, end: dt.date) -> dict:
     start = end - dt.timedelta(days=6)
     previous_end = start - dt.timedelta(days=1)
@@ -119,6 +189,13 @@ def query_site(headers: dict[str, str], site: str, prop: str | None, end: dt.dat
         "site": site,
         "property": prop,
         "status": "PROPERTY_NOT_AVAILABLE" if not prop else "NO_DATA",
+        "indexed": None,
+        "submitted": None,
+        "unindexed": None,
+        "index_rate": None,
+        "index_status": "PROPERTY_NOT_AVAILABLE" if not prop else "NOT_CHECKED",
+        "index_checked_at": None,
+        "sitemap_count": 0,
         "requested_date": end.isoformat(),
         "period_start": start.isoformat(),
         "period_end": end.isoformat(),
@@ -134,6 +211,7 @@ def query_site(headers: dict[str, str], site: str, prop: str | None, end: dt.dat
     }
     if not prop:
         return result
+    result.update(sitemap_coverage(headers, prop))
     try:
         current = query_range(headers, prop, start, end)
         previous = query_range(headers, prop, previous_start, previous_end)
@@ -163,12 +241,8 @@ def main() -> None:
     end = now.astimezone(KST).date() - dt.timedelta(days=3)
     token = token_from_service_account()
     headers = {"Authorization": "Bearer " + token, "Content-Type": "application/json"}
-    portfolio = json.loads(
-        (ROOT / "config" / "blogger_portfolio.json").read_text(encoding="utf-8")
-    )
-    blogspot33 = [channel["blogspot"].rstrip("/") for channel in portfolio["channels"]]
-    targets = [("wordpress", site) for site in WP25] + [
-        ("blogspot", site) for site in blogspot33
+    targets = [("wordpress", site) for site in WP23] + [
+        ("blogspot", site) for site in BLOGSPOT31
     ]
 
     # Use only properties visible to this same service account in live GSC.
@@ -269,7 +343,7 @@ def main() -> None:
         "generated_at": now.isoformat(),
         "timezone": "Asia/Seoul",
         "policy": (
-            "WP25 + Blogspot33 unified ranking uses only Google Search Console "
+            "WP23 + Blogspot31 unified ranking uses only Google Search Console "
             "Search Analytics. Primary ranking metric is clicks. Impressions, "
             "CTR and average position are secondary. Visitor widgets, custom "
             "visitor APIs, GA4 and platform counters are excluded. "
@@ -278,8 +352,8 @@ def main() -> None:
             "NO_DATA, missing properties and access errors remain null and are never converted to zero."
         ),
         "counts": {
-            "wordpress": len(WP25),
-            "blogspot": len(blogspot33),
+            "wordpress": len(WP23),
+            "blogspot": len(BLOGSPOT31),
             "total": len(targets),
             "ok": sum(row["status"] == "OK" for row in results),
             "unavailable": sum(row["status"] != "OK" for row in results),
