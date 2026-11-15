@@ -21,13 +21,16 @@
       "display_name": "SeoulTOPIK",
       "role": "Korean and TOPIK learning for international learners",
       "handles": {
-        "TikTok": "@seoultopik",
+        "TikTok": "@seoul_topik",
         "Instagram": "@seoul_topik",
         "Threads": "@seoul_topik",
         "Facebook": "@seoul_topik"
       },
+      "current_handle_exceptions": {
+        "TikTok": "@seoultopik is the verified 31.1K-follower account; rename only after availability and account review"
+      },
       "verification": {
-        "TikTok": "live profile and authenticated browser verified; 31.1K followers",
+        "TikTok": "live profile and authenticated browser verified; 31.1K followers; public handle currently differs from the unified target",
         "Instagram": "existing handle recorded; publication authorization unverified",
         "Threads": "existing handle recorded; publication authorization unverified",
         "Facebook": "target handle only; actual page username must be verified"
