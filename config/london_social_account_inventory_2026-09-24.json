@@ -8,6 +8,11 @@
     "threads": 3,
     "total": 31
   },
+  "tiktok_target_portfolio": {
+    "base_count": 5,
+    "base_roles": ["TOPIK", "English", "Japanese", "Shopping", "Politics and current affairs"],
+    "optional_sixth_role": "Chinese, only when an existing account is identified"
+  },
   "youtube": [
     {
       "group": "playlist",
@@ -215,6 +220,9 @@
       "name": "SIS Korean · TOPIK",
       "handle": "seoultopik",
       "state": "profile_verified_authenticated_browser_2026-11-15",
+      "target_name": "SeoulTOPIK",
+      "target_handle": "seoultopik",
+      "editorial_role": "Korean and TOPIK learning for international learners",
       "followers_snapshot": 31100,
       "likes_snapshot": 505700
     },
@@ -222,6 +230,9 @@
       "name": "SIS English · Survival",
       "handle": "sis_languagecenter",
       "state": "profile_verified_publish_auth_unverified_2026-11-15",
+      "target_name": "English Pick",
+      "target_handle": "english_pick1",
+      "editorial_role": "English basics and United States topics",
       "followers_snapshot": 102,
       "likes_snapshot": 1758
     },
@@ -229,6 +240,9 @@
       "name": "지수의 하루 · Jisoo Picks",
       "handle": "sis_languageccenter",
       "state": "profile_verified_publish_auth_unverified_2026-11-15",
+      "target_name": "Japanese Pick",
+      "target_handle": "japanese_pick",
+      "editorial_role": "Japanese basics and Japan topics",
       "followers_snapshot": 42,
       "likes_snapshot": 508
     },
@@ -236,8 +250,19 @@
       "name": "Rosies Picks",
       "handle": "rosiespicks",
       "state": "profile_verified_publish_auth_unverified_2026-11-15",
+      "target_name": "Seoul Jisoo",
+      "target_handle": "seoul_jisoo",
+      "editorial_role": "Shopping",
       "followers_snapshot": 3,
       "likes_snapshot": 29
+    },
+    {
+      "name": "Seoul Journal",
+      "handle": null,
+      "state": "account_and_publish_auth_to_be_created_or_identified",
+      "target_name": "Seoul Journal",
+      "target_handle": "seouljournal",
+      "editorial_role": "Korean politics and current-affairs Shorts and long-form"
     }
   ],
   "instagram": [
