@@ -1,19 +1,15 @@
-name: "Blogger 33 — twice daily (AM + PM, random time, GitHub)"
+name: "Blogger 31 — daily (random morning time, GitHub)"
 
-# Chairman 2026-10-05: every Blogspot blog publishes once in the morning and once in the afternoon,
-# at a random time each day, from GitHub (PC-independent).
-# Mechanism: cron ticks every 30 min inside both windows; a deterministic per-day random target
-# (date-seeded, never on the hour) decides when a slot becomes due. Publishing is idempotent per
-# blog via the run-key marker, so repeated ticks never double-post. AM key == the VPS timer's key
-# (blogger33-daily-<date>), so a VPS run counts as the AM post and the total stays at 2/day.
+# Every approved Blogger site publishes once per day from GitHub, without a PC.
+# Cron ticks during the morning window; a date-seeded random target selects one run.
+# The per-day marker makes repeat ticks idempotent.
 on:
   schedule:
     - cron: '7,37 22,23,0,1,2 * * *'      # 07:07-11:37 KST
-    - cron: '7,37 5,6,7,8,9,10,11 * * *'  # 14:07-20:37 KST
   workflow_dispatch:
     inputs:
       site_key:
-        description: "Optional single blog key; empty = all 33"
+        description: "Optional single blog key; empty = all 31 approved sites"
         required: false
         type: string
       slot:
@@ -25,7 +21,7 @@ permissions:
   contents: write   # lets the free-image step re-host Pixabay/AI images under assets/blogger_images
 
 concurrency:
-  group: blogger-33-direct-publish
+  group: blogger-31-direct-publish
   cancel-in-progress: false
 
 jobs:
@@ -101,7 +97,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: blogger-33-daily-${{ github.run_id }}
-          path: artifacts/blogger-33-public-results.json
+          name: blogger-31-daily-${{ github.run_id }}
+          path: artifacts/blogger-31-public-results.json
           retention-days: 7
           if-no-files-found: ignore
