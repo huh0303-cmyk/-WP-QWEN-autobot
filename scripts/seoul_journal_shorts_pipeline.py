@@ -134,7 +134,13 @@ def draft(title, body):
             errors.append(f"{model_name}:{type(exc).__name__}")
     raise RuntimeError("Gemini writing chain failed or narration too short: " + ", ".join(errors))
 
-EDGE_VOICES = [("ko-KR-HyunsuNeural","male_deep"),("ko-KR-InJoonNeural","male_documentary"),("ko-KR-BongJinNeural","male_anchor"),("ko-KR-SunHiNeural","female_anchor"),("ko-KR-JiMinNeural","female_documentary"),("ko-KR-SeoHyeonNeural","female_news")]
+# Keep this list limited to voice names returned by Edge's current voice list.
+# Invalid/retired names make the timestamp fallback fail before rendering.
+EDGE_VOICES = [
+    ("ko-KR-HyunsuMultilingualNeural", "male_deep"),
+    ("ko-KR-InJoonNeural", "male_documentary"),
+    ("ko-KR-SunHiNeural", "female_anchor"),
+]
 
 def tts(text):
     """Create narration plus word/phrase timestamps for exact subtitle timing."""
@@ -154,7 +160,7 @@ def tts(text):
                     "Content-Type": "application/json",
                     "Accept": "text/event-stream",
                 },
-                json={"text": text, "format": "mp3", "latency":"balanced", "language":"ko", **({"reference_id": fish_voice} if fish_voice else {})},
+                json={"text": text, "format": "mp3", "latency":"balanced", **({"reference_id": fish_voice} if fish_voice else {})},
                 timeout=180,stream=True,
             )
             r.raise_for_status()
@@ -180,7 +186,7 @@ def tts(text):
             log(f"TTS_ENGINE=fish_audio_timestamped model=s2.1-pro-free voice_role={voice_role} segments={len(timeline)} bytes={p.stat().st_size}")
             return p
         except Exception as exc:
-            errors.append(f"Fish Audio failed ({type(exc).__name__})")
+            errors.append(f"Fish Audio failed ({type(exc).__name__}: {str(exc)[:180]})")
     else:
         errors.append("Fish Audio API key not configured; trying free Edge TTS")
 
@@ -190,7 +196,9 @@ def tts(text):
         import edge_tts
         async def save_edge():
             audio=[]; timeline=[]
-            async for chunk in edge_tts.Communicate(text,voice_name).stream():
+            async for chunk in edge_tts.Communicate(
+                text, voice_name, boundary="WordBoundary"
+            ).stream():
                 if chunk["type"]=="audio": audio.append(chunk["data"])
                 elif chunk["type"]=="WordBoundary":
                     start=float(chunk["offset"])/10_000_000
@@ -204,7 +212,7 @@ def tts(text):
             return p
         errors.append("Edge TTS returned invalid audio")
     except Exception as exc:
-        errors.append(f"Edge TTS failed ({type(exc).__name__})")
+        errors.append(f"Edge TTS failed ({type(exc).__name__}: {str(exc)[:180]})")
 
     raise RuntimeError("All free TTS providers failed: " + "; ".join(errors))
 

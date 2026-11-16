@@ -132,7 +132,11 @@ def test_schedules_stop_before_generation_until_thumbnail_api_is_verified():
 def test_tts_timestamps_drive_fast_synchronized_subtitles():
     text = source()
     assert "/v1/tts/stream/with-timestamp" in text
+    assert 'boundary="WordBoundary"' in text
     assert '"type"]=="WordBoundary"' in text
+    assert "ko-KR-HyunsuMultilingualNeural" in text
+    assert "ko-KR-HyunsuNeural" not in text
+    assert "ko-KR-BongJinNeural" not in text
     assert "max_seconds=2.8" in text
     assert "atempo=1.2" not in text
     assert 'subtitle_timing_source":"TTS word/phrase timestamps"' in text
