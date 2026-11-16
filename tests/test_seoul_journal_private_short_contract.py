@@ -3,6 +3,7 @@ from pathlib import Path
 
 PIPELINE = Path("scripts/seoul_journal_shorts_pipeline.py")
 PUBLIC_WORKFLOW = Path(".github/workflows/seoul-journal-randomized-shorts.yml")
+PRIVATE_WORKFLOW = Path(".github/workflows/seoul-journal-political-shorts.yml")
 
 
 def source():
@@ -39,4 +40,10 @@ def test_public_release_requires_explicit_owner_approval():
     assert "schedule:" not in workflow
     assert "confirm_public_release_after_owner_review" in workflow
     assert "inputs.confirm_public_release_after_owner_review == true" in workflow
+
+
+def test_private_schedule_is_three_review_uploads_per_day():
+    workflow = PRIVATE_WORKFLOW.read_text(encoding="utf-8")
+    assert workflow.count('cron:') == 3
+    assert "Confirm upload will be PRIVATE only" in workflow
 

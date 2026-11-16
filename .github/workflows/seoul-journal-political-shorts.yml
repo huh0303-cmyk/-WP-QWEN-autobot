@@ -2,12 +2,10 @@ name: Seoul Journal Political Shorts (private upload)
 
 on:
   schedule:
+    # Three private review uploads per day: 09:07, 15:27, 21:37 KST.
     - cron: "7 0 * * *"
-    - cron: "17 4 * * *"
-    - cron: "27 8 * * *"
+    - cron: "27 6 * * *"
     - cron: "37 12 * * *"
-    - cron: "47 16 * * *"
-    - cron: "57 20 * * *"
   workflow_dispatch:
     inputs:
       article_url:
