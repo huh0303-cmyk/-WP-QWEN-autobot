@@ -1,9 +1,11 @@
 {
   "2026-11-16:threads:seoul_topik:1": {
-    "status": "ATTEMPT_RESERVED",
+    "status": "PUBLISHED",
     "account": "seoul_topik",
     "platform": "threads",
     "at": "2026-11-16T11:58:31.487692+09:00",
-    "content_sha256": "77280b1bc1d147cfc91bc1165d81656d47625cf269a78e5722fd325d063ed5ea"
+    "content_sha256": "77280b1bc1d147cfc91bc1165d81656d47625cf269a78e5722fd325d063ed5ea",
+    "id": "18100294727393237",
+    "public_url": "https://www.threads.com/@seoul_topik/post/DfyVlkyDJK-"
   }
 }
