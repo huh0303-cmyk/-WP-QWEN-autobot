@@ -19,6 +19,7 @@ OUT=ROOT/"artifacts"/"seoul-journal-short"
 OUT.mkdir(parents=True,exist_ok=True)
 NAVER_POLITICS="https://news.naver.com/section/100"
 CONTENT_SCOPE="politics"
+CANONICAL_SEOUL_JOURNAL_CHANNEL_ID="UChRUdHZlXSjftAqBtdDNEWA"
 THUMBNAIL_BENCHMARKS=ROOT/"config"/"seoul_journal_thumbnail_benchmarks.json"
 UA={"User-Agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/126 Safari/537.36"}
 PRIORITY_FIGURES={
@@ -414,7 +415,7 @@ def fetch_article_photos(url, lead_url, article_html, meta):
             try:
                 response=get_with_retries(api,params={
                     "action":"query","generator":"search","gsrsearch":query,"gsrnamespace":6,
-                    "gsrlimit":30,"prop":"imageinfo","iiprop":"url|extmetadata",
+                    "gsrlimit":30,"prop":"imageinfo","iiprop":"url|extmetadata|mime",
                     "iiurlwidth":1400,"format":"json",
                 },timeout=20)
                 pages=response.json().get("query",{}).get("pages",{})
@@ -428,6 +429,12 @@ def fetch_article_photos(url, lead_url, article_html, meta):
                     continue
                 info=(page.get("imageinfo") or [{}])[0]
                 ext=info.get("extmetadata",{})
+                lower_title=title.casefold()
+                mime=info.get("mime","").casefold()
+                if any(word in lower_title for word in ("signature","logo","flag","map","diagram","coat of arms")):
+                    continue
+                if mime in ("image/svg+xml","image/gif"):
+                    continue
                 license_name=ext.get("LicenseShortName",{}).get("value","")
                 if not any(key in license_name.lower() for key in ("cc","public domain","pd")):
                     continue
@@ -448,7 +455,12 @@ def fetch_article_photos(url, lead_url, article_html, meta):
                     photos.append(target)
                     sources.append({
                         "figure":name,"title":title,"description_url":info.get("descriptionurl"),
-                        "license":license_name,"sha256":hashlib.sha256(raw).hexdigest(),
+                        "license":license_name,
+                        "license_url":ext.get("LicenseUrl",{}).get("value",""),
+                        "artist":BeautifulSoup(ext.get("Artist",{}).get("value",""),"html.parser").get_text(" ",strip=True),
+                        "credit_url":((BeautifulSoup(ext.get("Credit",{}).get("value",""),"html.parser").find("a") or {}).get("href","") if ext.get("Credit",{}).get("value") else ""),
+                        "attribution_required":ext.get("AttributionRequired",{}).get("value","").casefold()=="true",
+                        "sha256":hashlib.sha256(raw).hexdigest(),
                         "usage_note":"자료사진; 현재 사건 현장 사진 아님",
                     })
                     if len(photos)>=8:
@@ -467,13 +479,34 @@ def fetch_article_photos(url, lead_url, article_html, meta):
         raise RuntimeError(f"Visual quality gate: {len(photos)}/5 reusable politician photos; private upload blocked")
     return photos
 
+def compact_photo_credits(photo_sources):
+    """Keep only legally required, deduplicated attribution lines in the public description."""
+    rows=[]; seen=set()
+    for source in photo_sources:
+        if not source.get("attribution_required"):
+            continue
+        artist=source.get("artist") or source.get("figure") or "자료사진 제공자"
+        credit_url=source.get("credit_url") or source.get("description_url") or ""
+        license_name=source.get("license") or "재사용 허용"
+        license_url=source.get("license_url") or ""
+        key=(artist,credit_url,license_name,license_url)
+        if key in seen:
+            continue
+        seen.add(key)
+        links=" · ".join(x for x in (credit_url,license_url) if x)
+        rows.append(f"사진: {artist} · {license_name}"+(f" · {links}" if links else ""))
+    return rows
+
 def upload_private(video,meta,source_url):
     client_id=os.getenv("YOUTUBE_OAUTH_CLIENT_ID","").strip()
     client_secret=os.getenv("YOUTUBE_OAUTH_CLIENT_SECRET","").strip()
     refresh=os.getenv("SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN","").strip()
-    expected=os.getenv("SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID","").strip()
-    if not all([client_id,client_secret,refresh,expected]):
-        raise RuntimeError("YouTube 안전 업로드 차단: YOUTUBE_OAUTH_CLIENT_ID/SECRET 및 SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN, SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID 중 하나 이상 누락. 계정이 다른 채널일 수 있어 업로드하지 않았습니다.")
+    configured_expected=os.getenv("SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID","").strip()
+    expected=CANONICAL_SEOUL_JOURNAL_CHANNEL_ID
+    if configured_expected and configured_expected!=expected:
+        raise RuntimeError(f"서울저널 채널 ID 설정 오류: configured={configured_expected}; canonical={expected}")
+    if not all([client_id,client_secret,refresh]):
+        raise RuntimeError("YouTube 안전 업로드 차단: 서울저널 OAuth client/refresh token 중 하나 이상 누락되었습니다.")
     creds=Credentials(token=None,refresh_token=refresh,token_uri="https://oauth2.googleapis.com/token",
       client_id=client_id,client_secret=client_secret,scopes=["https://www.googleapis.com/auth/youtube.upload","https://www.googleapis.com/auth/youtube.readonly"])
     yt=build("youtube","v3",credentials=creds,cache_discovery=False)
@@ -521,13 +554,12 @@ def upload_private(video,meta,source_url):
                 }
                 log("DUPLICATE_SKIPPED: " + json.dumps(result, ensure_ascii=False))
                 return result
-    credits=[]
-    for source in meta.get("photo_sources",[])[:5]:
-        if source.get("description_url"):
-            credits.append(f"자료사진({source.get('figure','정치인')}, {source.get('license','재사용 가능')}): {source['description_url']}")
-    description=(meta["description"].replace("[원문 기사]",source_url)+"\n\n원문 기사: "+source_url)
+    summary=meta.get("description","").split("[원문 기사]",1)[0].strip()
+    summary=re.sub(r"https?://\S+","",summary).strip()
+    description=summary[:700]+"\n\n원문: "+source_url
+    credits=compact_photo_credits(meta.get("photo_sources",[]))
     if credits:
-        description+="\n\n"+"\n".join(credits)+"\n자료사진은 현재 사건 현장 사진이 아닙니다."
+        description+="\n\n"+"\n".join(credits)
     description+="\n\n#Shorts #서울저널 #정치뉴스"
     body={"snippet":{"title":meta["youtube_title"][:100],"description":description[:4900],"categoryId":"25","tags":["서울저널","정치뉴스","대한민국정치","Shorts"]},
           "status":{"privacyStatus":"private","selfDeclaredMadeForKids":False}}
@@ -573,6 +605,19 @@ def upload_private(video,meta,source_url):
         raise RuntimeError(f"YouTube readback channel mismatch: {actual_channel}")
     if actual_privacy!="private":
         raise RuntimeError(f"YouTube readback privacy mismatch: {actual_privacy}")
+    auto_public=os.getenv("AUTO_PUBLIC_AFTER_VALIDATION","").strip().casefold()=="true"
+    if auto_public:
+        yt.videos().update(
+            part="status",
+            body={"id":video_id,"status":{"privacyStatus":"public","selfDeclaredMadeForKids":False}},
+        ).execute()
+        released=yt.videos().list(part="snippet,status,contentDetails",id=video_id).execute().get("items",[])
+        if len(released)!=1 or released[0].get("snippet",{}).get("channelId")!=expected:
+            raise RuntimeError("Automatic public release readback channel mismatch")
+        actual_privacy=released[0].get("status",{}).get("privacyStatus")
+        if actual_privacy!="public":
+            raise RuntimeError(f"Automatic public release readback failed: {actual_privacy}")
+        saved=released[0]
     thumbnails=saved.get("snippet",{}).get("thumbnails",{})
     thumbnail_url=(thumbnails.get("maxres") or thumbnails.get("standard") or thumbnails.get("high") or thumbnails.get("default") or {}).get("url")
     return {
@@ -581,6 +626,7 @@ def upload_private(video,meta,source_url):
         "duration":saved.get("contentDetails",{}).get("duration"),"thumbnail_status":thumbnail_status,
         "thumbnail_url":thumbnail_url,"poll_cta":"댓글로 A·B·C를 눌러 참여하세요",
         "thumbnail_benchmark_receipt":"thumbnail-benchmark-receipt.json",
+        "release_mode":"automatic_public_after_validation" if auto_public else "manual_private_review",
     }
 
 def main():

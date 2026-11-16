@@ -1,4 +1,4 @@
-name: Seoul Journal Political Shorts (private upload)
+name: Seoul Journal Political Shorts (3/day automatic release)
 
 on:
   schedule:
@@ -13,8 +13,13 @@ on:
         required: false
         type: string
       confirm_private_upload:
-        description: "Confirm upload will be PRIVATE only (public release is manual after review)"
+        description: "Confirm manual run will upload PRIVATE for review"
         required: true
+        type: boolean
+        default: false
+      publish_after_validation:
+        description: "Manual run only: publish automatically after every quality/readback check passes"
+        required: false
         type: boolean
         default: false
 
@@ -26,7 +31,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build-and-upload-private:
+  build-validate-and-release:
     environment: FISH_AUDIO_API_KEY
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -40,7 +45,6 @@ jobs:
           YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_CLIENT_ID }}
           YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_CLIENT_SECRET }}
           SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN }}
-          SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID }}
           CONFIRM_PRIVATE_UPLOAD: ${{ inputs.confirm_private_upload }}
         run: |
           set -eu
@@ -49,7 +53,7 @@ jobs:
             exit 1
           fi
           missing=""
-          for name in GEMINI_API_KEY FISH_AUDIO_API_KEY YOUTUBE_OAUTH_CLIENT_ID YOUTUBE_OAUTH_CLIENT_SECRET SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID; do
+          for name in GEMINI_API_KEY FISH_AUDIO_API_KEY YOUTUBE_OAUTH_CLIENT_ID YOUTUBE_OAUTH_CLIENT_SECRET SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN; do
             eval 'value=${'"$name"'-}'
             if [ -z "$value" ]; then
               echo "::error title=Missing GitHub secret::$name is not configured. Check the repository secret or the FISH_AUDIO_API_KEY environment secret."
@@ -72,7 +76,7 @@ jobs:
           CLIENT_ID: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_CLIENT_SECRET }}
           REFRESH_TOKEN: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN }}
-          EXPECTED_CHANNEL_ID: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID }}
+          EXPECTED_CHANNEL_ID: UChRUdHZlXSjftAqBtdDNEWA
         run: python scripts/youtube_auth_preflight.py
       - name: Install system fonts and FFmpeg
         run: |
@@ -92,7 +96,8 @@ jobs:
           YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_CLIENT_ID }}
           YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_CLIENT_SECRET }}
           SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN }}
-          SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID }}
+          SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID: UChRUdHZlXSjftAqBtdDNEWA
+          AUTO_PUBLIC_AFTER_VALIDATION: ${{ github.event_name == 'schedule' || inputs.publish_after_validation == true }}
         run: python scripts/seoul_journal_shorts_pipeline.py
       - name: Upload package, MP4, and private upload receipt as workflow artifact
         if: always()

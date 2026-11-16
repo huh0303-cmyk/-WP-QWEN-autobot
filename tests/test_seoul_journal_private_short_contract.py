@@ -41,7 +41,7 @@ def test_visuals_require_reusable_principal_figure_photos():
     assert "photo-sources.json" in text
 
 
-def test_public_release_requires_explicit_owner_approval():
+def test_legacy_public_workflow_has_no_separate_schedule():
     workflow = PUBLIC_WORKFLOW.read_text(encoding="utf-8")
     assert "schedule:" not in workflow
     assert "confirm_public_release_after_owner_review" in workflow
@@ -51,7 +51,8 @@ def test_public_release_requires_explicit_owner_approval():
 def test_private_schedule_is_three_review_uploads_per_day():
     workflow = PRIVATE_WORKFLOW.read_text(encoding="utf-8")
     assert workflow.count('cron:') == 3
-    assert "Confirm upload will be PRIVATE only" in workflow
+    assert "publish_after_validation" in workflow
+    assert "github.event_name == 'schedule'" in workflow
 
 
 def test_thumbnail_contract_uses_three_inspected_500k_examples():
@@ -91,4 +92,31 @@ def test_ffmpeg_motion_is_applied_but_final_poll_stays_readable():
     assert '_cover_frame(headline, unique[0], style, len(unique)+1, poll=True)' in text
     assert "render-receipt.json" in text
     assert '"motion_effect":"ffmpeg zoompan Ken Burns on narration scenes"' in text
+
+
+def test_description_is_compact_and_scheduled_release_is_validated_first():
+    text = source()
+    assert "def compact_photo_credits" in text
+    assert 'split("[원문 기사]",1)[0]' in text
+    assert 'description=summary[:700]+"\\n\\n원문: "+source_url' in text
+    assert "credits.append(f\"자료사진" not in text
+    assert 'AUTO_PUBLIC_AFTER_VALIDATION' in text
+    assert 'privacyStatus":"public"' in text
+    assert 'thumbnail_status!="api_set"' in text
+
+
+def test_non_photo_commons_assets_are_rejected():
+    text = source()
+    assert '"signature","logo","flag","map","diagram","coat of arms"' in text
+    assert 'mime in ("image/svg+xml","image/gif")' in text
+
+
+def test_seoul_journal_channel_id_is_canonical_not_secret_controlled():
+    text = source()
+    workflow = PRIVATE_WORKFLOW.read_text(encoding="utf-8")
+    channel_id = "UChRUdHZlXSjftAqBtdDNEWA"
+    assert f'CANONICAL_SEOUL_JOURNAL_CHANNEL_ID="{channel_id}"' in text
+    assert f"EXPECTED_CHANNEL_ID: {channel_id}" in workflow
+    assert f"SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID: {channel_id}" in workflow
+    assert "secrets.SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID" not in workflow
 
