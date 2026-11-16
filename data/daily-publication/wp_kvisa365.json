@@ -1,1 +1,1 @@
-{"day": "2026-11-15", "status": "DISPATCHED", "attempts": 2, "claim": "daily-2026-11-15-wp_kvisa365-857555d4", "claimed_at": "2026-11-15T21:40:50.431335+09:00", "run_id": 43715160749, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-11-16", "status": "CLAIMED", "attempts": 1, "claim": "daily-2026-11-16-wp_kvisa365-136b5ab2", "claimed_at": "2026-11-16T10:56:34.829664+09:00", "run_id": null, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
