@@ -213,6 +213,8 @@ def _font(size):
     paths=[
       "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
       "/usr/share/fonts/truetype/noto/NotoSansCJK-Bold.ttc",
+      "C:/Windows/Fonts/malgunbd.ttf",
+      "C:/Windows/Fonts/malgun.ttf",
       "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"]
     fp=next((p for p in paths if os.path.exists(p)),None)
     try: return ImageFont.truetype(fp,size) if fp else ImageFont.load_default()
@@ -256,38 +258,45 @@ def _cover_frame(headline,photo,style,index,caption="",poll=False,thumbnail=Fals
     draw.text((58,43),style["badge"],font=_font(42),fill=(255,255,255),stroke_width=1,stroke_fill=(0,0,0))
     draw.text((W-425,48),"SEOUL JOURNAL",font=_font(30),fill=(255,255,255))
     if thumbnail:
-        # 500k+ reference commonality: one real face dominates, with only 1-3 huge
-        # Korean lines on a quiet dark panel and a single accent colour.
+        # 500k+ reference commonality adapted to the owner's explicit preference:
+        # one real face dominates and 1-3 huge lines float directly on the photo.
+        # No black panel or bar may cover the face.
         lines,title_font=_fit_headline(draw,headline,900,max_lines=3)
         line_height=title_font.size+18
-        panel_top=180
-        panel_bottom=panel_top+90+line_height*len(lines)
-        draw.rounded_rectangle((42,panel_top,W-42,panel_bottom),radius=22,fill=(0,0,0,205),outline=style["accent"],width=5)
-        y=panel_top+40
+        y=210
         for i,line in enumerate(lines):
             box=draw.textbbox((0,0),line,font=title_font,stroke_width=3)
             x=(W-(box[2]-box[0]))//2
             color=style["highlight"] if i==len(lines)-1 else (255,255,255)
-            draw.text((x,y),line,font=title_font,fill=color,stroke_width=5,stroke_fill=(0,0,0))
+            draw.text((x,y),line,font=title_font,fill=color,stroke_width=9,stroke_fill=(0,0,0))
             y+=line_height
-    # Mid-screen subtitles: concise narration highlights, never full-paragraph captions.
+    # Narration subtitles float directly on the image with a thick outline. Never
+    # place a black box/bar over the politician's face.
     if (caption or poll) and not thumbnail:
-        panel_top, panel_bottom = 760, 1160
-        draw.rounded_rectangle((55,panel_top,W-55,panel_bottom), radius=24, fill=(0,0,0,170), outline=style["highlight"], width=3)
-        text = "어떻게 생각하시나요?\nA 찬성   B 반대   C 더 지켜보기" if poll else caption
-        lines = textwrap.wrap(text, width=18)
-        font = _font(48 if poll else 43)
-        y = panel_top + 55
-        for line in lines[:4]:
-            box = draw.textbbox((0,0), line, font=font, stroke_width=2)
-            draw.text(((W-(box[2]-box[0]))//2,y), line, font=font, fill=style["highlight"] if poll else (255,255,255), stroke_width=2, stroke_fill=(0,0,0))
-            y += 66
-    # bottom editorial label; safe margin remains clear for Shorts controls
-    if not thumbnail:
-        draw.rectangle((0,1670,W,1760),fill=(*style["bg"],232))
-        footer = "댓글로 A·B·C를 눌러 참여하세요" if poll else "핵심 발언  ·  반박  ·  확인된 사실"
-        draw.text((55,1693),footer,font=_font(31),fill=(255,255,255))
+        if poll:
+            lines=["어떻게 생각하시나요?","A 찬성  B 반대","C 더 지켜보기"]
+            font=_font(64); y=690
+        else:
+            lines=textwrap.wrap(caption,width=18,break_long_words=True,break_on_hyphens=False)[:4]
+            font=_font(54); y=1250-len(lines)*34
+        for line in lines:
+            box=draw.textbbox((0,0),line,font=font,stroke_width=7)
+            draw.text(((W-(box[2]-box[0]))//2,y),line,font=font,fill=style["highlight"] if poll else (255,255,255),stroke_width=8,stroke_fill=(0,0,0))
+            y+=82 if poll else 72
+        if poll:
+            footer="댓글로 A·B·C를 눌러 참여하세요"
+            box=draw.textbbox((0,0),footer,font=_font(38),stroke_width=6)
+            draw.text(((W-(box[2]-box[0]))//2,1580),footer,font=_font(38),fill=(255,255,255),stroke_width=7,stroke_fill=(0,0,0))
     return base.convert("RGB")
+
+def _subtitle_chunks(narration, target_chars=32):
+    """Expose the full narration as sequential, readable on-screen subtitles."""
+    sentences=[x.strip() for x in re.split(r"\n+|(?<=[.!?。！？])\s+",narration) if x.strip()]
+    chunks=[]
+    for sentence in sentences:
+        pieces=textwrap.wrap(sentence,width=target_chars,break_long_words=True,break_on_hyphens=False) or [sentence]
+        chunks.extend(piece.strip() for piece in pieces if piece.strip())
+    return chunks
 
 def render(headline, photo, audio, photos=None):
     """Render rotating real source images; never loop a single still for a full Short."""
@@ -313,18 +322,22 @@ def render(headline, photo, audio, photos=None):
     probe = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", str(audio)], capture_output=True, text=True, check=True)
     duration = float(probe.stdout.strip()) / 1.2
     poll_seconds = min(4.0, max(3.0, duration * 0.10))
-    segment = (duration - poll_seconds) / len(unique)
-    if segment < 1.5:
+    available=duration-poll_seconds
+    if available/len(unique) < 1.5:
         raise RuntimeError("Narration is too short to show five source images and the final poll screen")
     frames = []
     narration_path = OUT/"narration.txt"
     narration = narration_path.read_text(encoding="utf-8") if narration_path.exists() else headline
-    caption_chunks = [x.strip() for x in re.split(r"\\n+|(?<=[.!?。！？])\\s+", narration) if x.strip()]
-    caption_chunks = (caption_chunks + [headline] * len(unique))[:len(unique)]
-    for idx, source in enumerate(unique):
+    caption_chunks=_subtitle_chunks(narration)
+    if not caption_chunks:
+        caption_chunks=[headline]
+    weights=[max(1,len(re.sub(r"\s+","",chunk))) for chunk in caption_chunks]
+    total_weight=sum(weights)
+    for idx, caption in enumerate(caption_chunks):
+        source=unique[idx % len(unique)]
         frame = OUT/f"scene-{idx:02d}.jpg"
-        _cover_frame(headline, source, style, idx+1, caption=caption_chunks[idx][:42]).save(frame, quality=92)
-        frames.append((frame,segment))
+        _cover_frame(headline,source,style,idx+1,caption=caption).save(frame,quality=92)
+        frames.append((frame,available*weights[idx]/total_weight))
     # Final hold frame gives viewers time to answer a poll in the comments.
     poll_frame = OUT/"scene-poll.jpg"
     _cover_frame(headline, unique[-1], style, len(unique)+1, poll=True).save(poll_frame, quality=92)

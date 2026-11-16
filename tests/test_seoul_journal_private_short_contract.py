@@ -14,7 +14,7 @@ def source():
 def test_final_poll_is_inside_the_narration_duration():
     text = source()
     assert "60초 상한을 두지 말고" in text
-    assert "segment = (duration - poll_seconds) / len(unique)" in text
+    assert "available=duration-poll_seconds" in text
     assert "frames.append((poll_frame,poll_seconds))" in text
     assert 'for frame,hold_seconds in frames:' in text
     assert '"댓글로 A·B·C를 눌러 참여하세요"' in text
@@ -68,4 +68,14 @@ def test_pipeline_fails_closed_without_fresh_benchmark_receipt():
     assert "age>30" in text
     assert "thumbnail-benchmark-receipt.json" in text
     assert "thumbnail=True" in text
+
+
+def test_no_face_covering_black_boxes_and_full_narration_subtitles():
+    text = source()
+    assert "def _subtitle_chunks" in text
+    assert "caption_chunks=_subtitle_chunks(narration)" in text
+    assert "source=unique[idx % len(unique)]" in text
+    assert "fill=(0,0,0,170)" not in text
+    assert "fill=(0,0,0,205)" not in text
+    assert "No black panel or bar may cover the face" in text
 
