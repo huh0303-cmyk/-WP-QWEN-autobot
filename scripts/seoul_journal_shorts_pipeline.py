@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 """Build one source-grounded Seoul Journal political Short and upload PRIVATE only."""
 import os, re, json, textwrap, subprocess, sys, random, hashlib, time
+from datetime import datetime, timezone
 from pathlib import Path
 from io import BytesIO
 from urllib.parse import urlparse
@@ -18,6 +19,7 @@ OUT=ROOT/"artifacts"/"seoul-journal-short"
 OUT.mkdir(parents=True,exist_ok=True)
 NAVER_POLITICS="https://news.naver.com/section/100"
 CONTENT_SCOPE="politics"
+THUMBNAIL_BENCHMARKS=ROOT/"config"/"seoul_journal_thumbnail_benchmarks.json"
 UA={"User-Agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/126 Safari/537.36"}
 PRIORITY_FIGURES={
     "이재명":"Lee Jae-myung", "한동훈":"Han Dong-hoon", "김민석":"Kim Min-seok politician",
@@ -26,6 +28,33 @@ PRIORITY_FIGURES={
 }
 
 def log(s): print(s,flush=True)
+
+def load_thumbnail_benchmark_contract():
+    """Fail closed unless three recently inspected 500k+ political Shorts back the cover design."""
+    if not THUMBNAIL_BENCHMARKS.is_file():
+        raise RuntimeError("썸네일 벤치마크 파일이 없어 비공개 업로드를 중단합니다.")
+    data=json.loads(THUMBNAIL_BENCHMARKS.read_text(encoding="utf-8"))
+    minimum=int(data.get("minimum_views",500000))
+    examples=data.get("examples",[])
+    if len(examples)<max(3,int(data.get("minimum_examples",3))):
+        raise RuntimeError("50만 조회 이상 정치 쇼츠 썸네일 3개 검수가 필요합니다.")
+    invalid=[row.get("video_id","unknown") for row in examples if int(row.get("observed_views",0))<minimum or not row.get("visual_observation")]
+    if invalid:
+        raise RuntimeError("썸네일 벤치마크 검수 미달: "+", ".join(invalid))
+    observed=datetime.fromisoformat(data["observed_at_kst"])
+    age=(datetime.now(timezone.utc)-observed.astimezone(timezone.utc)).days
+    if age>30:
+        raise RuntimeError(f"썸네일 벤치마크가 {age}일 경과했습니다. 실제 화면과 조회수를 다시 확인하세요.")
+    receipt={
+        "verified_at_run_utc":datetime.now(timezone.utc).isoformat(),
+        "observed_at_kst":data["observed_at_kst"],
+        "minimum_views":minimum,
+        "examples":examples[:3],
+        "common_traits":data.get("common_traits",[]),
+        "adaptation_rule":data.get("adaptation_rule",""),
+    }
+    (OUT/"thumbnail-benchmark-receipt.json").write_text(json.dumps(receipt,ensure_ascii=False,indent=2),encoding="utf-8")
+    return receipt
 
 def get_with_retries(url, *, params=None, timeout=25, attempts=3):
     last=None
@@ -189,7 +218,23 @@ def _font(size):
     try: return ImageFont.truetype(fp,size) if fp else ImageFont.load_default()
     except Exception: return ImageFont.load_default()
 
-def _cover_frame(headline,photo,style,index,caption="",poll=False):
+def _fit_headline(draw, headline, max_width, max_lines=3):
+    words=headline.split()
+    for size in (90,84,78,72,66):
+        font=_font(size); lines=[]; current=""
+        for word in words:
+            trial=(current+" "+word).strip()
+            if draw.textbbox((0,0),trial,font=font,stroke_width=3)[2] <= max_width:
+                current=trial
+            else:
+                if current: lines.append(current)
+                current=word
+        if current: lines.append(current)
+        if len(lines)<=max_lines:
+            return lines,font
+    return textwrap.wrap(headline,width=12)[:max_lines],_font(60)
+
+def _cover_frame(headline,photo,style,index,caption="",poll=False,thumbnail=False):
     W,H=1080,1920
     base=Image.new("RGB",(W,H),style["bg"])
     if photo:
@@ -210,26 +255,23 @@ def _cover_frame(headline,photo,style,index,caption="",poll=False):
     draw.rectangle((42,34,250,105),fill=style["accent"])
     draw.text((58,43),style["badge"],font=_font(42),fill=(255,255,255),stroke_width=1,stroke_fill=(0,0,0))
     draw.text((W-425,48),"SEOUL JOURNAL",font=_font(30),fill=(255,255,255))
-    # Center-safe copy: large, high-contrast Korean title over translucent panel.
-    panel_top,panel_bottom=900,1040
-    
-    words=[" ".join(headline.split()[:3])[:16]]
-    title_font=_font(56)
-    line_heights=[]
-    for line in words:
-        box=draw.textbbox((0,0),line,font=title_font,stroke_width=2)
-        line_heights.append(box[3]-box[1])
-    gap=24
-    total=sum(line_heights)+max(0,len(words)-1)*gap
-    y=panel_top+(panel_bottom-panel_top-total)//2
-    for i,line in enumerate(words):
-        box=draw.textbbox((0,0),line,font=title_font,stroke_width=3)
-        tw=box[2]-box[0]; x=(W-tw)//2
-        color=style["highlight"] if i in (0,len(words)-1) else (255,255,255)
-        draw.text((x,y),line,font=title_font,fill=color,stroke_width=4,stroke_fill=(0,0,0))
-        y+=line_heights[i]+gap
+    if thumbnail:
+        # 500k+ reference commonality: one real face dominates, with only 1-3 huge
+        # Korean lines on a quiet dark panel and a single accent colour.
+        lines,title_font=_fit_headline(draw,headline,900,max_lines=3)
+        line_height=title_font.size+18
+        panel_top=180
+        panel_bottom=panel_top+90+line_height*len(lines)
+        draw.rounded_rectangle((42,panel_top,W-42,panel_bottom),radius=22,fill=(0,0,0,205),outline=style["accent"],width=5)
+        y=panel_top+40
+        for i,line in enumerate(lines):
+            box=draw.textbbox((0,0),line,font=title_font,stroke_width=3)
+            x=(W-(box[2]-box[0]))//2
+            color=style["highlight"] if i==len(lines)-1 else (255,255,255)
+            draw.text((x,y),line,font=title_font,fill=color,stroke_width=5,stroke_fill=(0,0,0))
+            y+=line_height
     # Mid-screen subtitles: concise narration highlights, never full-paragraph captions.
-    if caption or poll:
+    if (caption or poll) and not thumbnail:
         panel_top, panel_bottom = 760, 1160
         draw.rounded_rectangle((55,panel_top,W-55,panel_bottom), radius=24, fill=(0,0,0,170), outline=style["highlight"], width=3)
         text = "어떻게 생각하시나요?\nA 찬성   B 반대   C 더 지켜보기" if poll else caption
@@ -241,9 +283,10 @@ def _cover_frame(headline,photo,style,index,caption="",poll=False):
             draw.text(((W-(box[2]-box[0]))//2,y), line, font=font, fill=style["highlight"] if poll else (255,255,255), stroke_width=2, stroke_fill=(0,0,0))
             y += 66
     # bottom editorial label; safe margin remains clear for Shorts controls
-    draw.rectangle((0,1670,W,1760),fill=(*style["bg"],232))
-    footer = "댓글로 A·B·C를 눌러 참여하세요" if poll else "핵심 발언  ·  반박  ·  확인된 사실"
-    draw.text((55,1693),footer,font=_font(31),fill=(255,255,255))
+    if not thumbnail:
+        draw.rectangle((0,1670,W,1760),fill=(*style["bg"],232))
+        footer = "댓글로 A·B·C를 눌러 참여하세요" if poll else "핵심 발언  ·  반박  ·  확인된 사실"
+        draw.text((55,1693),footer,font=_font(31),fill=(255,255,255))
     return base.convert("RGB")
 
 def render(headline, photo, audio, photos=None):
@@ -260,10 +303,11 @@ def render(headline, photo, audio, photos=None):
             unique.append(Path(candidate)); hashes.add(digest)
     if len(unique) < 5:
         raise RuntimeError(f"Visual quality gate: {len(unique)}/5 distinct photos; private upload blocked to prevent single-image video")
+    benchmark=load_thumbnail_benchmark_contract()
     style = random.choice(SHORT_STYLES)
     for idx, template in enumerate(SHORT_STYLES, 1):
-        _cover_frame(headline, unique[0], template, idx, caption=headline).save(OUT/f"thumbnail-template-{idx:02d}.jpg", quality=93)
-    _cover_frame(headline, unique[0], style, 1, caption=headline).save(OUT/"cover.jpg", quality=94)
+        _cover_frame(headline, unique[0], template, idx, thumbnail=True).save(OUT/f"thumbnail-template-{idx:02d}.jpg", quality=93)
+    _cover_frame(headline, unique[0], style, 1, thumbnail=True).save(OUT/"cover.jpg", quality=94)
     (OUT/"template.txt").write_text(style["name"], encoding="utf-8")
     ffmpeg = os.getenv("FFMPEG_BINARY", "ffmpeg")
     probe = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", str(audio)], capture_output=True, text=True, check=True)
@@ -441,12 +485,33 @@ def upload_private(video,meta,source_url):
     while response is None:
         _,response=req.next_chunk()
     video_id=response["id"]
+    # YouTube may initially return P0D and reject a custom thumbnail while the
+    # new upload is still processing. Wait for a real duration before setting it.
+    saved=[]
+    for _ in range(36):
+        saved=yt.videos().list(part="snippet,status,contentDetails,processingDetails",id=video_id).execute().get("items",[])
+        if saved:
+            processing=saved[0].get("processingDetails",{}).get("processingStatus")
+            duration=saved[0].get("contentDetails",{}).get("duration")
+            if processing=="failed":
+                raise RuntimeError("YouTube video processing failed; private upload needs investigation")
+            if duration and duration!="P0D" and processing in (None,"succeeded"):
+                break
+        time.sleep(5)
+    else:
+        raise RuntimeError("YouTube processing did not finish within 3 minutes; thumbnail was not applied")
     thumbnail_status="not_set"
-    try:
-        yt.thumbnails().set(videoId=video_id,media_body=MediaFileUpload(str(OUT/"cover.jpg"),mimetype="image/jpeg")).execute()
-        thumbnail_status="api_set"
-    except Exception as exc:
-        thumbnail_status="not_set_"+type(exc).__name__
+    thumbnail_error=""
+    for attempt in range(6):
+        try:
+            yt.thumbnails().set(videoId=video_id,media_body=MediaFileUpload(str(OUT/"cover.jpg"),mimetype="image/jpeg")).execute()
+            thumbnail_status="api_set"
+            break
+        except Exception as exc:
+            thumbnail_error=f"{type(exc).__name__}: {str(exc)[:240]}"
+            if attempt<5: time.sleep(10)
+    if thumbnail_status!="api_set":
+        raise RuntimeError("Custom thumbnail application failed after retries: "+thumbnail_error)
     saved=yt.videos().list(part="snippet,status,contentDetails",id=video_id).execute().get("items",[])
     if len(saved)!=1:
         raise RuntimeError("YouTube upload readback failed; receipt must be investigated before retry")
@@ -464,6 +529,7 @@ def upload_private(video,meta,source_url):
         "privacy":actual_privacy,"channel_title":items[0]["snippet"]["title"],"channel_id":actual_channel,
         "duration":saved.get("contentDetails",{}).get("duration"),"thumbnail_status":thumbnail_status,
         "thumbnail_url":thumbnail_url,"poll_cta":"댓글로 A·B·C를 눌러 참여하세요",
+        "thumbnail_benchmark_receipt":"thumbnail-benchmark-receipt.json",
     }
 
 def main():
@@ -487,6 +553,8 @@ def main():
     photos=fetch_article_photos(url,img,article_html,meta)
     (OUT/"package.json").write_text(json.dumps(meta,ensure_ascii=False,indent=2),encoding="utf-8")
     video=render(meta["headline"],photos[0] if photos else None,audio,photos=photos)
+    meta["thumbnail_benchmark"]=json.loads((OUT/"thumbnail-benchmark-receipt.json").read_text(encoding="utf-8"))
+    (OUT/"package.json").write_text(json.dumps(meta,ensure_ascii=False,indent=2),encoding="utf-8")
     log("VIDEO_RENDERED: "+str(video))
     result=upload_private(video,meta,url)
     (OUT/"upload_receipt.json").write_text(json.dumps(result,ensure_ascii=False,indent=2),encoding="utf-8")

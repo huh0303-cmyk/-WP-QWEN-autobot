@@ -960,3 +960,11 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 
 - Japan stock portraits require metadata identifying a Japanese person. A location alone is insufficient. If no portrait passes, search for Japanese meals and screen out results with people mentioned in the metadata. The text card remains the final fallback when stock media is unavailable.
 - Verified compilation, diff check and mocked portrait screening and food fallback order. Live stock search and video rendering remain unverified.
+
+## seoul-journal-private-thumbnail-benchmark-20261117
+
+- Confirmed the automation target is the dedicated Seoul Journal OAuth channel `UChRUdHZlXSjftAqBtdDNEWA`; another authorized/connected channel must never be substituted. All uploads remain private until the owner explicitly approves release.
+- Visually inspected three political Shorts from independent channels with at least 500,000 observed views: JTBC News `rwGoMN2yKT4` (17,081,061), Channel A News `ahbc3wl6bCk` (2,541,044), and 불꽃보수 `R2poX-pqChM` (1,012,675). The reusable commonality is a dominant real politician face, 1-3 large Korean headline lines, a quiet/dark text field, one strong accent colour, and minimal clutter. This is a three-example design triage sample, not proof that the layout causes views.
+- Added a 30-day freshness-checked benchmark contract and run receipt. The renderer now derives the cover from those composition principles while using new story-specific wording and rights-cleared real politician photos.
+- Intermediate private run `43916622029` uploaded to the correct Seoul Journal channel as `w6r-M_Kxp0c`, but its immediate `thumbnails.set` call failed and readback still returned `P0D`. It is not considered release-ready and must remain private. The upload path now waits for video processing, retries the custom thumbnail, and fails closed if the thumbnail is not confirmed.
+- The Shorts narration has no 60-second ceiling. The final 3-4 seconds remain inside the rendered duration and show the A/B/C comment poll prompt. Focused contract suite: 7 tests passed; a fresh private validation run is still required after commit.

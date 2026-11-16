@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "observed_at_kst": "2026-11-17T12:00:00+09:00",
+  "minimum_views": 500000,
+  "minimum_examples": 3,
+  "examples": [
+    {
+      "video_id": "rwGoMN2yKT4",
+      "url": "https://www.youtube.com/shorts/rwGoMN2yKT4",
+      "channel": "JTBC News",
+      "title": "읽던 자료 탁! 분노 폭발한 이재명 #JTBC #Shorts",
+      "observed_views": 17081061,
+      "duration_seconds": 60,
+      "visual_observation": "실제 이재명 장면을 크게 배치하고 상단에 청록·흰색 2줄 제목, 배경과 글자를 강하게 분리했다."
+    },
+    {
+      "video_id": "ahbc3wl6bCk",
+      "url": "https://www.youtube.com/shorts/ahbc3wl6bCk",
+      "channel": "채널A News",
+      "title": "김병민이 한동훈에게…",
+      "observed_views": 2541044,
+      "duration_seconds": 58,
+      "visual_observation": "실제 한동훈 얼굴이 화면 대부분을 차지하며 하단의 어두운 반투명 판 위에 큰 흰색 제목만 두었다."
+    },
+    {
+      "video_id": "R2poX-pqChM",
+      "url": "https://www.youtube.com/shorts/R2poX-pqChM",
+      "channel": "불꽃보수",
+      "title": "탄핵 해보십시오…",
+      "observed_views": 1012675,
+      "duration_seconds": 65,
+      "visual_observation": "실제 인물 반응을 크게 쓰고 검은 배경에 흰색·빨간색 2줄 제목으로 논점을 즉시 드러냈다."
+    }
+  ],
+  "common_traits": [
+    "실제 핵심 정치인 한 명의 얼굴 또는 반응 장면이 화면의 약 45~80%를 차지한다.",
+    "한국어 제목은 1~3줄, 큰 글자로 구성해 작은 화면에서도 즉시 읽힌다.",
+    "어두운 배경 또는 반투명 판으로 얼굴과 제목을 확실히 분리한다.",
+    "흰색에 청록·빨강·노랑 중 한 가지 강조색만 더해 시선을 모은다.",
+    "장식과 로고는 최소화하고 제목 영역과 얼굴 영역을 명확히 나눈다."
+  ],
+  "adaptation_rule": "표현과 문구는 새 기사에 맞게 독창적으로 만들고, 공통된 구성 원리만 서울저널 썸네일에 적용한다."
+}
