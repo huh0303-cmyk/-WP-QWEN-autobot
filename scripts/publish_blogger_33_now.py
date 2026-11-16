@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Sequentially publish one public article to every configured Blogger destination."""
+"""Sequentially publish one public article to each of the 31 approved Blogger destinations."""
 from __future__ import annotations
 
 import html
@@ -26,7 +26,7 @@ from blogger_free_image import pick_image, insert_image
 from blogger_adsense_structure import rules_for, structure_issues
 from automation_hub.editorial_readability import format_article, validate_article_length
 
-RESULT = ROOT / "artifacts" / "blogger-33-public-results.json"
+RESULT = ROOT / "artifacts" / "blogger-31-public-results.json"
 
 
 def load_sites() -> list[dict]:
@@ -37,8 +37,8 @@ def load_sites() -> list[dict]:
         "theme": p["blogspot"].get("theme") or p["wordpress"]["theme"], "persona": p["blogspot"]["persona"],
         "tone": p["blogspot"]["tone"],
     } for p in profiles if p["blogspot"].get("ready_for_automation")]
-    if len(sites) != 33 or len({s["id"] for s in sites}) != 33 or len({s["url"].rstrip('/').lower() for s in sites}) != 33:
-        raise RuntimeError("scope guard: exactly 33 unique Blogger IDs and URLs are required")
+    if len(sites) != 31 or len({s["id"] for s in sites}) != 31 or len({s["url"].rstrip('/').lower() for s in sites}) != 31:
+        raise RuntimeError("scope guard: exactly 31 unique Blogger IDs and URLs are required")
     priority = {"kwellness_lab": 0, "kskin365": 1}
     return sorted(sites, key=lambda s: (priority.get(s["key"], 2), s["key"]))
 
@@ -88,10 +88,10 @@ Write in a natural editorial voice with varied sentence structure. Never mention
 automatic generation, prompts, or how the article was produced.
 {lang_rule}
 Provide 1-3 short, highly relevant labels only.{hint}"""
-    raw = blogger_generate_with_fallback(prompt, temperature=0.5).strip()
+    raw = blogger_generate_with_fallback(prompt, temperature=0.5, language=site["language"]).strip()
     try:
-        import economy_text
-        print(f"writer engine for {site['key']}: {economy_text.last_writer_model}")
+        import gemini_text
+        print(f"writer engine for {site['key']}: {gemini_text.last_writer_model}")
     except Exception:
         pass
     if raw.startswith("```"):
