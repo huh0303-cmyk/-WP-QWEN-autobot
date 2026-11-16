@@ -340,19 +340,57 @@ def render(headline, photo, audio, photos=None):
         frames.append((frame,available*weights[idx]/total_weight))
     # Final hold frame gives viewers time to answer a poll in the comments.
     poll_frame = OUT/"scene-poll.jpg"
-    _cover_frame(headline, unique[-1], style, len(unique)+1, poll=True).save(poll_frame, quality=92)
+    _cover_frame(headline, unique[0], style, len(unique)+1, poll=True).save(poll_frame, quality=92)
     frames.append((poll_frame,poll_seconds))
     cmd = [ffmpeg, "-y"]
     for frame,hold_seconds in frames:
         cmd += ["-loop", "1", "-t", str(hold_seconds), "-i", str(frame)]
     cmd += ["-i", str(audio)]
-    inputs = "".join(f"[{i}:v]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1,format=yuv420p[v{i}];" for i in range(len(frames)))
+    filters=[]
+    for i in range(len(frames)):
+        prefix=f"[{i}:v]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1"
+        if i < len(frames)-1:
+            # Slow Ken Burns motion keeps archival politician photos alive without
+            # distorting the face or interfering with the narration subtitles.
+            motion="zoompan=z='min(zoom+0.00012,1.04)':x='iw/2-(iw/zoom/2)+6*sin(on/18)':y='ih/2-(ih/zoom/2)+6*cos(on/21)':d=1:s=1080x1920:fps=30"
+            filters.append(prefix+","+motion+f",format=yuv420p[v{i}];")
+        else:
+            # Keep the final poll steady for legibility.
+            filters.append(prefix+f",fps=30,format=yuv420p[v{i}];")
+    inputs="".join(filters)
     inputs += "".join(f"[v{i}]" for i in range(len(frames))) + f"concat=n={len(frames)}:v=1:a=0[outv]"
     video = OUT/"seoul-journal-short.mp4"
     cmd += ["-filter_complex", inputs, "-map", "[outv]", "-map", f"{len(frames)}:a", "-c:v", "libx264", "-preset", "medium", "-af", "atempo=1.2", "-c:a", "aac", "-shortest", "-movflags", "+faststart", str(video)]
     result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
     if result.returncode:
         raise RuntimeError("FFmpeg multi-scene render failed: " + result.stderr[-1200:])
+    # Prove the poll survived the final mux instead of trusting an intermediate frame.
+    final_probe=subprocess.run(["ffprobe","-v","error","-show_entries","format=duration","-of","default=noprint_wrappers=1:nokey=1",str(video)],capture_output=True,text=True,check=True)
+    final_duration=float(final_probe.stdout.strip())
+    proof_at=max(0.0,final_duration-1.5)
+    proof=OUT/"poll-proof.jpg"
+    proof_cmd=[ffmpeg,"-y","-ss",f"{proof_at:.3f}","-i",str(video),"-frames:v","1","-q:v","2",str(proof)]
+    proof_result=subprocess.run(proof_cmd,capture_output=True,text=True,timeout=60)
+    if proof_result.returncode or not proof.is_file():
+        raise RuntimeError("Final poll proof frame extraction failed")
+    with Image.open(poll_frame) as expected_im, Image.open(proof) as actual_im:
+        expected=expected_im.convert("L").resize((180,320))
+        actual=actual_im.convert("L").resize((180,320))
+        import PIL.ImageChops
+        diff=PIL.ImageChops.difference(expected,actual)
+        mean_difference=sum(diff.getdata())/(180*320)
+    if mean_difference>18:
+        raise RuntimeError(f"Final poll proof mismatch ({mean_difference:.2f}); private upload blocked")
+    render_receipt={
+        "duration_seconds":round(final_duration,3),
+        "motion_effect":"ffmpeg zoompan Ken Burns on narration scenes",
+        "narration_subtitle_cards":len(caption_chunks),
+        "poll_seconds":round(poll_seconds,3),
+        "poll_proof_at_seconds":round(proof_at,3),
+        "poll_proof_mean_difference":round(mean_difference,3),
+        "poll_proof_file":proof.name,
+    }
+    (OUT/"render-receipt.json").write_text(json.dumps(render_receipt,ensure_ascii=False,indent=2),encoding="utf-8")
     return video
 
 

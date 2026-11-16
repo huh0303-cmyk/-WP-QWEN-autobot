@@ -18,6 +18,9 @@ def test_final_poll_is_inside_the_narration_duration():
     assert "frames.append((poll_frame,poll_seconds))" in text
     assert 'for frame,hold_seconds in frames:' in text
     assert '"댓글로 A·B·C를 눌러 참여하세요"' in text
+    assert 'proof_at=max(0.0,final_duration-1.5)' in text
+    assert '"poll-proof.jpg"' in text
+    assert 'if mean_difference>18' in text
 
 
 def test_private_upload_sets_thumbnail_and_reads_back_identity():
@@ -78,4 +81,14 @@ def test_no_face_covering_black_boxes_and_full_narration_subtitles():
     assert "fill=(0,0,0,170)" not in text
     assert "fill=(0,0,0,205)" not in text
     assert "No black panel or bar may cover the face" in text
+
+
+def test_ffmpeg_motion_is_applied_but_final_poll_stays_readable():
+    text = source()
+    assert "zoompan=z='min(zoom+0.00012,1.04)'" in text
+    assert "if i < len(frames)-1" in text
+    assert "Keep the final poll steady for legibility" in text
+    assert '_cover_frame(headline, unique[0], style, len(unique)+1, poll=True)' in text
+    assert "render-receipt.json" in text
+    assert '"motion_effect":"ffmpeg zoompan Ken Burns on narration scenes"' in text
 
