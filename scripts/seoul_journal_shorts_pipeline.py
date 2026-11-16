@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Build one source-grounded Seoul Journal political Short and upload PRIVATE only."""
-import os, re, json, textwrap, subprocess, sys, random, hashlib, time
+import os, re, json, textwrap, subprocess, sys, random, hashlib, time, base64
 from datetime import datetime, timezone
 from pathlib import Path
 from io import BytesIO
@@ -137,9 +137,7 @@ def draft(title, body):
 EDGE_VOICES = [("ko-KR-HyunsuNeural","male_deep"),("ko-KR-InJoonNeural","male_documentary"),("ko-KR-BongJinNeural","male_anchor"),("ko-KR-SunHiNeural","female_anchor"),("ko-KR-JiMinNeural","female_documentary"),("ko-KR-SeoHyeonNeural","female_news")]
 
 def tts(text):
-    """Free-only narration: Fish Audio S2.1 Pro Free first, then Edge TTS.
-    Never calls a paid endpoint. Secrets are never printed to logs.
-    """
+    """Create narration plus word/phrase timestamps for exact subtitle timing."""
     p = OUT / "voice.mp3"
     errors = []
     voice_name, voice_role = random.choice(EDGE_VOICES)
@@ -149,21 +147,38 @@ def tts(text):
     if api_key:
         try:
             r = requests.post(
-                "https://api.fish.audio/v1/tts",
+                "https://api.fish.audio/v1/tts/stream/with-timestamp",
                 headers={
                     "Authorization": f"Bearer {api_key}",
                     "model": "s2.1-pro-free",
                     "Content-Type": "application/json",
-                    "Accept": "audio/mpeg",
+                    "Accept": "text/event-stream",
                 },
-                json={"text": text, "format": "mp3", **({"reference_id": fish_voice} if fish_voice else {})},
-                timeout=150,
+                json={"text": text, "format": "mp3", "latency":"balanced", "language":"ko", **({"reference_id": fish_voice} if fish_voice else {})},
+                timeout=180,stream=True,
             )
-            if r.ok and len(r.content) >= 2000 and not r.content.lstrip().startswith(b"{"):
-                p.write_bytes(r.content)
-                log(f"TTS_ENGINE=fish_audio model=s2.1-pro-free voice_role={voice_role} bytes={p.stat().st_size}")
-                return p
-            errors.append(f"Fish Audio returned HTTP {r.status_code} or invalid audio")
+            r.raise_for_status()
+            audio_chunks=[]; alignment_by_chunk={}
+            for line in r.iter_lines(decode_unicode=True):
+                if not line or not line.startswith("data: "):
+                    continue
+                event=json.loads(line.removeprefix("data: "))
+                if event.get("audio_base64"):
+                    audio_chunks.append(base64.b64decode(event["audio_base64"]))
+                if event.get("alignment") is not None:
+                    alignment_by_chunk[int(event["chunk_seq"])]=event
+            p.write_bytes(b"".join(audio_chunks))
+            timeline=[]
+            for chunk_seq,event in sorted(alignment_by_chunk.items()):
+                offset=float(event.get("chunk_audio_offset_sec",0))
+                for segment in event["alignment"].get("segments",[]):
+                    timeline.append({"text":str(segment.get("text","")).strip(),"start":float(segment["start"])+offset,"end":float(segment["end"])+offset,"chunk_seq":chunk_seq})
+            timeline=[row for row in timeline if row["text"] and row["end"]>row["start"]]
+            if p.stat().st_size<2000 or not timeline:
+                raise RuntimeError("Fish Audio returned audio without usable timestamp alignment")
+            (OUT/"tts-timeline.json").write_text(json.dumps({"engine":"fish_audio","segments":timeline},ensure_ascii=False,indent=2),encoding="utf-8")
+            log(f"TTS_ENGINE=fish_audio_timestamped model=s2.1-pro-free voice_role={voice_role} segments={len(timeline)} bytes={p.stat().st_size}")
+            return p
         except Exception as exc:
             errors.append(f"Fish Audio failed ({type(exc).__name__})")
     else:
@@ -174,10 +189,18 @@ def tts(text):
         import asyncio
         import edge_tts
         async def save_edge():
-            await edge_tts.Communicate(text, voice_name).save(str(p))
-        asyncio.run(save_edge())
-        if p.exists() and p.stat().st_size >= 2000:
-            log(f"TTS_ENGINE=edge_tts voice={voice_name} voice_role={voice_role} bytes={p.stat().st_size}")
+            audio=[]; timeline=[]
+            async for chunk in edge_tts.Communicate(text,voice_name).stream():
+                if chunk["type"]=="audio": audio.append(chunk["data"])
+                elif chunk["type"]=="WordBoundary":
+                    start=float(chunk["offset"])/10_000_000
+                    timeline.append({"text":chunk["text"],"start":start,"end":start+float(chunk["duration"])/10_000_000})
+            p.write_bytes(b"".join(audio))
+            (OUT/"tts-timeline.json").write_text(json.dumps({"engine":"edge_tts","segments":timeline},ensure_ascii=False,indent=2),encoding="utf-8")
+            return timeline
+        edge_timeline=asyncio.run(save_edge())
+        if p.exists() and p.stat().st_size >= 2000 and edge_timeline:
+            log(f"TTS_ENGINE=edge_tts_timestamped voice={voice_name} voice_role={voice_role} segments={len(edge_timeline)} bytes={p.stat().st_size}")
             return p
         errors.append("Edge TTS returned invalid audio")
     except Exception as exc:
@@ -290,14 +313,92 @@ def _cover_frame(headline,photo,style,index,caption="",poll=False,thumbnail=Fals
             draw.text(((W-(box[2]-box[0]))//2,1580),footer,font=_font(38),fill=(255,255,255),stroke_width=7,stroke_fill=(0,0,0))
     return base.convert("RGB")
 
-def _subtitle_chunks(narration, target_chars=32):
-    """Expose the full narration as sequential, readable on-screen subtitles."""
-    sentences=[x.strip() for x in re.split(r"\n+|(?<=[.!?。！？])\s+",narration) if x.strip()]
-    chunks=[]
-    for sentence in sentences:
-        pieces=textwrap.wrap(sentence,width=target_chars,break_long_words=True,break_on_hyphens=False) or [sentence]
-        chunks.extend(piece.strip() for piece in pieces if piece.strip())
-    return chunks
+def build_caption_cues(timeline_path, max_chars=28, max_seconds=2.8):
+    """Group timestamped TTS segments into fast, speech-synchronous caption cues."""
+    data=json.loads(Path(timeline_path).read_text(encoding="utf-8"))
+    segments=data.get("segments",[])
+    if not segments:
+        raise RuntimeError("Timestamped narration has no segments; subtitle render blocked")
+    cues=[]; current=[]; cue_start=None; cue_end=None
+    def clean_join(parts):
+        value=" ".join(str(part).strip() for part in parts if str(part).strip())
+        return re.sub(r"\s+([,.!?。！？])",r"\1",value).strip()
+    for segment in segments:
+        text=str(segment.get("text","")).strip()
+        start=float(segment.get("start",0)); end=float(segment.get("end",0))
+        if not text or end<=start: continue
+        trial=clean_join(current+[text])
+        if current and (len(trial)>max_chars or end-cue_start>max_seconds):
+            cues.append({"text":clean_join(current),"start":cue_start,"end":cue_end})
+            current=[]; cue_start=None
+        if cue_start is None: cue_start=start
+        current.append(text); cue_end=end
+    if current:
+        cues.append({"text":clean_join(current),"start":cue_start,"end":cue_end})
+    if not cues:
+        raise RuntimeError("Timestamped narration could not form subtitle cues")
+    cues[0]["start"]=0.0
+    for index,cue in enumerate(cues):
+        cue["start"]=round(float(cue["start"]),3); cue["end"]=round(float(cue["end"]),3)
+        if index and cue["start"]<cues[index-1]["end"]-0.15:
+            raise RuntimeError("Subtitle timestamp overlap exceeds tolerance")
+        if cue["end"]-cue["start"]>max_seconds+0.75:
+            raise RuntimeError("A subtitle cue is too slow; timing alignment blocked")
+    receipt={"engine":data.get("engine"),"max_chars":max_chars,"max_seconds":max_seconds,"cues":cues}
+    (OUT/"subtitle-cues.json").write_text(json.dumps(receipt,ensure_ascii=False,indent=2),encoding="utf-8")
+    return cues
+
+def plan_visual_sequence(cues, photos, photo_sources):
+    """Use actual image pixels and narration meaning to choose semantic change points."""
+    key=os.getenv("GEMINI_API_KEY","").strip()
+    if not key:
+        raise RuntimeError("Visual scene matching requires GEMINI_API_KEY; round-robin photos are forbidden")
+    genai.configure(api_key=key)
+    cue_lines="\n".join(f"CUE_{i} [{cue['start']:.2f}-{cue['end']:.2f}]: {cue['text']}" for i,cue in enumerate(cues))
+    photo_lines=[]
+    for i,source in enumerate(photo_sources[:len(photos)]):
+        photo_lines.append(f"PHOTO_{i}: figure={source.get('figure','')}; title={source.get('title','')}; description={source.get('visual_description','')}; categories={source.get('categories','')}")
+    prompt=f"""당신은 서울저널 정치 쇼츠의 영상 편집 감독입니다. 실제 사진 픽셀과 내레이션 자막 의미를 함께 보고 사진을 배치하세요.
+규칙:
+- 단순 0,1,2 순환은 금지합니다. 인물·발언·기자회견·국회/회의·법률 맥락을 실제 사진 내용과 맞추세요.
+- 화제가 바뀌는 지점에서만 사진을 교체하고 보통 연속 자막 2~6개를 한 그룹으로 묶으세요.
+- 연결이 약한 사진은 사용하지 마세요. 최소 4개, 최대 12개 그룹, 실제 사진 최소 3개를 사용하세요.
+- 한 사진이 전체 자막의 45%를 넘지 않게 하세요. confidence 0.65 미만이면 blocked=true로 하세요.
+자막:\n{cue_lines}\n사진 메타데이터:\n{chr(10).join(photo_lines)}
+JSON만 반환: {{"blocked":false,"groups":[{{"start":0,"end":3,"photo_index":0,"confidence":0.86,"reason":"발언 자막과 기자회견 사진"}}]}}
+start/end는 포함 범위이며 CUE_0부터 CUE_{len(cues)-1}까지 중복·누락 없이 덮어야 합니다."""
+    content=[prompt]; opened=[]
+    try:
+        for i,photo in enumerate(photos):
+            image=Image.open(photo).convert("RGB"); opened.append(image)
+            content.extend([f"PHOTO_{i} 실제 이미지:",image])
+        errors=[]
+        models=[os.getenv("SEOUL_JOURNAL_GEMINI_MODEL","").strip(),"gemini-3.1-flash-lite","gemini-3.0-flash-lite","gemini-2.0-flash"]
+        for model_name in dict.fromkeys(x for x in models if x):
+            try:
+                response=genai.GenerativeModel(model_name).generate_content(content,generation_config={"temperature":0.15,"response_mime_type":"application/json"})
+                plan=json.loads((response.text or "").strip().strip("`"))
+                if plan.get("blocked"): raise RuntimeError("Scene director found insufficient visual relevance")
+                groups=plan.get("groups",[]); expected=0; mapping=[None]*len(cues); used=[]
+                for group in groups:
+                    start=int(group["start"]); end=int(group["end"]); photo_index=int(group["photo_index"]); confidence=float(group.get("confidence",0))
+                    if start!=expected or end<start or end>=len(cues): raise RuntimeError("Scene plan range gap/overlap")
+                    if not 0<=photo_index<len(photos) or confidence<0.65: raise RuntimeError("Scene plan low-confidence/invalid photo")
+                    for idx in range(start,end+1): mapping[idx]=photo_index
+                    used.append(photo_index); expected=end+1
+                if expected!=len(cues) or any(index is None for index in mapping): raise RuntimeError("Scene plan does not cover narration")
+                if len(groups)<min(4,len(cues)) or len(groups)>12 or len(set(used))<min(3,len(photos)): raise RuntimeError("Scene plan variety/change-point rules failed")
+                if any(groups[i]["photo_index"]==groups[i-1]["photo_index"] for i in range(1,len(groups))): raise RuntimeError("Adjacent duplicate visual groups must be merged")
+                counts={index:mapping.count(index) for index in set(mapping)}
+                if max(counts.values())/len(mapping)>0.45: raise RuntimeError("One photo dominates over 45 percent")
+                receipt={"engine":model_name,"groups":groups,"cue_to_photo":mapping,"photo_usage":counts}
+                (OUT/"visual-plan.json").write_text(json.dumps(receipt,ensure_ascii=False,indent=2),encoding="utf-8")
+                return mapping
+            except Exception as exc:
+                errors.append(f"{model_name}:{type(exc).__name__}:{str(exc)[:100]}")
+        raise RuntimeError("Semantic visual planning failed: "+" | ".join(errors))
+    finally:
+        for image in opened: image.close()
 
 def render(headline, photo, audio, photos=None):
     """Render rotating real source images; never loop a single still for a full Short."""
@@ -321,24 +422,31 @@ def render(headline, photo, audio, photos=None):
     (OUT/"template.txt").write_text(style["name"], encoding="utf-8")
     ffmpeg = os.getenv("FFMPEG_BINARY", "ffmpeg")
     probe = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", str(audio)], capture_output=True, text=True, check=True)
-    duration = float(probe.stdout.strip()) / 1.2
+    duration = float(probe.stdout.strip())
     poll_seconds = min(4.0, max(3.0, duration * 0.10))
-    available=duration-poll_seconds
-    if available/len(unique) < 1.5:
+    poll_start=duration-poll_seconds
+    if poll_start/len(unique) < 1.5:
         raise RuntimeError("Narration is too short to show five source images and the final poll screen")
     frames = []
-    narration_path = OUT/"narration.txt"
-    narration = narration_path.read_text(encoding="utf-8") if narration_path.exists() else headline
-    caption_chunks=_subtitle_chunks(narration)
-    if not caption_chunks:
-        caption_chunks=[headline]
-    weights=[max(1,len(re.sub(r"\s+","",chunk))) for chunk in caption_chunks]
-    total_weight=sum(weights)
-    for idx, caption in enumerate(caption_chunks):
-        source=unique[idx % len(unique)]
+    cues=build_caption_cues(OUT/"tts-timeline.json")
+    if cues[-1]["end"]>duration+0.5 or duration-cues[-1]["end"]>2.5:
+        raise RuntimeError("Narration audio and timestamp timeline duration do not agree")
+    active_cues=[cue for cue in cues if cue["start"]<poll_start-0.05]
+    if len(active_cues)<4:
+        raise RuntimeError("Too few timestamped subtitle cues before the final poll")
+    photo_sources=json.loads((OUT/"photo-sources.json").read_text(encoding="utf-8"))
+    if len(photo_sources)<len(unique):
+        raise RuntimeError("Photo metadata is incomplete; semantic scene matching blocked")
+    photo_mapping=plan_visual_sequence(active_cues,unique,photo_sources)
+    for idx,cue in enumerate(active_cues):
+        source=unique[photo_mapping[idx]]
+        next_start=active_cues[idx+1]["start"] if idx+1<len(active_cues) else poll_start
+        hold_seconds=next_start-(0.0 if idx==0 else cue["start"])
+        if hold_seconds<=0 or hold_seconds>4.5:
+            raise RuntimeError(f"Subtitle display duration out of sync: cue={idx} hold={hold_seconds:.3f}")
         frame = OUT/f"scene-{idx:02d}.jpg"
-        _cover_frame(headline,source,style,idx+1,caption=caption).save(frame,quality=92)
-        frames.append((frame,available*weights[idx]/total_weight))
+        _cover_frame(headline,source,style,idx+1,caption=cue["text"]).save(frame,quality=92)
+        frames.append((frame,hold_seconds))
     # Final hold frame gives viewers time to answer a poll in the comments.
     poll_frame = OUT/"scene-poll.jpg"
     _cover_frame(headline, unique[0], style, len(unique)+1, poll=True).save(poll_frame, quality=92)
@@ -361,7 +469,7 @@ def render(headline, photo, audio, photos=None):
     inputs="".join(filters)
     inputs += "".join(f"[v{i}]" for i in range(len(frames))) + f"concat=n={len(frames)}:v=1:a=0[outv]"
     video = OUT/"seoul-journal-short.mp4"
-    cmd += ["-filter_complex", inputs, "-map", "[outv]", "-map", f"{len(frames)}:a", "-c:v", "libx264", "-preset", "medium", "-af", "atempo=1.2", "-c:a", "aac", "-shortest", "-movflags", "+faststart", str(video)]
+    cmd += ["-filter_complex", inputs, "-map", "[outv]", "-map", f"{len(frames)}:a", "-c:v", "libx264", "-preset", "medium", "-c:a", "aac", "-shortest", "-movflags", "+faststart", str(video)]
     result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
     if result.returncode:
         raise RuntimeError("FFmpeg multi-scene render failed: " + result.stderr[-1200:])
@@ -385,7 +493,10 @@ def render(headline, photo, audio, photos=None):
     render_receipt={
         "duration_seconds":round(final_duration,3),
         "motion_effect":"ffmpeg zoompan Ken Burns on narration scenes",
-        "narration_subtitle_cards":len(caption_chunks),
+        "narration_subtitle_cards":len(active_cues),
+        "subtitle_timing_source":"TTS word/phrase timestamps",
+        "subtitle_max_hold_seconds":round(max(seconds for _,seconds in frames[:-1]),3),
+        "visual_plan_file":"visual-plan.json",
         "poll_seconds":round(poll_seconds,3),
         "poll_proof_at_seconds":round(proof_at,3),
         "poll_proof_mean_difference":round(mean_difference,3),
@@ -459,6 +570,8 @@ def fetch_article_photos(url, lead_url, article_html, meta):
                         "license_url":ext.get("LicenseUrl",{}).get("value",""),
                         "artist":BeautifulSoup(ext.get("Artist",{}).get("value",""),"html.parser").get_text(" ",strip=True),
                         "credit_url":((BeautifulSoup(ext.get("Credit",{}).get("value",""),"html.parser").find("a") or {}).get("href","") if ext.get("Credit",{}).get("value") else ""),
+                        "visual_description":BeautifulSoup(ext.get("ImageDescription",{}).get("value","") or ext.get("ObjectName",{}).get("value",""),"html.parser").get_text(" ",strip=True)[:500],
+                        "categories":ext.get("Categories",{}).get("value","")[:500],
                         "attribution_required":ext.get("AttributionRequired",{}).get("value","").casefold()=="true",
                         "sha256":hashlib.sha256(raw).hexdigest(),
                         "usage_note":"자료사진; 현재 사건 현장 사진 아님",
@@ -653,7 +766,10 @@ def main():
     meta["thumbnail_benchmark"]=json.loads((OUT/"thumbnail-benchmark-receipt.json").read_text(encoding="utf-8"))
     (OUT/"package.json").write_text(json.dumps(meta,ensure_ascii=False,indent=2),encoding="utf-8")
     log("VIDEO_RENDERED: "+str(video))
-    result=upload_private(video,meta,url)
+    if os.getenv("VERIFY_ONLY","").strip().casefold()=="true":
+        result={"upload_skipped":True,"privacy":"not_uploaded","reason":"verify_only","channel_id":CANONICAL_SEOUL_JOURNAL_CHANNEL_ID}
+    else:
+        result=upload_private(video,meta,url)
     (OUT/"upload_receipt.json").write_text(json.dumps(result,ensure_ascii=False,indent=2),encoding="utf-8")
     if result.get("skipped_duplicate"):
         log("YOUTUBE_UPLOAD_SKIPPED_DUPLICATE: " + json.dumps(result, ensure_ascii=False))

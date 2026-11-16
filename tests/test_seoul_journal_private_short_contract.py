@@ -14,7 +14,7 @@ def source():
 def test_final_poll_is_inside_the_narration_duration():
     text = source()
     assert "60초 상한을 두지 말고" in text
-    assert "available=duration-poll_seconds" in text
+    assert "poll_start=duration-poll_seconds" in text
     assert "frames.append((poll_frame,poll_seconds))" in text
     assert 'for frame,hold_seconds in frames:' in text
     assert '"댓글로 A·B·C를 눌러 참여하세요"' in text
@@ -76,9 +76,9 @@ def test_pipeline_fails_closed_without_fresh_benchmark_receipt():
 
 def test_no_face_covering_black_boxes_and_full_narration_subtitles():
     text = source()
-    assert "def _subtitle_chunks" in text
-    assert "caption_chunks=_subtitle_chunks(narration)" in text
-    assert "source=unique[idx % len(unique)]" in text
+    assert "def build_caption_cues" in text
+    assert 'cues=build_caption_cues(OUT/"tts-timeline.json")' in text
+    assert "source=unique[photo_mapping[idx]]" in text
     assert "fill=(0,0,0,170)" not in text
     assert "fill=(0,0,0,205)" not in text
     assert "No black panel or bar may cover the face" in text
@@ -127,4 +127,34 @@ def test_schedules_stop_before_generation_until_thumbnail_api_is_verified():
     assert 'github.event_name }}" = "schedule"' in workflow
     assert 'THUMBNAIL_API_READY" != "true"' in workflow
     assert "Scheduled public release is blocked" in workflow
+
+
+def test_tts_timestamps_drive_fast_synchronized_subtitles():
+    text = source()
+    assert "/v1/tts/stream/with-timestamp" in text
+    assert '"type"]=="WordBoundary"' in text
+    assert "max_seconds=2.8" in text
+    assert "atempo=1.2" not in text
+    assert 'subtitle_timing_source":"TTS word/phrase timestamps"' in text
+    assert "Subtitle display duration out of sync" in text
+
+
+def test_photos_are_semantically_planned_not_round_robin():
+    text = source()
+    assert "def plan_visual_sequence" in text
+    assert "단순 0,1,2 순환은 금지합니다" in text
+    assert "photo_mapping=plan_visual_sequence" in text
+    assert "source=unique[photo_mapping[idx]]" in text
+    assert "source=unique[idx % len(unique)]" not in text
+    assert "confidence<0.65" in text
+    assert "visual-plan.json" in text
+
+
+def test_manual_verify_only_can_render_without_upload():
+    text = source()
+    workflow = PRIVATE_WORKFLOW.read_text(encoding="utf-8")
+    assert "verify_only:" in workflow
+    assert "VERIFY_ONLY: ${{ inputs.verify_only }}" in workflow
+    assert 'os.getenv("VERIFY_ONLY","")' in text
+    assert '"upload_skipped":True' in text
 

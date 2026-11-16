@@ -22,6 +22,11 @@ on:
         required: false
         type: boolean
         default: false
+      verify_only:
+        description: "Render and verify everything without uploading to YouTube"
+        required: false
+        type: boolean
+        default: true
 
 permissions:
   contents: read
@@ -103,6 +108,7 @@ jobs:
           SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN }}
           SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID: UChRUdHZlXSjftAqBtdDNEWA
           AUTO_PUBLIC_AFTER_VALIDATION: ${{ github.event_name == 'schedule' || inputs.publish_after_validation == true }}
+          VERIFY_ONLY: ${{ inputs.verify_only }}
         run: python scripts/seoul_journal_shorts_pipeline.py
       - name: Upload package, MP4, and private upload receipt as workflow artifact
         if: always()
