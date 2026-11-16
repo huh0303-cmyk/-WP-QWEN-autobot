@@ -1,1 +1,1 @@
-{"day": "2026-11-16", "status": "DISPATCHED", "attempts": 2, "claim": "daily-2026-11-16-wp_koreataxlaw-c1e9fb8d", "claimed_at": "2026-11-16T18:31:06.261878+09:00", "run_id": 43840589357, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-11-16", "status": "PUBLISHED", "public_url": "https://koreataxnlaw.com/compliance-mandates-and-export-controls-for-foreign-owned-small-businesses-impacted-by-russia-sanctions/", "published_at": "2026-11-16T12:09:00Z"}
