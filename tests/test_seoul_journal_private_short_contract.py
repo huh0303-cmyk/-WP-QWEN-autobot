@@ -120,3 +120,11 @@ def test_seoul_journal_channel_id_is_canonical_not_secret_controlled():
     assert f"SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID: {channel_id}" in workflow
     assert "secrets.SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID" not in workflow
 
+
+def test_schedules_stop_before_generation_until_thumbnail_api_is_verified():
+    workflow = PRIVATE_WORKFLOW.read_text(encoding="utf-8")
+    assert "vars.SEOUL_JOURNAL_THUMBNAIL_API_READY" in workflow
+    assert 'github.event_name }}" = "schedule"' in workflow
+    assert 'THUMBNAIL_API_READY" != "true"' in workflow
+    assert "Scheduled public release is blocked" in workflow
+

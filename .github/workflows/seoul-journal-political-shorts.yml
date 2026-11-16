@@ -46,8 +46,13 @@ jobs:
           YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_CLIENT_SECRET }}
           SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN }}
           CONFIRM_PRIVATE_UPLOAD: ${{ inputs.confirm_private_upload }}
+          THUMBNAIL_API_READY: ${{ vars.SEOUL_JOURNAL_THUMBNAIL_API_READY }}
         run: |
           set -eu
+          if [ "${{ github.event_name }}" = "schedule" ] && [ "$THUMBNAIL_API_READY" != "true" ]; then
+            echo "::error title=Thumbnail permission required::Scheduled public release is blocked until SEOUL_JOURNAL_THUMBNAIL_API_READY=true after a successful thumbnails.set test."
+            exit 1
+          fi
           if [ "${{ github.event_name }}" != "schedule" ] && [ "$CONFIRM_PRIVATE_UPLOAD" != "true" ]; then
             echo "::error title=Confirmation required::Re-run this workflow and check 'Confirm upload will be PRIVATE only'."
             exit 1
