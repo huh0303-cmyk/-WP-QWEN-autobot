@@ -84,7 +84,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install requests trafilatura beautifulsoup4 Pillow google-generativeai google-api-python-client google-auth google-auth-httplib2 edge-tts
-      - name: Build one-minute POLITICS-ONLY Short and upload as PRIVATE
+      - name: Build context-complete POLITICS-ONLY Short and upload as PRIVATE
         env:
           INPUT_ARTICLE_URL: ${{ inputs.article_url }}
           SEOUL_JOURNAL_CONTENT_SCOPE: politics

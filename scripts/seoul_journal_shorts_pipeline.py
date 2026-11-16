@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Build one source-grounded Seoul Journal political Short and upload PRIVATE only."""
-import os, re, json, textwrap, subprocess, sys, random, hashlib
+import os, re, json, textwrap, subprocess, sys, random, hashlib, time
 from pathlib import Path
-from urllib.parse import urljoin, urlparse
+from io import BytesIO
+from urllib.parse import urlparse
 import requests, trafilatura
 from bs4 import BeautifulSoup
 from PIL import Image, ImageDraw, ImageFont
@@ -18,11 +19,29 @@ OUT.mkdir(parents=True,exist_ok=True)
 NAVER_POLITICS="https://news.naver.com/section/100"
 CONTENT_SCOPE="politics"
 UA={"User-Agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/126 Safari/537.36"}
+PRIORITY_FIGURES={
+    "이재명":"Lee Jae-myung", "한동훈":"Han Dong-hoon", "김민석":"Kim Min-seok politician",
+    "정청래":"Chung Chung-rae", "오세훈":"Oh Se-hoon", "추미애":"Choo Mi-ae",
+    "조국":"Cho Kuk", "장동혁":"Jang Dong-hyeok politician", "안철수":"Ahn Cheol-soo",
+}
 
 def log(s): print(s,flush=True)
 
+def get_with_retries(url, *, params=None, timeout=25, attempts=3):
+    last=None
+    for attempt in range(attempts):
+        try:
+            response=requests.get(url,params=params,headers=UA,timeout=timeout)
+            response.raise_for_status()
+            return response
+        except requests.RequestException as exc:
+            last=exc
+            if attempt+1<attempts:
+                time.sleep(1.5*(attempt+1))
+    raise last
+
 def choose_naver_article():
-    r=requests.get(NAVER_POLITICS,headers=UA,timeout=25); r.raise_for_status()
+    r=get_with_retries(NAVER_POLITICS)
     soup=BeautifulSoup(r.text,"html.parser")
     candidates=[]
     for a in soup.select('a[href*="n.news.naver.com/mnews/article/"], a[href*="n.news.naver.com/article/"]'):
@@ -33,14 +52,17 @@ def choose_naver_article():
         candidates.append({"url":href,"title":title})
     if not candidates:
         raise RuntimeError("네이버 정치 섹션에서 기사 URL을 자동 추출하지 못했습니다. workflow_dispatch에 article_url을 입력해 주세요.")
-    # Naver section card order is used as a prominence heuristic, not a verified view-count ranking.
-    return candidates[0]["url"], candidates[0]["title"], "Naver Politics section first eligible card (not verified by view count)"
+    # Prefer a current item whose title names a major political figure. This is a
+    # packaging requirement, not a popularity or truth signal.
+    selected=next((row for row in candidates if any(name in row["title"] for name in PRIORITY_FIGURES)),candidates[0])
+    method="Naver Politics first card naming a priority political figure" if selected is not candidates[0] or any(name in selected["title"] for name in PRIORITY_FIGURES) else "Naver Politics section first eligible card"
+    return selected["url"], selected["title"], method+" (not verified by view count)"
 
 def extract(url):
     p=urlparse(url)
     if p.scheme not in ("https","http") or not p.netloc or "naver.com" not in p.netloc.lower():
         raise RuntimeError("기사 URL은 네이버 뉴스 URL이어야 합니다.")
-    r=requests.get(url,headers=UA,timeout=25); r.raise_for_status()
+    r=get_with_retries(url)
     soup=BeautifulSoup(r.text,"html.parser")
     title=(soup.select_one("#title_area") or soup.select_one("h2") or soup.title)
     title=" ".join(title.get_text(" ",strip=True).split()) if title else ""
@@ -48,7 +70,7 @@ def extract(url):
     og=soup.find("meta",property="og:image")
     image_url=og.get("content","") if og else ""
     if not text or len(text)<300: raise RuntimeError("기사 본문 추출 실패/본문 부족. 접근 제한 기사일 수 있습니다.")
-    return title,text,image_url
+    return title,text,image_url,r.text
 
 def draft(title, body):
     key = os.getenv("GEMINI_API_KEY", "").strip()
@@ -61,10 +83,10 @@ def draft(title, body):
 기사 제목: {title}
 기사 본문:
 {body[:12000]}
-약 55~60초 세로 쇼츠 패키지를 작성하세요. 내레이션은 공백 포함 450~650자, 최소 4개 문단으로 작성하세요.
+세로 정치 쇼츠 패키지를 작성하세요. 60초 상한을 두지 말고 핵심 발언, 상대 반박, 확인된 사실과 맥락, 마지막 중립적 투표 질문이 완결될 만큼 작성하세요. 보통 공백 포함 650~1100자, 최소 5개 문단을 목표로 하되 근거가 부족하면 억지로 늘리지 마세요.
 기사에 있는 배경·당사자 발언·확인된 사실을 구체적으로 설명하고 마지막은 '서울저널이 알려드립니다. 여러분은 어떻게 생각하십니까?'로 마무리하세요.
 기사에 없는 사실·추측·숫자·인용은 만들지 마세요. JSON 객체 하나만 반환:
-{{"headline":"썸네일용 10~18자 헤드라인","youtube_title":"사실에 근거한 제목 100자 이내","narration":"450~650자 기자 내레이션","description":"중립적 요약과 [원문 기사] 자리","source_note":"확인된 사실과 한계"}}"""
+{{"headline":"썸네일용 10~18자 헤드라인","youtube_title":"사실에 근거한 제목 100자 이내","narration":"650~1100자 기자 내레이션(근거가 부족하면 더 짧게)","description":"중립적 요약과 [원문 기사] 자리","source_note":"확인된 사실과 한계"}}"""
     errors = []
     for model_name in models:
         try:
@@ -246,7 +268,10 @@ def render(headline, photo, audio, photos=None):
     ffmpeg = os.getenv("FFMPEG_BINARY", "ffmpeg")
     probe = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", str(audio)], capture_output=True, text=True, check=True)
     duration = float(probe.stdout.strip()) / 1.2
-    segment = max(2.5, duration / len(unique))
+    poll_seconds = min(4.0, max(3.0, duration * 0.10))
+    segment = (duration - poll_seconds) / len(unique)
+    if segment < 1.5:
+        raise RuntimeError("Narration is too short to show five source images and the final poll screen")
     frames = []
     narration_path = OUT/"narration.txt"
     narration = narration_path.read_text(encoding="utf-8") if narration_path.exists() else headline
@@ -255,14 +280,14 @@ def render(headline, photo, audio, photos=None):
     for idx, source in enumerate(unique):
         frame = OUT/f"scene-{idx:02d}.jpg"
         _cover_frame(headline, source, style, idx+1, caption=caption_chunks[idx][:42]).save(frame, quality=92)
-        frames.append(frame)
+        frames.append((frame,segment))
     # Final hold frame gives viewers time to answer a poll in the comments.
     poll_frame = OUT/"scene-poll.jpg"
     _cover_frame(headline, unique[-1], style, len(unique)+1, poll=True).save(poll_frame, quality=92)
-    frames.append(poll_frame)
+    frames.append((poll_frame,poll_seconds))
     cmd = [ffmpeg, "-y"]
-    for frame in frames:
-        cmd += ["-loop", "1", "-t", str(segment), "-i", str(frame)]
+    for frame,hold_seconds in frames:
+        cmd += ["-loop", "1", "-t", str(hold_seconds), "-i", str(frame)]
     cmd += ["-i", str(audio)]
     inputs = "".join(f"[{i}:v]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1,format=yuv420p[v{i}];" for i in range(len(frames)))
     inputs += "".join(f"[v{i}]" for i in range(len(frames))) + f"concat=n={len(frames)}:v=1:a=0[outv]"
@@ -274,38 +299,77 @@ def render(headline, photo, audio, photos=None):
     return video
 
 
-def fetch_article_photos(url, lead_url):
-    """Use only actual images from the cited article, deduplicated by pixel hash."""
-    response = requests.get(url, headers=UA, timeout=25)
-    response.raise_for_status()
-    soup = BeautifulSoup(response.text, "html.parser")
-    urls = [lead_url] if lead_url else []
-    for im in soup.select("#dic_area img, #newsct_article img, article img"):
-        source = im.get("data-src") or im.get("data-lazy-src") or im.get("src")
-        if source and not source.startswith("data:"):
-            urls.append(urljoin(url, source))
-    photos = []
-    hashes = set()
-    for image_url in dict.fromkeys(urls):
-        if len(photos) >= 12:
+def fetch_article_photos(url, lead_url, article_html, meta):
+    """Fetch reusable Commons file photos of the named principal figure(s).
+
+    A news article image is not automatically reusable. The article URL remains the
+    editorial source, while the visual package uses files with explicit reusable
+    Wikimedia Commons license metadata and records every source in the artifact.
+    """
+    del url,lead_url,article_html
+    story=" ".join((meta.get("headline",""),meta.get("youtube_title",""),meta.get("narration","")))
+    figures=[name for name in PRIORITY_FIGURES if name in story]
+    if not figures:
+        raise RuntimeError("Visual quality gate: no approved principal political figure named in the package")
+    api="https://commons.wikimedia.org/w/api.php"
+    photos=[]; hashes=set(); sources=[]
+    for name in figures:
+        english=PRIORITY_FIGURES[name]
+        for query in (english,f"{english} politician"):
+            try:
+                response=get_with_retries(api,params={
+                    "action":"query","generator":"search","gsrsearch":query,"gsrnamespace":6,
+                    "gsrlimit":30,"prop":"imageinfo","iiprop":"url|extmetadata",
+                    "iiurlwidth":1400,"format":"json",
+                },timeout=20)
+                pages=response.json().get("query",{}).get("pages",{})
+            except Exception as exc:
+                log(f"Commons search skipped for {name}: {type(exc).__name__}")
+                continue
+            tokens=[part.lower() for part in english.split() if len(part)>3 and part.lower()!="politician"]
+            for page in pages.values():
+                title=page.get("title","")
+                if tokens and not all(token in title.lower() for token in tokens[:2]):
+                    continue
+                info=(page.get("imageinfo") or [{}])[0]
+                ext=info.get("extmetadata",{})
+                license_name=ext.get("LicenseShortName",{}).get("value","")
+                if not any(key in license_name.lower() for key in ("cc","public domain","pd")):
+                    continue
+                image_url=info.get("thumburl") or info.get("url")
+                if not image_url:
+                    continue
+                try:
+                    raw=get_with_retries(image_url,timeout=20,attempts=2).content
+                    im=Image.open(BytesIO(raw)).convert("RGB")
+                    if min(im.size)<300:
+                        continue
+                    digest=hashlib.sha256(im.resize((64,64)).tobytes()).hexdigest()
+                    if digest in hashes:
+                        continue
+                    hashes.add(digest)
+                    target=OUT/f"source-photo-{len(photos):02d}.jpg"
+                    im.save(target,quality=90)
+                    photos.append(target)
+                    sources.append({
+                        "figure":name,"title":title,"description_url":info.get("descriptionurl"),
+                        "license":license_name,"sha256":hashlib.sha256(raw).hexdigest(),
+                        "usage_note":"자료사진; 현재 사건 현장 사진 아님",
+                    })
+                    if len(photos)>=8:
+                        break
+                except Exception as exc:
+                    log(f"Commons photo skipped for {name}: {type(exc).__name__}")
+            if len(photos)>=5:
+                break
+        if len(photos)>=8:
             break
-        try:
-            r = requests.get(image_url, headers=UA, timeout=15)
-            r.raise_for_status()
-            from io import BytesIO
-            im = Image.open(BytesIO(r.content)).convert("RGB")
-            if min(im.size) < 220:
-                continue
-            digest = hashlib.sha256(im.resize((64, 64)).tobytes()).hexdigest()
-            if digest in hashes:
-                continue
-            hashes.add(digest)
-            target = OUT/f"source-photo-{len(photos):02d}.jpg"
-            im.save(target, quality=90)
-            photos.append(target)
-        except Exception as exc:
-            log(f"Photo fetch skipped: {type(exc).__name__}")
-    log(f"DISTINCT_ARTICLE_PHOTOS: {len(photos)}")
+    (OUT/"photo-sources.json").write_text(json.dumps(sources,ensure_ascii=False,indent=2),encoding="utf-8")
+    meta["principal_figures"]=figures
+    meta["photo_sources"]=sources
+    log(f"RIGHTS_CLEARED_POLITICIAN_PHOTOS: {len(photos)} figures={','.join(figures)}")
+    if len(photos)<5:
+        raise RuntimeError(f"Visual quality gate: {len(photos)}/5 reusable politician photos; private upload blocked")
     return photos
 
 def upload_private(video,meta,source_url):
@@ -362,14 +426,45 @@ def upload_private(video,meta,source_url):
                 }
                 log("DUPLICATE_SKIPPED: " + json.dumps(result, ensure_ascii=False))
                 return result
-    description=(meta["description"].replace("[원문 기사]",source_url)+"\n\n원문 기사: "+source_url+"\n\n#Shorts #서울저널 #정치뉴스")
+    credits=[]
+    for source in meta.get("photo_sources",[])[:5]:
+        if source.get("description_url"):
+            credits.append(f"자료사진({source.get('figure','정치인')}, {source.get('license','재사용 가능')}): {source['description_url']}")
+    description=(meta["description"].replace("[원문 기사]",source_url)+"\n\n원문 기사: "+source_url)
+    if credits:
+        description+="\n\n"+"\n".join(credits)+"\n자료사진은 현재 사건 현장 사진이 아닙니다."
+    description+="\n\n#Shorts #서울저널 #정치뉴스"
     body={"snippet":{"title":meta["youtube_title"][:100],"description":description[:4900],"categoryId":"25","tags":["서울저널","정치뉴스","대한민국정치","Shorts"]},
           "status":{"privacyStatus":"private","selfDeclaredMadeForKids":False}}
     req=yt.videos().insert(part="snippet,status",body=body,media_body=MediaFileUpload(str(video),mimetype="video/mp4",resumable=True,chunksize=5*1024*1024))
     response=None
     while response is None:
         _,response=req.next_chunk()
-    return {"video_id":response["id"],"url":"https://studio.youtube.com/video/"+response["id"]+"/edit","privacy":"private","channel_title":items[0]["snippet"]["title"],"channel_id":items[0]["id"]}
+    video_id=response["id"]
+    thumbnail_status="not_set"
+    try:
+        yt.thumbnails().set(videoId=video_id,media_body=MediaFileUpload(str(OUT/"cover.jpg"),mimetype="image/jpeg")).execute()
+        thumbnail_status="api_set"
+    except Exception as exc:
+        thumbnail_status="not_set_"+type(exc).__name__
+    saved=yt.videos().list(part="snippet,status,contentDetails",id=video_id).execute().get("items",[])
+    if len(saved)!=1:
+        raise RuntimeError("YouTube upload readback failed; receipt must be investigated before retry")
+    saved=saved[0]
+    actual_channel=saved.get("snippet",{}).get("channelId")
+    actual_privacy=saved.get("status",{}).get("privacyStatus")
+    if actual_channel!=expected:
+        raise RuntimeError(f"YouTube readback channel mismatch: {actual_channel}")
+    if actual_privacy!="private":
+        raise RuntimeError(f"YouTube readback privacy mismatch: {actual_privacy}")
+    thumbnails=saved.get("snippet",{}).get("thumbnails",{})
+    thumbnail_url=(thumbnails.get("maxres") or thumbnails.get("standard") or thumbnails.get("high") or thumbnails.get("default") or {}).get("url")
+    return {
+        "video_id":video_id,"url":"https://studio.youtube.com/video/"+video_id+"/edit",
+        "privacy":actual_privacy,"channel_title":items[0]["snippet"]["title"],"channel_id":actual_channel,
+        "duration":saved.get("contentDetails",{}).get("duration"),"thumbnail_status":thumbnail_status,
+        "thumbnail_url":thumbnail_url,"poll_cta":"댓글로 A·B·C를 눌러 참여하세요",
+    }
 
 def main():
     scope=os.getenv("SEOUL_JOURNAL_CONTENT_SCOPE","politics").strip().casefold()
@@ -381,7 +476,7 @@ def main():
         log(f"Auto-selected from Naver Politics: {url} ({selection})")
     else:
         title_hint=""; selection="User-supplied Naver Politics article URL (politics-only workflow)"
-    title,body,img=extract(url)
+    title,body,img,article_html=extract(url)
     if title_hint and len(title)<8: title=title_hint
     meta=draft(title,body)
     meta["source_title"]=title; meta["source_url"]=url; meta["article_selection_method"]=selection; meta["content_scope"]="politics"
@@ -389,7 +484,8 @@ def main():
     (OUT/"narration.txt").write_text(meta["narration"],encoding="utf-8")
     log("SCRIPT_READY: "+meta["youtube_title"])
     audio=tts(meta["narration"])
-    photos=fetch_article_photos(url,img)
+    photos=fetch_article_photos(url,img,article_html,meta)
+    (OUT/"package.json").write_text(json.dumps(meta,ensure_ascii=False,indent=2),encoding="utf-8")
     video=render(meta["headline"],photos[0] if photos else None,audio,photos=photos)
     log("VIDEO_RENDERED: "+str(video))
     result=upload_private(video,meta,url)

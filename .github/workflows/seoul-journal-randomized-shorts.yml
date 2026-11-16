@@ -1,10 +1,12 @@
-name: Seoul Journal public daily three Shorts
+name: Seoul Journal public release (owner approval required)
 on:
-  schedule:
-    # KST 08-10, 13-15, 19-22; exact date-specific slot picked by gate.
-    - cron: "*/10 23,0,4,5,10,11,12 * * *"
   workflow_dispatch:
     inputs:
+      confirm_public_release_after_owner_review:
+        description: "I reviewed the exact private video and approve this public release"
+        required: true
+        type: boolean
+        default: false
       slot:
         type: choice
         options: [morning, midday, evening]
@@ -66,7 +68,7 @@ jobs:
           fi
   publish:
     needs: pick
-    if: ${{ needs.pick.outputs.slot != 'none' }}
+    if: ${{ inputs.confirm_public_release_after_owner_review == true && needs.pick.outputs.slot != 'none' }}
     runs-on: ubuntu-latest
     timeout-minutes: 25
     environment: FISH_AUDIO_API_KEY
