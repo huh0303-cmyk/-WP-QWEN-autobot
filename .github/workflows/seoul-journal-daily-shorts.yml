@@ -53,6 +53,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Validate required secrets before generation
         env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           FISH_AUDIO_API_KEY: ${{ secrets.FISH_AUDIO_API_KEY }}
           REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
@@ -63,7 +64,7 @@ jobs:
         run: |
           set -eu
           missing=""
-          for name in OPENAI_API_KEY FISH_AUDIO_API_KEY YOUTUBE_OAUTH_CLIENT_ID YOUTUBE_OAUTH_CLIENT_SECRET SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID; do
+          for name in GEMINI_API_KEY FISH_AUDIO_API_KEY YOUTUBE_OAUTH_CLIENT_ID YOUTUBE_OAUTH_CLIENT_SECRET SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID; do
             eval 'value=${'"$name"'-}'
             if [ -z "$value" ]; then
               echo "::error title=Missing GitHub secret::$name is not configured."
@@ -92,9 +93,10 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg fonts-noto-cjk
-          python -m pip install --disable-pip-version-check requests trafilatura beautifulsoup4 Pillow openai google-api-python-client google-auth google-auth-httplib2 edge-tts
+          python -m pip install --disable-pip-version-check requests trafilatura beautifulsoup4 Pillow openai google-generativeai google-api-python-client google-auth google-auth-httplib2 edge-tts
       - name: Render with Fish Audio first and free Edge TTS fallback; upload PRIVATE only
         env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           FISH_AUDIO_API_KEY: ${{ secrets.FISH_AUDIO_API_KEY }}
           YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_CLIENT_ID || secrets.YOUTUBE_OAUTH_CLIENT_ID }}
