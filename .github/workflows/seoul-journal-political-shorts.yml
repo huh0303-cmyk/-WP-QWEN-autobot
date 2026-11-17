@@ -56,7 +56,7 @@ jobs:
         run: |
           set -eu
           if [ "${{ github.event_name }}" = "schedule" ] && [ "$THUMBNAIL_API_READY" != "true" ]; then
-            echo "::error title=Thumbnail permission required::Scheduled public release is blocked until SEOUL_JOURNAL_THUMBNAIL_API_READY=true after a successful thumbnails.set test."
+            echo "::error title=Thumbnail permission required::Scheduled private upload is blocked until SEOUL_JOURNAL_THUMBNAIL_API_READY=true after a successful thumbnails.set test."
             exit 1
           fi
           if [ "${{ github.event_name }}" != "schedule" ] && [ "$CONFIRM_PRIVATE_UPLOAD" != "true" ]; then
@@ -109,7 +109,7 @@ jobs:
           YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_CLIENT_SECRET }}
           SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN }}
           SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID: UChRUdHZlXSjftAqBtdDNEWA
-          AUTO_PUBLIC_AFTER_VALIDATION: ${{ github.event_name == 'schedule' || inputs.publish_after_validation == true }}
+          AUTO_PUBLIC_AFTER_VALIDATION: 'false'
           VERIFY_ONLY: ${{ inputs.verify_only }}
         run: python scripts/seoul_journal_shorts_pipeline.py
       - name: Upload package, MP4, and private upload receipt as workflow artifact
