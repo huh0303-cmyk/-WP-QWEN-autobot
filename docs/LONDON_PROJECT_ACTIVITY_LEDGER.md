@@ -406,3 +406,8 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - No GitHub Actions dispatch, retry, manual publication, or production mutation occurred. Next: independently confirm the VPS host key through a trusted provider/server channel; then restore trusted SSH and repeat the read-only audit. Check same-date publication markers and public posts before any recovery. Never dispatch publish-blogger-33-now.yml.
 
 \r\n
+## 2026-11-17 23:52 KST — Blogger 33 daily audit blocked by unverified SSH host key
+
+- Strict read-only SSH to `root@187.127.121.57` again rejected the changed server identity. Presented ED25519 fingerprint: `SHA256:xGz5BAS5YPG5zrRx8d/ugCTdNg10MhDFavjKmUrXGQg`, unchanged from the earlier November 16–17 observations. Host-key checking and `known_hosts` were not altered.
+- The November 17 `korea365-blogger33-daily.timer` state, exact 33-target schedule, transient-service outcomes, same-date publication-key duplicates, OAuth/API errors, and `/opt/korea365/artifacts/blogger-33-public-results.json` remain unverified. Failed blog keys cannot be identified without trusted server access.
+- No GitHub Actions dispatch, retry, manual publication, or production mutation occurred. Next: independently verify the VPS fingerprint through a trusted provider/server channel, restore trusted SSH, and repeat the read-only audit. Check same-date publication markers and public posts before any recovery; never dispatch `publish-blogger-33-now.yml`.
