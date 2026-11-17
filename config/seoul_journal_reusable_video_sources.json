@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "policy": "Only the individual media item's displayed license controls reuse. A government or parliamentary owner alone is not permission.",
+  "allowed_licenses": [
+    "KOGL Type 1",
+    "Public domain",
+    "CC0",
+    "CC BY 3.0",
+    "CC BY 4.0"
+  ],
+  "required_receipt_fields": [
+    "source_url",
+    "media_title",
+    "publisher",
+    "published_at",
+    "license_name",
+    "license_url",
+    "license_evidence_url",
+    "download_url",
+    "clip_start_seconds",
+    "clip_end_seconds",
+    "speakers",
+    "transcript_excerpt",
+    "editorial_reason"
+  ],
+  "sources": [
+    {
+      "name": "공공누리 영상 원문",
+      "url": "https://www.kogl.or.kr/recommend/recommendDivList.do?division=video",
+      "automatic_use": true,
+      "rule": "Use only an individual item marked KOGL Type 1 and preserve its attribution evidence."
+    },
+    {
+      "name": "대한민국 국회",
+      "url": "https://www.assembly.go.kr/",
+      "copyright_policy": "https://assembly.go.kr/portal/bbs/B0000051/view.do?nttId=3869667",
+      "automatic_use": false,
+      "rule": "A National Assembly or NATV label is not sufficient. Use only when the exact video page/file displays KOGL Type 1; otherwise obtain prior permission."
+    },
+    {
+      "name": "KTV 국민방송",
+      "url": "https://www.ktv.go.kr/",
+      "copyright_policy": "https://www.ktv.go.kr/guide/copyright?unit=330",
+      "automatic_use": false,
+      "rule": "Use only the exact item carrying KOGL Type 1. Exclude any page stating unauthorized reproduction/redistribution is prohibited or containing third-party footage."
+    },
+    {
+      "name": "Wikimedia Commons video",
+      "url": "https://commons.wikimedia.org/wiki/Category:Videos_of_South_Korea",
+      "automatic_use": true,
+      "rule": "Use only the file page's explicit Public Domain, CC0, CC BY, or KOGL Type 1 license; record author, source, license and changes."
+    },
+    {
+      "name": "e영상역사관 / KTV 나누리",
+      "url": "https://www.ehistory.go.kr/info/announce",
+      "automatic_use": false,
+      "rule": "Archive access or download availability is not a reuse license. Require the supplied item's written license or a separate use approval."
+    },
+    {
+      "name": "대한민국 정책브리핑",
+      "url": "https://www.korea.kr/",
+      "automatic_use": false,
+      "rule": "Default to text-only citation. Photos and video are excluded unless that exact media item separately carries an allowed license."
+    }
+  ],
+  "clip_selection": {
+    "decision_maker": "semantic edit director constrained by the official transcript and license receipt",
+    "minimum_confidence": 0.85,
+    "rules": [
+      "Cut on complete speaking turns, never mid-sentence.",
+      "Match the clip to the narration claim and named speaker.",
+      "Keep the original voice audible; narration may bridge context but must not distort the quote.",
+      "Generate captions from the selected clip audio and verify them against the official minutes/transcript.",
+      "Reject clips with missing license evidence, unclear speaker identity, transcript mismatch, or third-party inserts.",
+      "Record start/end timestamps, speakers, transcript excerpt and editorial reason for owner review."
+    ]
+  }
+}

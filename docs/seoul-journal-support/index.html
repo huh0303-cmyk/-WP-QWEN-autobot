@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>서울저널 자율구독 계좌 복사</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;background:#07152d;color:#fff;font-family:system-ui,"Malgun Gothic",sans-serif}
+    main{min-height:100vh;display:grid;place-items:center;padding:24px}.card{width:min(620px,100%);padding:34px 24px;background:#102442;border:1px solid #315076;border-radius:20px;text-align:center}
+    h1{font-size:clamp(25px,6vw,38px);margin:0 0 14px}.help{font-size:18px;line-height:1.6;color:#dbeafe}.account{margin:24px 0;padding:20px 12px;background:#fff;color:#07152d;border-radius:14px;font-size:clamp(22px,5vw,32px);font-weight:800;overflow-wrap:anywhere}
+    button{width:100%;border:0;border-radius:14px;padding:20px;background:#ffe04b;color:#07152d;font-size:24px;font-weight:900;cursor:pointer}button:focus{outline:4px solid #68d8ff;outline-offset:4px}
+    #status{min-height:30px;margin:18px 0 0;font-size:18px;color:#73f0c1}.warning{color:#ffb4b4}
+  </style>
+</head>
+<body>
+  <main><section class="card" aria-labelledby="title">
+    <h1 id="title">서울저널 자율구독</h1>
+    <p class="help">아래 버튼을 누르면 계좌번호가 휴대전화에 복사됩니다.<br>은행 앱의 계좌번호 칸을 길게 눌러 붙여넣으세요.</p>
+    <div id="account" class="account" aria-live="polite"></div>
+    <button id="copy" type="button">계좌번호 복사</button>
+    <p id="status" role="status"></p>
+  </section></main>
+  <script>
+    const raw = new URLSearchParams(location.search).get("account") || "";
+    const account = raw.trim();
+    const accountBox = document.getElementById("account");
+    const status = document.getElementById("status");
+    const button = document.getElementById("copy");
+    accountBox.textContent = account || "계좌 정보가 없습니다";
+    if (!account) { button.disabled = true; status.textContent = "영상 설명란의 정확한 링크로 다시 열어주세요."; status.className = "warning"; }
+    button.addEventListener("click", async () => {
+      const digits = account.replace(/[^0-9]/g, "");
+      if (!digits) return;
+      try {
+        await navigator.clipboard.writeText(digits);
+      } catch (_) {
+        const area=document.createElement("textarea"); area.value=digits; document.body.appendChild(area); area.select(); document.execCommand("copy"); area.remove();
+      }
+      status.textContent = "복사됐습니다. 은행 앱에서 붙여넣으세요.";
+      button.textContent = "복사 완료";
+    });
+  </script>
+</body>
+</html>

@@ -5,22 +5,50 @@ PIPELINE = Path("scripts/seoul_journal_shorts_pipeline.py")
 PUBLIC_WORKFLOW = Path(".github/workflows/seoul-journal-randomized-shorts.yml")
 PRIVATE_WORKFLOW = Path(".github/workflows/seoul-journal-political-shorts.yml")
 BENCHMARKS = Path("config/seoul_journal_thumbnail_benchmarks.json")
+VIDEO_SOURCES = Path("config/seoul_journal_reusable_video_sources.json")
 
 
 def source():
     return PIPELINE.read_text(encoding="utf-8")
 
 
-def test_final_poll_is_inside_the_narration_duration():
+def test_final_poll_starts_after_narration_and_holds_six_seconds():
     text = source()
     assert "60초 상한을 두지 말고" in text
-    assert "poll_start=duration-poll_seconds" in text
+    assert "poll_seconds = 6.0" in text
     assert "frames.append((poll_frame,poll_seconds))" in text
     assert 'for frame,hold_seconds in frames:' in text
     assert '"댓글로 A·B·C를 눌러 참여하세요"' in text
+    assert "next_start=active_cues[idx+1]" in text
+    assert "else duration" in text
+    assert "apad=pad_dur=" in text
+    assert '"poll_starts_after_narration_seconds":round(duration,3)' in text
     assert 'proof_at=max(0.0,final_duration-1.5)' in text
     assert '"poll-proof.jpg"' in text
     assert 'if mean_difference>18' in text
+
+
+def test_support_account_is_secret_driven_on_every_video_frame():
+    text = source()
+    workflow = PRIVATE_WORKFLOW.read_text(encoding="utf-8")
+    assert 'os.getenv("SEOUL_JOURNAL_SUPPORT_LINE","").strip()' in text
+    assert "secrets.SEOUL_JOURNAL_SUPPORT_LINE" in workflow
+    assert "for name in GEMINI_API_KEY FISH_AUDIO_API_KEY SEOUL_JOURNAL_SUPPORT_LINE" in workflow
+    assert "자율구독 전체 계좌 표시가 없어 생성·비공개 업로드를 중단합니다." in text
+    assert "352-2371" not in text
+    assert '"support_line_present":bool' in text
+    assert "if support_line and not thumbnail" in text
+    assert "https://control.korea365.org/seoul-journal-support/?account=" in text
+
+
+def test_final_poll_is_story_specific_with_three_choices():
+    text = source()
+    assert '"poll_question":"15~28자 중립 질문"' in text
+    assert '"poll_options":[' in text
+    assert 'zip("ABC",choices)' in text
+    assert 'poll_question=meta["poll_question"]' in text
+    assert 'poll_options=meta["poll_options"]' in text
+    assert 'choices=list(poll_options or [])' in text
 
 
 def test_private_upload_sets_thumbnail_and_reads_back_identity():
@@ -64,6 +92,21 @@ def test_thumbnail_contract_uses_three_inspected_500k_examples():
     assert all(row["observed_views"] >= 500_000 for row in data["examples"])
     assert all(row["visual_observation"] for row in data["examples"])
     assert len(data["common_traits"]) >= 5
+    assert len(data["examples"]) >= 6
+    assert sum(row["channel"] == "KNN NEWS" for row in data["examples"]) >= 3
+
+
+def test_reusable_video_sources_fail_closed_on_item_level_license():
+    import json
+    data = json.loads(VIDEO_SOURCES.read_text(encoding="utf-8"))
+    names = {row["name"] for row in data["sources"]}
+    assert "공공누리 영상 원문" in names
+    assert "KTV 국민방송" in names
+    assert "e영상역사관 / KTV 나누리" in names
+    assert any("exact video page/file displays KOGL Type 1" in row["rule"] for row in data["sources"])
+    assert any("Archive access or download availability is not a reuse license" in row["rule"] for row in data["sources"])
+    assert "clip_start_seconds" in data["required_receipt_fields"]
+    assert "transcript_excerpt" in data["required_receipt_fields"]
 
 
 def test_pipeline_fails_closed_without_fresh_benchmark_receipt():
@@ -89,7 +132,8 @@ def test_ffmpeg_motion_is_applied_but_final_poll_stays_readable():
     assert "zoompan=z='min(zoom+0.00012,1.04)'" in text
     assert "if i < len(frames)-1" in text
     assert "Keep the final poll steady for legibility" in text
-    assert '_cover_frame(headline, unique[0], style, len(unique)+1, poll=True)' in text
+    assert "poll=True" in text
+    assert "poll_question=poll_question,poll_options=poll_options" in text
     assert "render-receipt.json" in text
     assert '"motion_effect":"ffmpeg zoompan Ken Burns on narration scenes"' in text
 
@@ -98,7 +142,8 @@ def test_description_is_compact_and_scheduled_release_is_validated_first():
     text = source()
     assert "def compact_photo_credits" in text
     assert 'split("[원문 기사]",1)[0]' in text
-    assert 'description=summary[:700]+"\\n\\n원문: "+source_url' in text
+    assert 'description=support_intro+summary[:700]+"\\n\\n원문: "+source_url' in text
+    assert "seoul-journal-support/?account=" in text
     assert "credits.append(f\"자료사진" not in text
     assert 'AUTO_PUBLIC_AFTER_VALIDATION' in text
     assert 'privacyStatus":"public"' in text

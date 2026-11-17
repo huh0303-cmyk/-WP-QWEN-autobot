@@ -5,7 +5,7 @@ import os, re, json, textwrap, subprocess, sys, random, hashlib, time, base64
 from datetime import datetime, timezone
 from pathlib import Path
 from io import BytesIO
-from urllib.parse import urlparse
+from urllib.parse import quote, urlparse
 import requests, trafilatura
 from bs4 import BeautifulSoup
 from PIL import Image, ImageDraw, ImageFont
@@ -50,7 +50,7 @@ def load_thumbnail_benchmark_contract():
         "verified_at_run_utc":datetime.now(timezone.utc).isoformat(),
         "observed_at_kst":data["observed_at_kst"],
         "minimum_views":minimum,
-        "examples":examples[:3],
+        "examples":examples,
         "common_traits":data.get("common_traits",[]),
         "adaptation_rule":data.get("adaptation_rule",""),
     }
@@ -114,9 +114,11 @@ def draft(title, body):
 기사 본문:
 {body[:12000]}
 세로 정치 쇼츠 패키지를 작성하세요. 60초 상한을 두지 말고 핵심 발언, 상대 반박, 확인된 사실과 맥락, 마지막 중립적 투표 질문이 완결될 만큼 작성하세요. 보통 공백 포함 650~1100자, 최소 5개 문단을 목표로 하되 근거가 부족하면 억지로 늘리지 마세요.
-기사에 있는 배경·당사자 발언·확인된 사실을 구체적으로 설명하고 마지막은 '서울저널이 알려드립니다. 여러분은 어떻게 생각하십니까?'로 마무리하세요.
+기사에 있는 배경·당사자 발언·확인된 사실을 구체적으로 설명하고 마지막은 '서울저널이 알려드립니다.'로 마무리하세요. 투표 질문은 내레이션이 모두 끝난 뒤 별도 화면에 표시합니다.
+실제 쌍방 충돌이나 반박이 기사에서 확인될 때만 헤드라인에 '공방!', '대격돌!', '정면 대립!' 같은 강한 표현을 자연스럽게 사용할 수 있습니다. 실제 대립이 없으면 이런 표현을 만들지 마세요.
+poll_question은 이 기사에서 시청자가 판단할 핵심 질문으로 쓰고, poll_options는 기사 속 서로 다른 입장 2개와 중립·추가확인 선택지 1개를 A/B/C 순서로 만드세요. 서로 겹치지 않게 하고 사람·주장을 정확히 표시하세요.
 기사에 없는 사실·추측·숫자·인용은 만들지 마세요. JSON 객체 하나만 반환:
-{{"headline":"썸네일용 10~18자 헤드라인","youtube_title":"사실에 근거한 제목 100자 이내","narration":"650~1100자 기자 내레이션(근거가 부족하면 더 짧게)","description":"중립적 요약과 [원문 기사] 자리","source_note":"확인된 사실과 한계"}}"""
+{{"headline":"썸네일용 10~18자 헤드라인","youtube_title":"사실에 근거한 제목 100자 이내","narration":"650~1100자 기자 내레이션(근거가 부족하면 더 짧게)","description":"중립적 요약과 [원문 기사] 자리","source_note":"확인된 사실과 한계","poll_question":"15~28자 중립 질문","poll_options":["18자 이내 선택지","18자 이내 선택지","18자 이내 중립 선택지"]}}"""
     errors = []
     for model_name in models:
         try:
@@ -125,11 +127,18 @@ def draft(title, body):
             raw = (result.text or "").strip().strip("`")
             data = json.loads(raw)
             narration = str(data.get("narration", "")).strip()
-            if len(narration) >= 420:
+            poll_question=str(data.get("poll_question","")).strip()
+            poll_options=[str(choice).strip() for choice in data.get("poll_options",[]) if str(choice).strip()]
+            poll_valid=(15<=len(poll_question)<=32 and len(poll_options)==3
+                        and all(2<=len(choice)<=22 for choice in poll_options)
+                        and len(set(poll_options))==3)
+            if len(narration) >= 420 and poll_valid:
                 data["narration"] = narration
+                data["poll_question"] = poll_question
+                data["poll_options"] = poll_options
                 log(f"WRITER_ENGINE=gemini model={model_name} narration_chars={len(narration)}")
                 return data
-            errors.append(f"{model_name}:{len(narration)}")
+            errors.append(f"{model_name}:narration={len(narration)}:poll_valid={poll_valid}")
         except Exception as exc:
             errors.append(f"{model_name}:{type(exc).__name__}")
     raise RuntimeError("Gemini writing chain failed or narration too short: " + ", ".join(errors))
@@ -268,7 +277,8 @@ def _fit_headline(draw, headline, max_width, max_lines=3):
             return lines,font
     return textwrap.wrap(headline,width=12)[:max_lines],_font(60)
 
-def _cover_frame(headline,photo,style,index,caption="",poll=False,thumbnail=False):
+def _cover_frame(headline,photo,style,index,caption="",poll=False,thumbnail=False,
+                 poll_question="",poll_options=None):
     W,H=1080,1920
     base=Image.new("RGB",(W,H),style["bg"])
     if photo:
@@ -306,8 +316,12 @@ def _cover_frame(headline,photo,style,index,caption="",poll=False,thumbnail=Fals
     # place a black box/bar over the politician's face.
     if (caption or poll) and not thumbnail:
         if poll:
-            lines=["어떻게 생각하시나요?","A 찬성  B 반대","C 더 지켜보기"]
-            font=_font(64); y=690
+            choices=list(poll_options or [])
+            if len(choices)!=3:
+                raise RuntimeError("Final poll requires exactly three story-specific choices")
+            lines=textwrap.wrap(poll_question,width=14,break_long_words=True,break_on_hyphens=False)[:2]
+            lines += [f"{letter}  {choice}" for letter,choice in zip("ABC",choices)]
+            font=_font(58); y=560
         else:
             lines=textwrap.wrap(caption,width=18,break_long_words=True,break_on_hyphens=False)[:4]
             font=_font(54); y=1250-len(lines)*34
@@ -319,6 +333,15 @@ def _cover_frame(headline,photo,style,index,caption="",poll=False,thumbnail=Fals
             footer="댓글로 A·B·C를 눌러 참여하세요"
             box=draw.textbbox((0,0),footer,font=_font(38),stroke_width=6)
             draw.text(((W-(box[2]-box[0]))//2,1580),footer,font=_font(38),fill=(255,255,255),stroke_width=7,stroke_fill=(0,0,0))
+    # The voluntary-subscription account remains visible from the first frame
+    # through the final poll. It floats directly on the picture, never in a bar.
+    support_line=os.getenv("SEOUL_JOURNAL_SUPPORT_LINE","").strip()
+    if support_line and not thumbnail:
+        support_font=next((_font(size) for size in (40,36,32,28)
+                           if draw.textbbox((0,0),support_line,font=_font(size),stroke_width=5)[2] <= 980),_font(28))
+        support_box=draw.textbbox((0,0),support_line,font=support_font,stroke_width=5)
+        draw.text(((W-(support_box[2]-support_box[0]))//2,1710),support_line,font=support_font,
+                  fill=(255,224,75),stroke_width=6,stroke_fill=(0,0,0))
     return base.convert("RGB")
 
 def build_caption_cues(timeline_path, max_chars=28, max_seconds=2.8):
@@ -408,7 +431,7 @@ start/end는 포함 범위이며 CUE_0부터 CUE_{len(cues)-1}까지 중복·누
     finally:
         for image in opened: image.close()
 
-def render(headline, photo, audio, photos=None):
+def render(headline, photo, audio, photos=None, poll_question="", poll_options=None):
     """Render rotating real source images; never loop a single still for a full Short."""
     candidates = list(photos or ([] if photo is None else [photo]))
     unique = []
@@ -431,15 +454,14 @@ def render(headline, photo, audio, photos=None):
     ffmpeg = os.getenv("FFMPEG_BINARY", "ffmpeg")
     probe = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", str(audio)], capture_output=True, text=True, check=True)
     duration = float(probe.stdout.strip())
-    poll_seconds = min(4.0, max(3.0, duration * 0.10))
-    poll_start=duration-poll_seconds
-    if poll_start/len(unique) < 1.5:
+    poll_seconds = 6.0
+    if duration/len(unique) < 1.5:
         raise RuntimeError("Narration is too short to show five source images and the final poll screen")
     frames = []
     cues=build_caption_cues(OUT/"tts-timeline.json")
     if cues[-1]["end"]>duration+0.5 or duration-cues[-1]["end"]>2.5:
         raise RuntimeError("Narration audio and timestamp timeline duration do not agree")
-    active_cues=[cue for cue in cues if cue["start"]<poll_start-0.05]
+    active_cues=list(cues)
     if len(active_cues)<4:
         raise RuntimeError("Too few timestamped subtitle cues before the final poll")
     photo_sources=json.loads((OUT/"photo-sources.json").read_text(encoding="utf-8"))
@@ -448,16 +470,18 @@ def render(headline, photo, audio, photos=None):
     photo_mapping=plan_visual_sequence(active_cues,unique,photo_sources)
     for idx,cue in enumerate(active_cues):
         source=unique[photo_mapping[idx]]
-        next_start=active_cues[idx+1]["start"] if idx+1<len(active_cues) else poll_start
+        next_start=active_cues[idx+1]["start"] if idx+1<len(active_cues) else duration
         hold_seconds=next_start-(0.0 if idx==0 else cue["start"])
         if hold_seconds<=0 or hold_seconds>4.5:
             raise RuntimeError(f"Subtitle display duration out of sync: cue={idx} hold={hold_seconds:.3f}")
         frame = OUT/f"scene-{idx:02d}.jpg"
         _cover_frame(headline,source,style,idx+1,caption=cue["text"]).save(frame,quality=92)
         frames.append((frame,hold_seconds))
-    # Final hold frame gives viewers time to answer a poll in the comments.
+    # Narration and every synchronized subtitle end first. Only then does the
+    # separate silent poll hold begin.
     poll_frame = OUT/"scene-poll.jpg"
-    _cover_frame(headline, unique[0], style, len(unique)+1, poll=True).save(poll_frame, quality=92)
+    _cover_frame(headline, unique[0], style, len(unique)+1, poll=True,
+                 poll_question=poll_question,poll_options=poll_options).save(poll_frame, quality=92)
     frames.append((poll_frame,poll_seconds))
     cmd = [ffmpeg, "-y"]
     for frame,hold_seconds in frames:
@@ -475,9 +499,10 @@ def render(headline, photo, audio, photos=None):
             # Keep the final poll steady for legibility.
             filters.append(prefix+f",fps=30,format=yuv420p[v{i}];")
     inputs="".join(filters)
-    inputs += "".join(f"[v{i}]" for i in range(len(frames))) + f"concat=n={len(frames)}:v=1:a=0[outv]"
+    inputs += "".join(f"[v{i}]" for i in range(len(frames))) + f"concat=n={len(frames)}:v=1:a=0[outv];"
+    inputs += f"[{len(frames)}:a]apad=pad_dur={poll_seconds:.3f}[outa]"
     video = OUT/"seoul-journal-short.mp4"
-    cmd += ["-filter_complex", inputs, "-map", "[outv]", "-map", f"{len(frames)}:a", "-c:v", "libx264", "-preset", "medium", "-c:a", "aac", "-shortest", "-movflags", "+faststart", str(video)]
+    cmd += ["-filter_complex", inputs, "-map", "[outv]", "-map", "[outa]", "-c:v", "libx264", "-preset", "medium", "-c:a", "aac", "-shortest", "-movflags", "+faststart", str(video)]
     result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
     if result.returncode:
         raise RuntimeError("FFmpeg multi-scene render failed: " + result.stderr[-1200:])
@@ -506,9 +531,13 @@ def render(headline, photo, audio, photos=None):
         "subtitle_max_hold_seconds":round(max(seconds for _,seconds in frames[:-1]),3),
         "visual_plan_file":"visual-plan.json",
         "poll_seconds":round(poll_seconds,3),
+        "poll_starts_after_narration_seconds":round(duration,3),
+        "poll_question":poll_question,
+        "poll_options":list(poll_options or []),
         "poll_proof_at_seconds":round(proof_at,3),
         "poll_proof_mean_difference":round(mean_difference,3),
         "poll_proof_file":proof.name,
+        "support_line_present":bool(os.getenv("SEOUL_JOURNAL_SUPPORT_LINE","").strip()),
     }
     (OUT/"render-receipt.json").write_text(json.dumps(render_receipt,ensure_ascii=False,indent=2),encoding="utf-8")
     return video
@@ -677,7 +706,10 @@ def upload_private(video,meta,source_url):
                 return result
     summary=meta.get("description","").split("[원문 기사]",1)[0].strip()
     summary=re.sub(r"https?://\S+","",summary).strip()
-    description=summary[:700]+"\n\n원문: "+source_url
+    support_line=os.getenv("SEOUL_JOURNAL_SUPPORT_LINE","").strip()
+    support_copy_url="https://control.korea365.org/seoul-journal-support/?account="+quote(support_line,safe="") if support_line else ""
+    support_intro=(f"자율구독: {support_line}\n계좌번호 한 번에 복사: {support_copy_url}\n\n" if support_line else "")
+    description=support_intro+summary[:700]+"\n\n원문: "+source_url
     credits=compact_photo_credits(meta.get("photo_sources",[]))
     if credits:
         description+="\n\n"+"\n".join(credits)
@@ -754,6 +786,8 @@ def main():
     scope=os.getenv("SEOUL_JOURNAL_CONTENT_SCOPE","politics").strip().casefold()
     if scope != CONTENT_SCOPE:
         raise RuntimeError("서울저널 워크플로는 정치(politics) 콘텐츠만 허용합니다.")
+    if not os.getenv("SEOUL_JOURNAL_SUPPORT_LINE","").strip():
+        raise RuntimeError("자율구독 전체 계좌 표시가 없어 생성·비공개 업로드를 중단합니다.")
     url=os.getenv("INPUT_ARTICLE_URL","").strip()
     if not url:
         url,title_hint,selection=choose_naver_article()
@@ -770,7 +804,10 @@ def main():
     audio=tts(meta["narration"])
     photos=fetch_article_photos(url,img,article_html,meta)
     (OUT/"package.json").write_text(json.dumps(meta,ensure_ascii=False,indent=2),encoding="utf-8")
-    video=render(meta["headline"],photos[0] if photos else None,audio,photos=photos)
+    video=render(
+        meta["headline"], photos[0] if photos else None, audio, photos=photos,
+        poll_question=meta["poll_question"], poll_options=meta["poll_options"],
+    )
     meta["thumbnail_benchmark"]=json.loads((OUT/"thumbnail-benchmark-receipt.json").read_text(encoding="utf-8"))
     (OUT/"package.json").write_text(json.dumps(meta,ensure_ascii=False,indent=2),encoding="utf-8")
     log("VIDEO_RENDERED: "+str(video))
