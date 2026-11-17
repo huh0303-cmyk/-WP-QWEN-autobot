@@ -298,7 +298,8 @@ def _cover_frame(headline,photo,style,index,caption="",poll=False,thumbnail=Fals
     draw.rectangle((0,0,W,130),fill=(*style["bg"],238))
     draw.rectangle((42,34,250,105),fill=style["accent"])
     draw.text((58,43),style["badge"],font=_font(42),fill=(255,255,255),stroke_width=1,stroke_fill=(0,0,0))
-    draw.text((W-425,48),"SEOUL JOURNAL",font=_font(30),fill=(255,255,255))
+    draw.text((285,36),"서울저널",font=_font(54),fill=(255,255,255))
+    draw.text((W-290,52),"자율 구독",font=_font(36),fill=(255,255,255))
     if thumbnail:
         # 500k+ reference commonality adapted to the owner's explicit preference:
         # one real face dominates and 1-3 huge lines float directly on the photo.
@@ -333,15 +334,9 @@ def _cover_frame(headline,photo,style,index,caption="",poll=False,thumbnail=Fals
             footer="댓글로 A·B·C를 눌러 참여하세요"
             box=draw.textbbox((0,0),footer,font=_font(38),stroke_width=6)
             draw.text(((W-(box[2]-box[0]))//2,1580),footer,font=_font(38),fill=(255,255,255),stroke_width=7,stroke_fill=(0,0,0))
-    # The voluntary-subscription account remains visible from the first frame
-    # through the final poll. It floats directly on the picture, never in a bar.
-    support_line=os.getenv("SEOUL_JOURNAL_SUPPORT_LINE","").strip()
-    if support_line and not thumbnail:
-        support_font=next((_font(size) for size in (40,36,32,28)
-                           if draw.textbbox((0,0),support_line,font=_font(size),stroke_width=5)[2] <= 980),_font(28))
-        support_box=draw.textbbox((0,0),support_line,font=support_font,stroke_width=5)
-        draw.text(((W-(support_box[2]-support_box[0]))//2,1710),support_line,font=support_font,
-                  fill=(255,224,75),stroke_width=6,stroke_fill=(0,0,0))
+    if not thumbnail:
+        draw.text((540,1620),"서울저널  |  자율 후원  농협 352-2371-04-7373",
+                  anchor="mt",font=_font(36),fill=(255,224,75),stroke_width=5,stroke_fill=(0,0,0))
     return base.convert("RGB")
 
 def build_caption_cues(timeline_path, max_chars=28, max_seconds=2.8):
@@ -350,12 +345,30 @@ def build_caption_cues(timeline_path, max_chars=28, max_seconds=2.8):
     segments=data.get("segments",[])
     if not segments:
         raise RuntimeError("Timestamped narration has no segments; subtitle render blocked")
+    narration=Path(timeline_path).with_name("narration.txt").read_text(encoding="utf-8")
+    indices=[index for index,char in enumerate(narration) if char.isalnum()]
+    normalized="".join(narration[index].casefold() for index in indices)
+    offset=0
+    source_start=0
+    for segment in segments:
+        spoken="".join(char.casefold() for char in segment["text"] if char.isalnum())
+        if not spoken:
+            segment["text"]=""
+            continue
+        if not normalized.startswith(spoken,offset):
+            raise RuntimeError("TTS boundary text differs from the approved narration; subtitle render blocked")
+        offset+=len(spoken)
+        source_end=indices[offset] if offset<len(indices) else len(narration)
+        segment["text"]=narration[source_start:source_end]
+        source_start=source_end
+    if offset!=len(normalized):
+        raise RuntimeError("TTS boundaries do not cover the approved narration; subtitle render blocked")
     cues=[]; current=[]; cue_start=None; cue_end=None
     def clean_join(parts):
-        value=" ".join(str(part).strip() for part in parts if str(part).strip())
+        value="".join(parts)
         return re.sub(r"\s+([,.!?。！？])",r"\1",value).strip()
     for segment in segments:
-        text=str(segment.get("text","")).strip()
+        text=segment.get("text","")
         start=float(segment.get("start",0)); end=float(segment.get("end",0))
         if not text or end<=start: continue
         trial=clean_join(current+[text])
@@ -368,7 +381,6 @@ def build_caption_cues(timeline_path, max_chars=28, max_seconds=2.8):
         cues.append({"text":clean_join(current),"start":cue_start,"end":cue_end})
     if not cues:
         raise RuntimeError("Timestamped narration could not form subtitle cues")
-    cues[0]["start"]=0.0
     for index,cue in enumerate(cues):
         cue["start"]=round(float(cue["start"]),3); cue["end"]=round(float(cue["end"]),3)
         if index and cue["start"]<cues[index-1]["end"]-0.15:
@@ -537,7 +549,7 @@ def render(headline, photo, audio, photos=None, poll_question="", poll_options=N
         "poll_proof_at_seconds":round(proof_at,3),
         "poll_proof_mean_difference":round(mean_difference,3),
         "poll_proof_file":proof.name,
-        "support_line_present":bool(os.getenv("SEOUL_JOURNAL_SUPPORT_LINE","").strip()),
+        "support_line_present":True,
     }
     (OUT/"render-receipt.json").write_text(json.dumps(render_receipt,ensure_ascii=False,indent=2),encoding="utf-8")
     return video
@@ -706,14 +718,11 @@ def upload_private(video,meta,source_url):
                 return result
     summary=meta.get("description","").split("[원문 기사]",1)[0].strip()
     summary=re.sub(r"https?://\S+","",summary).strip()
-    support_line=os.getenv("SEOUL_JOURNAL_SUPPORT_LINE","").strip()
-    support_copy_url="https://control.korea365.org/seoul-journal-support/?account="+quote(support_line,safe="") if support_line else ""
-    support_intro=(f"자율구독: {support_line}\n계좌번호 한 번에 복사: {support_copy_url}\n\n" if support_line else "")
-    description=support_intro+summary[:700]+"\n\n원문: "+source_url
+    description=summary[:700]+"\n\n원문: "+source_url
     credits=compact_photo_credits(meta.get("photo_sources",[]))
     if credits:
         description+="\n\n"+"\n".join(credits)
-    description+="\n\n#Shorts #서울저널 #정치뉴스"
+    description+="\n\n#Shorts #서울저널 #정치뉴스\n\n자율 후원\n농협 352-2371-04-7373"
     body={"snippet":{"title":meta["youtube_title"][:100],"description":description[:4900],"categoryId":"25","tags":["서울저널","정치뉴스","대한민국정치","Shorts"]},
           "status":{"privacyStatus":"private","selfDeclaredMadeForKids":False}}
     req=yt.videos().insert(part="snippet,status",body=body,media_body=MediaFileUpload(str(video),mimetype="video/mp4",resumable=True,chunksize=5*1024*1024))
@@ -786,8 +795,6 @@ def main():
     scope=os.getenv("SEOUL_JOURNAL_CONTENT_SCOPE","politics").strip().casefold()
     if scope != CONTENT_SCOPE:
         raise RuntimeError("서울저널 워크플로는 정치(politics) 콘텐츠만 허용합니다.")
-    if not os.getenv("SEOUL_JOURNAL_SUPPORT_LINE","").strip():
-        log("SUPPORT_LINE_OMITTED: no support/bank account was configured; continuing without donation CTA.")
     url=os.getenv("INPUT_ARTICLE_URL","").strip()
     if not url:
         url,title_hint,selection=choose_naver_article()
