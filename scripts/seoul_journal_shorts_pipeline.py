@@ -107,7 +107,7 @@ def draft(title, body):
     if not key:
         raise RuntimeError("GEMINI_API_KEY GitHub Actions secret이 없습니다.")
     genai.configure(api_key=key)
-    models = [os.getenv("SEOUL_JOURNAL_GEMINI_MODEL", "").strip(), "gemini-3.0-flash-lite", "gemini-3.1-flash-lite", "gemini-3.0-flash", "gemini-2.0-flash", "gemini-3.6-flash", "gemini-3.8-flash"]
+    models = [os.getenv("SEOUL_JOURNAL_GEMINI_MODEL", "").strip(), "gemini-3.1-flash-lite", "gemini-2.5-flash-lite", "gemini-2.5-flash"]
     models = list(dict.fromkeys(x for x in models if x))
     prompt = f"""당신은 서울저널의 한국어 정치 뉴스 기자 겸 팩트체커입니다.
 기사 제목: {title}
@@ -416,7 +416,7 @@ start/end는 포함 범위이며 CUE_0부터 CUE_{len(cues)-1}까지 중복·누
             image=Image.open(photo).convert("RGB"); opened.append(image)
             content.extend([f"PHOTO_{i} 실제 이미지:",image])
         errors=[]
-        models=[os.getenv("SEOUL_JOURNAL_GEMINI_MODEL","").strip(),"gemini-3.1-flash-lite","gemini-3.0-flash-lite","gemini-2.0-flash"]
+        models=[os.getenv("SEOUL_JOURNAL_GEMINI_MODEL","").strip(),"gemini-3.1-flash-lite","gemini-2.5-flash-lite","gemini-2.5-flash"]
         for model_name in dict.fromkeys(x for x in models if x):
             try:
                 response=genai.GenerativeModel(model_name).generate_content(content,generation_config={"temperature":0.15,"response_mime_type":"application/json"})
@@ -433,7 +433,7 @@ start/end는 포함 범위이며 CUE_0부터 CUE_{len(cues)-1}까지 중복·누
                 if len(groups)<min(4,len(cues)) or len(groups)>12 or len(set(used))<min(3,len(photos)): raise RuntimeError("Scene plan variety/change-point rules failed")
                 if any(groups[i]["photo_index"]==groups[i-1]["photo_index"] for i in range(1,len(groups))): raise RuntimeError("Adjacent duplicate visual groups must be merged")
                 counts={index:mapping.count(index) for index in set(mapping)}
-                if max(counts.values())/len(mapping)>0.45: raise RuntimeError("One photo dominates over 45 percent")
+                if max(counts.values())/len(mapping)>0.65: raise RuntimeError("One photo dominates over 65 percent")
                 receipt={"engine":model_name,"groups":groups,"cue_to_photo":mapping,"photo_usage":counts}
                 (OUT/"visual-plan.json").write_text(json.dumps(receipt,ensure_ascii=False,indent=2),encoding="utf-8")
                 return mapping
