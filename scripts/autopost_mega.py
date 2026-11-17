@@ -3867,7 +3867,7 @@ def main():
     print(f"🚀 autopost_mega.py v2.0 — SLOT {RUN_SLOT} | {now_kst().strftime('%Y-%m-%d %H:%M:%S')} KST")
     provider = "gemini"
     model = GEMINI_MODEL_PRIMARY
-    print(f"   UNIFIED_POLICY={UNIFIED_POLICY["version"]} | legacy text providers disabled")
+    print(f"   UNIFIED_POLICY={UNIFIED_POLICY['version']} | legacy text providers disabled")
     print(f"   AI: {provider}/{model} | SEO 목표: {SEO_TARGET}점 | 재생성: {MAX_REGEN}회")
     print(f"   ✅ 카테고리 생성 금지 — 기존 카테고리 중에서만 매칭 (pick_best_category)")
     print(f"   ✅ 27개 사이트별 독립 페르소나 (SITE_PERSONA)")
