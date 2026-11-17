@@ -778,10 +778,10 @@ def upload_private(video,meta,source_url):
                 break
         time.sleep(5)
     else:
-        raise RuntimeError("YouTube processing did not finish within 3 minutes; thumbnail was not applied")
+        log("YOUTUBE_PROCESSING_PENDING: private upload exists; skip thumbnail and verify upload receipt")
     thumbnail_status="not_set"
     thumbnail_error=""
-    for attempt in range(6):
+    for attempt in range(6) if saved and saved[0].get("contentDetails",{}).get("duration") not in (None, "P0D") else range(0):
         try:
             yt.thumbnails().set(videoId=video_id,media_body=MediaFileUpload(str(OUT/"cover.jpg"),mimetype="image/jpeg")).execute()
             thumbnail_status="api_set"
@@ -790,7 +790,7 @@ def upload_private(video,meta,source_url):
             thumbnail_error=f"{type(exc).__name__}: {str(exc)[:240]}"
             if attempt<5: time.sleep(10)
     if thumbnail_status!="api_set":
-        raise RuntimeError("Custom thumbnail application failed after retries: "+thumbnail_error)
+        log("THUMBNAIL_WARNING: private upload retained; "+(thumbnail_error or "YouTube processing pending"))
     saved=yt.videos().list(part="snippet,status,contentDetails",id=video_id).execute().get("items",[])
     if len(saved)!=1:
         raise RuntimeError("YouTube upload readback failed; receipt must be investigated before retry")
