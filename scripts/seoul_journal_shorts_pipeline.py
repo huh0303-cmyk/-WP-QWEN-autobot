@@ -177,7 +177,10 @@ def tts(text):
             for line in r.iter_lines(decode_unicode=True):
                 if not line or not line.startswith("data: "):
                     continue
-                event=json.loads(line.removeprefix("data: "))
+                try:
+                    event=json.loads(line.removeprefix("data: "))
+                except json.JSONDecodeError:
+                    continue
                 if event.get("audio_base64"):
                     audio_chunks.append(base64.b64decode(event["audio_base64"]))
                 if event.get("alignment") is not None:
@@ -215,7 +218,17 @@ def tts(text):
             p.write_bytes(b"".join(audio))
             (OUT/"tts-timeline.json").write_text(json.dumps({"engine":"edge_tts","segments":timeline},ensure_ascii=False,indent=2),encoding="utf-8")
             return timeline
-        edge_timeline=asyncio.run(save_edge())
+        edge_timeline=[]
+        for attempt in range(3):
+            try:
+                edge_timeline=asyncio.run(save_edge())
+                if p.exists() and p.stat().st_size >= 2000 and edge_timeline:
+                    break
+            except Exception as edge_exc:
+                if attempt == 2:
+                    raise
+                import time
+                time.sleep(2 * (attempt + 1))
         if p.exists() and p.stat().st_size >= 2000 and edge_timeline:
             log(f"TTS_ENGINE=edge_tts_timestamped voice={voice_name} voice_role={voice_role} segments={len(edge_timeline)} bytes={p.stat().st_size}")
             return p
