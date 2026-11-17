@@ -359,23 +359,44 @@ def build_caption_cues(timeline_path, max_chars=28, max_seconds=2.8):
     if not segments:
         raise RuntimeError("Timestamped narration has no segments; subtitle render blocked")
     narration=Path(timeline_path).with_name("narration.txt").read_text(encoding="utf-8")
+    # Fish timestamp text can omit punctuation, split words, or normalize spoken
+    # numerals. Never replace approved narration with unverified provider text.
     indices=[index for index,char in enumerate(narration) if char.isalnum()]
     normalized="".join(narration[index].casefold() for index in indices)
-    offset=0
-    source_start=0
-    for segment in segments:
-        spoken="".join(char.casefold() for char in segment["text"] if char.isalnum())
-        if not spoken:
-            segment["text"]=""
-            continue
-        if not normalized.startswith(spoken,offset):
-            raise RuntimeError("TTS boundary text differs from the approved narration; subtitle render blocked")
-        offset+=len(spoken)
-        source_end=indices[offset] if offset<len(indices) else len(narration)
-        segment["text"]=narration[source_start:source_end]
-        source_start=source_end
-    if offset!=len(normalized):
-        raise RuntimeError("TTS boundaries do not cover the approved narration; subtitle render blocked")
+    spoken_parts=["".join(c.casefold() for c in seg.get("text","") if c.isalnum()) for seg in segments]
+    combined="".join(spoken_parts)
+    if not normalized:
+        raise RuntimeError("Approved narration is empty; subtitles blocked")
+    if combined==normalized:
+        offset=0; source_start=0
+        for segment,spoken in zip(segments,spoken_parts):
+            if not spoken:
+                segment["text"]=""
+                continue
+            offset+=len(spoken)
+            source_end=indices[offset] if offset<len(indices) else len(narration)
+            segment["text"]=narration[source_start:source_end]
+            source_start=source_end
+    else:
+        # A provider transcription mismatch is not permission to invent subtitles.
+        # Fall back to the exact approved text and allocate its characters over the
+        # measured TTS segment durations. Preserve audio timing and log the drift.
+        import difflib
+        similarity=difflib.SequenceMatcher(None,normalized,combined,autojunk=False).ratio()
+        if similarity<0.85 or not combined:
+            raise RuntimeError(f"TTS transcript differs materially from approved narration (similarity={similarity:.3f}); subtitles blocked")
+        log(f"TTS_ALIGNMENT_FALLBACK similarity={similarity:.3f}; approved narration retained")
+        weights=[max(0.001,float(seg.get("end",0))-float(seg.get("start",0))) for seg in segments]
+        total=sum(weights); cumulative=0.0; source_start=0
+        for i,(segment,weight) in enumerate(zip(segments,weights)):
+            cumulative+=weight
+            char_end=round(len(indices)*cumulative/total)
+            char_end=max(char_end,0 if i==0 else previous_end)
+            char_end=min(len(indices),char_end)
+            source_end=indices[char_end] if char_end<len(indices) else len(narration)
+            segment["text"]=narration[source_start:source_end]
+            source_start=source_end
+            previous_end=char_end
     cues=[]; current=[]; cue_start=None; cue_end=None
     def clean_join(parts):
         value="".join(parts)
