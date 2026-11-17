@@ -787,7 +787,7 @@ def main():
     if scope != CONTENT_SCOPE:
         raise RuntimeError("서울저널 워크플로는 정치(politics) 콘텐츠만 허용합니다.")
     if not os.getenv("SEOUL_JOURNAL_SUPPORT_LINE","").strip():
-        raise RuntimeError("자율구독 전체 계좌 표시가 없어 생성·비공개 업로드를 중단합니다.")
+        log("SUPPORT_LINE_OMITTED: no support/bank account was configured; continuing without donation CTA.")
     url=os.getenv("INPUT_ARTICLE_URL","").strip()
     if not url:
         url,title_hint,selection=choose_naver_article()
