@@ -1,13 +1,12 @@
-name: "WordPress 25 — twice daily automatic"
+name: "WordPress — once daily automatic"
 
 on:
   schedule:
     - cron: "17 22 * * *"
-    - cron: "17 10 * * *"
   workflow_dispatch:
     inputs:
       slot:
-        description: "Optional single slot"
+        description: "Legacy compatibility; daily publication only"
         required: false
         type: choice
         options: ["", "am", "pm"]
@@ -26,8 +25,8 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  wordpress_am:
-    if: ${{ (github.event_name == 'schedule' && github.event.schedule == '17 22 * * *') || (github.event_name == 'workflow_dispatch' && (inputs.slot == '' || inputs.slot == 'am')) }}
+  wordpress_daily:
+    if: ${{ (github.event_name == 'schedule') || (github.event_name == 'workflow_dispatch') }}
     strategy:
       fail-fast: false
       max-parallel: 2
@@ -40,16 +39,3 @@ jobs:
       image_count: "1"
     secrets: inherit
 
-  wordpress_pm:
-    if: ${{ (github.event_name == 'schedule' && github.event.schedule == '17 10 * * *') || (github.event_name == 'workflow_dispatch' && inputs.slot == 'pm') }}
-    strategy:
-      fail-fast: false
-      max-parallel: 2
-      matrix:
-        site: ${{ fromJSON(inputs.target_site_url != '' && format('["{0}"]', inputs.target_site_url) || '["https://k-health365.com","https://koreamedicaltour.com","https://koreainvest365.com","https://koreainsurance365.com","https://kfinance365.com","https://koreataxnlaw.com","https://koreacrypto365.com","https://krealestate365.com","https://ktech365.com","https://kskin365.com","https://oliveyoungkorea.com","https://kworld365.com","https://k-trip365.com","https://k-visa365.com","https://koreawedding365.com","https://kstudy365.com","https://studyinkorea365.com","https://kieca-korea.org","https://ksa-korea.org","https://jobkorea365.com","https://jobinkorea365.com","https://jobkoreaglobal.com","https://korea365.org","https://koreanews365.com"]') }}
-    uses: ./.github/workflows/daily-network-publish.yml
-    with:
-      target_site_url: ${{ matrix.site }}
-      publication_approved: true
-      image_count: "1"
-    secrets: inherit
