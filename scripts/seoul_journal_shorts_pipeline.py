@@ -194,6 +194,14 @@ def tts(text):
             timeline=[row for row in timeline if row["text"] and row["end"]>row["start"]]
             if p.stat().st_size<2000 or not timeline:
                 raise RuntimeError("Fish Audio returned audio without usable timestamp alignment")
+            # Reject unusable provider transcripts before rendering; fall back to Edge.
+            # This preserves the approved narration and prevents fabricated subtitles.
+            import difflib
+            expected="".join(c.casefold() for c in text if c.isalnum())
+            actual="".join(c.casefold() for seg in timeline for c in seg["text"] if c.isalnum())
+            similarity=difflib.SequenceMatcher(None,expected,actual,autojunk=False).ratio() if expected and actual else 0.0
+            if similarity < 0.85:
+                raise RuntimeError(f"Fish timestamp transcript mismatch (similarity={similarity:.3f}); trying Edge TTS")
             (OUT/"tts-timeline.json").write_text(json.dumps({"engine":"fish_audio","segments":timeline},ensure_ascii=False,indent=2),encoding="utf-8")
             log(f"TTS_ENGINE=fish_audio_timestamped model=s2.1-pro-free voice_role={voice_role} segments={len(timeline)} bytes={p.stat().st_size}")
             return p
