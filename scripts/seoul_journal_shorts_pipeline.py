@@ -501,8 +501,11 @@ def render(headline, photo, audio, photos=None, poll_question="", poll_options=N
     probe = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", str(audio)], capture_output=True, text=True, check=True)
     duration = float(probe.stdout.strip())
     poll_seconds = 6.0
-    if duration/len(unique) < 1.5:
-        raise RuntimeError("Narration is too short to show five source images and the final poll screen")
+    # The minimum is five distinct source photos, not every downloaded candidate.
+    # The final poll is a separate six-second scene after narration.
+    required_photo_seconds = 5 * 1.5
+    if duration < required_photo_seconds:
+        raise RuntimeError(f"Narration is too short for five source images: {duration:.2f}s < {required_photo_seconds:.2f}s")
     frames = []
     cues=build_caption_cues(OUT/"tts-timeline.json")
     if cues[-1]["end"]>duration+0.5 or duration-cues[-1]["end"]>2.5:
