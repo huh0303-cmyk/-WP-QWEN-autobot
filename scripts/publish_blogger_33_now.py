@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Sequentially publish one public article to each of the 31 approved Blogger destinations."""
+"""Publish at most one verified article to each of 33 approved Blogger destinations."""
 from __future__ import annotations
 
 import html
@@ -26,7 +26,7 @@ from blogger_free_image import pick_image, insert_image
 from blogger_adsense_structure import rules_for, structure_issues
 from automation_hub.editorial_readability import format_article, validate_article_length
 
-RESULT = ROOT / "artifacts" / "blogger-31-public-results.json"
+RESULT = ROOT / "artifacts" / "blogger-33-public-results.json"
 
 
 def load_sites() -> list[dict]:
@@ -37,8 +37,8 @@ def load_sites() -> list[dict]:
         "theme": p["blogspot"].get("theme") or p["wordpress"]["theme"], "persona": p["blogspot"]["persona"],
         "tone": p["blogspot"]["tone"],
     } for p in profiles if p["blogspot"].get("ready_for_automation")]
-    if len(sites) != 31 or len({s["id"] for s in sites}) != 31 or len({s["url"].rstrip('/').lower() for s in sites}) != 31:
-        raise RuntimeError("scope guard: exactly 31 unique Blogger IDs and URLs are required")
+    if len(sites) != 33 or len({s["id"] for s in sites}) != 33 or len({s["url"].rstrip('/').lower() for s in sites}) != 33:
+        raise RuntimeError("scope guard: exactly 33 unique Blogger IDs and URLs are required")
     priority = {"kwellness_lab": 0, "kskin365": 1}
     return sorted(sites, key=lambda s: (priority.get(s["key"], 2), s["key"]))
 
@@ -158,6 +158,8 @@ def normalize_title(value: str) -> str:
 
 def main() -> int:
     draft_mode = os.environ.get("BLOGGER_REVIEW_DRAFT_MODE", "false").strip().lower() == "true"
+    if not draft_mode and os.environ.get("BLOGGER_33_BACKUP_AND_TEST_VERIFIED", "").strip() != "true":
+        raise SystemExit("BLOCKED: 33-site backups, ownership, OAuth and test publication must be verified before public publishing")
     run_key = os.environ.get("REVIEW_RUN_KEY" if draft_mode else "PUBLIC_RUN_KEY", "").strip()
     if not run_key:
         raise SystemExit("PUBLIC_RUN_KEY is required")
@@ -311,7 +313,7 @@ def main() -> int:
                         pass
                     ok = api_status == "LIVE" and bool(post.get("id"))
                     print(f"verify {site['key']}: public HTTP {check.status_code}, api status {api_status}")
-                results.append({"site": site["key"], "status": "published" if ok else "verification_failed", "image_engine": image_engine_used, "url": url, "post_id": post.get("id", ""), "http": check.status_code})
+                results.append({"site": site["key"], "status": "published" if ok else "verification_failed", "image_engine": (found or {}).get("provider", "none") if "found" in locals() else "none", "url": url, "post_id": post.get("id", ""), "http": check.status_code})
             failed = failed or not ok
         except Exception as exc:
             failed = True
