@@ -123,7 +123,7 @@ Provide 1-3 short, highly relevant labels only.{hint}"""
     if body_issues:
         raise RuntimeError("body quality gate: AI filler phrasing rejected: " + "; ".join(body_issues[:5]))
     visible_body = html.unescape(re.sub(r"<[^>]*>", " ", body))
-    visible_chars = len(re.sub(r"\\s+", "", visible_body))
+    visible_chars = len(re.sub(r"\s+", "", visible_body))
     if not (2500 <= visible_chars <= 4000):
         raise RuntimeError(f"body length quality gate: {visible_chars} visible characters; required 2500-4000")
     if not title or not (1 <= len(labels) <= 3):
