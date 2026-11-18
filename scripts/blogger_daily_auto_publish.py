@@ -49,6 +49,11 @@ def load_state() -> dict:
                 state['posted'] = []
             if state.get('date') != today:
                 state['posted'] = []
+                # Pending dispatches are day-scoped. Keeping yesterday's
+                # unverified requests forever silently disables future days.
+                # Today's public-feed reconciliation still runs before dispatch,
+                # preventing a second post when today's publication is visible.
+                state['pending'] = {}
             state.update(version=2, date=today)
             state.setdefault('pending', {})
             return state
