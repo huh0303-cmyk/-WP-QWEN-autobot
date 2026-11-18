@@ -1,0 +1,68 @@
+name: Blogger 33 - read-only ownership preflight
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify owned Blogger sites without modifying config
+        env:
+          BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
+          BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
+          BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
+        run: |
+          python - <<'PY'
+          import json,os,urllib.parse,urllib.request,urllib.error,sys
+          from pathlib import Path
+          config=json.loads(Path('config/blogger_portfolio.json').read_text(encoding='utf-8'))
+          channels=config.get('channels',[])
+          print('configured channels:',len(channels))
+          creds={k:os.getenv(k,'') for k in ('BLOGGER_GOOGLE_CLIENT_ID','BLOGGER_GOOGLE_CLIENT_SECRET','BLOGGER_GOOGLE_REFRESH_TOKEN')}
+          missing=[k for k,v in creds.items() if not v]
+          if missing:
+              print('Missing secret names:',', '.join(missing))
+              sys.exit(2)
+          form=urllib.parse.urlencode(dict(client_id=creds['BLOGGER_GOOGLE_CLIENT_ID'],client_secret=creds['BLOGGER_GOOGLE_CLIENT_SECRET'],refresh_token=creds['BLOGGER_GOOGLE_REFRESH_TOKEN'],grant_type='refresh_token')).encode()
+          try:
+              with urllib.request.urlopen(urllib.request.Request('https://oauth2.googleapis.com/token',data=form),timeout=25) as resp:
+                  token=json.load(resp)['access_token']
+              request=urllib.request.Request('https://www.googleapis.com/blogger/v3/users/self/blogs?maxResults=500',headers={'Authorization':'Bearer '+token})
+              with urllib.request.urlopen(request,timeout=30) as resp:
+                  owned=json.load(resp)
+          except urllib.error.HTTPError as e:
+              print('OAuth or Blogger API HTTP status:',e.code)
+              sys.exit(3)
+          except Exception as e:
+              print('Connection error type:',type(e).__name__)
+              sys.exit(3)
+          items=owned.get('items',[])
+          byurl={str(b.get('url','')).rstrip('/').lower():str(b.get('id','')) for b in items}
+          verified,missing_blogs=[],[]
+          for c in channels:
+              url=str(c.get('blogspot','')).rstrip('/').lower()
+              record={'order':c.get('order'),'title':c.get('title'),'url':url}
+              if url in byurl:
+                  record['blog_id']=byurl[url]
+                  verified.append(record)
+              else: missing_blogs.append(record)
+          configured={str(c.get('blogspot','')).rstrip('/').lower() for c in channels}
+          result={'configured_total':len(channels),'owned_total':len(items),'verified_count':len(verified),'missing_count':len(missing_blogs),'verified':verified,'missing':missing_blogs,'unregistered_owned':[{'url':u,'blog_id':b} for u,b in byurl.items() if u not in configured]}
+          Path('blogger_33_readonly_preflight.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          print('Verified:',len(verified),'Missing:',len(missing_blogs),'Unregistered owned:',len(result['unregistered_owned']))
+          if len(channels)!=33 or missing_blogs: sys.exit(4)
+          PY
+      - name: Upload inventory snapshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: blogger-33-readonly-preflight
+          path: blogger_33_readonly_preflight.json
+          if-no-files-found: ignore
+          retention-days: 7
