@@ -119,7 +119,7 @@ function platformCell(p){var m={youtube:['YouTube','youtube'],tiktok:['TikTok','
 function val(r,k){return Number.isFinite(r[k])?r[k]:null}
 var blogPlatform='wordpress';
 function blogPlatformOf(r){return String(r.platform||'').toLowerCase()==='newsroom'?'wordpress':String(r.platform||'').toLowerCase()}
-function isActiveBlogspot(r){return blogPlatformOf(r)==='blogspot' ? true : true;}
+function isActiveBlogspot(r){return true;}
 function visitorFor(r){var key=String(r.site||'').toLowerCase().replace(/^https?:\/\//,'').replace(/\/$/,'');return VISITOR_DATA&&VISITOR_DATA.sites?VISITOR_DATA.sites[key]||null:null}
 
 // Seven-day values are only shown when seven distinct daily observations exist.
