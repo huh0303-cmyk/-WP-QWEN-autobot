@@ -1,0 +1,51 @@
+name: Seoul Journal Shorts Cutter
+on:
+  workflow_dispatch:
+    inputs:
+      youtube_url:
+        description: YouTube source video URL
+        required: true
+        type: string
+      layout:
+        description: Vertical video layout
+        required: true
+        default: blur
+        type: choice
+        options:
+          - blur
+          - crop
+permissions:
+  contents: read
+jobs:
+  shorts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-noto-cjk
+      - name: Install Python dependencies
+        run: python -m pip install 'yt-dlp>=2025.1' 'faster-whisper>=1.1,<2' 'google-generativeai>=0.8,<1'
+      - name: Generate clips
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          YT_COOKIES: ${{ secrets.YT_COOKIES }}
+          VIDEO_URL: ${{ inputs.youtube_url }}
+          LAYOUT: ${{ inputs.layout }}
+        run: python shorts_cutter.py "$VIDEO_URL" --layout "$LAYOUT"
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: seoul-journal-shorts-${{ github.run_number }}
+          path: |
+            shorts_output/short_*.mp4
+            shorts_output/metadata.json
+            shorts_output/transcript.json
+          if-no-files-found: warn
+          retention-days: 7
