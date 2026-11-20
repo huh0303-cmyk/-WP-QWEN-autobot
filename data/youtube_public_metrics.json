@@ -1,5 +1,5 @@
 {
-  "checked_at_kst": "2026-11-19T12:18:55.849483+09:00",
+  "checked_at_kst": "2026-11-20T12:12:37.461545+09:00",
   "source": "YouTube Data API v3 public statistics",
   "confirmed_channels": 23,
   "connected_channels": 23,
@@ -88,24 +88,24 @@
       "name": "서울국제대학-TOPIK센터",
       "handle": "seoul_topik1",
       "subscribers": 5830,
-      "views": 414329,
-      "videos": 1347,
+      "views": 414451,
+      "videos": 1349,
       "connected": true
     },
     "UCrjkKWMHzAAvpLIFgHnwcWg": {
       "name": "English_SOS1",
       "handle": "english_sos1",
-      "subscribers": 33,
+      "subscribers": 34,
       "views": 19814,
-      "videos": 78,
+      "videos": 79,
       "connected": true
     },
     "UCOWoNH_d6p45ywQ6W0Z1Jng": {
       "name": "Japanese_SOS",
       "handle": "seoul_japanese1",
-      "subscribers": 26,
+      "subscribers": 27,
       "views": 16110,
-      "videos": 119,
+      "videos": 121,
       "connected": true
     },
     "UCGTd7RhfaUaGGbVRsNPUN6Q": {
@@ -152,7 +152,7 @@
       "name": "Health_Clinic_Japan",
       "handle": "Health_Clinic_Japan",
       "subscribers": 3,
-      "views": 112,
+      "views": 113,
       "videos": 23,
       "connected": true
     },
