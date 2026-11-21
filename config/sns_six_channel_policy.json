@@ -1,8 +1,8 @@
 {
   "version": 1,
   "effective_date": "2026-11-06",
-  "canonical_identity_map": "config/SNS_SIX_BRAND_IDENTITY_LOCK_2026-11-15.json",
-  "identity_precedence": "The canonical six-brand identity map controls display names and public handles across every SNS platform.",
+  "canonical_identity_map": "config/SNS_SIX_BRAND_IDENTITY_LOCK_2026-11-21.json",
+  "identity_precedence": "The 2026-11-21 canonical six-brand identity map controls display names and public handles. Conflicting legacy account rows in this file are historical operational slots and must not be used for login, connection, scheduling, or publication.",
   "timezone": "Asia/Seoul",
   "cadence": "1_public_post_per_account_per_day_after_publish_auth_verified",
   "schedule": {

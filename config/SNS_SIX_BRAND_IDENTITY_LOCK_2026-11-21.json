@@ -1,0 +1,157 @@
+{
+  "version": 2,
+  "effective_date": "2026-11-21",
+  "timezone": "Asia/Seoul",
+  "status": "current_authoritative_identity_map",
+  "supersedes": [
+    "config/SNS_SIX_BRAND_IDENTITY_LOCK_2026-11-15.json",
+    "Any active mapping that uses seoul_topik, english_pick1, japanese_pick, seoul_chris1, sis_topik, englishsurvival1, japanese_survival1, or seoul_item365 for the six-brand Instagram/Threads roster"
+  ],
+  "rules": {
+    "brand_count": 6,
+    "instagram_profile_count": 6,
+    "threads_profile_count": 6,
+    "instagram_and_threads_must_use_exact_current_handles": true,
+    "legacy_handle_substitution_forbidden": true,
+    "live_account_delete_move_separate_or_security_change_requires_owner_approval": true,
+    "public_publish_requires_exact_identity_write_authorization_and_receipt": true,
+    "backlog_cutoff_kst": "2026-11-21T00:00:00+09:00",
+    "pre_cutoff_missed_social_slots_must_not_be_backfilled": true
+  },
+  "brands": [
+    {
+      "order": 1,
+      "key": "korean_sos",
+      "display_name": "Korean SOS",
+      "instagram": {
+        "handle": "korean_sos1",
+        "profile_id": "17841410825136018",
+        "accounts_center_verified": true
+      },
+      "threads": {
+        "handle": "korean_sos1",
+        "profile_id": "17841443859544848",
+        "accounts_center_verified": true
+      },
+      "tiktok": {
+        "handle": "seoultopik",
+        "display_name": "KOREAN_SOS1",
+        "public_profile_verified": true,
+        "metricool_brand_id": "7080348"
+      },
+      "facebook": {
+        "display_name": "서울국제대학 SIS - TOPIK Center",
+        "profile_id": "61588777439380",
+        "page_asset_id": "1128119143729384",
+        "public_profile_verified": true,
+        "metricool_brand_id": "7080348"
+      }
+    },
+    {
+      "order": 2,
+      "key": "english_sos",
+      "display_name": "English SOS",
+      "instagram": {
+        "handle": "english_sos1",
+        "profile_id": "17841441355349874",
+        "accounts_center_verified": true
+      },
+      "threads": {
+        "handle": "english_sos1",
+        "public_profile_id": "49399536420",
+        "public_profile_verified": true,
+        "accounts_center_verified": false,
+        "blocker": "Standalone or legacy Meta login requires two-factor authentication; SMS did not arrive on 2026-11-21"
+      }
+    },
+    {
+      "order": 3,
+      "key": "japanese_sos",
+      "display_name": "Japanese SOS",
+      "instagram": {
+        "handle": "japanese_sos1",
+        "profile_id": "17841411813216531",
+        "accounts_center_verified": true
+      },
+      "threads": {
+        "handle": "japanese_sos1",
+        "profile_id": "17841413573916402",
+        "accounts_center_verified": true,
+        "interactive_login_verified": true
+      }
+    },
+    {
+      "order": 4,
+      "key": "chinese_sos",
+      "display_name": "Chinese SOS",
+      "instagram": {
+        "handle": "chinese.sos1",
+        "profile_id": "17841411010918367",
+        "accounts_center_verified": true
+      },
+      "threads": {
+        "handle": "chinese.sos1",
+        "profile_id": "17841478047108255",
+        "accounts_center_verified": true
+      }
+    },
+    {
+      "order": 5,
+      "key": "seoul_jisoo",
+      "display_name": "Seoul Jisoo",
+      "instagram": {
+        "handle": "seoul_jisoo1",
+        "profile_id": "17841404970616486",
+        "accounts_center_verified": true
+      },
+      "threads": {
+        "handle": "seoul_jisoo1",
+        "profile_id": "17841472145325611",
+        "accounts_center_verified": true
+      }
+    },
+    {
+      "order": 6,
+      "key": "seoul_journal",
+      "display_name": "서울저널",
+      "instagram": {
+        "handle": "seoul_journal1",
+        "profile_id": "17841449179626171",
+        "accounts_center_verified": true,
+        "public_profile_verified": true,
+        "public_profile_snapshot": "4 followers, 6 following, 1 post on 2026-11-21"
+      },
+      "threads": {
+        "handle": "seoul_journal1",
+        "public_profile_id": "55327914621",
+        "public_profile_verified": true,
+        "accounts_center_verified": false,
+        "blocker": "Standalone or legacy Meta login requires two-factor authentication; SMS did not arrive on 2026-11-21"
+      }
+    }
+  ],
+  "automation_connections": {
+    "metricool": {
+      "brand_id": "7080348",
+      "label": "Korean SOS | TOPIK",
+      "timezone": "Asia/Seoul",
+      "instagram": "korean_sos1",
+      "tiktok": "seoultopik",
+      "facebook_page_asset_id": "1128119143729384",
+      "threads": "No current six-brand Threads connection was returned by brand settings",
+      "read_checks_2026_11_21": "Facebook, Instagram, and TikTok best-time data reads succeeded",
+      "write_warning": "A 2026-11-05 job published Threads to legacy @englishsurvival1 and Instagram failed because the account was restricted; do not reuse it as a current 6+6 publishing proof"
+    },
+    "meta_business_suite": {
+      "currently_visible_asset": "Westlake Vietnam",
+      "currently_visible_asset_id": "103960881944000",
+      "warning": "This is not the Metricool-connected TOPIK Facebook page and must not be substituted"
+    },
+    "fikaclip": {
+      "plan": "Creator monthly",
+      "social_auto_upload_available": false,
+      "owner_decision": "Do not upgrade during the one-month Creator trial",
+      "pipeline_state": "Configured through review but not created; no destination connected and no credits spent"
+    }
+  }
+}

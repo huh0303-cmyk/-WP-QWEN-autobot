@@ -2,7 +2,8 @@
   "version": 1,
   "effective_date": "2026-11-15",
   "timezone": "Asia/Seoul",
-  "status": "current_authoritative_identity_map",
+  "status": "historical_superseded",
+  "superseded_by": "config/SNS_SIX_BRAND_IDENTITY_LOCK_2026-11-21.json",
   "supersedes": [
     "SNS structures that define more than the five approved operating brands",
     "Legacy TikTok handles sis_topik, sis_languagecenter, sis_languageccenter, and rosiespicks as public brand identities"

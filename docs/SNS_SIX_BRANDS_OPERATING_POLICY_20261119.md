@@ -32,5 +32,12 @@
 4. 예약/작업 성공 표시는 실제 게시 성공과 구분. 인증 실패·영상 실패·업로드 실패는 오류 사유를 남기고 무한 중복 재시도 금지.
 5. 이 문서는 정책 기록이며 자동화 코드, 인증, 예약, 게시 완료를 주장하지 않는다.
 
-## 확인된 연결 스냅샷 (2026-11-19)
-Metricool brand ID 7080348 (Korean SOS | TOPIK), timezone Asia/Seoul: Instagram korean_sos1, Threads korean_sos1, TikTok seoultopik, Facebook page ID 1128119143729384. 나머지 브랜드 연결 및 실제 발행 권한은 미검증. 이 스냅샷은 영구적 계정 보증이 아니다.
+## 현재 계정 기준 (2026-11-21 교정)
+
+현재 Instagram 6개와 Threads 6개의 정확한 이름·ID·계정 센터 차이·자동발행 연결 위험은 `docs/SNS_SIX_ACCOUNT_IDENTITY_AUDIT_2026-11-21.md`와 `config/SNS_SIX_BRAND_IDENTITY_LOCK_2026-11-21.json`을 단일 기준으로 사용한다.
+
+이전 `seoul_topik`, `english_pick1`, `japanese_pick`, `seoul_chris1` 중심 이름표는 현재 6+6 운영 매핑이 아니다. 실제 외부 계정은 삭제하지 않았고, 과거 감사 기록만 보존한다.
+
+Metricool brand ID `7080348`의 2026-11-21 확인값은 Instagram `korean_sos1`, TikTok `seoultopik`, Facebook page asset ID `1128119143729384`다. 현재 Threads 연결은 반환되지 않았다. 2026-11-05 옛 Threads `@englishsurvival1` 발행 기록은 현재 연결 증거가 아니며 재사용 금지다.
+
+미발행 적체를 뒤늦게 몰아 발행하지 않는다. 2026-11-21 00:00 KST 이전의 놓친 SNS 회차는 건너뛰고 오늘부터 새 기준으로 재시작한다.
