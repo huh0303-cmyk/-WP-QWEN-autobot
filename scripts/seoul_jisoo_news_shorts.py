@@ -18,11 +18,12 @@ from urllib.parse import urlencode, urlparse
 
 CHANNEL_ID = "UCAizx0tPkRSol8sIhanN_QQ"
 KST = dt.timezone(dt.timedelta(hours=9))
+# 2026-11-22: space-separated names were AND-ed by Google News -> 0 results -> 15 straight failures. Use OR groups.
 FEEDS = {
-    "politics": "한국 정치 이재명 한동훈 김민석 장동혁 오세훈 정청래 서영교 when:1d",
-    "society": "한국 사회 사건 사고 논란 속보 when:1d",
-    "sports": "한국시리즈 KBO MLB 한국 선수 경기 when:1d",
-    "shopping": "한국 쇼핑 신상품 품절 인기 아이템 when:1d",
+    "politics": "한국 정치 (이재명 OR 한동훈 OR 김민석 OR 장동혁 OR 오세훈 OR 정청래 OR 서영교) when:1d",
+    "society": "한국 사회 (사건 OR 사고 OR 논란 OR 속보) when:1d",
+    "sports": "(한국시리즈 OR KBO OR MLB) 한국 선수 경기 when:1d",
+    "shopping": "한국 쇼핑 (신상품 OR 품절 OR 인기) when:1d",
 }
 TRUSTED_SOURCES = {"연합뉴스","KBS뉴스","KBS","MBC","SBS","SBS 뉴스","JTBC","뉴스1","뉴시스","연합뉴스TV","YTN","조선일보","한겨레","스포츠조선","스포츠서울","스포티비뉴스","OSEN","네이버뉴스"}
 PERSONS = ("이재명","한동훈","김민석","장동혁","오세훈","정청래","서영교")
