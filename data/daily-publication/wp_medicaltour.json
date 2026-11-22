@@ -1,1 +1,1 @@
-{"day": "2026-11-21", "status": "DISPATCHED", "attempts": 1, "claim": "daily-2026-11-21-wp_medicaltour-8c22db99", "claimed_at": "2026-11-21T22:24:29.211974+09:00", "run_id": 44908724496, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-11-22", "status": "PUBLISHED", "public_url": "https://koreamedicaltour.com/administrative-protections-and-liability-coverage-for-international-patients-in-korea/", "published_at": "2026-11-22T11:57:52Z"}
