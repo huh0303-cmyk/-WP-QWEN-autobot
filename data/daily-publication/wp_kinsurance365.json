@@ -1,1 +1,1 @@
-{"day": "2026-11-20", "status": "DISPATCHED", "attempts": 2, "claim": "daily-2026-11-20-wp_kinsurance365-bf6487f9", "claimed_at": "2026-11-20T22:57:15.745567+09:00", "run_id": 44748887682, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-11-22", "status": "PUBLISHED", "public_url": "https://koreainsurance365.com/kb-insurance-foreign-resident-policies-qualification-criteria-supplemental-coverage-and-claims-filing-procedures/", "published_at": "2026-11-22T11:53:11Z"}
