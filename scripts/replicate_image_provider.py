@@ -46,6 +46,7 @@ MAX_POLL_SECONDS = 60
 _prompt_cache: dict[str, Optional[str]] = {}
 _attempted_prompts: set[str] = set()
 last_image_model = "none"
+_replicate_auth_failed = False
 
 
 def _token() -> str:
@@ -210,7 +211,7 @@ def _site_safe_image(url):
 
 def generate_image_url(subject: str, theme: str = "", *, mode: str = "auto") -> Optional[str]:
     """Exactly four stages: randomized free pair -> SDXL Turbo -> FLUX Schnell."""
-    global last_image_model
+    global last_image_model, _replicate_auth_failed
     last_image_model = "none"
     if mode == "none": return None
     if mode not in {"auto", "legacy", "auto_free", "replicate_sdxl", "replicate_flux", "pexels", "pixabay"}:
@@ -237,6 +238,9 @@ def generate_image_url(subject: str, theme: str = "", *, mode: str = "auto") -> 
             if not token:
                 print(f"image_engine_skipped={provider};reason=missing_token")
                 continue
+            if _replicate_auth_failed:
+                print(f"image_engine_skipped={provider};reason=REPLICATE_API_TOKEN_rejected_401_renew_secret_or_stay_free_only")
+                continue
             if cache_key in _prompt_cache and _prompt_cache[cache_key]:
                 last_image_model = "cached_image"
                 print("image_engine_used=cached_image")
@@ -256,6 +260,8 @@ def generate_image_url(subject: str, theme: str = "", *, mode: str = "auto") -> 
                     return url
         except Exception as exc:
             status = getattr(getattr(exc, "response", None), "status_code", None)
+            if status in (401, 403) and provider not in ("pexels", "pixabay"):
+                _replicate_auth_failed = True  # token is invalid; do not hit the paid API again this run
             print(f"image_engine_failed={provider};error={type(exc).__name__};http_status={status or 'n/a'}")
     print("image_engine_used=none;all_four_failed")
     return None

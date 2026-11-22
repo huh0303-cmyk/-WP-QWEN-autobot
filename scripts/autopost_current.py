@@ -80,7 +80,7 @@ def _readable_wp_post(site, title, body_html, meta, tags, faq, images, keyword, 
         count = validate_article_length(body_html)
     except ValueError as exc:
         return {"ok": False, "error": str(exc)}
-    print(f"EDITORIAL_LENGTH_OK: {count} characters (2500-4000)")
+    print(f"EDITORIAL_LENGTH_OK: {count} characters (accept 2500-4500, target 3000-3500)")
     body_html = format_article(body_html, site.get("url", ""), include_faq=False)
     return _original_wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, reporter, category_hint)
 

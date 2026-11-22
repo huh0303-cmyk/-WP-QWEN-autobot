@@ -120,7 +120,7 @@ def collect():
    row['status']=('오늘 발행 확인' if row['today']>= 1 else '목표까지 추가 발행 필요')
    if news:
     newsroom_hold=os.environ.get('NEWSROOM_COST_HOLD','true').strip().lower() not in {'false','0','no','off'}
-   row['next']='RSS 감지 중 · 유료 작성 승인 대기' if newsroom_hold else 'RSS 감지 중 · 검수 대기'
+    row['next']='RSS 감지 중 · 유료 작성 승인 대기' if newsroom_hold else 'RSS 감지 중 · 검수 대기'
    else:row['next']='무료 검수 원고 준비 필요 · 자동작성 복구 미완료'
   except Exception as e:row.update(status='확인 실패',error=type(e).__name__+': '+str(e)[:180])
   return row

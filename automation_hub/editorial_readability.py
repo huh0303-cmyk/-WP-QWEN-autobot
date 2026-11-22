@@ -6,8 +6,13 @@ Call validate_article_length on the article body BEFORE adding CTAs/affiliate co
 import html
 import re
 
+# Owner decision 2026-11-22: write for 3000-3500 visible characters, but accept
+# anything from 2500 to 4500 so a slightly long/short draft is published rather
+# than discarded.
 MIN_CHARS = 2500
-MAX_CHARS = 4000
+MAX_CHARS = 4500
+TARGET_MIN_CHARS = 3000
+TARGET_MAX_CHARS = 3500
 PALETTES = {
     "insurance": "#2563eb", "finance": "#1d4ed8", "invest": "#1d4ed8",
     "health": "#0f766e", "medical": "#0f766e", "skin": "#0f766e",

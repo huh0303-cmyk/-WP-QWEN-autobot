@@ -95,7 +95,7 @@ jobs:
             --title "$CONTENT_TITLE" \
             --url "$CONTENT_URL" \
             --summary "$CONTENT_SUMMARY" \
-            --mode "$CONTENT_MODE"
+            --mode "${CONTENT_MODE:-new}"
       - name: Upload destination queue and blockers
         uses: actions/upload-artifact@v4
         with:

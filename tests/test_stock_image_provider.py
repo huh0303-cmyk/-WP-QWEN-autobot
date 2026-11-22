@@ -97,3 +97,16 @@ def test_public_photo_credit_leak_detector():
     )
     assert stock.contains_public_photo_credit('<p class="photo-credit">Photo: Test / Pexels (License)</p>')
     assert not stock.contains_public_photo_credit("<p>Understanding Korea's industrial landscape.</p>")
+
+
+def test_relaxed_match_accepts_half_of_long_query_but_not_one_word():
+    # 4-term query: at least 2 terms must appear in the photo text.
+    assert stock.matches("Seoul apartment rental contract", "modern apartment interior in Seoul")
+    assert not stock.matches("Seoul apartment rental contract", "contract signing")
+    assert not stock.matches("Seoul skyline", "New York skyline")
+
+
+def test_condense_query_shortens_keyword_plus_title():
+    q = stock.condense_query("Korea tax filing foreigners Understanding the complete guide to filing your Korean income tax return as a foreign resident in 2026")
+    assert 0 < len(q) <= 60
+    assert len(q.split()) <= 5

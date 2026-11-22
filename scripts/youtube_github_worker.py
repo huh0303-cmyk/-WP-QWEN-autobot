@@ -269,10 +269,25 @@ def main() -> int:
         if not process_one():
             raise RuntimeError("GitHub worker did not claim the newly enqueued job")
         return 0
+    # 2026-11-22: one channel's job failing (e.g. the history channel finding no
+    # usable public-domain footage) must not stop every other queued channel.
+    # The failed job is already recorded (queue/failed + dashboard); move on to the next one.
+    failed_jobs = 0
     while True:
-        worked = process_one()
+        try:
+            worked = process_one()
+        except Exception as exc:
+            failed_jobs += 1
+            print(f"YOUTUBE_JOB_FAILED (continuing with next queued job): {type(exc).__name__}: {str(exc)[:300]}", flush=True)
+            if args.daemon:
+                time.sleep(3)
+                continue
+            if failed_jobs >= 5:
+                return 1
+            continue
         if not args.daemon:
-            return 0
+            # Exit non-zero only when jobs failed and nothing succeeded, so a red run still means "nothing published".
+            return 1 if (failed_jobs and not worked) else 0
         if not worked:
             time.sleep(3)
 

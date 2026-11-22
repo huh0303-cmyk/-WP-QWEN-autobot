@@ -48,9 +48,34 @@ def terms(text):
 
 
 def matches(subject, description):
+    """Topic relevance check.
+
+    2026-11-22: the old rule required EVERY query term to appear in the photo's
+    short alt/tag text, which almost never happens, so both free stages returned
+    nothing and articles went out image-less. Now short queries (1-2 terms) must
+    match fully, longer ones need at least half of their terms (minimum two).
+    A single shared word is never enough ("Seoul skyline" != "New York skyline").
+    """
     required = terms(subject)
-    # Never substitute a broad generic image for an unknown named subject.
-    return bool(required) and required <= terms(description)
+    if not required:
+        return False
+    hits = len(required & terms(description))
+    needed = len(required) if len(required) <= 2 else max(2, (len(required) + 1) // 2)
+    return hits >= needed
+
+
+def condense_query(query, max_terms=5):
+    """Reduce a long 'keyword + full title' string to a short, searchable query."""
+    words, seen = [], set()
+    for w in re.findall(r"[a-zA-Z0-9가-힣]+", query):
+        key = w.lower().rstrip("s")
+        if len(w) <= 2 or w.lower() in STOP or key in seen:
+            continue
+        seen.add(key)
+        words.append(w)
+        if len(words) >= max_terms:
+            break
+    return " ".join(words)
 
 
 def query_variants(query):
@@ -126,7 +151,12 @@ def find_stock_image(subject, theme="", *, force=False, selected_provider="auto"
         return None
     from editorial_topic_scope import stock_query
     query = " ".join(stock_query(subject, theme).split())
-    if not query or len(query) > 100 or not terms(query):
+    # Callers pass "keyword + full title"; searching with that whole string (and
+    # rejecting anything over 100 chars) meant the free stages never ran at all.
+    if len(query) > 100 or len(terms(query)) > 6:
+        query = condense_query(query)
+    if not query or not terms(query):
+        print("stock search skipped: no usable query terms")
         return None
     # 2026-11-10 user directive: keep a fixed stock-first order and do not add
     # Wikimedia or any other provider to the four-stage fallback chain.
@@ -178,6 +208,8 @@ def find_stock_image(subject, theme="", *, force=False, selected_provider="auto"
             # Never log the request URL: Pixabay's query includes its secret key.
             status = getattr(getattr(exc, "response", None), "status_code", None)
             print(f"stock search/hosting unavailable: {provider} ({type(exc).__name__}; http_status={status or 'n/a'})")
+            continue
+        print(f"stock search found no matching photo: {provider} query={query!r}")
     return None
 
 

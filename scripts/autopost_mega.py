@@ -3484,6 +3484,15 @@ def build_newsroom_meta(title, source_summary, lang):
     text = generate_content_gemini(prompt).strip().strip('"').strip("'")
     return re.sub(r'^META_DESC:\s*', '', text, flags=re.IGNORECASE).strip()[:180]
 
+# Owner decision 2026-11-22: aim for 3000-3500 visible characters, but publish
+# anything from 2500 to 4500. Drafts outside the accept range are regenerated
+# with explicit direction, then (if still too long) trimmed at a sentence end.
+WP_ACCEPT_MIN = 2500
+WP_ACCEPT_MAX = 4500
+WP_TARGET_MIN = 3000
+WP_TARGET_MAX = 3500
+_KOREANEWS_URLS = {"https://koreanews365.com", "http://koreanews365.com"}
+
 def process_one(site, keyword):
     from economy_text import begin_article
     begin_article()
@@ -3527,6 +3536,8 @@ def process_one(site, keyword):
     base_prompt=make_site_prompt(keyword,site,reporter,tag_count=tag_count,min_chars_override=min_chars)
     from editorial_title_gate import TITLE_RULE
     from automation_hub.repetition_guard import fetch_wp_history, history_prompt, repetition_issues, clean_opening
+    from automation_hub.repetition_guard import title_repeats as _title_repeats, plain as _plain_text
+    from automation_hub.editorial_language_policy import title_cliches as _title_cliches, scrub_body_cliches
     history = fetch_wp_history(requests, url, (WP_USER, os.getenv(site["wp_pass_env"], "")))
     base_prompt += "\nFINAL HEADLINE REQUIREMENTS:\n" + TITLE_RULE + "\n" + history_prompt(history)
     if mode in ("news", "news_en"):
@@ -3547,8 +3558,15 @@ def process_one(site, keyword):
         )
     from editorial_brief import editorial_brief
     base_prompt += editorial_brief(base_prompt)
+    if mode not in ("news", "news_en") and url.rstrip("/").lower() not in _KOREANEWS_URLS:
+        base_prompt += (
+            f"\n\nFINAL LENGTH RULE (overrides any earlier length instruction): the article body must be about "
+            f"{WP_TARGET_MIN}-{WP_TARGET_MAX} visible characters (HTML tags and spaces excluded). Under {WP_ACCEPT_MIN} or over "
+            f"{WP_ACCEPT_MAX} is rejected. Keep it to 5-6 focused H2 sections, no repetition, no filler, no recap of earlier sections."
+        )
     prompt=base_prompt
     best_score=0; best_result=None; best_length_valid=False
+    length_fallback=None
 
     for attempt in range(MAX_REGEN+1):
         # First draft uses the shared Flash-first writer; quality repair uses GPT.
@@ -3580,6 +3598,31 @@ def process_one(site, keyword):
 
         body = clean_opening(title, body)
         repeat_errors = repetition_issues(title, body, history)
+        if repeat_errors and title and all(
+                e.startswith(("TITLE_", "REPETITION: How-start", "REPETITION: headline frame")) for e in repeat_errors):
+            # Only the headline is the problem: rewrite just the headline instead of
+            # throwing away a good article (4 failed full rewrites used to block the day's post).
+            try:
+                _recent = "\n".join("- " + _plain_text(p.get("title", {}).get("rendered", "") if isinstance(p.get("title"), dict) else p.get("title", ""))
+                                    for p in history[:40])
+                _ask = ("Rewrite ONLY the headline of the article below. Output exactly one line: the new headline, nothing else. "
+                        "It must be specific to the article's real subject, 40-90 characters, in the same language as the current headline, "
+                        "must not start with How/Understanding/Navigating/Managing/A Guide to, must not contain a stock formula "
+                        "(Ultimate/Complete Guide, Everything You Need to Know, Top N tips, Demystifying, Deep Dive), and must not share a sentence frame "
+                        "with any recent headline listed.\n"
+                        f"Current headline: {title}\nProblems: {'; '.join(repeat_errors)[:400]}\n"
+                        f"Recent headlines:\n{_recent[:2500]}\nArticle opening: {_plain_text(body)[:600]}")
+                _new = (generate_content_gemini(_ask) or "").strip().splitlines()[0].strip().strip('"“”\'')
+                _new = re.sub(r"^(?:TITLE|Headline)\s*:\s*", "", _new, flags=re.I).strip()
+                _ok = (len(_new) >= 15 and not _title_cliches(_new) and not repetition_issues(_new, body, history))
+                if _ok:
+                    print(f"  ✏️ 제목만 재작성: {title!r} → {_new!r}")
+                    title = _new
+                    repeat_errors = []
+                else:
+                    print("  ⚠️ 제목 단독 재작성도 게이트 미통과 — 전체 재생성")
+            except Exception as _exc:
+                print(f"  ⚠️ 제목 단독 재작성 실패({type(_exc).__name__}) — 전체 재생성")
         if repeat_errors:
             print("REWRITE_REQUIRED " + "; ".join(repeat_errors))
             prompt = (base_prompt + "\nMANDATORY HEADLINE REPAIR: Start TITLE: with a specific subject relevant to this site's theme and the verified keyword, followed by a concrete outcome or comparison. Do not begin with How, Understanding, Managing, Navigating, Saving, Choosing, or any generic gerund. Do not copy the previous title structure. Preserve verifiable facts and write a fresh opening.\n" + "\n".join(repeat_errors))
@@ -3599,7 +3642,15 @@ def process_one(site, keyword):
         # NEWSROOM EXCEPTION: KoreaNews365 and The Seoul Journal are never
         # selected or rejected by article length. Prefer the strongest factual/SEO draft.
         else:
-            best_score=0; best_result=(body,title,meta,faq,tags)
+            _exempt_len = mode in ("news", "news_en") or url.rstrip("/").lower() in _KOREANEWS_URLS
+            _vlen = newsroom_char_count(body)
+            if _exempt_len or WP_ACCEPT_MIN <= _vlen <= WP_ACCEPT_MAX:
+                best_score=0; best_result=(body,title,meta,faq,tags)
+            else:
+                print(f"  📏 본문 {_vlen}자 — 허용 {WP_ACCEPT_MIN}-{WP_ACCEPT_MAX}자 밖, 재생성 필요")
+                # Keep the draft closest to the range as a last-resort fallback.
+                if length_fallback is None or abs(_vlen - WP_TARGET_MAX) < abs(length_fallback[5] - WP_TARGET_MAX):
+                    length_fallback=(body,title,meta,faq,tags,_vlen)
 
         if mode in ("news", "news_en") and best_result is not None:
             break
@@ -3610,11 +3661,11 @@ def process_one(site, keyword):
             # 부족 항목 진단
             issues=[]
             plain=re.sub(r'<[^>]+>','',body)
-            blen=len(plain.replace(' ','').replace('\n',''))
-            if mode not in ("news", "news_en") and blen<min_chars:
-                issues.append(f"본문 {blen}자→{min_chars}자 증량")
-            if mode not in ("news", "news_en") and max_chars and blen>max_chars:
-                issues.append(f"본문 {blen}자→{max_chars}자 이하로 축약")
+            blen=newsroom_char_count(body)
+            if mode not in ("news", "news_en") and blen<WP_ACCEPT_MIN:
+                issues.append(f"본문 {blen}자 → {WP_TARGET_MIN}~{WP_TARGET_MAX}자로 증량 (각 소제목 아래 실무 사례·조건을 보강)")
+            if mode not in ("news", "news_en") and blen>WP_ACCEPT_MAX:
+                issues.append(f"본문 {blen}자 → {WP_TARGET_MIN}~{WP_TARGET_MAX}자로 대폭 축약 (섹션 수를 줄이고 반복·군더더기 삭제, 절대 {WP_ACCEPT_MAX}자 초과 금지)")
             if mode not in ("news", "news_en"):
                 issues.append("통계·날짜·정책은 확인한 출처가 있는 사실만 사용. 점수를 위해 숫자나 출처를 만들지 말 것.")
                 if len(re.findall(r'<a\s+href=["\']https?://',body,re.IGNORECASE))<4: issues.append("내부링크 4개 이상")
@@ -3630,12 +3681,28 @@ def process_one(site, keyword):
             print(f"  🔄 재생성 ({attempt+2}회차)")
             time.sleep(5)
 
+    if best_result is None and length_fallback is not None:
+        _fb_body, _fb_title, _fb_meta, _fb_faq, _fb_tags, _fb_len = length_fallback
+        if _fb_len > WP_ACCEPT_MAX:
+            # Last resort: cut whole trailing text at a sentence boundary instead of
+            # losing the day's post. Only used after every regeneration overshot.
+            _trimmed = trim_newsroom_html(_fb_body, target_chars=WP_ACCEPT_MAX - 100)
+            _tlen = newsroom_char_count(_trimmed)
+            if WP_ACCEPT_MIN <= _tlen <= WP_ACCEPT_MAX:
+                print(f"  ✂️ 재생성 후에도 {_fb_len}자 — 문장 단위 절삭 {_fb_len}→{_tlen}자로 발행 진행")
+                best_result=(_trimmed,_fb_title,_fb_meta,_fb_faq,_fb_tags)
+        if best_result is None:
+            print(f"  ❌ 길이 {_fb_len}자 — 허용 {WP_ACCEPT_MIN}-{WP_ACCEPT_MAX}자 복구 실패, 발행 차단")
+            log(url,theme,keyword,_fb_title,"",0,0,"skip_wp_length",str(_fb_len))
+            return False
+
     if best_result is None:
         print(f"  ❌ {MAX_REGEN+1}회 시도 모두 제목 추출 실패 — 발행 차단")
         log(url,theme,keyword,"","",0,0,"❌ 제목 추출 실패","no valid title after all attempts")
         return False
 
     body,title,meta,faq,tags=best_result
+    body = scrub_body_cliches(body)  # drop removable AI lead-ins ("In conclusion,", "It's important to note that")
 
     # Koreanews365 uses the same 2,500–3,500 character publication standard as
     # the other WordPress sites. Run a dedicated fact-bounded expansion pass
@@ -3657,8 +3724,8 @@ def process_one(site, keyword):
     if url.rstrip("/").lower() == "https://kworld365.com":
         from automation_hub.repetition_guard import plain as _plain_article
         _length = len(re.sub(r"\\s+", "", _plain_article(body)))
-        if not 2500 <= _length <= 3500:
-            print(f"KWORLD_LENGTH_BLOCKED: {_length} characters; required 2500-3500")
+        if not WP_ACCEPT_MIN <= _length <= WP_ACCEPT_MAX:
+            print(f"KWORLD_LENGTH_BLOCKED: {_length} characters; required {WP_ACCEPT_MIN}-{WP_ACCEPT_MAX}")
             log(url, theme, keyword, title, "", 0, 0, "skip_kworld_length", str(_length))
             return False
     newsroom_len=newsroom_char_count(body)
@@ -3758,8 +3825,8 @@ def process_one(site, keyword):
     if is_koreanews365:
         print(f"WP_ARTICLE_LENGTH site={url} chars={_wp_visible_chars} gate=disabled_breaking_news")
     else:
-        print(f"WP_ARTICLE_LENGTH site={url} chars={_wp_visible_chars} required=2500-4000")
-        if not (2500 <= _wp_visible_chars <= 4000):
+        print(f"WP_ARTICLE_LENGTH site={url} chars={_wp_visible_chars} accept={WP_ACCEPT_MIN}-{WP_ACCEPT_MAX} target={WP_TARGET_MIN}-{WP_TARGET_MAX}")
+        if not (WP_ACCEPT_MIN <= _wp_visible_chars <= WP_ACCEPT_MAX):
             log(url, theme, keyword, title, "", 0, 0, "skip_wp_length", str(_wp_visible_chars))
             print(f"WP_LENGTH_BLOCKED: {_wp_visible_chars}; regeneration required before publication")
             return False

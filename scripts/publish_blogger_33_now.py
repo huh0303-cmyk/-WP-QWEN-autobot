@@ -18,7 +18,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 from blogger_free_text import blogger_generate_with_fallback  # noqa: E402
 from automation_hub.blogger_search_description import build_search_description, validate_search_description
-from automation_hub.editorial_language_policy import body_cliches, language_mismatch_fields, title_cliches
+from automation_hub.editorial_language_policy import body_cliches, language_mismatch_fields, title_cliches, scrub_body_cliches
 from automation_hub.kinvest_title_guard import kinvest_title_issues
 from review_sheet import append_review_rows
 from repair_blogger_images import stabilize_html_images
@@ -68,10 +68,10 @@ def strip_hangul_parentheticals(text: str) -> str:
 def generate(site: dict, hint: str = "", recent_titles: list[str] | None = None) -> tuple[str, str, list[str], str, str]:
     if str(site["language"]).lower().startswith("ko"):
         lang_rule = ("반드시 한국어로만 작성하세요. 제목·본문·소제목·라벨 전부 한글이어야 하며 영어 문장은 절대 쓰지 않습니다 "
-                     "(고유명사·약어만 예외). 본문 분량은 HTML 태그와 공백을 제외한 한글 2500~4000자. 영어로 쓰면 폐기됩니다. "
+                     "(고유명사·약어만 예외). 본문 분량은 HTML 태그와 공백을 제외한 한글 3000~3500자를 목표로 하고, 2500자 미만이나 4500자 초과는 폐기됩니다. 영어로 쓰면 폐기됩니다. "
                      "image_subject 만 영어 단어 2~5개로 씁니다.")
     else:
-        lang_rule = ("English: 2500-4000 visible characters excluding spaces and HTML tags (count them). For English articles use Latin script only: "
+        lang_rule = ("English: aim for 3000-3500 visible characters excluding spaces and HTML tags (count them); under 2500 or over 4500 is rejected. For English articles use Latin script only: "
                      "write Korean names and terms in romanization (e.g. Gyeongbokgung), with no Hangul characters anywhere in title, body or labels.")
     requested_topic = os.environ.get("BLOGGER_TOPIC_HINT", "").strip()
     topic = requested_topic or site["theme"]
@@ -119,13 +119,14 @@ Provide 1-3 short, highly relevant labels only.{hint}"""
     title_issues = title_cliches(title)
     if title_issues:
         raise RuntimeError("title quality gate: mass-produced/repetitive headline rejected: " + "; ".join(title_issues))
+    body = scrub_body_cliches(body)  # remove removable AI lead-ins before the hard gate
     body_issues = body_cliches(body)
     if body_issues:
         raise RuntimeError("body quality gate: AI filler phrasing rejected: " + "; ".join(body_issues[:5]))
     visible_body = html.unescape(re.sub(r"<[^>]*>", " ", body))
     visible_chars = len(re.sub(r"\s+", "", visible_body))
-    if not (2500 <= visible_chars <= 4000):
-        raise RuntimeError(f"body length quality gate: {visible_chars} visible characters; required 2500-4000")
+    if not (2500 <= visible_chars <= 4500):
+        raise RuntimeError(f"body length quality gate: {visible_chars} visible characters; required 2500-4500")
     if not title or not (1 <= len(labels) <= 3):
         raise RuntimeError("Gemini Flash output failed quality gate")
     issues = structure_issues(body, site["theme"], site["language"])
@@ -227,10 +228,17 @@ def main() -> int:
                     if not retriable or attempt == 3:
                         raise
                     print(f"generation retry {attempt + 1} for {site['key']}: {str(gate_exc)[:120]}")
-                    if "too short" in str(gate_exc):
-                        hint = ("\nIMPORTANT: your previous draft was too short (" + str(gate_exc).split("(")[-1].rstrip(")") +
-                                "). Write a clearly LONGER article: 2500-4000 visible characters in either language, "
+                    _msg = str(gate_exc)
+                    _m = _re.search(r"(\d{3,5}) (?:visible )?characters", _msg)
+                    _n = int(_m.group(1)) if _m else 0
+                    if ("ARTICLE_LENGTH_BLOCKED" in _msg or "length quality gate" in _msg) and _n and _n < 2500:
+                        hint = (f"\nIMPORTANT: your previous draft had only {_n} visible characters. Write a clearly LONGER article "
+                                "of 3000-3500 visible characters (excluding spaces and HTML) in either language, "
                                 "with fuller paragraphs of practical detail under every heading.")
+                    elif ("ARTICLE_LENGTH_BLOCKED" in _msg or "length quality gate" in _msg) and _n > 4500:
+                        hint = (f"\nIMPORTANT: your previous draft had {_n} visible characters, far too long. Rewrite it TIGHTER at "
+                                "3000-3500 visible characters (excluding spaces and HTML): fewer sections, no repetition, no filler. "
+                                "Never exceed 4500.")
                     else:
                         hint = "\nIMPORTANT: your previous draft failed a deterministic editorial quality gate. Correct this exact issue before returning new JSON: " + str(gate_exc) + ". Use a concrete subject-led title; never use a generic gerund opener or stock AI phrasing. Return one valid JSON object only."
             try:  # free image chain; failure must never block publication
