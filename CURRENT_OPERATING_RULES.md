@@ -13,9 +13,7 @@
 - The local PC must be powered on, connected, and authenticated for PC-bound tasks. Never describe this as 24/7 unattended server publishing.
 
 ## 2. Seoul Jisoo and Seoul Chris — current social policy
-- Instagram and Threads use the same five designated accounts: `seoul_topik`, `english_pick`, `japanese_pick`, `seoul_jisoo`, `seoul_chris`.
-- Seoul Jisoo: `@seoul_jisoo`, health and everyday-life stories plus broad political, social, economic, sports, entertainment, consumer, and trending topics. Health functional foods only when contextually relevant.
-- Seoul Chris: `@seoul_chris`, K-beauty, skincare, cosmetics, beauty trends, and selected broader popular issues. Relevant cosmetics only when contextually appropriate.
+- Instagram and Threads use the same six designated accounts (identical handles on both): `korean_sos1`, `english_sos1`, `japanese_sos1`, `chinese_sos1`, `seoul_jisoo1` (shopping channel), `seoul_journal1` (political shorts). Source of truth: config/SNS_SIX_BRAND_IDENTITY_LOCK_2026-11-21.json and config/meta_six_account_policy.json.
 - Seoul Jisoo: 3 distinct posts per day. Seoul Chris: 3 distinct posts per day.
 - Randomize each account's publication times daily within 08:00–23:00 KST, with at least 120 minutes between that account's posts.
 - Publish platform-native versions to Instagram and Threads; do not copy the same text verbatim.
@@ -53,10 +51,8 @@
 
 
 ## 7. Five-brand Facebook / Instagram / Threads update (2026-11-07)
-- Target brands: `seoul_topik`, `seoul_chris`, `seoul_jisoo`, `english_pick`, `japanese_pick`.
 - The shared content strategy and proposed Facebook Page rename mapping are documented in `config/meta_five_brand_social_strategy.json` and `docs/META_FIVE_BRAND_CONTENT_WORKFLOW_2026-11-07.md`.
 - All five brands may feature K-beauty, skincare, cosmetics, and health functional foods when relevant. Use politics, sports, society, economy, international news, entertainment, and timely topics for reach, with factual verification and clear separation of fact, allegation, and opinion.
 - Keep editorial value primary (80–90%); contextual commerce should not exceed 20%. Never force unrelated products into news posts. Use only verified affiliate links with disclosure.
 - Proposed Facebook Page renames follow the order in the owner's screenshot and are not applied. Confirm the row-by-row mapping before renaming.
-- Instagram currently shows `english_pick1`, while the requested brand is `english_pick`. Do not alter the API identity, user ID, token, or secret key until the owner confirms the actual username change.
 - The existing Meta preflight checks Instagram and Threads credential presence only. Facebook Page IDs, Page tokens, and write scopes must be verified separately. No actual publishing is enabled by this policy update.

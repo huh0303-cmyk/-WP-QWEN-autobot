@@ -82,11 +82,11 @@
     },
     {
       "key": "chinese_sos",
-      "handle": "chinese.sos1",
+      "handle": "chinese_sos1",
       "role": "chinese",
       "platform_handles": {
-        "instagram": "chinese.sos1",
-        "threads": "chinese.sos1"
+        "instagram": "chinese_sos1",
+        "threads": "chinese_sos1"
       },
       "topics": [
         "Chinese conversation from beginner to practical daily use"

@@ -166,8 +166,8 @@ KNOWN_HANDLES = {
     # 다른/빈 계정이라 실제로 못 씀)으로 개명. TikTok(sis_topik, 언더바 1개)이랑
     # 미묘하게 다른 철자니 주의. 표시이름("이름" 필드)은 아직 "Language center"인
     # 채로 남아있음 — 별도 수정 필요.
-    "instagram": {"TOPIK": "sis__topik", "ENGLISH": "sis_english1", "LANGUAGE": "sis_language365"},
-    "threads": {"TOPIK": "sis__topik", "ENGLISH": "sis_english1", "LANGUAGE": "sis_language"},
+    "instagram": {"TOPIK": "korean_sos1", "ENGLISH": "english_sos1", "LANGUAGE": "japanese_sos1"},
+    "threads": {"TOPIK": "korean_sos1", "ENGLISH": "english_sos1", "LANGUAGE": "japanese_sos1"},
     # 2026-08-06 페이스북 공개검색으로 3개 브랜드 페이지ID 전부 확인됨(핸들 없이 숫자ID URL 사용).
     "facebook_ids": {"TOPIK": "61588777439380", "ENGLISH": "61592457107609", "LANGUAGE": "61593057083167"},
     # 2026-08-06: TOPIK<->Language 사이에서 두 번 왔다갔다 하다가 최종 확정.

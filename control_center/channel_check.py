@@ -18,8 +18,8 @@ def install(app):
    note=f'영구 고정 10개 채널: {connected_count}개 기존 읽기 연결 정상, {len(d.get("youtube",[]))-connected_count}개 확인 필요. 채널 ID 기준이며 업로드·공개는 수행하지 않았습니다.'
   else:
    plans={
-    'instagram':[('SIS TOPIK','sis_topik1','한국어·TOPIK 교육'),('Rosie’s Picks','seoul_item365','뷰티·상품·생활용품'),('서울 라이프365','seoul_life365','지원금·여행·생활정보'),('서울 헬스365','seoul_health365','건강·식품 정보')],
-    'threads':[('Rosie’s Picks','seoul_item365','상품 발견 · 가벼운 말투'),('서울 라이프365','seoul_life365','생활·여행·검증된 화제'),('서울 헬스365','seoul_health365','건강·식품 정보')],
+    'instagram':[('Korean SOS','korean_sos1','Korean/TOPIK'),('English SOS','english_sos1','English'),('Japanese SOS','japanese_sos1','Japanese'),('Chinese SOS','chinese_sos1','Chinese'),('Seoul Jisoo','seoul_jisoo1','Shopping'),('Seoul Journal','seoul_journal1','Political shorts')],
+    'threads':[('Korean SOS','korean_sos1','Korean/TOPIK'),('English SOS','english_sos1','English'),('Japanese SOS','japanese_sos1','Japanese'),('Chinese SOS','chinese_sos1','Chinese'),('Seoul Jisoo','seoul_jisoo1','Shopping'),('Seoul Journal','seoul_journal1','Political shorts')],
     'tiktok':[('SIS TOPIK','sis_topik','한국어·TOPIK 교육'),('English Survival','','영어 서바이벌'),('언어교육 채널','','기타 언어 · 최신 채널 매핑 확인'),('Rosie’s Picks','','쇼핑 콘텐츠')],
     'facebook':[('TOPIK 페이지','','한국어·TOPIK 교육'),('기존 영어 페이지','','페이지 식별 후 운영 주제 대조'),('기존 Language 페이지','','라이프·상품 운영안과 페이지 매핑 대조')]}
    for name,handle,topic in plans[platform]:

@@ -7,7 +7,7 @@
 - VPS, SSH, Linux 서버, systemd, 서버 로컬 큐, 서버형 n8n을 London Project의 실행 경로로 사용하지 않는다.
 - SNS 계정 인증과 Instagram/Threads 게시 작업은 승인된 Windows 로컬 PC에서 Desktop Commander와 PowerShell 중심으로 수행한다.
 - GitHub는 코드·설정·운영지침·변경 이력의 기준 저장소이며, `control.korea365.org`는 GitHub Pages 운영 대시보드다.
-- 서울지수(@seoul_jisoo)와 서울크리스(@seoul_chris)는 Instagram·Threads 각각 하루 3개, 매일 08:00~23:00 KST 무작위 시각, 계정별 최소 120분 간격으로 운영한다.
+- seoul_jisoo1 (shopping) and seoul_journal1 (political shorts): 3 posts/day each on Instagram and Threads, random 08:00-23:00 KST, at least 120 minutes apart per account.
 - 재미·정보·공감 가치가 먼저다. 관련 쿠팡 파트너스 상품만 콘텐츠 마지막에 연결하며, 무관한 상품 링크는 넣지 않는다.
 - 네이버 검색 관심 키워드·뉴스를 확인하되, 실제 검색량 자료가 없으면 검색량 순위를 단정하지 않는다. 정치 이슈는 사실·주장·의견을 구분하고 스포츠 결과는 최신 자료로 검증한다.
 - 자세한 기준은 [CURRENT_OPERATING_RULES.md](CURRENT_OPERATING_RULES.md)와 [서울지수·서울크리스 편집 지침](docs/SEOUL_JISOO_CHRIS_EDITORIAL_POLICY_2026-11-06.md)을 따른다. 기존 문서의 상충하는 VPS 지침과 SNS 게시량은 이 규칙으로 대체한다.

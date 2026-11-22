@@ -1166,8 +1166,8 @@ def get_sns_data() -> list[dict[str, object]]:
     latest, previous = history.get("latest", {}), history.get("previous", {})
     handles = {
         "tiktok": {"TOPIK": "sis_topik"},
-        "instagram": {"TOPIK": "sis_topik1", "ENGLISH": "sis_english1", "LANGUAGE": "sis_language365"},
-        "threads": {"TOPIK": "sis__topik", "ENGLISH": "sis_english1", "LANGUAGE": "sis_language"},
+        "instagram": {"TOPIK": "korean_sos1", "ENGLISH": "english_sos1", "LANGUAGE": "japanese_sos1"},
+        "threads": {"TOPIK": "korean_sos1", "ENGLISH": "english_sos1", "LANGUAGE": "japanese_sos1"},
         "facebook": {"TOPIK": "61588777439380", "ENGLISH": "61592457107609", "LANGUAGE": "61593057083167"},
     }
     labels = {"tiktok": "TikTok", "instagram": "Instagram", "threads": "Threads", "facebook": "Facebook 페이지"}

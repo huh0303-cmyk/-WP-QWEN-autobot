@@ -79,7 +79,7 @@ Completion evidence should include:
 
 
 ## Instagram and Threads — Seoul Jisoo / Seoul Chris (2026-11-06)
-- Instagram and Threads use the same five designated handles: seoul_topik, english_pick, japanese_pick, seoul_jisoo, seoul_chris.
+- Instagram and Threads use the same six handles: korean_sos1, english_sos1, japanese_sos1, chinese_sos1, seoul_jisoo1 (shopping), seoul_journal1 (political shorts).
 - Seoul Jisoo and Seoul Chris each target 3 distinct posts per day, randomized within 08:00–23:00 KST, with at least 120 minutes between posts per account.
 - Jisoo covers health and broad political/social/economic/sports/entertainment/lifestyle hot issues; health functional foods only when relevant.
 - Chris covers K-beauty, skincare, cosmetics and broader popular trends; cosmetics only when relevant.

@@ -99,7 +99,7 @@ def test_worker_preserves_request_id_through_dispatch_and_polling(monkeypatch):
 def test_sns_buttons_use_known_destinations_without_claiming_automation():
     accounts = module.get_sns_data()
     topik = next(row for row in accounts if row['platform_key'] == 'instagram' and row['brand'] == 'TOPIK')
-    assert topik['url'] == 'https://www.instagram.com/sis_topik1/'
+    assert topik['url'] == 'https://www.instagram.com/korean_sos1/'
     assert all(row['url'].startswith('https://www.threads.com/@') for row in accounts if row['platform_key'] == 'threads')
     assert not any(row['publish_connected'] for row in accounts)
     assert not next(row for row in accounts if row['platform_key'] == 'tiktok' and row['brand'] == 'ENGLISH')['url']

@@ -11,7 +11,7 @@
 | Korean SOS | `@korean_sos1` | `17841410825136018` | Meta 계정 센터 |
 | English SOS | `@english_sos1` | `17841441355349874` | Meta 계정 센터 |
 | Japanese SOS | `@japanese_sos1` | `17841411813216531` | Meta 계정 센터 |
-| Chinese SOS | `@chinese.sos1` | `17841411010918367` | Meta 계정 센터 |
+| Chinese SOS | `@chinese_sos1` | `17841411010918367` | Meta 계정 센터 |
 | Seoul Jisoo | `@seoul_jisoo1` | `17841404970616486` | Meta 계정 센터 |
 | 서울저널 | `@seoul_journal1` | `17841449179626171` | Meta 계정 센터 + 공개 프로필 직접 확인 |
 
@@ -24,7 +24,7 @@
 | Korean SOS | `@korean_sos1` | Meta 계정 센터 표시, ID `17841443859544848` |
 | English SOS | `@english_sos1` | 공개 프로필 존재, 공개 ID `49399536420`; 현재 Meta 계정 센터에는 미표시 |
 | Japanese SOS | `@japanese_sos1` | Meta 계정 센터 표시, ID `17841413573916402`; 실제 로그인 성공 확인 |
-| Chinese SOS | `@chinese.sos1` | Meta 계정 센터 표시, ID `17841478047108255` |
+| Chinese SOS | `@chinese_sos1` | Meta 계정 센터 표시, ID `17841478047108255` |
 | Seoul Jisoo | `@seoul_jisoo1` | Meta 계정 센터 표시, ID `17841472145325611` |
 | 서울저널 | `@seoul_journal1` | 공개 프로필 존재, 공개 ID `55327914621`; 현재 Meta 계정 센터에는 미표시 |
 

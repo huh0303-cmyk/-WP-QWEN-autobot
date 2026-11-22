@@ -160,7 +160,7 @@ def main():
             "korean_sos1",
             "english_sos1",
             "japanese_sos1",
-            "chinese.sos1",
+            "chinese_sos1",
             "seoul_jisoo1",
             "seoul_journal1",
         ]
