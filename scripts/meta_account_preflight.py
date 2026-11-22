@@ -9,16 +9,16 @@ from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
 ROOT = Path(__file__).resolve().parents[1]
-POLICY = ROOT / "config" / "meta_five_account_daily_policy.json"
+POLICY = ROOT / "config" / "meta_six_account_policy.json"
 
 
 def load_policy():
     data = json.loads(POLICY.read_text(encoding="utf-8-sig"))
-    if len(data.get("accounts", [])) != 5:
-        raise ValueError("Policy must contain exactly five accounts")
+    if len(data.get("accounts", [])) != 6:
+        raise ValueError("Policy must contain exactly six accounts")
     handles = [a["handle"] for a in data["accounts"]]
     keys = [a["key"] for a in data["accounts"]]
-    if len(set(handles)) != 5 or len(set(keys)) != 5:
+    if len(set(handles)) != 6 or len(set(keys)) != 6:
         raise ValueError("Account handles and keys must be unique")
     if data["platforms"] != ["instagram", "threads"]:
         raise ValueError("Unexpected platform scope")
@@ -135,9 +135,9 @@ def readiness(data):
         for row in rows
     )
     return {
-        "account_count": 5,
+        "account_count": 6,
         "platform_count": 2,
-        "expected_connections": 10,
+        "expected_connections": 12,
         "identity_verified_connections": verified,
         "ready_connections": verified,
         "publish_enabled": False,
@@ -157,14 +157,15 @@ def main():
     data = load_policy()
     if args.self_test:
         assert [x["handle"] for x in data["accounts"]] == [
-            "seoul_topik",
-            "seoul_jisoo",
-            "seoul_chris1",
-            "english_pick1",
-            "japanese_pick",
+            "korean_sos1",
+            "english_sos1",
+            "japanese_sos1",
+            "chinese.sos1",
+            "seoul_jisoo1",
+            "seoul_journal1",
         ]
         assert data["authentication"]["publish_enabled"] is False
-        print("SELF_TEST=PASS; exact five handles; no publishing")
+        print("SELF_TEST=PASS; exact six handles; no publishing")
         return 0
 
     result = readiness(data)
@@ -172,7 +173,7 @@ def main():
     print(rendered)
     print(
         "STATUS=IDENTITY_VERIFIED_BUT_PUBLISHING_REMAINS_DISABLED"
-        if result["ready_connections"] == 10
+        if result["ready_connections"] == 12
         else "STATUS=BLOCKED_AUTH; no publishing attempted"
     )
     if args.report_path:
@@ -183,7 +184,7 @@ def main():
         report_path.write_text(rendered + "\n", encoding="utf-8")
         print("SANITIZED_REPORT_WRITTEN=" + str(report_path.relative_to(ROOT)))
 
-    return 0 if result["ready_connections"] == 10 else 1
+    return 0 if result["ready_connections"] == 12 else 1
 
 
 if __name__ == "__main__":

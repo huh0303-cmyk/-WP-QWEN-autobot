@@ -5,10 +5,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from meta_daily_schedule import plan
 
 class ScheduleTests(unittest.TestCase):
-    def test_thirty_unique_slots_and_three_per_connection(self):
+    def test_thirty_six_unique_slots_and_three_per_connection(self):
         slots = plan("2026-11-08")
-        self.assertEqual(len(slots), 30)
-        self.assertEqual(len({s["slot_id"] for s in slots}), 30)
+        self.assertEqual(len(slots), 36)
+        self.assertEqual(len({s["slot_id"] for s in slots}), 36)
         from collections import Counter
         self.assertEqual(set(Counter((s["platform"], s["account_key"]) for s in slots).values()), {3})
 

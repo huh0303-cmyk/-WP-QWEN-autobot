@@ -27,7 +27,7 @@ def test_instagram_login_identity_endpoint_and_fields(monkeypatch):
 
     def fake_urlopen(request, timeout):
         seen["url"] = request.full_url
-        return FakeResponse({"user_id": "111222333", "username": "english_pick1"})
+        return FakeResponse({"user_id": "111222333", "username": "english_sos1"})
 
     monkeypatch.setattr(preflight, "urlopen", fake_urlopen)
     result = preflight.verify_identity("instagram", "FAKE_INSTAGRAM_TOKEN")
@@ -38,7 +38,7 @@ def test_instagram_login_identity_endpoint_and_fields(monkeypatch):
     assert parse_qs(parsed.query)["fields"] == ["user_id,username"]
     assert result["status"] == "IDENTITY_RESPONSE_OK"
     assert result["resolved_user_id"] == "111222333"
-    assert result["resolved_username"] == "english_pick1"
+    assert result["resolved_username"] == "english_sos1"
 
 
 def test_threads_identity_endpoint_and_fields(monkeypatch):
@@ -46,7 +46,7 @@ def test_threads_identity_endpoint_and_fields(monkeypatch):
 
     def fake_urlopen(request, timeout):
         seen["url"] = request.full_url
-        return FakeResponse({"id": "444555666", "username": "japanese_pick"})
+        return FakeResponse({"id": "444555666", "username": "japanese_sos1"})
 
     monkeypatch.setattr(preflight, "urlopen", fake_urlopen)
     result = preflight.verify_identity("threads", "FAKE_THREADS_TOKEN")
@@ -57,7 +57,7 @@ def test_threads_identity_endpoint_and_fields(monkeypatch):
     assert parse_qs(parsed.query)["fields"] == ["id,username"]
     assert result["status"] == "IDENTITY_RESPONSE_OK"
     assert result["resolved_user_id"] == "444555666"
-    assert result["resolved_username"] == "japanese_pick"
+    assert result["resolved_username"] == "japanese_sos1"
 
 
 def test_readiness_derives_user_id_and_checks_exact_handle(monkeypatch):
@@ -65,7 +65,7 @@ def test_readiness_derives_user_id_and_checks_exact_handle(monkeypatch):
         preflight,
         "urlopen",
         lambda request, timeout: FakeResponse(
-            {"user_id": "111222333", "username": "english_pick1"}
+            {"user_id": "111222333", "username": "english_sos1"}
         ),
     )
     import os
@@ -73,7 +73,7 @@ def test_readiness_derives_user_id_and_checks_exact_handle(monkeypatch):
 
     with patch.dict(
         os.environ,
-        {"META_INSTAGRAM_ENGLISH_PICK1_ACCESS_TOKEN": "FAKE_TOKEN"},
+        {"META_INSTAGRAM_ENGLISH_SOS_ACCESS_TOKEN": "FAKE_TOKEN"},
         clear=True,
     ):
         result = preflight.readiness(preflight.load_policy())
@@ -81,11 +81,11 @@ def test_readiness_derives_user_id_and_checks_exact_handle(monkeypatch):
     assert result["ready_connections"] == 1
     row = next(
         x for x in result["connections"]
-        if x["platform"] == "instagram" and x["handle"] == "english_pick1"
+        if x["platform"] == "instagram" and x["handle"] == "english_sos1"
     )
     assert row["status"] == "IDENTITY_VERIFIED_WRITE_SCOPE_UNCONFIRMED"
     assert row["resolved_user_id"] == "111222333"
-    assert row["resolved_username"] == "english_pick1"
+    assert row["resolved_username"] == "english_sos1"
     assert result["publish_enabled"] is False
     assert result["publication_performed"] is False
     assert result["write_scope_verified"] is False
@@ -96,7 +96,7 @@ def test_wrong_handle_is_blocked(monkeypatch):
         preflight,
         "urlopen",
         lambda request, timeout: FakeResponse(
-            {"user_id": "111222333", "username": "not_english_pick1"}
+            {"user_id": "111222333", "username": "not_english_sos1"}
         ),
     )
     import os
@@ -104,14 +104,14 @@ def test_wrong_handle_is_blocked(monkeypatch):
 
     with patch.dict(
         os.environ,
-        {"META_INSTAGRAM_ENGLISH_PICK1_ACCESS_TOKEN": "FAKE_TOKEN"},
+        {"META_INSTAGRAM_ENGLISH_SOS_ACCESS_TOKEN": "FAKE_TOKEN"},
         clear=True,
     ):
         result = preflight.readiness(preflight.load_policy())
 
     row = next(
         x for x in result["connections"]
-        if x["platform"] == "instagram" and x["handle"] == "english_pick1"
+        if x["platform"] == "instagram" and x["handle"] == "english_sos1"
     )
     assert row["status"] == "HANDLE_MISMATCH"
     assert result["ready_connections"] == 0

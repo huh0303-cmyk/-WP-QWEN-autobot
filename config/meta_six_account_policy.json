@@ -1,0 +1,173 @@
+{
+  "schema_version": 2,
+  "effective_at_kst": "2026-11-22",
+  "owner_confirmation": "2026-11-22: owner finalized six brands; every legacy handle and name is removed",
+  "canonical_identity_map": "config/SNS_SIX_BRAND_IDENTITY_LOCK_2026-11-21.json",
+  "timezone": "Asia/Seoul",
+  "platforms": [
+    "instagram",
+    "threads"
+  ],
+  "daily_cadence": {
+    "target_per_account_per_platform": 3,
+    "random_window_kst": {
+      "start": "08:10",
+      "end": "22:50"
+    },
+    "minimum_gap_minutes": 15,
+    "publish_only_after_account_auth_and_content_review": true,
+    "owner_confirmation": "2026-11-07: all ten account-platform connections, three posts daily at randomized KST times"
+  },
+  "accounts": [
+    {
+      "key": "korean_sos",
+      "handle": "korean_sos1",
+      "role": "korean",
+      "platform_handles": {
+        "instagram": "korean_sos1",
+        "threads": "korean_sos1"
+      },
+      "topics": [
+        "Korean language for foreigners",
+        "TOPIK vocabulary and grammar",
+        "survival Korean phrases"
+      ],
+      "content_language": [
+        "ko",
+        "en"
+      ],
+      "editorial_rules": [
+        "Educational accuracy; distinguish TOPIK levels; give examples"
+      ]
+    },
+    {
+      "key": "english_sos",
+      "handle": "english_sos1",
+      "role": "english",
+      "platform_handles": {
+        "instagram": "english_sos1",
+        "threads": "english_sos1"
+      },
+      "topics": [
+        "English conversation from beginner to practical daily use"
+      ],
+      "content_language": [
+        "en",
+        "ko"
+      ],
+      "editorial_rules": [
+        "Short progressive lessons",
+        "Natural example sentences with Korean explanations"
+      ]
+    },
+    {
+      "key": "japanese_sos",
+      "handle": "japanese_sos1",
+      "role": "japanese",
+      "platform_handles": {
+        "instagram": "japanese_sos1",
+        "threads": "japanese_sos1"
+      },
+      "topics": [
+        "Japanese conversation from beginner to practical daily use"
+      ],
+      "content_language": [
+        "ja",
+        "ko"
+      ],
+      "editorial_rules": [
+        "Short progressive lessons",
+        "Include kana, natural examples and Korean explanations"
+      ]
+    },
+    {
+      "key": "chinese_sos",
+      "handle": "chinese.sos1",
+      "role": "chinese",
+      "platform_handles": {
+        "instagram": "chinese.sos1",
+        "threads": "chinese.sos1"
+      },
+      "topics": [
+        "Chinese conversation from beginner to practical daily use"
+      ],
+      "content_language": [
+        "zh",
+        "ko"
+      ],
+      "editorial_rules": [
+        "Short progressive lessons",
+        "Include pinyin, natural examples and Korean explanations"
+      ]
+    },
+    {
+      "key": "seoul_jisoo",
+      "handle": "seoul_jisoo1",
+      "role": "shopping",
+      "platform_handles": {
+        "instagram": "seoul_jisoo1",
+        "threads": "seoul_jisoo1"
+      },
+      "topics": [
+        "shopping picks: beauty, health, everyday items"
+      ],
+      "content_language": [
+        "ko"
+      ],
+      "editorial_rules": [
+        "Commercial claims and prices require current source verification",
+        "No health efficacy or guaranteed-effect claims"
+      ]
+    },
+    {
+      "key": "seoul_journal",
+      "handle": "seoul_journal1",
+      "role": "political_shorts",
+      "platform_handles": {
+        "instagram": "seoul_journal1",
+        "threads": "seoul_journal1"
+      },
+      "topics": [
+        "political and current-affairs shorts"
+      ],
+      "content_language": [
+        "ko"
+      ],
+      "editorial_rules": [
+        "Political claims require dated reliable sources and neutral framing"
+      ]
+    }
+  ],
+  "account_mapping": {
+    "instagram": "Each accounts[].handle is the exact Instagram handle",
+    "threads": "Threads uses the identical handle; no legacy substitution"
+  },
+  "authentication": {
+    "meta_app_name": "SIS Center Publisher",
+    "meta_app_id": "1383946033947009",
+    "instagram_login_type": "instagram",
+    "instagram_identity_endpoint": "https://graph.instagram.com/v25.0/me?fields=user_id,username",
+    "threads_identity_endpoint": "https://graph.threads.net/v1.0/me?fields=id,username",
+    "required_env_pattern": "META_{PLATFORM}_{ACCOUNT_KEY}_ACCESS_TOKEN",
+    "user_id_storage": "Resolved by read-only platform /me identity verification; optional GitHub environment variable for publisher use",
+    "token_storage": "GitHub Actions environment secrets or local secret store only; never repository files",
+    "state": "PENDING_ACCOUNT_BY_ACCOUNT_OAUTH_AND_WRITE_PERMISSION_VERIFICATION",
+    "publish_enabled": false
+  },
+  "scheduler": {
+    "workflow": ".github/workflows/meta-six-account-daily-preflight.yml",
+    "cron_utc": "10 0 * * *",
+    "purpose": "Daily readiness preflight only",
+    "publish_state": "BLOCKED_UNTIL_ALL_TWELVE_CONNECTIONS_VERIFIED"
+  },
+  "safety": {
+    "no_cross_account_substitution": true,
+    "no_publish_without_exact_account_identity_match": true,
+    "no_publish_without_platform_specific_write_scope": true,
+    "no_tokens_in_logs_or_git": true,
+    "require_public_post_url_for_success": true,
+    "no_duplicate_account_platform_local_date": false,
+    "no_cross_platform_verbatim_copy": true,
+    "no_duplicate_account_platform_local_date_slot": true
+  }
+}

@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def plan(day):
     date.fromisoformat(day)
-    policy = json.loads((ROOT / "config/meta_five_account_daily_policy.json").read_text(encoding="utf-8-sig"))
+    policy = json.loads((ROOT / "config/meta_six_account_policy.json").read_text(encoding="utf-8-sig"))
     slots = []
     # Separate morning, afternoon and evening windows avoid clustered posting.
     for platform in policy["platforms"]:
@@ -34,4 +34,4 @@ if __name__ == "__main__":
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps({"timezone": "Asia/Seoul", "slots": plan(args.date)}, indent=2)+"\n", encoding="utf-8")
-    print("PLANNED=30; PUBLICATION_PERFORMED=false")
+    print("PLANNED=36; PUBLICATION_PERFORMED=false")

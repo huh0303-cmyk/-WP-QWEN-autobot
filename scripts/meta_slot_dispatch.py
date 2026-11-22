@@ -9,7 +9,7 @@ from urllib.error import HTTPError
 ROOT = Path(__file__).resolve().parents[1]
 STATE = ROOT / "data/meta_publishing_receipts.json"
 KST = timezone(timedelta(hours=9))
-POLICY = json.loads((ROOT / "config/meta_five_account_daily_policy.json").read_text(encoding="utf-8-sig"))
+POLICY = json.loads((ROOT / "config/meta_six_account_policy.json").read_text(encoding="utf-8-sig"))
 sys.path.insert(0, str(ROOT / "scripts"))
 from meta_daily_schedule import plan
 
@@ -29,7 +29,7 @@ def generate(account, platform, slot):
     key = os.getenv("GEMINI_API_KEY", "")
     if not key: raise RuntimeError("GEMINI_API_KEY missing")
     # Never generate unsourced breaking news, politics, medical efficacy or prices.
-    if account["key"] in ("seoul_jisoo", "seoul_chris"):
+    if account["key"] in ("seoul_jisoo", "seoul_journal"):
         category = "timeless Korean skincare routines or everyday wellbeing; avoid medical and commercial claims"
     else:
         category = ", ".join(account["topics"])
