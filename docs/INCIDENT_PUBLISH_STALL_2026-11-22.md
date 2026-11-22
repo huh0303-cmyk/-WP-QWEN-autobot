@@ -38,3 +38,10 @@
 
 - 로컬: 변경 모듈 컴파일, 이미지 테스트 12개 통과, `editorial_gate_preflight` 통과. 전체 테스트는 변경 전에도 132건 실패(기존 낡은 테스트)였고 이번 변경으로 새 실패 없음.
 - 미검증: `autopost_mega.py`는 이 세션 환경 제약으로 로컬 컴파일을 못 했다. 실제 검증은 GitHub Actions 수동 실행과 게시 URL 확인으로만 가능.
+
+## 추가 기록 (2026-11-22 21:10 KST)
+- 코드: 길이 초과 시 LLM 압축 후 트림(condense-before-trim), 영어 사이트 본문의 한글 병기 괄호 제거, 스톡 이미지 검색어 변형 판정 개선(ab0a28c), 서울지수 뉴스 쇼츠 RSS 쿼리를 OR 그룹으로 교체(b64bcaf; 기존 AND 쿼리 0건 → OR 55건).
+- 검증(공개 REST 기준): 수동 재디스패치 후 WP 22개 사이트 중 20개가 2026-11-22 당일 신규 발행 확인. kworld365/k-health365는 1차 길이 게이트(5034/1889자)로 막혔으나 재시도에서 발행됨(LLM 편차; 재시도 필요).
+- 미해결(사람 조치): jobkorea365.com, kstudy365.com — 러너에서 NameResolutionError(도메인 DNS 미해석). 도메인 만료/네임서버 확인 필요.
+- 미해결(사람 조치): Meta 토큰 8건 만료·Threads 토큰 2건 누락, YouTube SOS 쇼츠 OAuth(unauthorized_client), REPLICATE_API_TOKEN 401, Blogger 33 게이트 변수, 쿠팡 주간 세트 만료(2026-11-19).
+- 미검증: Blogger 실발행, 무료 이미지 단계 실제 반환, YouTube 채널별 전수 점검, SNS 정리.
