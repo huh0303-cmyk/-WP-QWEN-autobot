@@ -3684,6 +3684,23 @@ def process_one(site, keyword):
     if best_result is None and length_fallback is not None:
         _fb_body, _fb_title, _fb_meta, _fb_faq, _fb_tags, _fb_len = length_fallback
         if _fb_len > WP_ACCEPT_MAX:
+            # Preferred repair: one condensing pass toward the 3000-3500 target that keeps
+            # headings, links and tables, so the ending is not chopped off.
+            try:
+                _cond = generate_content_gemini(
+                    f"Condense the following HTML article from about {_fb_len} to about {WP_TARGET_MAX - 200} visible characters "
+                    f"(HTML tags and spaces excluded). Keep every <h2> section, the table, the links and the factual claims; remove repetition, "
+                    f"filler and redundant examples. Keep the same language. Return ONLY the condensed HTML body, no commentary, no code fences.\n\n{_fb_body}")
+                _cond = re.sub(r"^```(?:html)?\s*|\s*```\s*$", "", (_cond or "").strip())
+                _clen = newsroom_char_count(_cond)
+                if WP_ACCEPT_MIN <= _clen <= WP_ACCEPT_MAX and len(re.findall(r"<h2[\s>]", _cond, re.I)) >= 3:
+                    print(f"  🗜 압축 재작성 {_fb_len}→{_clen}자")
+                    best_result=(_cond,_fb_title,_fb_meta,_fb_faq,_fb_tags)
+                else:
+                    print(f"  ⚠️ 압축 재작성 결과 부적합({_clen}자) — 문장 단위 절삭으로 진행")
+            except Exception as _exc:
+                print(f"  ⚠️ 압축 재작성 실패({type(_exc).__name__}) — 문장 단위 절삭으로 진행")
+        if best_result is None and _fb_len > WP_ACCEPT_MAX:
             # Last resort: cut whole trailing text at a sentence boundary instead of
             # losing the day's post. Only used after every regeneration overshot.
             _trimmed = trim_newsroom_html(_fb_body, target_chars=WP_ACCEPT_MAX - 100)
@@ -3703,6 +3720,12 @@ def process_one(site, keyword):
 
     body,title,meta,faq,tags=best_result
     body = scrub_body_cliches(body)  # drop removable AI lead-ins ("In conclusion,", "It's important to note that")
+    if lang != "ko":
+        # English sites must not show Hangul glosses such as "(가동 준비)" in title/body/meta.
+        _gloss = re.compile(r"\s*[\(（][^()（）]*[가-힣][^()（）]*[\)）]")
+        title = _gloss.sub("", title).strip()
+        body = _gloss.sub("", body)
+        meta = _gloss.sub("", meta).strip()
 
     # Koreanews365 uses the same 2,500–3,500 character publication standard as
     # the other WordPress sites. Run a dedicated fact-bounded expansion pass
