@@ -1,1 +1,1 @@
-{"day": "2026-11-22", "status": "DISPATCHED", "attempts": 1, "claim": "daily-2026-11-22-wp_koreataxlaw-d69a8495", "claimed_at": "2026-11-22T19:14:56.127150+09:00", "run_id": 45011527369, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-11-22", "status": "PUBLISHED", "public_url": "https://koreataxnlaw.com/korea-foreign-resident-worldwide-income-obligations-and-tax-residency-thresholds/", "published_at": "2026-11-22T11:42:29Z"}
