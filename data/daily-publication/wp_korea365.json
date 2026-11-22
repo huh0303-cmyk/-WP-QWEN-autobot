@@ -1,1 +1,1 @@
-{"day": "2026-11-22", "status": "DISPATCHED", "attempts": 1, "claim": "daily-2026-11-22-wp_korea365-67525e95", "claimed_at": "2026-11-22T20:45:32.431245+09:00", "run_id": 45018895548, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-11-22", "status": "PUBLISHED", "public_url": "https://korea365.org/foreign-resident-administrative-preparedness-amid-us-diplomatic-changes-and-trump-policy-updates/", "published_at": "2026-11-22T11:53:57Z"}
