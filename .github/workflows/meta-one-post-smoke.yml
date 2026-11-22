@@ -1,0 +1,38 @@
+name: Meta one Threads smoke post
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: META-SOCIAL
+    steps:
+      - name: Publish exactly one verified Threads text
+        env:
+          TOKEN: ${{ secrets.META_THREADS_SEOUL_TOPIK_ACCESS_TOKEN }}
+          USER_ID: ${{ secrets.META_THREADS_SEOUL_TOPIK_USER_ID || vars.META_THREADS_SEOUL_TOPIK_USER_ID }}
+        run: |
+          python - <<'PY'
+          import os,json,time,urllib.request,urllib.parse,urllib.error
+          token=os.getenv("TOKEN",""); uid=os.getenv("USER_ID","")
+          if not token or not uid.isdigit(): raise SystemExit("MISSING_AUTH")
+          base="https://graph.threads.net/v1.0/"
+          def api(url, fields=None):
+              data=urllib.parse.urlencode(fields).encode() if fields else None
+              req=urllib.request.Request(url,data=data,headers={"Authorization":"Bearer "+token},method="POST" if data else "GET")
+              with urllib.request.urlopen(req,timeout=35) as response: return json.load(response)
+          me=api(base+"me?fields=id,username")
+          if str(me.get("id"))!=uid or me.get("username","").lower()!="seoultopik": raise SystemExit("IDENTITY_MISMATCH")
+          caption="오늘의 한국어 한 문장 🇰🇷\n안녕하세요! = Hello!\n처음 만난 사람에게 쓰는 기본 인사입니다.\n#한국어 #LearnKorean #TOPIK"
+          container=api(base+uid+"/threads",{"media_type":"TEXT","text":caption})
+          if not container.get("id"): raise SystemExit("NO_CONTAINER")
+          time.sleep(5)
+          result=api(base+uid+"/threads_publish",{"creation_id":container["id"]})
+          pid=result.get("id")
+          if not pid: raise SystemExit("NO_PUBLISH_ID")
+          verified=api(base+str(pid)+"?fields=id,permalink")
+          print("POST_ID="+str(pid))
+          print("POST_URL="+str(verified.get("permalink","")))
+          if str(verified.get("id"))!=str(pid) or not verified.get("permalink","").startswith("https://"): raise SystemExit("PUBLISHED_BUT_URL_UNVERIFIED")
+          PY
