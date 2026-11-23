@@ -25,7 +25,6 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 if str(ROOT / "scripts") not in sys.path:
     sys.path.insert(0, str(ROOT / "scripts"))
-from openai_text import openai_available, openai_generate_text  # noqa: E402
 from replicate_image_provider import generate_image_url  # noqa: E402
 from stable_image_hosting import host_permanently, is_temporary  # noqa: E402
 from automation_hub.editorial_language_policy import body_cliches, title_cliches  # noqa: E402
@@ -205,16 +204,23 @@ def _consensus_issues(consensus: dict) -> list[str]:
 
 
 def _rewrite_after_consensus(draft: dict, job: dict, consensus: dict) -> dict:
-    """Use GPT only as the configured repair engine after a failed review."""
-    if not openai_available():
-        raise RuntimeError("GPT rewrite requested but OpenAI credentials are unavailable")
+    """Repair a draft that failed review, using the same free-tier chain as
+    the initial write (Gemini -> Groq -> OpenRouter -> Cerebras per the
+    publishing charter; no paid API). This used to require OpenAI
+    exclusively and therefore always raised in this project, since paid
+    providers stay off per policy -- every near-miss draft (e.g. a few
+    hundred characters under the length floor) was an unconditional total
+    failure with no actual repair attempt."""
     feedback = "\n".join(f"- {issue}" for issue in _consensus_issues(consensus))
     prompt = (
         f"{WRITER_SYSTEM_PROMPT}\n\n"
         "Revise the supplied draft so every reviewer issue is genuinely fixed. "
         "Keep the same site, language, search intent and allowed category. "
         "Remove clickbait, unsupported numbers, repetitive AI-like phrases and vague generalities. "
-        "Make the article practical and specific without inventing facts.\n\n"
+        "Make the article practical and specific without inventing facts. "
+        f"The body_html plain text must be at least {MIN_BODY_CHARS + 200} characters -- "
+        "if a reviewer issue mentions the article is too short, substantially expand the "
+        "existing sections with more concrete detail and examples rather than padding.\n\n"
         f"Site: {job['title']} ({job['language']})\n"
         f"Allowed categories: {', '.join(job['categories'])}\n"
         f"Seed topic: {job['seed_topic']}\n"
@@ -222,7 +228,8 @@ def _rewrite_after_consensus(draft: dict, job: dict, consensus: dict) -> dict:
         f"Current draft JSON:\n{json.dumps(draft, ensure_ascii=False)}\n\n"
         "Return only the corrected JSON object."
     )
-    parsed = _parse_json_response(openai_generate_text(prompt, temperature=0.35, max_retries=1))
+    import economy_text
+    parsed = _parse_json_response(economy_text.generate_text(prompt, temperature=0.35, language=job.get("language")))
     category = parsed.get("category")
     if category not in job["categories"]:
         category = draft["category"] if draft.get("category") in job["categories"] else job["categories"][0]
