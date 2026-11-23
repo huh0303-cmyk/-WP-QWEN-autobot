@@ -1219,3 +1219,12 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - 발행준비도 원장의 공개 테스트 증거는 현재 3/12: Instagram English SOS, Japanese SOS, Korean SOS. 남은 9개는 중국어·서울지수·서울저널 Instagram 및 6개 Threads이며, 아직 각 목적지의 신원/쓰기 권한과 공개 테스트 URL이 모두 검증되지 않았다.
 - `META_LIVE_PUBLISH=false`, `META_12_TARGETS_READY=false` 유지. 12개 전부 검증 전에는 10분 스케줄이 게시하지 않도록 잠겨 있다. 단체 발행을 시작할 수 있는 상태가 아니다.
 - 다음: 기존 승인된 범위에서 남은 계정의 정확한 토큰/ID 및 Threads 권한을 대조하고, 목적지별 단일 테스트를 완료해 URL 영수증을 등록한다. 두 게이트는 계속 false로 유지한다. 비밀 값은 기록하지 않는다.
+
+## 2026-11-23 21:28 KST — Seoul Journal Instagram test stopped before publishing
+
+- task_id: `meta-12-destination-publisher-20261123`
+- Already-authorized one-account test run `45174662670` targeted Instagram `seoul_journal1`. The workflow received that target's token and ID, and its exact Meta `/me` ID+handle comparison passed (otherwise the script would have stopped before the next step).
+- The script then failed while pushing its `ATTEMPT_RESERVED` readiness update to `main` (`git push origin HEAD:main`, exit 1). The failure occurred before any Instagram media container or publish API call. No Seoul Journal test post was sent and no reservation/URL was written to the remote readiness file.
+- The job log showed no target credentials configured in `META-SOCIAL` for Instagram Chinese SOS and Seoul Jisoo, and no Threads token/ID pairs for all six handles. Token values were masked; no values are recorded.
+- Current test receipts remain 3/12; both publisher gates remain false. Mass scheduling is still blocked.
+- Next: diagnose the Actions `main` push rejection and make the reservation/receipt write robust without bypassing branch protections; then resume the already-authorized Seoul Journal single test. Continue remaining target-specific setup; do not enable the schedule until 12/12 verified receipts exist.
