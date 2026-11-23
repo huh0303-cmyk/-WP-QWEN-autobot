@@ -79,7 +79,7 @@ Source of truth for handles/IDs: `config/SNS_SIX_BRAND_IDENTITY_LOCK_2026-11-21.
 - `korean_sos1` → `17841410825136018`
 - `seoul_journal1` → `17841449179626171`
 - `seoul_jisoo1` → `17841404970616486`
-- `japanese_sos1` → `17841441813216531` (see mismatch note above — confirm against what the
+- `japanese_sos1` → **ID mismatch unresolved**: Meta Developers API setup currently displays `17841411813216531`, while an earlier record listed `17841441813216531`. Do not save either ID as verified; generate/verify token and trust the `/me` response only.
   `/me` preflight resolves, not the legacy variable)
 - `english_sos1` → `17841441355349874`
 - `chinese.sos1` → not yet connected; will be assigned when added in step 5
