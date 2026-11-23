@@ -440,3 +440,11 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - Read-only inspection identified `클로드` as the existing app with Instagram API and Threads API use-case setup. In its Threads API permissions, `threads_basic` and `threads_content_publish` show “test ready” (0 API calls).
 - In its Instagram API permissions, `instagram_basic` and `instagram_manage_messages` show “test ready”; `instagram_content_publish` currently presents an “Add to App Review” action. The SEOUL TOPIK app was also development mode and did not show the same configured API sections in its sidebar.
 - No permission was added, no role changed, no token was issued, no GitHub secret was changed, and no post was attempted. The required next action before adding Instagram publishing access is action-time confirmation for the `instagram_content_publish` permission on app `2064957407740645`; afterwards continue with account authorization and token checks.
+
+
+## 2026-11-23 KST — Meta Unified Login configuration and roles audit
+
+- Follow-up for `task_id`: `meta-social-token-20261123-0800-kst`, app `클로드` (`2064957407740645`), SeoulTopik business portfolio (`2303233377081420`).
+- In the recommended Instagram API with Unified Login setup, Meta reports no compatible configuration. A new configuration requires an Instagram account and shows `instagram_content_publish`, `instagram_basic`, `instagram_manage_comments`, and `instagram_manage_messages`; ad-account permissions `ads_read` and `ads_management` are also listed as optional. Meta describes the generated system-user access token as non-expiring. The setup says each Instagram account needs the Instagram Tester role before token generation.
+- The legacy Instagram Login setup says it is no longer updated and also requires an Instagram Tester role. The app role list currently contains only the owner as Admin; Tester, Instagram Tester, and Threads Tester counts are zero. Threads API permissions `threads_basic` and `threads_content_publish` were previously shown as test-ready.
+- No configuration, role, permission, token, GitHub secret, or publication state was changed. Next step is action-time authorization for the exact Unified Login configuration and tester-role additions; select the narrowest available posting-only permissions and avoid optional ads, comments, or messaging access unless required and separately approved.
