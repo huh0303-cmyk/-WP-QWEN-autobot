@@ -25,7 +25,22 @@ from gsheets_direct import get_sheets_service
 
 
 def _run(command: list[str], env: dict[str, str], log_handle) -> None:
-    subprocess.run(command, cwd=ROOT, env=env, stdout=log_handle, stderr=subprocess.STDOUT, check=True)
+    try:
+        subprocess.run(command, cwd=ROOT, env=env, stdout=log_handle, stderr=subprocess.STDOUT, check=True)
+    except subprocess.CalledProcessError:
+        # 2026-11-23: the per-job log file is only visible later as a downloaded
+        # artifact, which has repeatedly left failures undiagnosable straight from
+        # the GitHub Actions run log. Echo the tail of this job's own log into the
+        # step's real stdout so the actual traceback shows up where it's seen first.
+        log_handle.flush()
+        try:
+            with open(log_handle.name, "r", encoding="utf-8", errors="replace") as f:
+                tail = f.readlines()[-80:]
+            print(f"----- tail of {log_handle.name} after failed command {command!r} -----", flush=True)
+            print("".join(tail), flush=True)
+        except OSError as exc:
+            print(f"(could not read {log_handle.name} for diagnostics: {exc})", flush=True)
+        raise
 
 
 def _state_path(group: str) -> Path:
