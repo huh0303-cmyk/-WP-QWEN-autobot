@@ -1120,3 +1120,16 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - 현재 저장소 준비도 기록: 2/12 목적지만 신원 확인(English Instagram, Korean Instagram), 1/12만 공개 테스트 URL 확인(English Instagram). 따라서 자동 발행은 의도적으로 차단 상태다.
 - 확인할 차단 항목: 나머지 10개 목적지의 실제 토큰/ID와 권한/테스트, Korean Instagram 쓰기 권한 및 테스트, Japanese SOS ID 불일치(`17841411813216531` 대 이전 `17841441813216531`), Threads 계정별 승인/토큰, 중국어 IG 앱 연결 상태.
 - 다음 단계: feature branch의 안전성/워크플로 정적 검토를 마치고 PR을 연다. PR 병합 후 Actions에서 계정별 read-only 사전검증과 1회 테스트를 진행할 수 있다. 12개 테스트가 전부 확인되기 전에는 `META_12_TARGETS_READY`를 켜지 않는다.
+
+
+## 2026-11-23 KST — Meta 12 Actions merged and Korean Instagram test verified
+
+- task_id: `meta-12-destination-publisher-20261123`
+- PR #289 merged to `main` as commit `7c849dabd95753772cbd84bad4a9d544dc3ad573`. The 12-destination workflows are now visible in GitHub Actions.
+- Reconciled actual `META-SOCIAL` environment: `META_LIVE_PUBLISH=false` and `META_12_TARGETS_READY=false`; verified manually in GitHub settings. Legacy dispatcher remains disabled. Automatic publishing remains blocked.
+- Corrected English SOS Instagram ID mapping: existing ID was stored as a Secret, while the new workflow reads it as an Environment variable. Added `META_INSTAGRAM_ENGLISH_SOS1_USER_ID` environment variable using the already recorded exact ID. No token value was exposed.
+- Read-only all-destination preflight run `45157747497` succeeded: English SOS Instagram and Korean SOS Instagram verified (2/12); the other ten destinations returned missing credentials. `PUBLISHING=NOT_ATTEMPTED` for this run.
+- Explicitly authorized one-account test workflow run `45157899793` published and verified Korean SOS Instagram. Public URL: `https://www.instagram.com/p/DgFLy1yG_7m/`. Readiness registry now records identity and write scope verified, plus the public test URL. No other destination was published.
+- Current readiness: 2/12 identities and write permissions verified; 2/12 destinations have public test URLs (English SOS Instagram and Korean SOS Instagram). Threads and remaining accounts are not ready. The scheduled workflow still requires all 12 rows and both false switches to be deliberately set true; neither switch was enabled.
+- The GitHub CLI local auth was expired/unavailable; the connected browser session was used for GitHub Actions UI dispatch. No credential was re-entered.
+- Next: match each remaining existing account token/ID to the workflow's exact `META_{PLATFORM}_{ACCOUNT}_ACCESS_TOKEN` Secret and `META_{PLATFORM}_{ACCOUNT}_USER_ID` Environment variable names, then run preflight and one test per destination. Do not enable live schedule until all 12 are verified.
