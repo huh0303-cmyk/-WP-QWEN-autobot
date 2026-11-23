@@ -1,13 +1,18 @@
 {
-  "generated_at": "2026-11-22 11:02:11",
-  "reference_date": "",
+  "generated_at": "2026-11-23 11:27:57",
+  "reference_date": "2026-11-22",
   "source": "verified previous-day site counters; stale platform snapshots are excluded",
   "sites": {
     "k-health365.com": {
-      "total_visitors": 18572,
+      "yesterday_visitors": 228,
+      "yesterday_delta": 65,
+      "reference_date": "2026-11-22",
+      "source": "verified site visitor counter",
+      "checked_at": "2026-11-23 11:27:57",
+      "total_visitors": 18766,
       "total_visitors_delta": null,
       "total_visitors_source": "authenticated WordPress site-stats counter",
-      "total_visitors_checked_at": "2026-11-21T12:04:05.055246+09:00",
+      "total_visitors_checked_at": "2026-11-22T11:01:32.313977+09:00",
       "daily_history": [
         {
           "date": "2026-11-08",
@@ -56,14 +61,23 @@
         {
           "date": "2026-11-20",
           "visitors": 213
+        },
+        {
+          "date": "2026-11-22",
+          "visitors": 228
         }
       ]
     },
     "koreamedicaltour.com": {
-      "total_visitors": 12719,
+      "yesterday_visitors": 160,
+      "yesterday_delta": 63,
+      "reference_date": "2026-11-22",
+      "source": "verified site visitor counter",
+      "checked_at": "2026-11-23 11:27:57",
+      "total_visitors": 12819,
       "total_visitors_delta": null,
       "total_visitors_source": "authenticated WordPress site-stats counter",
-      "total_visitors_checked_at": "2026-11-21T12:04:05.345422+09:00",
+      "total_visitors_checked_at": "2026-11-22T11:01:32.415410+09:00",
       "daily_history": [
         {
           "date": "2026-11-08",
@@ -112,14 +126,23 @@
         {
           "date": "2026-11-20",
           "visitors": 212
+        },
+        {
+          "date": "2026-11-22",
+          "visitors": 160
         }
       ]
     },
     "koreainvest365.com": {
-      "total_visitors": 21390,
+      "yesterday_visitors": 481,
+      "yesterday_delta": -347,
+      "reference_date": "2026-11-22",
+      "source": "verified site visitor counter",
+      "checked_at": "2026-11-23 11:27:57",
+      "total_visitors": 21953,
       "total_visitors_delta": null,
       "total_visitors_source": "authenticated WordPress site-stats counter",
-      "total_visitors_checked_at": "2026-11-21T12:04:05.362311+09:00",
+      "total_visitors_checked_at": "2026-11-22T11:01:32.532053+09:00",
       "daily_history": [
         {
           "date": "2026-11-08",
@@ -168,14 +191,23 @@
         {
           "date": "2026-11-20",
           "visitors": 638
+        },
+        {
+          "date": "2026-11-22",
+          "visitors": 481
         }
       ]
     },
     "koreainsurance365.com": {
-      "total_visitors": 18702,
+      "yesterday_visitors": 487,
+      "yesterday_delta": -168,
+      "reference_date": "2026-11-22",
+      "source": "verified site visitor counter",
+      "checked_at": "2026-11-23 11:27:57",
+      "total_visitors": 19259,
       "total_visitors_delta": null,
       "total_visitors_source": "authenticated WordPress site-stats counter",
-      "total_visitors_checked_at": "2026-11-21T12:04:05.143686+09:00",
+      "total_visitors_checked_at": "2026-11-22T11:01:32.425280+09:00",
       "daily_history": [
         {
           "date": "2026-11-08",
@@ -224,14 +256,23 @@
         {
           "date": "2026-11-20",
           "visitors": 564
+        },
+        {
+          "date": "2026-11-22",
+          "visitors": 487
         }
       ]
     },
     "kfinance365.com": {
-      "total_visitors": 23154,
+      "yesterday_visitors": 459,
+      "yesterday_delta": -184,
+      "reference_date": "2026-11-22",
+      "source": "verified site visitor counter",
+      "checked_at": "2026-11-23 11:27:57",
+      "total_visitors": 23672,
       "total_visitors_delta": null,
       "total_visitors_source": "authenticated WordPress site-stats counter",
-      "total_visitors_checked_at": "2026-11-21T12:04:04.956681+09:00",
+      "total_visitors_checked_at": "2026-11-22T11:01:32.548677+09:00",
       "daily_history": [
         {
           "date": "2026-11-08",
@@ -280,14 +321,23 @@
         {
           "date": "2026-11-20",
           "visitors": 390
+        },
+        {
+          "date": "2026-11-22",
+          "visitors": 459
         }
       ]
     },
     "koreataxnlaw.com": {
-      "total_visitors": 11277,
+      "yesterday_visitors": 278,
+      "yesterday_delta": 124,
+      "reference_date": "2026-11-22",
+      "source": "verified site visitor counter",
+      "checked_at": "2026-11-23 11:27:57",
+      "total_visitors": 11445,
       "total_visitors_delta": null,
       "total_visitors_source": "authenticated WordPress site-stats counter",
-      "total_visitors_checked_at": "2026-11-21T12:04:05.436383+09:00",
+      "total_visitors_checked_at": "2026-11-22T11:01:32.448716+09:00",
       "daily_history": [
         {
           "date": "2026-11-08",
@@ -336,14 +386,23 @@
         {
           "date": "2026-11-20",
           "visitors": 293
+        },
+        {
+          "date": "2026-11-22",
+          "visitors": 278
         }
       ]
     },
     "koreacrypto365.com": {
-      "total_visitors": 15114,
+      "yesterday_visitors": 282,
+      "yesterday_delta": 131,
+      "reference_date": "2026-11-22",
+      "source": "verified site visitor counter",
+      "checked_at": "2026-11-23 11:27:57",
+      "total_visitors": 15328,
       "total_visitors_delta": null,
       "total_visitors_source": "authenticated WordPress site-stats counter",
-      "total_visitors_checked_at": "2026-11-21T12:04:05.360393+09:00",
+      "total_visitors_checked_at": "2026-11-22T11:01:32.728930+09:00",
       "daily_history": [
         {
           "date": "2026-11-08",
@@ -392,14 +451,23 @@
         {
           "date": "2026-11-20",
           "visitors": 252
+        },
+        {
+          "date": "2026-11-22",
+          "visitors": 282
         }
       ]
     },
     "krealestate365.com": {
-      "total_visitors": 11151,
+      "yesterday_visitors": 306,
+      "yesterday_delta": 179,
+      "reference_date": "2026-11-22",
+      "source": "verified site visitor counter",
+      "checked_at": "2026-11-23 11:27:57",
+      "total_visitors": 11380,
       "total_visitors_delta": null,
       "total_visitors_source": "authenticated WordPress site-stats counter",
-      "total_visitors_checked_at": "2026-11-21T12:04:07.035890+09:00",
+      "total_visitors_checked_at": "2026-11-22T11:01:34.163435+09:00",
       "daily_history": [
         {
           "date": "2026-11-08",
@@ -448,14 +516,23 @@
         {
           "date": "2026-11-20",
           "visitors": 230
+        },
+        {
+          "date": "2026-11-22",
+          "visitors": 306
         }
       ]
     },
     "ktech365.com": {
-      "total_visitors": 20589,
+      "yesterday_visitors": 260,
+      "yesterday_delta": 44,
+      "reference_date": "2026-11-22",
+      "source": "verified site visitor counter",
+      "checked_at": "2026-11-23 11:27:57",
+      "total_visitors": 20802,
       "total_visitors_delta": null,
       "total_visitors_source": "authenticated WordPress site-stats counter",
-      "total_visitors_checked_at": "2026-11-21T12:04:07.783691+09:00",
+      "total_visitors_checked_at": "2026-11-22T11:01:34.603527+09:00",
       "daily_history": [
         {
           "date": "2026-11-08",
@@ -504,14 +581,23 @@
         {
           "date": "2026-11-20",
           "visitors": 227
+        },
+        {
+          "date": "2026-11-22",
+          "visitors": 260
         }
       ]
     },
     "kskin365.com": {
-      "total_visitors": 18011,
+      "yesterday_visitors": 256,
+      "yesterday_delta": -65,
+      "reference_date": "2026-11-22",
+      "source": "verified site visitor counter",
+      "checked_at": "2026-11-23 11:27:57",
+      "total_visitors": 18287,
       "total_visitors_delta": null,
       "total_visitors_source": "authenticated WordPress site-stats counter",
-      "total_visitors_checked_at": "2026-11-21T12:04:08.291260+09:00",
+      "total_visitors_checked_at": "2026-11-22T11:01:35.229161+09:00",
       "daily_history": [
         {
           "date": "2026-11-08",
@@ -560,14 +646,23 @@
         {
           "date": "2026-11-20",
           "visitors": 245
+        },
+        {
+          "date": "2026-11-22",
+          "visitors": 256
         }
       ]
     },
     "oliveyoungkorea.com": {
-      "total_visitors": 18373,
+      "yesterday_visitors": 267,
+      "yesterday_delta": 97,
+      "reference_date": "2026-11-22",
+      "source": "verified site visitor counter",
+      "checked_at": "2026-11-23 11:27:57",
+      "total_visitors": 18568,
       "total_visitors_delta": null,
       "total_visitors_source": "authenticated WordPress site-stats counter",
-      "total_visitors_checked_at": "2026-11-21T12:04:10.448015+09:00",
+      "total_visitors_checked_at": "2026-11-22T11:01:37.712084+09:00",
       "daily_history": [
         {
           "date": "2026-11-08",
@@ -616,14 +711,23 @@
         {
           "date": "2026-11-20",
           "visitors": 293
+        },
+        {
+          "date": "2026-11-22",
+          "visitors": 267
         }
       ]
     },
     "kworld365.com": {
-      "total_visitors": 21340,
+      "yesterday_visitors": 281,
+      "yesterday_delta": -192,
+      "reference_date": "2026-11-22",
+      "source": "verified site visitor counter",
+      "checked_at": "2026-11-23 11:27:57",
+      "total_visitors": 21662,
       "total_visitors_delta": null,
       "total_visitors_source": "authenticated WordPress site-stats counter",
-      "total_visitors_checked_at": "2026-11-21T12:04:08.108959+09:00",
+      "total_visitors_checked_at": "2026-11-22T11:01:37.568651+09:00",
       "daily_history": [
         {
           "date": "2026-11-08",
@@ -672,14 +776,23 @@
         {
           "date": "2026-11-20",
           "visitors": 277
+        },
+        {
+          "date": "2026-11-22",
+          "visitors": 281
         }
       ]
     },
     "k-trip365.com": {
-      "total_visitors": 15940,
+      "yesterday_visitors": 280,
+      "yesterday_delta": 38,
+      "reference_date": "2026-11-22",
+      "source": "verified site visitor counter",
+      "checked_at": "2026-11-23 11:27:57",
+      "total_visitors": 16214,
       "total_visitors_delta": null,
       "total_visitors_source": "authenticated WordPress site-stats counter",
-      "total_visitors_checked_at": "2026-11-21T12:04:08.574745+09:00",
+      "total_visitors_checked_at": "2026-11-22T11:01:35.712881+09:00",
       "daily_history": [
         {
           "date": "2026-11-08",
@@ -728,14 +841,23 @@
         {
           "date": "2026-11-20",
           "visitors": 221
+        },
+        {
+          "date": "2026-11-22",
+          "visitors": 280
         }
       ]
     },
     "k-visa365.com": {
-      "total_visitors": 9178,
+      "yesterday_visitors": 197,
+      "yesterday_delta": 7,
+      "reference_date": "2026-11-22",
+      "source": "verified site visitor counter",
+      "checked_at": "2026-11-23 11:27:57",
+      "total_visitors": 9424,
       "total_visitors_delta": null,
       "total_visitors_source": "authenticated WordPress site-stats counter",
-      "total_visitors_checked_at": "2026-11-21T12:04:08.515993+09:00",
+      "total_visitors_checked_at": "2026-11-22T11:01:35.232686+09:00",
       "daily_history": [
         {
           "date": "2026-11-08",
@@ -784,14 +906,23 @@
         {
           "date": "2026-11-20",
           "visitors": 58
+        },
+        {
+          "date": "2026-11-22",
+          "visitors": 197
         }
       ]
     },
     "koreawedding365.com": {
-      "total_visitors": 24975,
+      "yesterday_visitors": 437,
+      "yesterday_delta": 154,
+      "reference_date": "2026-11-22",
+      "source": "verified site visitor counter",
+      "checked_at": "2026-11-23 11:27:57",
+      "total_visitors": 25184,
       "total_visitors_delta": null,
       "total_visitors_source": "authenticated WordPress site-stats counter",
-      "total_visitors_checked_at": "2026-11-21T12:04:09.434692+09:00",
+      "total_visitors_checked_at": "2026-11-22T11:01:36.254390+09:00",
       "daily_history": [
         {
           "date": "2026-11-08",
@@ -840,14 +971,23 @@
         {
           "date": "2026-11-20",
           "visitors": 418
+        },
+        {
+          "date": "2026-11-22",
+          "visitors": 437
         }
       ]
     },
     "studyinkorea365.com": {
-      "total_visitors": 14763,
+      "yesterday_visitors": 357,
+      "yesterday_delta": 101,
+      "reference_date": "2026-11-22",
+      "source": "verified site visitor counter",
+      "checked_at": "2026-11-23 11:27:57",
+      "total_visitors": 15081,
       "total_visitors_delta": null,
       "total_visitors_source": "authenticated WordPress site-stats counter",
-      "total_visitors_checked_at": "2026-11-21T12:04:12.114734+09:00",
+      "total_visitors_checked_at": "2026-11-22T11:01:36.916569+09:00",
       "daily_history": [
         {
           "date": "2026-11-08",
@@ -896,14 +1036,23 @@
         {
           "date": "2026-11-20",
           "visitors": 511
+        },
+        {
+          "date": "2026-11-22",
+          "visitors": 357
         }
       ]
     },
     "kieca-korea.org": {
-      "total_visitors": 10970,
+      "yesterday_visitors": 154,
+      "yesterday_delta": 5,
+      "reference_date": "2026-11-22",
+      "source": "verified site visitor counter",
+      "checked_at": "2026-11-23 11:27:57",
+      "total_visitors": 11137,
       "total_visitors_delta": null,
       "total_visitors_source": "authenticated WordPress site-stats counter",
-      "total_visitors_checked_at": "2026-11-21T12:04:10.561051+09:00",
+      "total_visitors_checked_at": "2026-11-22T11:01:37.060747+09:00",
       "daily_history": [
         {
           "date": "2026-11-08",
@@ -952,14 +1101,23 @@
         {
           "date": "2026-11-20",
           "visitors": 137
+        },
+        {
+          "date": "2026-11-22",
+          "visitors": 154
         }
       ]
     },
     "jobinkorea365.com": {
-      "total_visitors": 11254,
+      "yesterday_visitors": 206,
+      "yesterday_delta": -94,
+      "reference_date": "2026-11-22",
+      "source": "verified site visitor counter",
+      "checked_at": "2026-11-23 11:27:57",
+      "total_visitors": 11494,
       "total_visitors_delta": null,
       "total_visitors_source": "authenticated WordPress site-stats counter",
-      "total_visitors_checked_at": "2026-11-21T12:04:12.372942+09:00",
+      "total_visitors_checked_at": "2026-11-22T11:01:37.612722+09:00",
       "daily_history": [
         {
           "date": "2026-11-08",
@@ -1008,14 +1166,23 @@
         {
           "date": "2026-11-20",
           "visitors": 204
+        },
+        {
+          "date": "2026-11-22",
+          "visitors": 206
         }
       ]
     },
     "jobkoreaglobal.com": {
-      "total_visitors": 20932,
+      "yesterday_visitors": 508,
+      "yesterday_delta": 215,
+      "reference_date": "2026-11-22",
+      "source": "verified site visitor counter",
+      "checked_at": "2026-11-23 11:27:57",
+      "total_visitors": 21362,
       "total_visitors_delta": null,
       "total_visitors_source": "authenticated WordPress site-stats counter",
-      "total_visitors_checked_at": "2026-11-21T12:04:10.656179+09:00",
+      "total_visitors_checked_at": "2026-11-22T11:01:38.229782+09:00",
       "daily_history": [
         {
           "date": "2026-11-08",
@@ -1064,14 +1231,23 @@
         {
           "date": "2026-11-20",
           "visitors": 247
+        },
+        {
+          "date": "2026-11-22",
+          "visitors": 508
         }
       ]
     },
     "korea365.org": {
-      "total_visitors": 40093,
+      "yesterday_visitors": 646,
+      "yesterday_delta": -5,
+      "reference_date": "2026-11-22",
+      "source": "verified site visitor counter",
+      "checked_at": "2026-11-23 11:27:57",
+      "total_visitors": 40792,
       "total_visitors_delta": null,
       "total_visitors_source": "authenticated WordPress site-stats counter",
-      "total_visitors_checked_at": "2026-11-21T12:04:10.857407+09:00",
+      "total_visitors_checked_at": "2026-11-22T11:01:38.294454+09:00",
       "daily_history": [
         {
           "date": "2026-11-08",
@@ -1120,14 +1296,23 @@
         {
           "date": "2026-11-20",
           "visitors": 668
+        },
+        {
+          "date": "2026-11-22",
+          "visitors": 646
         }
       ]
     },
     "koreanews365.com": {
-      "total_visitors": 8706,
+      "yesterday_visitors": 120,
+      "yesterday_delta": 20,
+      "reference_date": "2026-11-22",
+      "source": "verified site visitor counter",
+      "checked_at": "2026-11-23 11:27:57",
+      "total_visitors": 8854,
       "total_visitors_delta": null,
       "total_visitors_source": "authenticated WordPress site-stats counter",
-      "total_visitors_checked_at": "2026-11-21T12:04:12.415699+09:00",
+      "total_visitors_checked_at": "2026-11-22T11:01:39.816606+09:00",
       "daily_history": [
         {
           "date": "2026-11-08",
@@ -1176,6 +1361,10 @@
         {
           "date": "2026-11-20",
           "visitors": 172
+        },
+        {
+          "date": "2026-11-22",
+          "visitors": 120
         }
       ]
     }
