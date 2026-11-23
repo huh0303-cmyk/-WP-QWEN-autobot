@@ -95,7 +95,20 @@ def commit(paths,message):
     subprocess.run(['git','add',*paths],cwd=ROOT,check=True,capture_output=True)
     if subprocess.run(['git','diff','--cached','--quiet'],cwd=ROOT).returncode==0:return
     subprocess.run(['git','-c','user.name=london-meta-bot','-c','user.email=actions@users.noreply.github.com','commit','-m',message],cwd=ROOT,check=True,capture_output=True)
-    subprocess.run(['git','push','origin','HEAD:main'],cwd=ROOT,check=True,capture_output=True)
+    # Another workflow or operator may update main after checkout. Rebase this
+    # isolated receipt commit once before retrying; never force-push.
+    push=subprocess.run(['git','push','origin','HEAD:main'],cwd=ROOT,text=True,capture_output=True)
+    if push.returncode==0:return
+    fetch=subprocess.run(['git','fetch','origin','main'],cwd=ROOT,text=True,capture_output=True)
+    if fetch.returncode!=0:
+        raise RuntimeError('GitHub receipt push failed; fetch failed: '+fetch.stderr[-500:].strip())
+    rebase=subprocess.run(['git','rebase','origin/main'],cwd=ROOT,text=True,capture_output=True)
+    if rebase.returncode!=0:
+        subprocess.run(['git','rebase','--abort'],cwd=ROOT,capture_output=True)
+        raise RuntimeError('GitHub receipt push failed; rebase conflict: '+rebase.stderr[-500:].strip())
+    retry=subprocess.run(['git','push','origin','HEAD:main'],cwd=ROOT,text=True,capture_output=True)
+    if retry.returncode!=0:
+        raise RuntimeError('GitHub receipt push failed after one safe rebase retry: '+retry.stderr[-500:].strip())
 
 def main():
     if os.environ.get('META_LIVE_PUBLISH','false').lower()!='true':print('RESULT=BLOCKED_LIVE_SWITCH_OFF');return
