@@ -1259,3 +1259,11 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
   whatever happens the next time new "ready" rows are queued and the scheduled tasks
   (`TistoryAutoPublish_Morning/Lunch/Evening`) run against them. Next: watch the next real run
   for an actual publish (`remote_id`/public URL), not just absence of a length-block error.
+
+## 2026-11-23 21:37 KST — Meta receipt push repaired; Seoul Journal Instagram verified
+
+- task_id: `meta-12-destination-publisher-20261123`
+- Corrected `scripts/meta_12_publisher.py` commit helper in commit `644f94067e6eb3d19018120db3f3066ef22793ef`: on a rejected receipt push it fetches current `main`, rebases the single local receipt commit once, then retries a normal push. No force push or branch-protection bypass. This repairs the pre-publication reservation failure path and benefits the scheduled receipt writer too.
+- Retried the previously authorized Seoul Journal Instagram one-account test. Run `45175984903` completed successfully with `RESULT=TEST_PUBLISHED_AND_VERIFIED`; exact account identity, write permission and public URL are now recorded in `data/meta_12_destination_readiness.json`. URL: https://www.instagram.com/p/DgFZYcKFvOc/.
+- Current public test receipts: 4/12 (English, Japanese, Korean, Seoul Journal Instagram). Chinese and Seoul Jisoo Instagram have no exact token/ID in the environment; all six Threads exact token/ID pairs are absent in the test workflow environment. The prior job log masked secrets; no secret value recorded.
+- Both live-publishing switches remain false; no recurring publication was launched. Remaining 8 destinations must receive exact credentials and account-isolated verification before activation.
