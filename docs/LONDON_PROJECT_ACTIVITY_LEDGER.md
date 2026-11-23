@@ -1180,3 +1180,12 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - The two schedule gates `META_LIVE_PUBLISH` and `META_12_TARGETS_READY` remain false. No recurring schedule activated.
 - Security note: Meta displayed the one-time token in an accessibility state while the GitHub form was being verified. Treat this token as potentially exposed; recommend rotating it after the account workflow is complete, and never include its value in records or logs.
 - Current confirmed Instagram test destinations: English SOS and Japanese SOS; Korean SOS has identity verified but still needs a write test. Remaining nine of twelve require exact credential/identity checks and a one-time test each. Continue from existing session and only hand off where Meta explicitly requests owner password/2FA.
+
+
+## 2026-11-23 KST — Remaining Instagram token OAuth logins staged
+
+- task_id: `meta-12-destination-publisher-20261123`
+- After Japanese SOS was completed, opened the current-app OAuth login tabs for the three other Instagram accounts that already appear in the app's connected account roster: `chinese.sos1` (17841411010918367), `seoul_jisoo1` (17841404970616486), and `seoul_journal1` (17841449179626171).
+- Meta is forcing fresh account authentication for each distinct target. All three Instagram login forms are open and marked for owner handoff. No password/2FA was entered by this session; no token generated for these three yet.
+- Next action after owner completes the three account-specific sign-ins and consent screens: capture each generated token directly into its matching `META-SOCIAL` Secret, ensure current exact ID variables exist, run the existing one-account identity/write test, and record each public URL.
+- Threads remain unresolved: all six tester invitations in the selected Meta app were pending on the last role audit; account-specific Threads authorization and tokens still need completion. Both schedule gates remain false.
