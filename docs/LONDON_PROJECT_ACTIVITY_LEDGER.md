@@ -516,3 +516,13 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - The current app roles view showed all six Instagram Tester roles accepted/active. All six Threads Tester roles remain pending acceptance.
 - Selecting token generation for `english_sos1` opened Instagram forced-login for that exact profile. The OAuth request includes `instagram_business_basic`, `instagram_business_content_publish`, plus manage-messages, manage-comments, and manage-insights scopes. No login credentials, token value, or 2FA were entered/read/copied by the assistant. The user must authenticate in the open tab; no token has yet been generated.
 - No GitHub Secret was written and no test publication was attempted. After the user completes login, inspect the consent/token result and avoid exposing the token; proceed with the approved account-specific credential storage and test workflow, while separately resolving the six pending Threads Tester acceptances.
+
+
+## 2026-11-23 KST — Meta 12-destination setup paused after browser control interruption
+
+- Follow-up for `task_id=meta-social-token-20261123-0800-kst`. The user reiterated that the remaining Threads acceptance, token/Secret setup, 12-destination readiness check, and one post per destination should proceed immediately.
+- Chrome control was interrupted while attempting to open a Threads settings tab. The open Instagram OAuth login remains on the user-authentication screen for `english_sos1`; the user must provide credentials/2FA directly. No Threads invite was accepted in this segment.
+- GitHub repository inspection found `.github/workflows/meta-five-account-daily-preflight.yml`, which checks only the legacy five-account mapping (`seoul_topik`, `seoul_jisoo`, `seoul_chris`, `english_pick1`, `japanese_pick`) and performs read-only identity preflight; it is not a publishing workflow for the user's current six paired handles. No current 12-destination publication path was verified.
+- The Instagram OAuth request for `english_sos1` includes content-publishing/basic scopes plus comments, messages, and insights scopes. Keep the project's least-privilege publishing policy; do not grant unrelated scopes merely to proceed.
+- No Threads invitation acceptance, token issuance, GitHub Secret mutation, or test post was completed after the preceding checkpoint. The prior Instagram six-profile IDs/Tester approvals remain recorded above.
+- Next actions: restore Chrome control; finish the user's direct `english_sos1` authentication; accept all six pending Threads Tester invitations in the matching accounts; use a posting-only token configuration; confirm/create the exact six-account Instagram+Threads workflow and secret/variable mapping; then verify each post URL before reporting any destination complete.
