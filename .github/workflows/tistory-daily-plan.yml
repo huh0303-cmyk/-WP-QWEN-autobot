@@ -22,7 +22,7 @@ on:
         type: string
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   prepare-and-queue:
@@ -33,6 +33,16 @@ jobs:
       TISTORY_RUN_KEY: ${{ inputs.run_key }}
       TISTORY_SLOT: ${{ inputs.slot }}
       TISTORY_SCHEDULED_LOCAL_TIME: ${{ inputs.scheduled_local_time }}
+      # 2026-11-23: every image path (Pexels, Pixabay, and any Replicate
+      # result, since is_temporary() routes those through the same call)
+      # ends in stable_image_hosting.host_permanently(), which commits the
+      # downloaded photo to this repo via the GitHub Contents API and
+      # requires GH_ASSET_TOKEN/GITHUB_TOKEN/GH_TOKEN plus contents:write.
+      # Neither was set, so every single image attempt -- regardless of
+      # provider or credentials -- failed with IMAGE_HOST_CONFIG_MISSING,
+      # which is the actual reason no Tistory draft has ever carried a
+      # representative image.
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       SHEET_ID: ${{ secrets.SHEET_ID }}
       GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
       GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
