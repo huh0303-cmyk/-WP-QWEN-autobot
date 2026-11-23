@@ -1326,3 +1326,12 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - SEOUL TOPIK 앱(`1383946033947009`) Roles 화면을 새로고침해 확인: Threads Tester 6개 중 `korean_sos1`, `seoul_jisoo1`, `japanese_sos1`는 수락 상태이며 `chinese.sos1`, `english_sos1`, `seoul_journal1`은 대기 중이다. 즉 이 앱에서 현재 미수락은 3개다. 사용자가 직전 제공한 화면에서는 네 계정이 대기였으나, 최신 화면에서는 일본 계정이 수락으로 갱신되어 상태가 달라졌다.
 - 현재 Threads 로그인 세션은 `japanese_sos1`; 해당 세션의 초대 목록에는 수락 가능한 대기 초대가 없다. 별도 Edge Threads 로그인 화면을 열어두었다. 자격 증명/2FA는 입력하거나 제출하지 않았다.
 - 이번 확인에서 새 초대는 수락하지 못했다. 중국어, 영어, 서울저널 세 계정의 계정별 인증 세션이 필요하다. 자동발행 게이트와 게시 검증 상태는 변경하지 않았다.
+
+
+## 2026-11-23 22:xx KST — Meta 역할표의 대기 초대 4건 정정
+
+- task_id: `meta-12-destination-publisher-20261123`
+- 소유자가 제공한 최신 SEOUL TOPIK 앱 역할 화면에서 대기 4건을 확인했다: Instagram `chinese.sos1` 1건, Threads `chinese.sos1`, `english_sos1`, `seoul_journal1` 3건. 일본·한국·서울지수 Threads 역할은 수락 상태다.
+- 앞선 재확인 기록의 “미수락 3개”는 Threads 초대만 센 값이었다. 전체 대기 초대는 4건으로 정정한다.
+- 아직 네 초대를 수락하지 못했다. 현재 Threads 세션은 일본 계정이며, 별도 Edge에는 `english_sos1` 아이디가 채워진 Threads 로그인 화면이 열려 있다. 비밀번호와 2단계 인증은 입력/제출하지 않았다. 중국 Instagram을 포함한 각 초대는 해당 계정으로 로그인한 세션에서 수락해야 한다.
+- 토큰, 게시 검증, 자동발행 게이트 상태에는 변경이 없다.
