@@ -79,8 +79,17 @@ on:
         type: string
         default: ""
 
+# 2026-11-23: GH_ASSET_TOKEN (below, github.token fallback) feeds
+# stable_image_hosting.host_permanently(), which commits the re-hosted
+# image to this repo via the GitHub Contents API. With contents:read the
+# token it resolves to has no write scope, so that commit 403s every
+# time regardless of which image source (Pexels/Pixabay/AI) found the
+# photo -- same root cause just confirmed live on the Tistory workflow,
+# which had the token missing entirely; here the token exists but can't
+# write. Blogger's equivalent workflow already got this right
+# (contents: write, same comment) -- matching it here.
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: wordpress-25-immediate-${{ github.run_id }}

@@ -37,8 +37,12 @@ on:
         default: "auto_free"
         type: string
 
+# 2026-11-23: this file's own comment below already warned that hosting
+# fails silently -- the actual cause is this permission. GH_ASSET_TOKEN
+# needs contents:write to commit the re-hosted image (same root cause
+# just confirmed live on Tistory's workflow).
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: blogger-33-direct-publish-${{ github.run_id }}

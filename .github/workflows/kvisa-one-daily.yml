@@ -5,8 +5,11 @@ on:
     - cron: "17 0 * * *"  # 09:17 Asia/Seoul
   workflow_dispatch:
 
+# 2026-11-23: GH_ASSET_TOKEN below needs contents:write to actually commit
+# the re-hosted image (same root cause just confirmed live on Tistory's
+# workflow, which had the token missing entirely).
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: kvisa-one-daily
