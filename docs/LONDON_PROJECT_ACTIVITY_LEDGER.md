@@ -1300,3 +1300,13 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - Repository readiness receipt `data/meta_12_destination_readiness.json` lists four verified public Instagram tests (English SOS, Japanese SOS, Korean SOS, Seoul Journal). The other eight Instagram/Threads destinations have no public test receipt in this registry yet.
 - Schedule policy is already configured for three randomized slots per account on both Instagram and Threads, Asia/Seoul time, across 08:10–22:50 KST. The scheduled workflow checks every 10 minutes, but requires both `META_LIVE_PUBLISH=true` and `META_12_TARGETS_READY=true`; both remain false. The publisher additionally fails closed unless all 12 exact identity/write-scope checks and public test receipts pass.
 - Correct current explanation: automatic publishing is stopped by the explicit 4/12 verification gate, not by the four-profile Account Center count. Next work is to match each remaining stored token/ID to its intended account, finish the isolated public tests, then activate the already-configured schedule only when 12/12 pass. Do not ask the owner to repeat logins already completed; reuse current authenticated sessions and existing approved secrets wherever possible.
+
+
+## 2026-11-23 22:0x KST — Threads 6개 테스터 초대 화면 재확인 및 계정별 수락 한계 기록
+
+- task_id: `meta-12-destination-publisher-20261123`
+- 사용자가 제공한 Meta Developers Roles 화면과 현재 화면을 재확인했다. Threads Tester 역할은 6개 계정 모두 등록되어 있다. `japanese_sos1`는 수락 상태이며 `english_sos1`, `chinese.sos1`, `korean_sos1`, `seoul_jisoo1`, `seoul_journal1` 다섯 계정은 대기 중이다. “계정이 없거나 역할이 누락됐다”는 이전 해석은 잘못이므로 폐기한다.
+- 현재 브라우저의 Threads 인증 프로필은 `japanese_sos1`이다. 해당 세션의 프로필/설정 UI에는 다른 다섯 계정으로 바꾸는 전환 항목이 나타나지 않았고, 일본 계정에 이미 수락된 초대가 나머지 계정의 초대를 대신 수락하지 않는다. 다른 계정 비밀번호·2단계 인증을 대신 입력하거나 계정 경계를 우회하지 않았다. 따라서 이 세션에서는 나머지 5건을 수락할 수 없었다.
+- Meta tester 초대 등록 완료: 6/6. 초대 수락 완료: 1/6. Threads 토큰·게시 검증은 별도 미완료다.
+- GitHub Actions read-only preflight `45179169663`: `VERIFIED=4/12`, `PUBLISHING=NOT_ATTEMPTED`. 확인된 공개 시험 게시 영수증은 Instagram 4개뿐이다. 8개 목적지에 공개 시험 영수증이 아직 없어 자동 게시 게이트가 닫혀 있다.
+- `META_LIVE_PUBLISH=false`, `META_12_TARGETS_READY=false` 유지. 계정 초대 수락이나 계정센터 프로필 수는 게시 검증을 대체하지 않는다. 기존 승인 범위에서 다른 계정의 기존 로그인 세션/초대를 이어서 사용할 수 있을 때만 진행하고, 계정 로그인/2FA가 요구되면 소유자가 해당 계정 세션에서 수락해야 한다. 비밀값은 기록하지 않는다.
