@@ -1189,3 +1189,6 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - Meta is forcing fresh account authentication for each distinct target. All three Instagram login forms are open and marked for owner handoff. No password/2FA was entered by this session; no token generated for these three yet.
 - Next action after owner completes the three account-specific sign-ins and consent screens: capture each generated token directly into its matching `META-SOCIAL` Secret, ensure current exact ID variables exist, run the existing one-account identity/write test, and record each public URL.
 - Threads remain unresolved: all six tester invitations in the selected Meta app were pending on the last role audit; account-specific Threads authorization and tokens still need completion. Both schedule gates remain false.
+
+
+- Follow-up UX step: populated only the public account handles in the three matching Instagram login forms (`chinese.sos1`, `seoul_jisoo1`, `seoul_journal1`) to distinguish the identical login tabs. No login button was submitted; any saved-password autofill remains for the owner to review and submit, and any 2FA remains owner-entered.
