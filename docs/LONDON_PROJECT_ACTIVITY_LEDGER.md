@@ -423,3 +423,12 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - Strict, read-only SSH to `root@187.127.121.57` failed with `REMOTE HOST IDENTIFICATION HAS CHANGED`. Presented ED25519 fingerprint `SHA256:xGz5BAS5YPG5zrRx8d/ugCTdNg10MhDFavjKmUrXGQg`, unchanged from November 16–21; client reported the offending ECDSA key in `known_hosts:3`. Host-key checking and `known_hosts` were not changed.
 - The November 22 `korea365-blogger33-daily.timer` enabled/active state, exact 33-target schedule, transient-service outcomes, same-date publication-key duplicates, OAuth/API errors, and `/opt/korea365/artifacts/blogger-33-public-results.json` remain unverified. Failed blog keys cannot be identified without trusted server access.
 - No GitHub Actions dispatch, retry, manual publication, or production mutation occurred. Next: independently verify the VPS host fingerprint through a trusted provider/server channel, restore trusted SSH, and repeat the read-only audit. Check same-date publication markers and public posts before any recovery; never dispatch `publish-blogger-33-now.yml`.
+
+
+## 2026-11-23 08:00 KST — Meta Instagram/Threads token issuance blocked: no developer app in current login
+
+- `task_id`: `meta-social-token-20261123-0800-kst`
+- The user explicitly instructed the assistant to proceed with Meta token issuance for the latest six handles: `seoul_journal1`, `seoul_jisoo1`, `korean_sos1`, `chinese.sos1`, `japanese_sos1`, and `english_sos1`.
+- In the logged-in Chrome Meta for Developers session, the My Apps page showed no apps. Selecting the visible `Westlake Co.,Ltd` business portfolio (`203213938399031`) also showed no apps. No app ID or token issuance page was available.
+- No app was created, no permissions or roles were changed, no token was issued or copied, and no GitHub secret was changed. No test publication was attempted.
+- Next action: resume with the Meta developer profile/business that owns the existing social publishing app, or obtain the existing app ID. Then verify the app's Instagram/Threads setup and continue issuing the six account-specific credentials. Do not create a new app or broaden permissions unless specifically authorized.
