@@ -1210,3 +1210,12 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - A redundant OAuth login tab was opened while checking the one-time token copy flow and then closed; it was not submitted, and no further owner login is needed for this saved credential.
 - The one-time token value was briefly present in the browser accessibility output during capture. Treat the issued token as potentially exposed and rotate it after the remaining account setup; replace the GitHub Secret with the replacement token. Do not publish it in chat, screenshots, logs, or repository files.
 - No post was sent in this step. Both publisher gates remain false. The one-account identity/write check and public test post for Seoul Journal remain outstanding; continue the already approved roster only with the appropriate account-specific token and exact identity validation.
+
+## 2026-11-23 KST — Meta 12개 자동발행 게이트 재점검
+
+- task_id: `meta-12-destination-publisher-20261123`
+- 사전점검에서 Japanese SOS Instagram과 Seoul Journal Instagram이 구형 Secret 별칭을 참조하던 오류를 수정했다. 수정 commit: `d19032f18c1e5b37a36920761fa89d55c5b23c48`. 일본 계정은 `META_INSTAGRAM_JAPANESE_SOS1_ACCESS_TOKEN`, 서울저널 계정은 `META_INSTAGRAM_SEOUL_JOURNAL1_ACCESS_TOKEN`을 읽도록 정리했다.
+- read-only 사전점검 run `45174144792` 성공: `VERIFIED=4/12`, `PUBLISHING=NOT_ATTEMPTED`. 이 점검은 게시 API를 호출하지 않았다.
+- 발행준비도 원장의 공개 테스트 증거는 현재 3/12: Instagram English SOS, Japanese SOS, Korean SOS. 남은 9개는 중국어·서울지수·서울저널 Instagram 및 6개 Threads이며, 아직 각 목적지의 신원/쓰기 권한과 공개 테스트 URL이 모두 검증되지 않았다.
+- `META_LIVE_PUBLISH=false`, `META_12_TARGETS_READY=false` 유지. 12개 전부 검증 전에는 10분 스케줄이 게시하지 않도록 잠겨 있다. 단체 발행을 시작할 수 있는 상태가 아니다.
+- 다음: 기존 승인된 범위에서 남은 계정의 정확한 토큰/ID 및 Threads 권한을 대조하고, 목적지별 단일 테스트를 완료해 URL 영수증을 등록한다. 두 게이트는 계속 false로 유지한다. 비밀 값은 기록하지 않는다.
