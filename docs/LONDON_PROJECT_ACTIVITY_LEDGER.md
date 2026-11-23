@@ -997,3 +997,11 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - Confirmed the browser still has the Instagram OAuth login tab open for the previously recorded English SOS account flow. No password, 2FA code, consent submission, access token, GitHub Secret mutation, Threads tester acceptance, or post publication was performed in this resumed session.
 - The credential entry and submission step remains a user handoff. After the user completes the Instagram login/consent screen, resume by confirming the redirect/token-generator state, then continue the already-authorized per-account token flow and remaining Threads tester acceptances. Never record token values in GitHub.
 - No production or account settings were changed. No test post was created.
+
+
+## 2026-11-23 16:12 KST — English SOS Meta consent returned; token generator error
+
+- `task_id=meta-social-12-account-publish-20261123-1256-kst`; the English SOS Instagram login/consent flow returned to the Meta token-generator callback after approval. The callback URL contained a temporary authorization code; its value is intentionally not recorded.
+- Meta displayed “Sorry, something went wrong. Close and reopen the browser window.” Reloading the callback page reproduced the same error. No access token was shown or verified, no GitHub Secret was written, and no test post was published.
+- Current status: Instagram consent completed for English SOS, but token exchange/generation remains unverified. The approved request included profile/media, comment management, messaging management, content publishing, and insights scopes.
+- Browser control then stopped because it could not safely determine the current URL on Windows. No further UI action was taken. Next action: reopen the authenticated Meta developer session and token setup from its app page, start a fresh English SOS token flow (do not reuse the callback code), verify token display without logging it, then continue with the other accounts. If Meta repeats the error, capture the Meta request/error reference from the visible page and use developer support; do not claim token issuance.
