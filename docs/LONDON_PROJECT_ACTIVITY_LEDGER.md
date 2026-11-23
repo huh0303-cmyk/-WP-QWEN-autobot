@@ -1160,3 +1160,13 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - Root cause: stale legacy tokens/IDs and unaccepted or unassigned Threads tester permissions; account labels alone do not prove a usable token. At least English and Seoul Journal Threads cannot mint from the SEOUL TOPIK generator while invitation is pending; Japanese/Chinese Threads are not assigned there. The user’s prior setup work is preserved; do not ask for routine login again.
 - No new token was generated and no app role/invitation was accepted. No post was published. GitHub secrets and account-specific ID variables were not modified. Both live-publish/readiness switches remain false.
 - Before the next security-sensitive Meta permission or token-generation action, obtain action-time confirmation for the exact roster and scope. Next: after approval, resolve pending invitations in a safe batch, generate target-specific tokens, store them only in the named `META-SOCIAL` GitHub environment, run identity preflight, then one account-isolated test per destination. Never publish scheduled content until all 12 receipts pass.
+
+
+## 2026-11-23 KST — Meta 10개 토큰 발급 재개 및 일본 SOS 인증 대기
+
+- task_id: `meta-12-destination-publisher-20261123`
+- 사용자 action-time 승인: 남은 10개 계정에 대한 Meta 권한 승인, 계정별 토큰 발급, `META-SOCIAL` GitHub Secret 저장 및 계정별 테스트 게시를 진행하도록 승인받음. 자동 예약은 12개 전부 확인 전까지 비활성 유지.
+- 앱 및 연결 상태 확인은 이전 기록을 재사용함. 새 로그인 요구를 반복하지 않음.
+- 현재 실제 진행: Claude Meta 앱의 일본 SOS Instagram 토큰 OAuth 흐름을 열었으나 Instagram이 계정 재인증을 요구함. Chrome 로그인 탭 하나를 열어 둠. 비밀번호/2FA는 소유자가 직접 입력해야 하므로 이 세션은 대기 상태이며 비밀번호나 코드는 채팅/로그에 요청하거나 저장하지 않음.
+- 이 시점에서 새 토큰은 발급·저장되지 않았고 공개 게시도 하지 않음. 기존 2개 확인 상태와 두 자동 발행 보호 스위치(false)는 변경하지 않음.
+- 다음: 소유자가 열린 Instagram 탭에서 일본 SOS 인증을 마치면 OAuth 권한 동의와 토큰 발급을 이어서 처리한다. Threads 초대 수락 및 나머지 계정 토큰은 같은 인증 세션을 재사용할 수 있는 범위에서 이어가되, 계정별 새 비밀번호/2FA 화면이 다시 나오면 해당 계정만 소유자 입력 대기 상태로 기록한다. Secret 값은 파일이나 로그에 절대 기록하지 않는다.
