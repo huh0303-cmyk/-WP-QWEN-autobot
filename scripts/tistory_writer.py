@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 """Generate one article draft per Tistory site job.
 
-LOCKED: GPT-5 mini writes the draft and deterministic quality checks perform
-the final review. SEO/quality below 70 is rejected.
+The free Gemini fallback chain (content_engine_policy_20261110.TEXT_MODELS,
+language-specific) writes the draft; deterministic quality checks perform
+the final review. SEO/quality below 70 is rejected. No paid model is used.
 
 Reads a plan produced by tistory_daily_planner.py and writes drafts only —
 this never publishes anything. Every job stays publish_policy=awaiting_approval
