@@ -1133,3 +1133,14 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - Current readiness: 2/12 identities and write permissions verified; 2/12 destinations have public test URLs (English SOS Instagram and Korean SOS Instagram). Threads and remaining accounts are not ready. The scheduled workflow still requires all 12 rows and both false switches to be deliberately set true; neither switch was enabled.
 - The GitHub CLI local auth was expired/unavailable; the connected browser session was used for GitHub Actions UI dispatch. No credential was re-entered.
 - Next: match each remaining existing account token/ID to the workflow's exact `META_{PLATFORM}_{ACCOUNT}_ACCESS_TOKEN` Secret and `META_{PLATFORM}_{ACCOUNT}_USER_ID` Environment variable names, then run preflight and one test per destination. Do not enable live schedule until all 12 are verified.
+
+
+## 2026-11-23 19:44 KST — Legacy Meta token alias read-only preflight
+
+- task_id: `meta-12-destination-publisher-20261123`; continued from PR #289/main. No account login or credential entry was requested again.
+- Failure recorded: initial alias attempt commit `7fa3b73889195aa0aac347209dc656032cedbccd` produced an invalid workflow due to duplicate YAML environment keys; run `45158396140` failed during workflow parsing before any preflight or publishing step. No post was attempted.
+- Corrected read-only mapping on branch `codex/meta-legacy-token-readonly-audit-20261123`, commit `23f4ecffd03eacc1b13869e5b92113b9c4ccbac0`. Legacy token names are referenced only inside the identity preflight; no publishing workflow mapping or live switch was changed.
+- Read-only run `45158789852` completed. Sanitized result: `INCOMPLETE VERIFIED=2/12 PUBLISHING=NOT_ATTEMPTED`. Existing aliases made Japanese Instagram ID `17841411813216531` and some other legacy tokens available to the check, but did not produce additional exact target identity matches. Credential values were masked; never record or reuse them based on presence alone.
+- Environment inspection in the run confirms some targets have no corresponding values (including Chinese Instagram, Japanese/Chinese Threads, Seoul Journal Threads); Threads Korean legacy mapping had a token but no user ID variable. This is incomplete preflight evidence, not a request for the owner to repeat login.
+- Existing confirmed state remains: English + Korean Instagram identity/write verified and public test URLs `https://www.instagram.com/p/DgFGOG7lSYt/` and `https://www.instagram.com/p/DgFLy1yG_7m/`. All other destinations remain unverified for this publisher.
+- Both activation switches remain false; no automated schedule is active. Next: inspect the sanitized per-target report and reconcile IDs/handles from authoritative Meta account records; only exact matches may be used for account-isolated write tests. Do not enable live scheduling until all 12 destinations have exact identity, write permission and public test receipts.
