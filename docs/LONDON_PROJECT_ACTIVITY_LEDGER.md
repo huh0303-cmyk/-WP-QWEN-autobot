@@ -1108,3 +1108,15 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - The login form had the `korean_sos1` username and a masked password present. Submitted the existing form and Instagram accepted it, advancing to its two-step verification chooser.
 - Current screen offers: passkey/biometric (selected by default), WhatsApp to the registered number ending `35`, or a saved backup code, plus more options. This session did not choose a method or enter/receive a code; the owner must complete this authentication check.
 - No token has been copied or saved during this step. Next: after the owner completes the 2FA challenge and the Meta token dialog appears, capture the token directly to the `META_INSTAGRAM_KOREAN_SOS1_ACCESS_TOKEN` GitHub Environment secret without printing it; verify identity via the `/me` preflight, then conduct the authorized Korean SOS test publish.
+
+## 2026-11-23 KST — 12개 Instagram/Threads 자동발행 준비 재개
+
+- task_id: `meta-12-destination-publisher-20261123`
+- 목표 확정: Instagram 6개 + Threads 6개, 각 목적지 하루 3회씩(총 36개 슬롯/일), Asia/Seoul 기준 08:10–22:50 무작위 분산. 사용자가 이미 진행한 Meta 로그인/토큰 작업을 다시 요구하지 않는다.
+- 최신 GitHub 상태를 대조한 결과, 기존 `meta-randomized-dispatch.yml`는 구형 5계정용 Threads 텍스트 발행기였고 Instagram 발행은 하지 않았다. 과거 실행은 `state_changed=false`였으며 12개 신규 목적지 자동 발행이 아니었다.
+- 오발행 방지: 구형 워크플로를 수동 비활성화하고 `META_LIVE_PUBLISH=false`로 설정했다. 신규 스케줄러도 `META_12_TARGETS_READY=false` 및 두 변수가 모두 true여야 실행된다.
+- 신규 feature branch `codex/meta-12-destination-publisher-20261123`에 12개 계정별 정책, 균등한 세 슬롯 시간대, 무작위 스케줄러, read-only 신원 사전검증, 단일 계정 테스트 발행, 공개 URL 영수증 기반 준비도 게이트를 추가했다. 서울저널은 검토된 출처가 있는 큐 항목 없이 발행할 수 없다. 토큰 값은 GitHub 파일/로그에 넣지 않는다.
+- 확인된 기존 Instagram 테스트: `english_sos1` 1건, 공개 URL `https://www.instagram.com/p/DgFGOG7lSYt/`. 이번 작업에서 Korean SOS 토큰은 환경 Secret에 등록되어 있으며 사전검증 run `45153093854`에서 계정 ID 일치와 HTTP 200을 확인했다. 이 run은 identity-only이며 `PUBLISHING=NOT_ATTEMPTED`; 쓰기 권한과 공개 테스트는 아직 검증하지 않았다. 스크린샷 노출 이력이 있어 토큰 회전 권고는 유지한다.
+- 현재 저장소 준비도 기록: 2/12 목적지만 신원 확인(English Instagram, Korean Instagram), 1/12만 공개 테스트 URL 확인(English Instagram). 따라서 자동 발행은 의도적으로 차단 상태다.
+- 확인할 차단 항목: 나머지 10개 목적지의 실제 토큰/ID와 권한/테스트, Korean Instagram 쓰기 권한 및 테스트, Japanese SOS ID 불일치(`17841411813216531` 대 이전 `17841441813216531`), Threads 계정별 승인/토큰, 중국어 IG 앱 연결 상태.
+- 다음 단계: feature branch의 안전성/워크플로 정적 검토를 마치고 PR을 연다. PR 병합 후 Actions에서 계정별 read-only 사전검증과 1회 테스트를 진행할 수 있다. 12개 테스트가 전부 확인되기 전에는 `META_12_TARGETS_READY`를 켜지 않는다.

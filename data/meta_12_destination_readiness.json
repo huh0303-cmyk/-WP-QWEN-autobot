@@ -1,0 +1,90 @@
+{
+    "schema_version":  1,
+    "updated_at_kst":  "2026-11-23",
+    "targets":  [
+                    {
+                        "test_public_url":  "https://www.instagram.com/p/DgFGOG7lSYt/",
+                        "account_key":  "english_sos1",
+                        "platform":  "instagram",
+                        "write_scope_verified":  true,
+                        "identity_verified":  true
+                    },
+                    {
+                        "test_public_url":  "",
+                        "account_key":  "japanese_sos1",
+                        "platform":  "instagram",
+                        "write_scope_verified":  false,
+                        "identity_verified":  false
+                    },
+                    {
+                        "test_public_url":  "",
+                        "account_key":  "chinese_sos1",
+                        "platform":  "instagram",
+                        "write_scope_verified":  false,
+                        "identity_verified":  false
+                    },
+                    {
+                        "test_public_url":  "",
+                        "account_key":  "korean_sos1",
+                        "platform":  "instagram",
+                        "write_scope_verified":  false,
+                        "identity_verified":  true
+                    },
+                    {
+                        "test_public_url":  "",
+                        "account_key":  "seoul_jisoo1",
+                        "platform":  "instagram",
+                        "write_scope_verified":  false,
+                        "identity_verified":  false
+                    },
+                    {
+                        "test_public_url":  "",
+                        "account_key":  "seoul_journal1",
+                        "platform":  "instagram",
+                        "write_scope_verified":  false,
+                        "identity_verified":  false
+                    },
+                    {
+                        "test_public_url":  "",
+                        "account_key":  "english_sos1",
+                        "platform":  "threads",
+                        "write_scope_verified":  false,
+                        "identity_verified":  false
+                    },
+                    {
+                        "test_public_url":  "",
+                        "account_key":  "japanese_sos1",
+                        "platform":  "threads",
+                        "write_scope_verified":  false,
+                        "identity_verified":  false
+                    },
+                    {
+                        "test_public_url":  "",
+                        "account_key":  "chinese_sos1",
+                        "platform":  "threads",
+                        "write_scope_verified":  false,
+                        "identity_verified":  false
+                    },
+                    {
+                        "test_public_url":  "",
+                        "account_key":  "korean_sos1",
+                        "platform":  "threads",
+                        "write_scope_verified":  false,
+                        "identity_verified":  false
+                    },
+                    {
+                        "test_public_url":  "",
+                        "account_key":  "seoul_jisoo1",
+                        "platform":  "threads",
+                        "write_scope_verified":  false,
+                        "identity_verified":  false
+                    },
+                    {
+                        "test_public_url":  "",
+                        "account_key":  "seoul_journal1",
+                        "platform":  "threads",
+                        "write_scope_verified":  false,
+                        "identity_verified":  false
+                    }
+                ]
+}

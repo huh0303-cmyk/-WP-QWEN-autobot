@@ -111,3 +111,11 @@ Only after those prerequisites are complete, enable a GitHub Actions randomized 
 - Published and verified one public Instagram image post for `@english_sos1`: https://www.instagram.com/p/DgFGOG7lSYt/ (media ID `18135124276695322`; GitHub Actions run `45150520283`).
 - This is one of 12 required account/platform tests. No other account or Threads post was published, and no automatic schedule was enabled.
 - `korean_sos1` token is recorded as visible in a screenshot. Treat it as exposed; replace the token before running its preflight or publishing. The owner's password/2FA/consent may be required during the replacement flow.
+
+## 2026-11-23 implementation status — 12-destination GitHub Actions
+
+The new implementation is on branch `codex/meta-12-destination-publisher-20261123`; the legacy five-account dispatcher is not the 12-account publisher and has been manually disabled. Repository variables `META_LIVE_PUBLISH` and `META_12_TARGETS_READY` are both false. The new scheduled workflow checks both values and also requires all 12 destinations to have verified identity, write scope, and one confirmed public test URL. It creates 36 randomized daily destination slots, grouped in three KST windows between 08:10 and 22:50 with 15-minute minimum spacing.
+
+Current readiness: English SOS Instagram has a public test URL; Korean SOS Instagram identity was verified by read-only preflight, but write permission and its public test remain unverified. Other ten destinations remain pending. Do not enable the schedule until every row passes. The Korean token is stored in the GitHub environment secret; its exposed screenshot history means rotation is recommended. Japanese SOS ID remains unresolved; use only the authenticated `/me` response, never the disputed prior ID. Chinese SOS Instagram app connection and Threads per-account authorization remain to be completed.
+
+The branch includes three manual workflows: all-account read-only identity preflight, one selected destination test publish with deduplication/reservation, and a scheduled publisher gated by readiness. Seoul Journal publication requires a reviewed, source-backed queue item. Merge of the branch makes the workflows available in Actions but does not activate scheduled publication while the two repository variables remain false.
