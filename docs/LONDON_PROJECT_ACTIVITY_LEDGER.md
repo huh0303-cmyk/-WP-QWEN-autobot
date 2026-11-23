@@ -1228,3 +1228,34 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - The job log showed no target credentials configured in `META-SOCIAL` for Instagram Chinese SOS and Seoul Jisoo, and no Threads token/ID pairs for all six handles. Token values were masked; no values are recorded.
 - Current test receipts remain 3/12; both publisher gates remain false. Mass scheduling is still blocked.
 - Next: diagnose the Actions `main` push rejection and make the reservation/receipt write robust without bypassing branch protections; then resume the already-authorized Seoul Journal single test. Continue remaining target-specific setup; do not enable the schedule until 12/12 verified receipts exist.
+
+## 2026-11-23 21:30 KST — Tistory local-runner queue found 100% stale; archived and wiped
+
+- Owner asked whether Tistory auto-publish (the local Playwright runner set up earlier this
+  session) is actually working. Checked `.local/tistory-queue.sqlite3` on the owner's PC: 81
+  jobs total, **0 had ever published** (`remote_id` empty on every row, all time). Ran two
+  manual batches (1 job, then 10 jobs) after deploying the attempt-cap fix below; **all 10**
+  failed the same `ARTICLE_LENGTH_BLOCKED` check (800–1300 characters against a 2500–4500
+  requirement).
+- Checked the Google Sheet queue tab (`자동화_발행대기`, id
+  `12l1w6g-DF4YvVpkEx8YCEsIMTf7TXkUzANm3ldauYiI`) directly: 741 total rows, 74 marked `ready`
+  (the sync source for the local queue). **All 74** were created between 2026-09-05 and
+  2026-09-28 — none are recent. This confirms the entire backlog is dead 2.5-month-old test/bulk
+  content, not a mix of real content blocked by a few bad rows.
+- Fix 1 (code, commit `2de5eca2`, pushed to `main`): `process_jobs()` in
+  `scripts/tistory_local_runner.py` selected `state IN ('pending','retry') ORDER BY rowid` with
+  no attempt cap, so permanently-too-short rows retried every single run forever and
+  monopolized every `--max-jobs` batch at the front of the FIFO queue. Capped retry selection at
+  3 attempts.
+- Fix 2 (data): per the owner's explicit instruction to delete the old backlog and start fresh
+  from now, batch-updated all 74 `ready` rows' status column to `archived_stale_20261123` in the
+  Sheet (not row-deleted, to preserve history) so `sync_sheet_to_local()`'s `status in
+  {ready,대기}` filter no longer pulls them. Then deleted the local
+  `.local/tistory-queue.sqlite3` on the owner's PC so the local queue rebuilds clean on next
+  sync. The 17 already-`local_attention_required` rows and other terminal statuses were left
+  untouched (they don't resync regardless).
+- Net effect: Tistory auto-publish is **not yet confirmed working** — no job has ever actually
+  published through this pipeline. The blocking dead backlog is now cleared; the real test is
+  whatever happens the next time new "ready" rows are queued and the scheduled tasks
+  (`TistoryAutoPublish_Morning/Lunch/Evening`) run against them. Next: watch the next real run
+  for an actual publish (`remote_id`/public URL), not just absence of a length-block error.
