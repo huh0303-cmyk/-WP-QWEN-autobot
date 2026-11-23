@@ -153,7 +153,16 @@ def flush_outbox(service, sheet_id, db):
 
 
 def process_jobs(db, context, limit, gap_seconds, *, force_private=False):
-    rows = db.execute("SELECT * FROM jobs WHERE state IN ('pending','retry') ORDER BY rowid LIMIT ?", (limit,)).fetchall()
+    # 2026-11-23: a handful of 2026-09-05 test rows have content too short to
+    # ever pass validate_article_length(); with no attempt cap they retried
+    # forever at the front of the FIFO queue (lowest rowid first) and
+    # permanently starved every real job behind them. Stop re-selecting a
+    # job once it has already failed 3 times; it stays visible via `status`
+    # for manual review instead of silently blocking the queue.
+    rows = db.execute(
+        "SELECT * FROM jobs WHERE state='pending' OR (state='retry' AND attempts < 3) ORDER BY rowid LIMIT ?",
+        (limit,),
+    ).fetchall()
     results = []
     for index, item in enumerate(rows):
         payload = json.loads(item["payload"])
