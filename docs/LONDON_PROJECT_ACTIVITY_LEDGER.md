@@ -526,3 +526,15 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - The Instagram OAuth request for `english_sos1` includes content-publishing/basic scopes plus comments, messages, and insights scopes. Keep the project's least-privilege publishing policy; do not grant unrelated scopes merely to proceed.
 - No Threads invitation acceptance, token issuance, GitHub Secret mutation, or test post was completed after the preceding checkpoint. The prior Instagram six-profile IDs/Tester approvals remain recorded above.
 - Next actions: restore Chrome control; finish the user's direct `english_sos1` authentication; accept all six pending Threads Tester invitations in the matching accounts; use a posting-only token configuration; confirm/create the exact six-account Instagram+Threads workflow and secret/variable mapping; then verify each post URL before reporting any destination complete.
+
+
+## 2026-11-23 KST — Repository audit: current 12-channel publishing is not ready
+
+- Follow-up for `task_id=meta-social-token-20261123-0800-kst`. Read-only GitHub inspection of the default-branch publisher files found:
+  - `.github/workflows/meta-five-account-daily-preflight.yml` verifies a legacy five-account mapping and is read-only.
+  - `.github/workflows/meta-one-post-smoke.yml` publishes only one legacy Threads `seoul_topik` text post; it does not test Instagram or the current six handles.
+  - `scripts/meta_slot_dispatch.py` is driven by the five-account policy and skips Instagram publication.
+  - `scripts/meta_publish.py` supports Instagram/Threads individually, but the configured brand suffix map is legacy and does not include the current six confirmed handle keys; publishing defaults disabled unless explicitly enabled.
+- The newest located preflight artifact, dated 2026-11-07, reports 3/10 legacy connections identity-verified, `publish_enabled=false`, `publication_performed=false`, and `write_scope_verified=false`. This is historical evidence, not a current secret-state check.
+- Determination: the repository does not currently establish readiness for one verified post to all 12 current destinations. Tokens/Secrets and Threads Tester acceptances are still incomplete, and a six-account mapping plus per-destination smoke/verification workflow is required before claiming readiness.
+- No publishing workflow was dispatched and no external post was made during this audit. Chrome control remains interrupted; resume UI work only after browser control is available and the user completes their own account authentication.
