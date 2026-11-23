@@ -989,3 +989,11 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - Metricool had zero scheduled posts from 2026-11-21 forward. Backlog cutoff is 2026-11-21 00:00 KST: do not backfill missed pre-cutoff social slots. No queued item was deleted because no future queue existed.
 - FikaClip remains on the owner's Creator monthly trial; no Pro upgrade. The prepared automation was not created, no social destination is connected, and no credits were spent.
 - Current source of truth: `docs/SNS_SIX_ACCOUNT_IDENTITY_AUDIT_2026-11-21.md` and `config/SNS_SIX_BRAND_IDENTITY_LOCK_2026-11-21.json`. The 2026-11-15 identity lock is marked historical/superseded; conflicting legacy handles must not be used for login, connection, scheduling, or publication.
+
+
+## 2026-11-23 15:56 KST — Meta token flow resumed; user authentication still pending
+
+- `task_id=meta-social-12-account-publish-20261123-1256-kst`; resumed from the November 23 12:56 checkpoint and re-read the required operation policy, working agreement, and London Project activity ledger.
+- Confirmed the browser still has the Instagram OAuth login tab open for the previously recorded English SOS account flow. No password, 2FA code, consent submission, access token, GitHub Secret mutation, Threads tester acceptance, or post publication was performed in this resumed session.
+- The credential entry and submission step remains a user handoff. After the user completes the Instagram login/consent screen, resume by confirming the redirect/token-generator state, then continue the already-authorized per-account token flow and remaining Threads tester acceptances. Never record token values in GitHub.
+- No production or account settings were changed. No test post was created.
