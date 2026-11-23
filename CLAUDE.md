@@ -112,3 +112,21 @@ Never use the word “complete” without evidence.
 ## GitHub durability duty
 
 Every material finding, decision, correction, ID mapping, code/config change, failure, verification result and unresolved next action must be written to GitHub during the same work session. Chat-only state is not authoritative. Before asking the Chairman to repeat prior information, read the latest GitHub canonical records first.
+
+
+## 스킬 연결 (2026-11-24, 런던프로젝트클로드)
+
+이 저장소 작업 시 아래 스킬을 상황별로 **먼저 호출**한다. 스킬은 작업 방식(절차)만 정하며, 위의 헌장·무료 정책·완료 규칙과 충돌하면 이 문서와 `LONDON_PROJECT_START_HERE.md`가 우선한다. 스킬 자체는 Claude 계정에 플러그인으로 설치되어 있어야 동작한다(superpowers, zizi-skills, marketing, anthropic-skills).
+
+| # | 스킬 | 언제 |
+|---|------|------|
+| 1 | `superpowers:systematic-debugging` | 워크플로 실패·사이트 발행 중단·스크립트 오류의 원인 추적 |
+| 2 | `zizi-skills:debugging-and-error-recovery` | 실패 재현 테스트 → 가설 → 회귀 테스트 |
+| 3 | `superpowers:verification-before-completion` | "고쳤다/완료" 보고 전 실제 실행·로그·공개 URL로 확인 (VERIFIED_COMPLETE는 감사 엔진만 발급) |
+| 4 | `zizi-skills:git-sync` | 브랜치 작업 시작, 커밋, 푸시, PR 전 (런던프로젝트GPT 트랙과 겹치는 파일은 `git log`로 확인) |
+| 5 | `zizi-skills:infrastructure` | `.github/workflows` cron·시크릿·환경 설정 수정 |
+| 6 | `zizi-skills:integrations` | WordPress REST·Blogger·YouTube·Meta API 연동, 중복 발행 방지 |
+| 7 | `zizi-skills:security-and-hardening` | PAT·API 키·시크릿을 다룰 때, 워크플로 수정 시 |
+| 8 | `zizi-skills:monitoring` | 사이트 무발행 감지, 로그·헬스체크 추가 |
+| 9 | `marketing:seo-audit` | 애드센스 승인·색인·GSC 문제 진단 |
+| 10 | `anthropic-skills:skill-creator` | 반복되는 규칙을 새 스킬로 만들 때 |
