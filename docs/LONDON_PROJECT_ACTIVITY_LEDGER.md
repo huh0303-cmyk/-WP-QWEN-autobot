@@ -1267,3 +1267,10 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - Retried the previously authorized Seoul Journal Instagram one-account test. Run `45175984903` completed successfully with `RESULT=TEST_PUBLISHED_AND_VERIFIED`; exact account identity, write permission and public URL are now recorded in `data/meta_12_destination_readiness.json`. URL: https://www.instagram.com/p/DgFZYcKFvOc/.
 - Current public test receipts: 4/12 (English, Japanese, Korean, Seoul Journal Instagram). Chinese and Seoul Jisoo Instagram have no exact token/ID in the environment; all six Threads exact token/ID pairs are absent in the test workflow environment. The prior job log masked secrets; no secret value recorded.
 - Both live-publishing switches remain false; no recurring publication was launched. Remaining 8 destinations must receive exact credentials and account-isolated verification before activation.
+
+## 2026-11-23 21:4x KST — Threads tester acceptance requires owner confirmation
+
+- task_id: `meta-12-destination-publisher-20261123`
+- Read-only inspection of Meta app `2064957407740645` Roles and Threads account settings confirms all six Threads tester invitations remain pending.
+- The currently authenticated Threads profile is `japanese_sos1`; its Website Permissions > Invitations tab shows the Claude developer app tester invitation and an Accept control. Meta's confirmation text states acceptance represents participation as an app tester and agreement to the Meta platform terms and developer policy.
+- No invitation was accepted and no role/security setting changed. Waiting for the owner to confirm acceptance at action time. Current GitHub readiness remains four public tests out of twelve; activation gates remain false.
