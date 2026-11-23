@@ -1020,3 +1020,11 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - Verified both secret names appear in the environment's Actions secrets list. Secret values were not read back or added to any project record.
 - Correction to the prior checkpoint: `IG_ACCESS_TOKEN_ENGLISH` is referenced by the existing `ceo-sns-probe.yml` metrics workflow and is not the account-specific key for `english_sos1`. The correct target-specific keys are the two `META_INSTAGRAM_ENGLISH_SOS1_*` entries above.
 - No Instagram post was published in this step. No other account's token or secret was changed. Next: verify the publishing workflow's expected account-secret mapping, then continue the remaining authorized account token/Threads setup work.
+
+
+## 2026-11-23 16:42 KST — English SOS Instagram token read-only verification
+
+- Added manual GitHub Actions workflow `.github/workflows/meta-english-sos-auth-preflight.yml` in commit `ed83ddac8a3f8deda7f0bf6b71b8ccbc878f3289`. It reads the English SOS token and account ID from `META-SOCIAL`, calls Instagram Login `/me` read-only, compares identity, and suppresses credential/error-body output. No publish endpoint is called.
+- Manual run `45132955917` completed successfully. Sanitized output: HTTP 200, resolved username `english_sos1`, account ID match YES, publishing NOT_ATTEMPTED. This verifies token validity and account identity only; it does not prove content-publishing scope.
+- Batch publishing is not ready. The existing five-account daily preflight still targets superseded handles and is read-only; the active six-brand Instagram/Threads roster has no verified current six-account publisher/test receipts. English SOS is the only newly verified current Instagram token in this session. No post was published.
+- Next: update the account mapping and publisher to the current six Instagram + six Threads identities; obtain and verify each account's platform-specific write authorization; then run account-isolated tests with receipt URLs before enabling batch automation.
