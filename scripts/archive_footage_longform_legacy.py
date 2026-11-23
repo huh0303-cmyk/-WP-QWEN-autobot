@@ -29,6 +29,17 @@ IA_METADATA = "https://archive.org/metadata"
 LOC_SEARCH = "https://www.loc.gov/collections/national-screening-room/"
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
+# 2026-11-23: GitHub Actions 러너의 기본 python-requests User-Agent로 보낸 요청이
+# archive.org/loc.gov에서 매번 빈 응답/타임아웃으로 돌아와(history 채널 10일 연속
+# "퍼블릭도메인 클립 0개"로 실패) 실제 영상 제작이 전혀 안 되고 있었음. 두 서비스
+# 모두 봇처럼 보이는 요청을 자주 막으므로 실제 브라우저 User-Agent를 붙인다.
+REQUEST_HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+    )
+}
+
 CHANNEL_ARCHIVE_CONFIG = {
     "american_archive": {"collections": None, "require_pd_license": True, "max_year": None,
                           "domain": "American history told through public archival footage"},
@@ -99,7 +110,7 @@ def search_archive_org(topic, cfg, count, max_retries=3):
     }
     for attempt in range(max_retries):
         try:
-            r = requests.get(IA_SEARCH, params=params, timeout=30)
+            r = requests.get(IA_SEARCH, params=params, timeout=30, headers=REQUEST_HEADERS)
             r.raise_for_status()
             data = r.json()
             docs = data.get("response", {}).get("docs")
@@ -147,7 +158,7 @@ def _best_ia_file(files, identifier):
 
 
 def download_file(url, out_path, timeout=180):
-    r = requests.get(url, stream=True, timeout=timeout)
+    r = requests.get(url, stream=True, timeout=timeout, headers=REQUEST_HEADERS)
     r.raise_for_status()
     with open(out_path, "wb") as f:
         for chunk in r.iter_content(chunk_size=1 << 16):
@@ -164,7 +175,7 @@ def download_file(url, out_path, timeout=180):
 # ════════════════════════════════════════════════════════════
 def search_loc(query, count):
     try:
-        r = requests.get(LOC_SEARCH, params={"fo": "json", "q": query, "c": count}, timeout=30)
+        r = requests.get(LOC_SEARCH, params={"fo": "json", "q": query, "c": count}, timeout=30, headers=REQUEST_HEADERS)
         r.raise_for_status()
         return (r.json().get("results") or [])[:count]
     except Exception as e:
@@ -176,7 +187,7 @@ def fetch_loc_clip_info(item_url):
     if not item_url:
         return None
     try:
-        r = requests.get(item_url, params={"fo": "json"}, timeout=30)
+        r = requests.get(item_url, params={"fo": "json"}, timeout=30, headers=REQUEST_HEADERS)
         r.raise_for_status()
         d = r.json()
     except Exception:
@@ -304,7 +315,7 @@ def fetch_archive_clips(topic, channel_key, workdir, n_target=16):
         if not identifier:
             continue
         try:
-            meta = requests.get(f"{IA_METADATA}/{identifier}", timeout=30).json()
+            meta = requests.get(f"{IA_METADATA}/{identifier}", timeout=30, headers=REQUEST_HEADERS).json()
         except Exception:
             continue
         fname = _best_ia_file(meta.get("files", []), identifier)
