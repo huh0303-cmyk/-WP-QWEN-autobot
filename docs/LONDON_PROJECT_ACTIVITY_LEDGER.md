@@ -1085,3 +1085,11 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - Caption teaches the A1 café phrase "Could I get a coffee, please?" and its Korean meaning. This is the first confirmed public test post among the 12 account/platform targets. No other post was sent and randomized automation remains disabled.
 - Security: the separate Korean SOS token is recorded as visible in a screenshot. Do not run its preflight or publish with that credential; the owner must generate and save a replacement first, using their own password/2FA/consent if prompted.
 - Next: replace and preflight Korean SOS, then continue account-by-account with the remaining Instagram and Threads credentials and public test receipts. Enable the 12-target randomized publisher only after all 12 identities and write permissions are verified and each has a test URL.
+
+## 2026-11-23 Meta SNS credential check (Desktop Commander / PowerShell)
+- Confirmed META-SOCIAL environment secret NAMES only; no secret values were read or printed.
+- Present: Instagram ENGLISH_SOS1 access token + user ID; KOREAN_SOS1 access token without a matching user ID secret. Threads entries are legacy ENGLISH_PICK1, SEOUL_JISOO, and SEOUL_TOPIK; no *_SOS1 Threads secrets appeared in the list.
+- Meta Developers SEOUL TOPIK Instagram API setup page shows 5 connected Instagram tester accounts: korean_sos1, seoul_journal1, seoul_jisoo1, japanese_sos1, english_sos1. It did not show chinese.sos1 on this app page.
+- Korean SOS token UI showed an access token in a dialog during inspection. Treat that token as exposed; do not use it. Rotate and securely replace it. The dialog was closed without copying or saving that token.
+- English SOS public test post already verified: https://www.instagram.com/p/DgFGOG7lSYt/ (GitHub Actions run 45150520283).
+- Remaining work: rotate Korean SOS token and add its user ID, add/verify Chinese SOS tester, obtain the remaining Instagram/Threads account-specific tokens and IDs, then run one verified test per target.
