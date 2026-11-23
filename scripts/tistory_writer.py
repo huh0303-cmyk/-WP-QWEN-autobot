@@ -99,7 +99,18 @@ def build_prompt(job: dict) -> str:
     return build_writer_prompt(job)
 
 
-MIN_BODY_CHARS = 800
+# 2026-11-23: this floor only gated DRAFT_READY, not actual publish
+# eligibility. The local Tistory publisher (tistory_local_runner.py ->
+# automation_hub.editorial_readability.validate_article_length) separately
+# requires MIN_CHARS-MAX_CHARS (2500-4500); this writer previously accepted
+# drafts as low as 800 chars as "ready", so they always reached the human/
+# local-runner stage only to be rejected there as ARTICLE_LENGTH_BLOCKED --
+# confirmed live on 2026-11-23 (845 and 980-char "ready" drafts both
+# bounced). Match the real publish floor here, with a small margin since
+# this count and validate_article_length's visible_length() strip HTML
+# slightly differently.
+from automation_hub.editorial_readability import MIN_CHARS as _PUBLISH_MIN_CHARS
+MIN_BODY_CHARS = _PUBLISH_MIN_CHARS + 100
 MIN_QUALITY_SCORE = 70
 MAX_CONSENSUS_REWRITES = 2
 
