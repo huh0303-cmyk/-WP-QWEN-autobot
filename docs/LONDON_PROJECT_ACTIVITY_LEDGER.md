@@ -1088,8 +1088,16 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 
 ## 2026-11-23 Meta SNS credential check (Desktop Commander / PowerShell)
 - Confirmed META-SOCIAL environment secret NAMES only; no secret values were read or printed.
-- Present: Instagram ENGLISH_SOS1 access token + user ID; KOREAN_SOS1 access token without a matching user ID secret. Threads entries are legacy ENGLISH_PICK1, SEOUL_JISOO, and SEOUL_TOPIK; no *_SOS1 Threads secrets appeared in the list.
+- Present: Instagram ENGLISH_SOS1 access token + user ID; KOREAN_SOS1 access token secret + user ID repository variable (verified via `gh variable list`). Threads entries are legacy ENGLISH_PICK1, SEOUL_JISOO, and SEOUL_TOPIK; no *_SOS1 Threads secrets appeared in the list.
 - Meta Developers SEOUL TOPIK Instagram API setup page shows 5 connected Instagram tester accounts: korean_sos1, seoul_journal1, seoul_jisoo1, japanese_sos1, english_sos1. It did not show chinese.sos1 on this app page.
 - Korean SOS token UI showed an access token in a dialog during inspection. Treat that token as exposed; do not use it. Rotate and securely replace it. The dialog was closed without copying or saving that token.
 - English SOS public test post already verified: https://www.instagram.com/p/DgFGOG7lSYt/ (GitHub Actions run 45150520283).
 - Remaining work: rotate Korean SOS token and add its user ID, add/verify Chinese SOS tester, obtain the remaining Instagram/Threads account-specific tokens and IDs, then run one verified test per target.
+
+## 2026-11-23 KST - Goal confirmed; Korean SOS login handoff ready
+
+- Owner restated target: connect and verify 6 Instagram + 6 Threads accounts, store each account's token in GitHub Environment `META-SOCIAL`, and run stable scheduled publishing three times per day per account/platform (36 destination posts/day once fully enabled).
+- Existing runbook's gate remains in force: do not activate scheduled publishing until all 12 identities/write permissions are verified and each target has a public test receipt URL. Current result is one of 12: English SOS Instagram.
+- Meta `SEOUL TOPIK` Instagram API setup contains `korean_sos1` and its correct profile ID `17841410825136018`. Opened the account-specific OAuth login flow for Korean SOS. Login form is presented; credential submission, 2FA and consent are for the owner to complete. No login was submitted by this session.
+- Existing Korean SOS token is exposed and must be replaced. After the owner completes login/consent and Meta displays the new one-time token, copy it directly into the GitHub `META-SOCIAL` secret `META_INSTAGRAM_KOREAN_SOS1_ACCESS_TOKEN`; preserve its already-confirmed ID in variable `META_INSTAGRAM_KOREAN_SOS1_USER_ID`. Do not record the token value.
+- No scheduled workflow was enabled and no other account was published in this step. Next: owner completes Korean SOS login/consent; then securely save replacement, run the read-only identity preflight and one public test, and continue the other 10 targets.
