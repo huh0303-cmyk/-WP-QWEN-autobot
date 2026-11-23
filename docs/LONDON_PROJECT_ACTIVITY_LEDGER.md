@@ -432,3 +432,11 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - In the logged-in Chrome Meta for Developers session, the My Apps page showed no apps. Selecting the visible `Westlake Co.,Ltd` business portfolio (`203213938399031`) also showed no apps. No app ID or token issuance page was available.
 - No app was created, no permissions or roles were changed, no token was issued or copied, and no GitHub secret was changed. No test publication was attempted.
 - Next action: resume with the Meta developer profile/business that owns the existing social publishing app, or obtain the existing app ID. Then verify the app's Instagram/Threads setup and continue issuing the six account-specific credentials. Do not create a new app or broaden permissions unless specifically authorized.
+
+
+## 2026-11-23 KST — Meta login succeeded; existing social app and permission readiness inspected
+
+- Follow-up for `task_id`: `meta-social-token-20261123-0800-kst`. The user completed Meta sign-in, and the developer account exposed the SeoulTopik business portfolio (`2303233377081420`) with two development-mode apps: `SEOUL TOPIK` (`1383946033947009`) and `클로드` (`2064957407740645`).
+- Read-only inspection identified `클로드` as the existing app with Instagram API and Threads API use-case setup. In its Threads API permissions, `threads_basic` and `threads_content_publish` show “test ready” (0 API calls).
+- In its Instagram API permissions, `instagram_basic` and `instagram_manage_messages` show “test ready”; `instagram_content_publish` currently presents an “Add to App Review” action. The SEOUL TOPIK app was also development mode and did not show the same configured API sections in its sidebar.
+- No permission was added, no role changed, no token was issued, no GitHub secret was changed, and no post was attempted. The required next action before adding Instagram publishing access is action-time confirmation for the `instagram_content_publish` permission on app `2064957407740645`; afterwards continue with account authorization and token checks.
