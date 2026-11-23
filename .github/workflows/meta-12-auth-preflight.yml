@@ -1,0 +1,49 @@
+name: Meta 12 destination identity preflight
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    environment: META-SOCIAL
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Check all 12 exact account identities (read-only)
+        env:
+          META_INSTAGRAM_ENGLISH_SOS1_ACCESS_TOKEN: ${{ secrets.META_INSTAGRAM_ENGLISH_SOS1_ACCESS_TOKEN }}
+          META_INSTAGRAM_ENGLISH_SOS1_USER_ID: ${{ vars.META_INSTAGRAM_ENGLISH_SOS1_USER_ID }}
+          META_INSTAGRAM_JAPANESE_SOS1_ACCESS_TOKEN: ${{ secrets.META_INSTAGRAM_JAPANESE_SOS1_ACCESS_TOKEN }}
+          META_INSTAGRAM_JAPANESE_SOS1_USER_ID: ${{ vars.META_INSTAGRAM_JAPANESE_SOS1_USER_ID }}
+          META_INSTAGRAM_CHINESE_SOS1_ACCESS_TOKEN: ${{ secrets.META_INSTAGRAM_CHINESE_SOS1_ACCESS_TOKEN }}
+          META_INSTAGRAM_CHINESE_SOS1_USER_ID: ${{ vars.META_INSTAGRAM_CHINESE_SOS1_USER_ID }}
+          META_INSTAGRAM_KOREAN_SOS1_ACCESS_TOKEN: ${{ secrets.META_INSTAGRAM_KOREAN_SOS1_ACCESS_TOKEN }}
+          META_INSTAGRAM_KOREAN_SOS1_USER_ID: ${{ vars.META_INSTAGRAM_KOREAN_SOS1_USER_ID }}
+          META_INSTAGRAM_SEOUL_JISOO1_ACCESS_TOKEN: ${{ secrets.META_INSTAGRAM_SEOUL_JISOO1_ACCESS_TOKEN }}
+          META_INSTAGRAM_SEOUL_JISOO1_USER_ID: ${{ vars.META_INSTAGRAM_SEOUL_JISOO1_USER_ID }}
+          META_INSTAGRAM_SEOUL_JOURNAL1_ACCESS_TOKEN: ${{ secrets.META_INSTAGRAM_SEOUL_JOURNAL1_ACCESS_TOKEN }}
+          META_INSTAGRAM_SEOUL_JOURNAL1_USER_ID: ${{ vars.META_INSTAGRAM_SEOUL_JOURNAL1_USER_ID }}
+          META_THREADS_ENGLISH_SOS1_ACCESS_TOKEN: ${{ secrets.META_THREADS_ENGLISH_SOS1_ACCESS_TOKEN }}
+          META_THREADS_ENGLISH_SOS1_USER_ID: ${{ vars.META_THREADS_ENGLISH_SOS1_USER_ID }}
+          META_THREADS_JAPANESE_SOS1_ACCESS_TOKEN: ${{ secrets.META_THREADS_JAPANESE_SOS1_ACCESS_TOKEN }}
+          META_THREADS_JAPANESE_SOS1_USER_ID: ${{ vars.META_THREADS_JAPANESE_SOS1_USER_ID }}
+          META_THREADS_CHINESE_SOS1_ACCESS_TOKEN: ${{ secrets.META_THREADS_CHINESE_SOS1_ACCESS_TOKEN }}
+          META_THREADS_CHINESE_SOS1_USER_ID: ${{ vars.META_THREADS_CHINESE_SOS1_USER_ID }}
+          META_THREADS_KOREAN_SOS1_ACCESS_TOKEN: ${{ secrets.META_THREADS_KOREAN_SOS1_ACCESS_TOKEN }}
+          META_THREADS_KOREAN_SOS1_USER_ID: ${{ vars.META_THREADS_KOREAN_SOS1_USER_ID }}
+          META_THREADS_SEOUL_JISOO1_ACCESS_TOKEN: ${{ secrets.META_THREADS_SEOUL_JISOO1_ACCESS_TOKEN }}
+          META_THREADS_SEOUL_JISOO1_USER_ID: ${{ vars.META_THREADS_SEOUL_JISOO1_USER_ID }}
+          META_THREADS_SEOUL_JOURNAL1_ACCESS_TOKEN: ${{ secrets.META_THREADS_SEOUL_JOURNAL1_ACCESS_TOKEN }}
+          META_THREADS_SEOUL_JOURNAL1_USER_ID: ${{ vars.META_THREADS_SEOUL_JOURNAL1_USER_ID }}
+          REPORT_PATH: reports/meta_12_preflight.json
+        run: python scripts/meta_12_preflight.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: meta-12-preflight-${{ github.run_id }}
+          path: reports/meta_12_preflight.json
+          if-no-files-found: ignore
