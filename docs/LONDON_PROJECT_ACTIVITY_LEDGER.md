@@ -1192,3 +1192,12 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 
 
 - Follow-up UX step: populated only the public account handles in the three matching Instagram login forms (`chinese.sos1`, `seoul_jisoo1`, `seoul_journal1`) to distinguish the identical login tabs. No login button was submitted; any saved-password autofill remains for the owner to review and submit, and any 2FA remains owner-entered.
+
+
+## 2026-11-23 KST — Seoul Journal Instagram token attempt rejected by profile mismatch
+
+- task_id: `meta-12-destination-publisher-20261123`
+- User-provided Meta result for `seoul_journal1` (Instagram ID `17841449179626171`) showed the error: “입력된 자격 증명이 선택된 테스터 프로필과 일치하지 않습니다.” The dialog had no usable access-token value or copy control; this attempt did not issue a token and no Secret was changed.
+- Read-only check of the same app `2064957407740645` Roles page shows the Instagram Tester role for `seoul_journal1` is present (as are all six listed Instagram tester roles); therefore this screenshot is not evidence that its tester invitation is pending. The current OAuth login/selected tester profile does not match the selected `seoul_journal1` target. Retry only with the exact `seoul_journal1` Instagram profile selected and authenticated. Do not reuse or save any value from this failed dialog.
+- The same Roles page shows all six Threads Tester invitations still pending. No roles were modified. Both publisher readiness/schedule gates remain false.
+- Progress remains: two Instagram public test URLs verified (English and Japanese); Korean Instagram identity is verified but needs its public write test. Nine credentials/identity pairs remain to validate or issue (Chinese, Seoul Jisoo, Seoul Journal Instagram and six Threads); ten public test posts remain including Korean. No post was made during this diagnostic.
