@@ -619,11 +619,17 @@ def main():
             event_clips = fetch_archive_clips(event['text'], channel_key, event_dir, n_target=4)
             if not event_clips:
                 continue
-            try:
-                event_clips = inspect_and_filter_clips(event['text'], event_clips, event_dir, run_ffmpeg, log)
-            except RuntimeError as exc:
-                log(f"   ⚠️ 관련 화면이 없는 역사 사건은 제외하고 다음 사건으로 진행: {exc}")
-                continue
+            if all(c["identifier"].startswith("pexels:") for c in event_clips):
+                # Pexels B-roll is atmospheric, not a literal match for the exact
+                # historical scene, so the strict archival scene-match gate below
+                # would always reject it (2026-11-23 incident: 0/4 every time).
+                log("   ℹ️ Pexels 대체 클립은 장면 일치 검증을 건너뜀(아카이브 원본이 아니므로)")
+            else:
+                try:
+                    event_clips = inspect_and_filter_clips(event['text'], event_clips, event_dir, run_ffmpeg, log)
+                except RuntimeError as exc:
+                    log(f"   ⚠️ 관련 화면이 없는 역사 사건은 제외하고 다음 사건으로 진행: {exc}")
+                    continue
             for clip in event_clips:
                 clip['event_label'] = f"{today.strftime('%B %d')} · {event['year']}"
                 clip['event_text'] = event['text']
@@ -646,7 +652,7 @@ def main():
         log("❌ 이 주제로 사용 가능한 퍼블릭도메인 클립을 하나도 못 찾음 — 주제를 바꿔서 재시도 필요")
         raise SystemExit(1)
     log(f"   {len(clips)}개 클립 확보 (전부 퍼블릭도메인 검증됨)")
-    if channel_key != "history":
+    if channel_key != "history" and not all(c["identifier"].startswith("pexels:") for c in clips):
         clips = inspect_and_filter_clips(topic, clips, workdir, run_ffmpeg, log)
     log(f"   AI actual-frame review passed: {len(clips)} relevant clips")
 
