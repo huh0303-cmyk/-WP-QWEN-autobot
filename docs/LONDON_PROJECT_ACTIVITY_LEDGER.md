@@ -1274,3 +1274,10 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - Read-only inspection of Meta app `2064957407740645` Roles and Threads account settings confirms all six Threads tester invitations remain pending.
 - The currently authenticated Threads profile is `japanese_sos1`; its Website Permissions > Invitations tab shows the Claude developer app tester invitation and an Accept control. Meta's confirmation text states acceptance represents participation as an app tester and agreement to the Meta platform terms and developer policy.
 - No invitation was accepted and no role/security setting changed. Waiting for the owner to confirm acceptance at action time. Current GitHub readiness remains four public tests out of twelve; activation gates remain false.
+
+## 2026-11-23 21:4x KST — Japanese SOS Threads tester invitation accepted
+
+- task_id: `meta-12-destination-publisher-20261123`
+- User explicitly approved accepting all six pending Threads tester invitations. Accepted the current `japanese_sos1` invitation through Threads Website Permissions. Rechecked Meta app Roles: Japanese SOS Threads row no longer shows the pending marker. No other invite was accepted yet.
+- Meta Account Center currently lists four Threads profiles under the linked account: `korean_sos1`, `japanese_sos1`, `chinese.sos1`, `seoul_jisoo1`. It lists all six Instagram profiles, but no `english_sos1` or `seoul_journal1` Threads profile. The other five Threads role invitations remain pending in the app Roles view; account-specific switching/creation is still needed to accept the four other existing profiles and establish/link the two absent profiles.
+- No Threads token was generated or saved, and no Threads test post was sent. Instagram public-test receipts remain 4/12; schedule gates remain false.
