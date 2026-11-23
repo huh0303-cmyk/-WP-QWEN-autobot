@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at_kst": "2026-11-23T21:37:15.380284+09:00",
+  "updated_at_kst": "2026-11-23T21:37:29.852938+09:00",
   "targets": [
     {
       "test_public_url": "https://www.instagram.com/p/DgFGOG7lSYt/",
@@ -44,13 +44,14 @@
       "identity_verified": false
     },
     {
-      "test_public_url": "",
+      "test_public_url": "https://www.instagram.com/p/DgFZYcKFvOc/",
       "account_key": "seoul_journal1",
       "platform": "instagram",
-      "write_scope_verified": false,
+      "write_scope_verified": true,
       "identity_verified": true,
-      "test_status": "ATTEMPT_RESERVED",
-      "test_attempted_at_kst": "2026-11-23T21:37:15.380284+09:00"
+      "test_status": "PUBLISHED",
+      "test_attempted_at_kst": "2026-11-23T21:37:15.380284+09:00",
+      "test_published_at_kst": "2026-11-23T21:37:29.852925+09:00"
     },
     {
       "test_public_url": "",
