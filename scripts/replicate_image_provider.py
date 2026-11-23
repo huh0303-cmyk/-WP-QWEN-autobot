@@ -27,8 +27,12 @@ import requests
 
 REPLICATE_API = "https://api.replicate.com/v1"
 
-PRIMARY_MODEL = "bytonylee/sdxl-turbo"
-SECONDARY_MODEL = "black-forest-labs/flux-schnell"
+# 2026-11-23: owner's own Replicate dashboard history shows
+# bytonylee/sdxl-turbo aborting (two "Aborted" runs, no successful API
+# call) while black-forest-labs/flux-schnell has succeeded repeatedly via
+# API. Try the model with a real success record first.
+PRIMARY_MODEL = "black-forest-labs/flux-schnell"
+SECONDARY_MODEL = "bytonylee/sdxl-turbo"
 ALLOWED_MODELS = (
     PRIMARY_MODEL,
     SECONDARY_MODEL,
