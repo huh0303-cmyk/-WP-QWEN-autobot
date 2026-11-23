@@ -46,6 +46,15 @@ import time as _time
 _DEAD: set = set()          # (provider, key_id, model) that returned 400/401/403/404: do not retry this run
 _COOLDOWN: dict = {}        # (provider, key_id, model) -> epoch seconds until which a 429 keeps it parked
 _KEY_NAMES = ("GEMINI_API_KEY", "GEMINI_API_KEY_2", "GEMINI_API_KEY_3")
+# 2026-11-23: _DISCOVERED/_SKIP/_PREFER are referenced by _discover() below
+# but none were ever defined anywhere in this module. _discover()/
+# _compat_models() were dead code until generate_text() was wired to
+# actually call them today, which immediately surfaced this as a live
+# NameError ("name '_DISCOVERED' is not defined") crashing every Groq/
+# OpenRouter fallback attempt.
+_DISCOVERED: dict = {}
+_SKIP = ("embed", "whisper", "tts", "guard", "moderation", "vision", "audio", "image")
+_PREFER = ("llama-3.3-70b", "llama-3.1-70b", "qwen", "mixtral", "gpt-oss")
 
 
 def _gemini_keys() -> list:
