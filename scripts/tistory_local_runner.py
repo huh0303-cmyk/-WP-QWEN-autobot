@@ -157,10 +157,15 @@ def process_jobs(db, context, limit, gap_seconds, *, force_private=False):
     results = []
     for index, item in enumerate(rows):
         payload = json.loads(item["payload"])
-        draft = draft_from_row(payload, payload["site_url"], force_private=force_private)
         db.execute("UPDATE jobs SET state='running',attempts=attempts+1,updated_at=CURRENT_TIMESTAMP WHERE job_id=?", (item["job_id"],)); db.commit()
         page = context.new_page()
         try:
+            # 2026-11-23: draft_from_row() (and its length validation) used to run
+            # before this try block, so one too-short article crashed the whole
+            # batch and left every other queued blog unpublished. Build the draft
+            # inside the try so a bad row is skipped (marked retry) and the run
+            # continues with the next job.
+            draft = draft_from_row(payload, payload["site_url"], force_private=force_private)
             saved = TistoryLocalPublisher(draft).publish(page)
             is_public = saved.status == "public"
             result = {
