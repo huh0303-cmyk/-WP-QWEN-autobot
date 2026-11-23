@@ -10,8 +10,8 @@ Source of truth for handles/IDs: `config/SNS_SIX_BRAND_IDENTITY_LOCK_2026-11-21.
 
 | Platform  | Account         | Status |
 |-----------|-----------------|--------|
-| Instagram | english_sos1    | DONE — token saved, identity-verified (`meta-english-sos-auth-preflight.yml` run `45132955917`) |
-| Instagram | korean_sos1     | DONE — token saved (`meta-korean-sos-auth-preflight.yml` added; run it once to confirm) |
+| Instagram | english_sos1 | TEST PUBLISHED; public URL verified: https://www.instagram.com/p/DgFGOG7lSYt/ (run 45150520283) |
+| Instagram | korean_sos1 | TOKEN SAVED BUT EXPOSED IN SCREENSHOT; replace before any use; preflight not run |
 | Instagram | japanese_sos1   | NOT DONE |
 | Instagram | seoul_jisoo1    | NOT DONE |
 | Instagram | seoul_journal1  | NOT DONE |
@@ -108,3 +108,9 @@ Only then wire up the randomized dispatch cadence (3 posts/account/platform/day,
 window, 15-minute minimum gap — see `config/meta_five_account_daily_policy.json`'s
 `daily_cadence` block for the pattern to carry over to the 6-account scope) and reconcile
 `meta-randomized-dispatch.yml`'s env var references, which still point at old account names.
+
+## Operational update - 2026-11-23 18:50 KST
+
+- Published and verified one public Instagram image post for `@english_sos1`: https://www.instagram.com/p/DgFGOG7lSYt/ (media ID `18135124276695322`; GitHub Actions run `45150520283`).
+- This is one of 12 required account/platform tests. No other account or Threads post was published, and no automatic schedule was enabled.
+- `korean_sos1` token is recorded as visible in a screenshot. Treat it as exposed; replace the token before running its preflight or publishing. The owner's password/2FA/consent may be required during the replacement flow.
