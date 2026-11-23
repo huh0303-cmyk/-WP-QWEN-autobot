@@ -457,3 +457,13 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - The user directed completion of automated publishing preparation, then one test publication per account and verification of each resulting URL.
 - Proceed with the least permissions needed for publishing and profile identification. Do not add comments, direct-message, or advertising permissions unless proven necessary and separately approved. Never expose tokens in the repository; use the designated GitHub Actions environment secrets.
 - This approval authorizes the requested flow, but does not itself prove that Meta setup, credentials, test posts, or URLs have completed. Record each step and verify the final receipts.
+
+
+## 2026-11-23 KST — Threads Tester invitations sent; Instagram posting role needs broader approval
+
+- Follow-up for `task_id=meta-social-token-20261123-0800-kst`, app `클로드` (`2064957407740645`), SeoulTopik business portfolio (`2303233377081420`).
+- The user confirmed the six paired handles: `seoul_journal1`, `seoul_jisoo1`, `korean_sos1`, `chinese.sos1`, `japanese_sos1`, and `english_sos1`.
+- With the user's explicit approval, Meta Threads Tester invitations were submitted for all six exact handle matches. The app role screen shows all six invitations as pending; each Threads profile must accept from its profile Website permissions section before use.
+- The dedicated `Instagram Tester` role is explicitly described in Meta UI as covering Instagram Basic Display API. No Instagram Tester invitation was sent because that role does not match content-publishing verification. The general `Tester` role permits testing all app permissions/features/products; action-time approval was requested before assigning it to the six accounts.
+- No Instagram roles were changed, no token was issued or copied, no GitHub secret was changed, and no test post or publication URL exists yet.
+- Next: await the user's approval for the general Tester role; then continue with account authorization, minimum-scope publishing tokens, designated GitHub environment secrets, and one verified test post per Instagram/Threads destination. Do not add comments, messages, ads, or unrelated scopes.
