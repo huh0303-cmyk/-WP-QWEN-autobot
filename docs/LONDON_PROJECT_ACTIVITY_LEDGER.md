@@ -1013,3 +1013,10 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - Repository workflow `.github/workflows/ceo-sns-probe.yml` consumes the English Instagram variables `IG_ACCESS_TOKEN_ENGLISH` and `IG_USER_ID_ENGLISH`.
 - GitHub Secret was not saved: local `gh auth status` reports the configured GitHub CLI credential is invalid, and the browser's GitHub settings page is signed out. The GitHub connector supports repository file operations but not Secrets API. No Secret value was changed and no post was published.
 - Next: owner completes GitHub sign-in in the open browser (or restores `gh` authentication). Then save the token to `IG_ACCESS_TOKEN_ENGLISH` and the confirmed account ID to `IG_USER_ID_ENGLISH`, verify the secret names only, and run the already-authorized controlled probe/test flow. Continue other account tokens and Threads tester acceptance afterward. Never put token values in project records.
+
+## 2026-11-23 KST — English SOS token stored in GitHub META-SOCIAL
+
+- The user completed GitHub sign-in. In repository `huh0303-cmyk/-WP-QWEN-autobot`, environment `META-SOCIAL`, the generated English SOS token was saved as `META_INSTAGRAM_ENGLISH_SOS1_ACCESS_TOKEN`; account ID `17841441355349874` was saved as `META_INSTAGRAM_ENGLISH_SOS1_USER_ID`.
+- Verified both secret names appear in the environment's Actions secrets list. Secret values were not read back or added to any project record.
+- Correction to the prior checkpoint: `IG_ACCESS_TOKEN_ENGLISH` is referenced by the existing `ceo-sns-probe.yml` metrics workflow and is not the account-specific key for `english_sos1`. The correct target-specific keys are the two `META_INSTAGRAM_ENGLISH_SOS1_*` entries above.
+- No Instagram post was published in this step. No other account's token or secret was changed. Next: verify the publishing workflow's expected account-secret mapping, then continue the remaining authorized account token/Threads setup work.
