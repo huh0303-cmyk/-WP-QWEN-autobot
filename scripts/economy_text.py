@@ -208,10 +208,42 @@ def _model_chain(choice: str) -> tuple[str, ...]:
     raise ValueError("unsupported writer model")
 
 
+# 2026-11-23: the publishing charter requires Gemini -> Groq -> OpenRouter
+# -> Cerebras, all free tier, no paid model. _try_compat/_discover below
+# already implement Groq and OpenRouter calls, but nothing ever called
+# them: this entrypoint used to stop at Gemini alone, so when Gemini's
+# free-tier quota ran out (confirmed live today) there was no real
+# fallback despite the charter requiring one and the keys already being
+# configured. Added a Cerebras spec (OpenAI-compatible, same as the
+# other two) and wired all three in after Gemini.
+GROQ_SPEC = ("groq", "GROQ_API_KEY", "https://api.groq.com/openai/v1/chat/completions", "GROQ_MODEL", "llama-3.3-70b-versatile")
+OPENROUTER_SPEC = ("openrouter", "OPENROUTER_API_KEY", "https://openrouter.ai/api/v1/chat/completions", "OPENROUTER_MODEL", "meta-llama/llama-3.3-70b-instruct:free")
+CEREBRAS_SPEC = ("cerebras", "CEREBRAS_API_KEY", "https://api.cerebras.ai/v1/chat/completions", "CEREBRAS_MODEL", "llama-3.3-70b")
+
+
 def generate_text(prompt, temperature=0.7, force_gpt=False, repair=False, writer_model=None, language=None):
-    """Compatibility entrypoint: only the approved language-aware Gemini chain."""
+    """Charter chain: free Gemini (all configured keys) -> Groq -> OpenRouter -> Cerebras. No paid model."""
     global last_writer_model
     import gemini_text
-    result = gemini_text.gemini_generate_text(prompt, temperature=temperature, language=language)
-    last_writer_model = gemini_text.last_writer_model
-    return result
+    failures = []
+    try:
+        result = gemini_text.gemini_generate_text(prompt, temperature=temperature, language=language)
+        last_writer_model = gemini_text.last_writer_model
+        return result
+    except Exception as exc:
+        failures.append(f"gemini:{type(exc).__name__}")
+        print(f"Article writer fallback: Gemini chain exhausted ({exc}); trying Groq")
+    for spec in (GROQ_SPEC, OPENROUTER_SPEC, CEREBRAS_SPEC):
+        provider = spec[0]
+        if not os.getenv(spec[1], "").strip():
+            failures.append(f"{provider}:missing_key")
+            continue
+        for model in _compat_models(spec):
+            try:
+                result = _try_compat(prompt, temperature, spec, model)
+                print(f"Article writer success: {provider} {model}")
+                return result
+            except (requests.RequestException, ValueError, KeyError, TypeError) as exc:
+                failures.append(f"{provider}:{model}:{type(exc).__name__}")
+                print(f"Article writer fallback: {provider} {model} {type(exc).__name__}")
+    raise RuntimeError("ALL_WRITERS_EXHAUSTED: " + "; ".join(failures))
