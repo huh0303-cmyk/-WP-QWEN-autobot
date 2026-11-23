@@ -1,0 +1,79 @@
+name: English SOS Instagram public test
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  publish-test:
+    runs-on: ubuntu-latest
+    environment: META-SOCIAL
+    timeout-minutes: 10
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: Publish one English SOS lesson and verify its public URL
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.META_INSTAGRAM_ENGLISH_SOS1_ACCESS_TOKEN }}
+          IG_USER_ID: ${{ secrets.META_INSTAGRAM_ENGLISH_SOS1_USER_ID }}
+        run: |
+          python - <<'PY'
+          import os, sys, time
+          import requests
+          token = os.environ.get("IG_ACCESS_TOKEN", "").strip()
+          expected_id = os.environ.get("IG_USER_ID", "").strip()
+          expected_handle = "english_sos1"
+          image_url = "https://raw.githubusercontent.com/huh0303-cmyk/-WP-QWEN-autobot/main/demo_assets/english-sos-publish-test.png"
+          caption = ("ENGLISH SOS | TRAVEL ENGLISH\\n\\n"
+                     "Phrase 1: Could I get a coffee, please?\\n\\n"
+                     "\\u11036\\u11073: \\ucee4\\ud53c \\ud55c \\uc794 \\uc8fc\\uc2dc\\uaca0\\uc5b4\\uc694?\\n\\n"
+                     "Say it aloud, then use it at a cafe. \\u2615\\n"
+                     "#EnglishSOS #TravelEnglish #EnglishConversation")
+          if not token or not expected_id.isdigit():
+              print("RESULT=BLOCKED_MISSING_CREDENTIAL")
+              sys.exit(1)
+          base = "https://graph.instagram.com/v25.0"
+          session = requests.Session()
+          headers = {"Authorization": "Bearer " + token, "User-Agent": "LondonProject-Instagram-Publish-Test/1.0"}
+          def call(method, path, **kwargs):
+              try:
+                  response = session.request(method, base + "/" + path, headers=headers, timeout=45, **kwargs)
+                  payload = response.json()
+              except Exception as exc:
+                  raise RuntimeError("Meta request failed; details suppressed") from None
+              if not response.ok or "error" in payload:
+                  err = payload.get("error") or {}
+                  raise RuntimeError(f"Meta API error HTTP={response.status_code} code={err.get('code')} subcode={err.get('error_subcode')}")
+              return payload
+          me = call("GET", "me", params={"fields":"user_id,username"})
+          user_id = str(me.get("user_id", ""))
+          username = str(me.get("username", "")).lstrip("@")
+          if user_id != expected_id or username.casefold() != expected_handle:
+              print(f"RESULT=IDENTITY_MISMATCH username={username or 'MISSING'} id_match={user_id == expected_id}; no publication attempted")
+              sys.exit(1)
+          recent = call("GET", f"{user_id}/media", params={"fields":"id,caption,permalink,timestamp", "limit":"25"})
+          existing = next((x for x in recent.get("data",[]) if x.get("caption") == caption), None)
+          if existing and existing.get("permalink"):
+              print(f"RESULT=ALREADY_PUBLISHED username={username} url={existing['permalink']}")
+              sys.exit(0)
+          container = call("POST", f"{user_id}/media", data={"image_url":image_url, "caption":caption})["id"]
+          for _ in range(36):
+              status = call("GET", container, params={"fields":"status_code"}).get("status_code")
+              if status == "FINISHED":
+                  break
+              if status != "IN_PROGRESS":
+                  raise RuntimeError(f"Instagram media processing stopped: {status}")
+              time.sleep(5)
+          else:
+              raise RuntimeError("Instagram media processing timed out; no publish call was made")
+          published = call("POST", f"{user_id}/media_publish", data={"creation_id":container})
+          media_id = str(published["id"])
+          verified = call("GET", media_id, params={"fields":"id,permalink,timestamp,username"})
+          permalink = verified.get("permalink", "")
+          if not permalink.startswith("https://www.instagram.com/"):
+              raise RuntimeError("Publish returned no verified Instagram permalink")
+          print(f"RESULT=PUBLISHED_AND_VERIFIED username={username} media_id={media_id} url={permalink} timestamp={verified.get('timestamp','')}")
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as summary:
+              summary.write(f"## English SOS test publish\\n\\n- Account: @{username}\\n- Result: public media URL verified\\n- URL: {permalink}\\n- Media ID: {media_id}\\n- Timestamp: {verified.get('timestamp','')}\\n- No token or private credential is included.\\n")
+          PY
