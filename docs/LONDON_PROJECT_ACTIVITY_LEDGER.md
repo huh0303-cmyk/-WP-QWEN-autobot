@@ -507,3 +507,12 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - The remaining five Instagram Tester invitations are still pending. All six Threads Tester invitations remain pending; no Threads profile acceptance was performed.
 - No token was generated or copied, no GitHub Secret was changed, no test post was published, and no post URL exists.
 - Next: user signs into each remaining Instagram profile in Chrome and indicates when each is ready; accept each exact invitation after the required action-time terms confirmation. Repeat the account-specific acceptance flow for Threads once its profiles are logged in. Then verify account assets, token type/expiry, and publication access before storing credentials or attempting tests.
+
+
+## 2026-11-23 KST — Live Meta Instagram token authorization paused for user login
+
+- Follow-up for `task_id=meta-social-token-20261123-0800-kst`. The user instructed token issuance, GitHub Secret registration, readiness check for 12 paired Instagram/Threads destinations, and one actual test post per destination with URL verification.
+- Corrects prior current-session notes: the existing app is available in Chrome as `클로드` (`2064957407740645`), Instagram product app `클로드-IG` (`1766267197891016`), SeoulTopik business portfolio `2303233377081420`. The app's Instagram API setup table currently lists six connected profiles and their IDs: `english_sos1` `17841441355349874`; `japanese_sos1` `17841411813216531`; `chinese.sos1` `17841411010918367`; `korean_sos1` `17841410825136018`; `seoul_jisoo1` `17841404970616486`; `seoul_journal1` `17841449179626171`.
+- The current app roles view showed all six Instagram Tester roles accepted/active. All six Threads Tester roles remain pending acceptance.
+- Selecting token generation for `english_sos1` opened Instagram forced-login for that exact profile. The OAuth request includes `instagram_business_basic`, `instagram_business_content_publish`, plus manage-messages, manage-comments, and manage-insights scopes. No login credentials, token value, or 2FA were entered/read/copied by the assistant. The user must authenticate in the open tab; no token has yet been generated.
+- No GitHub Secret was written and no test publication was attempted. After the user completes login, inspect the consent/token result and avoid exposing the token; proceed with the approved account-specific credential storage and test workflow, while separately resolving the six pending Threads Tester acceptances.
