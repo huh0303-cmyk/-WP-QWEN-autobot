@@ -538,3 +538,10 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - The newest located preflight artifact, dated 2026-11-07, reports 3/10 legacy connections identity-verified, `publish_enabled=false`, `publication_performed=false`, and `write_scope_verified=false`. This is historical evidence, not a current secret-state check.
 - Determination: the repository does not currently establish readiness for one verified post to all 12 current destinations. Tokens/Secrets and Threads Tester acceptances are still incomplete, and a six-account mapping plus per-destination smoke/verification workflow is required before claiming readiness.
 - No publishing workflow was dispatched and no external post was made during this audit. Chrome control remains interrupted; resume UI work only after browser control is available and the user completes their own account authentication.
+
+
+## 2026-11-23 23:50 KST — Blogger 33 daily audit blocked by unverified SSH host key
+
+- Strict, read-only SSH to `root@187.127.121.57` at 23:50:18 KST rejected a changed server identity (`REMOTE HOST IDENTIFICATION HAS CHANGED`). Presented ED25519 fingerprint: `SHA256:xGz5BAS5YPG5zrRx8d/ugCTdNg10MhDFavjKmUrXGQg`, the same unverified fingerprint recorded on November 16–22. Host-key checking and `known_hosts` were not changed.
+- The November 23 `korea365-blogger33-daily.timer` enabled/active state, exact 33-target schedule, transient-service outcomes, same-date publication-key duplicates, OAuth/API errors, and `/opt/korea365/artifacts/blogger-33-public-results.json` remain unverified. Failed blog keys cannot be identified without trusted server access.
+- No GitHub Actions dispatch, retry, manual publication, or production mutation occurred. Next: independently verify the VPS fingerprint through a trusted provider/server channel, restore trusted SSH, and repeat the read-only audit. Check same-date publication markers and public posts before any recovery; never dispatch `publish-blogger-33-now.yml`.
