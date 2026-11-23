@@ -1075,3 +1075,13 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
   with test-publish public URLs first). Next action: run `meta-korean-sos-auth-preflight.yml`
   once to confirm identity, then work through the runbook's remaining 10 connections at whatever
   pace the owner can sustain.
+
+## 2026-11-23 18:50 KST - English SOS live Instagram publish test verified
+
+- `task_id=meta-social-12-account-publish-20261123-1256-kst`; user instructed that I carry the publishing work forward and specifically told me to use Desktop Commander and PowerShell.
+- Used PowerShell to create a simple English SOS A1 travel-English image card and uploaded the public image asset `demo_assets/english-sos-publish-test.png` to `main` (asset commit `b7ed472bd7662648e4b00d0019d2d5711e6cbc3a`). Verified the raw image endpoint responded HTTP 200 with `image/png` before publication.
+- Added a manual-only workflow `.github/workflows/meta-english-sos-publish-test.yml` (final workflow commit `561cd6b4969134bb3a9e9bd2512e76520db32419`). It reads only the English SOS GitHub environment secrets, checks `/me` against exact handle and ID, avoids duplicate identical captions, waits for the image container, publishes once, and verifies Instagram's permalink. It prints no token or response body. Workflow is `workflow_dispatch` only; no schedule was added.
+- GitHub Actions run `45150520283` succeeded. Sanitized readback: `@english_sos1`, media ID `18135124276695322`, permalink `https://www.instagram.com/p/DgFGOG7lSYt/`, Meta timestamp `2026-11-23T09:50:01Z` (18:50:01 KST). The public Instagram page showed `@english_sos1` as the post owner.
+- Caption teaches the A1 café phrase "Could I get a coffee, please?" and its Korean meaning. This is the first confirmed public test post among the 12 account/platform targets. No other post was sent and randomized automation remains disabled.
+- Security: the separate Korean SOS token is recorded as visible in a screenshot. Do not run its preflight or publish with that credential; the owner must generate and save a replacement first, using their own password/2FA/consent if prompted.
+- Next: replace and preflight Korean SOS, then continue account-by-account with the remaining Instagram and Threads credentials and public test receipts. Enable the 12-target randomized publisher only after all 12 identities and write permissions are verified and each has a test URL.
