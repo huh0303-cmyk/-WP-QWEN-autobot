@@ -78,8 +78,19 @@ def main():
         raise SystemExit("SHEET_ID is required")
     payload = json.loads(Path(args.drafts).read_text(encoding="utf-8"))
     rows = rows_from_artifact(payload)
-    if len(rows) != len(payload.get("drafts", [])):
-        raise RuntimeError("Every requested Tistory draft must be DRAFT_READY and private before queueing")
+    total = len(payload.get("drafts", []))
+    # 2026-11-23: this used to raise and discard the whole batch when any
+    # single site failed its quality gate, even though rows_from_artifact()
+    # above had already correctly filtered to only the DRAFT_READY ones.
+    # With free-tier LLM rate limits, 5/5 sites succeeding in one run is the
+    # exception, not the norm -- that made every real run a guaranteed
+    # all-or-nothing loss of whatever did succeed. Queue what passed and
+    # report the rest; a site that failed quality stays out of the queue
+    # exactly as before, it just no longer blocks its siblings.
+    if len(rows) != total:
+        print(json.dumps({"partial": True, "ready": len(rows), "requested": total}, ensure_ascii=False))
+    if not rows:
+        raise SystemExit("No draft reached DRAFT_READY this run; nothing to queue")
     service = get_sheets_service()
     ensure_tab(service, sheet_id, QUEUE_TAB, PUBLISH_QUEUE_HEADER)
     existing = _with_retries(lambda: service.spreadsheets().values().get(
