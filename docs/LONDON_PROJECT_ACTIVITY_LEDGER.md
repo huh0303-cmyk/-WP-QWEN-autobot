@@ -1335,3 +1335,11 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - 앞선 재확인 기록의 “미수락 3개”는 Threads 초대만 센 값이었다. 전체 대기 초대는 4건으로 정정한다.
 - 아직 네 초대를 수락하지 못했다. 현재 Threads 세션은 일본 계정이며, 별도 Edge에는 `english_sos1` 아이디가 채워진 Threads 로그인 화면이 열려 있다. 비밀번호와 2단계 인증은 입력/제출하지 않았다. 중국 Instagram을 포함한 각 초대는 해당 계정으로 로그인한 세션에서 수락해야 한다.
 - 토큰, 게시 검증, 자동발행 게이트 상태에는 변경이 없다.
+
+
+## 2026-11-23 23:xx KST — Threads 계정 전환 재시도; 초대 미수락
+
+- task_id: `meta-12-destination-publisher-20261123`
+- 사용자가 초대 수락을 재차 지시해 기존 로그인 세션에서 계정 전환을 시도했다. Chrome Threads는 홈과 프로필 메뉴 모두 `japanese_sos1`로 표시됐고, 메뉴에는 피드 만들기만 있어 다른 계정 전환 항목이 없었다.
+- Chrome Instagram에는 `seoul_journal1` 프로필 탭이 로그인 상태로 열려 있었지만, 그 프로필에서 Threads 링크를 열어도 Threads는 `japanese_sos1`로 열렸다. Edge는 `english_sos1` 사용자명이 입력된 Threads 로그인 화면이며 비밀번호 입력란은 비어 있다.
+- 따라서 대기 4건(Instagram Chinese 1, Threads Chinese/English/Seoul Journal 3)은 이번 재시도에서도 수락되지 않았다. 사용자 비밀번호·2FA 입력, 다른 계정 경계 우회, 초대 설정 변경은 없었다. 다음 실질 단계는 대상 계정 세션에서 인증을 마친 후 해당 초대를 직접 수락하는 것이다.
