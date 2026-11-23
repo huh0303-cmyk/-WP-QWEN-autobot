@@ -1343,3 +1343,61 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - 사용자가 초대 수락을 재차 지시해 기존 로그인 세션에서 계정 전환을 시도했다. Chrome Threads는 홈과 프로필 메뉴 모두 `japanese_sos1`로 표시됐고, 메뉴에는 피드 만들기만 있어 다른 계정 전환 항목이 없었다.
 - Chrome Instagram에는 `seoul_journal1` 프로필 탭이 로그인 상태로 열려 있었지만, 그 프로필에서 Threads 링크를 열어도 Threads는 `japanese_sos1`로 열렸다. Edge는 `english_sos1` 사용자명이 입력된 Threads 로그인 화면이며 비밀번호 입력란은 비어 있다.
 - 따라서 대기 4건(Instagram Chinese 1, Threads Chinese/English/Seoul Journal 3)은 이번 재시도에서도 수락되지 않았다. 사용자 비밀번호·2FA 입력, 다른 계정 경계 우회, 초대 설정 변경은 없었다. 다음 실질 단계는 대상 계정 세션에서 인증을 마친 후 해당 초대를 직접 수락하는 것이다.
+
+## 2026-11-23 15:05 KST — Tistory pipeline: five real bugs found and fixed live, root cause of zero publishes identified
+
+- Owner directive, verbatim summary: resume Tistory daily auto-publish (owner-approved lift of the
+  2026-10-10 emergency pause, see earlier entry), then audit/fix the same writer/image pipeline
+  across WordPress (`daily-network-publish.yml`) and Blogspot. Chain of real, confirmed-live bugs
+  found and fixed in `scripts/tistory_local_runner.py`, `scripts/enqueue_tistory_drafts.py`,
+  `scripts/tistory_writer.py`, `scripts/gemini_text.py`, `scripts/economy_text.py`,
+  `scripts/content_engine_policy_20261110.py`, `scripts/replicate_image_provider.py`, and
+  `.github/workflows/tistory-daily-plan.yml` (commits `2de5eca2` through `6dcf4693`, all pushed to
+  `main`):
+  1. Local queue had an unbounded retry loop (no attempt cap) that let a handful of permanently
+     broken 2026-09-05 test rows monopolize every run forever; capped at 3 attempts.
+  2. The entire local queue (81 jobs, 0 ever published) turned out to be 2.5-month-old dead
+     test/bulk content once traced to the Sheet; archived all 74 stale `ready` rows.
+  3. `enqueue_tistory_drafts.py` discarded an entire batch (including successfully generated
+     drafts) if any single site failed quality; now queues partial successes.
+  4. Writer's own `MIN_BODY_CHARS=800` "ready" floor didn't match the publisher's real 2500-4500
+     requirement, so "ready" drafts still bounced at publish; aligned to the real floor.
+  5. `gemini_text.py` only ever read `GEMINI_API_KEY`, silently ignoring `_2`/`_3` even though all
+     three are configured and passed to every workflow using this writer (17 scripts repo-wide);
+     Gemini's free-tier quota is per-project not per-key, so one key absorbed 100% of today's
+     load. Now rotates all three.
+  6. The charter-mandated Gemini→Groq→OpenRouter→Cerebras fallback was never actually wired past
+     Gemini; Groq/OpenRouter calling code already existed but nothing invoked it, and there was no
+     Cerebras integration at all. Wired all three in; added a Cerebras spec. This introduced a new
+     live bug (`_DISCOVERED`/`_SKIP`/`_PREFER` referenced but never defined -- dead code until
+     today, immediately crashed 3/4 sites in the first real run) which was found and fixed in the
+     same session.
+  7. **Root cause of every single image failure across every provider** (Pexels, Pixabay,
+     Replicate all failed identically all day regardless of which API keys were set):
+     `stable_image_hosting.host_permanently()` commits the found/generated photo into this repo
+     via the GitHub Contents API and requires `GH_ASSET_TOKEN`/`GITHUB_TOKEN`/`GH_TOKEN` plus
+     `contents: write`; the Tistory workflow had neither (`contents: read`, no token env var at
+     all). This was never a credentials problem with any image provider; it was a missing
+     permission on the workflow itself. Fixed.
+  8. Per owner's explicit request, re-checked this same specific pattern (`GH_ASSET_TOKEN` present
+     but `contents: read`) across every workflow that uses `host_permanently`. Found and fixed the
+     identical bug in `daily-network-publish.yml` (the 25-site WordPress daily publish),
+     `kvisa-one-daily.yml`, and `publish-blogger-33-now.yml` (whose own pre-existing Korean
+     comment already warned hosting "fails silently" without the real cause ever being fixed).
+     `blogger-33-daily-github.yml`, `blogger-image-probe.yml`, `blogger-single-publish.yml`,
+     `newsrooms-daily-publisher.yml`, `stock-image-preflight.yml` and `blogger-rewrite.yml` were
+     already correct and needed no change.
+  9. Also reordered the Replicate image fallback (FLUX Schnell before SDXL Turbo) based on the
+     owner's own Replicate dashboard history showing SDXL Turbo aborting while FLUX Schnell
+     succeeded repeatedly, and reordered the Korean Gemini model chain to try lite/fast variants
+     first per owner request.
+- As of this entry: still no single Tistory post has been confirmed published with a real public
+  URL. The owner-visible local-runner result after fix #7's deploy has not yet been checked; a
+  fresh workflow run (`resume-20261123-0005`) is in flight with all nine fixes above combined.
+  This entry exists so the finding isn't lost regardless of that run's outcome -- the image-
+  hosting permission bug (#7/#8) is the most consequential: it explains why no draft from any of
+  the audited platforms could ever have shipped with a representative image, independent of which
+  stock/AI image provider or API key was in play.
+- Next: confirm the in-flight run's actual local-publish result (public URL or specific
+  remaining blocker); if WordPress/Blogspot's own daily workflows haven't run since this fix,
+  their next scheduled/manual run is the real-world confirmation for #8.
