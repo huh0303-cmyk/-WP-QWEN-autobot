@@ -246,6 +246,61 @@ _FALLBACK_QUERY = {
     "retro_reels": "vintage advertisement 1950s",
 }
 
+PEXELS_VIDEO_SEARCH = "https://api.pexels.com/videos/search"
+
+
+def fetch_pexels_clips(query, workdir, n_target=6):
+    """2026-11-23: archive.org/loc.gov both reject the GitHub Actions runner's
+    IP range (malformed responses / 429s on every retry), so every knowledge
+    channel was finding 0 usable clips and never publishing. This is a stock
+    video fallback (not public-domain archival footage) so the channel keeps
+    publishing while that IP-level block is unresolved."""
+    api_key = os.environ.get("PEXELS_API_KEY", "").strip()
+    if not api_key:
+        return []
+    try:
+        r = requests.get(
+            PEXELS_VIDEO_SEARCH, params={"query": query, "per_page": n_target * 2},
+            headers={**REQUEST_HEADERS, "Authorization": api_key}, timeout=30,
+        )
+        r.raise_for_status()
+        videos = r.json().get("videos", [])
+    except Exception as e:
+        log(f"   ⚠️ Pexels 영상 검색 실패({query}): {e}")
+        return []
+    clips = []
+    for v in videos:
+        if len(clips) >= n_target:
+            break
+        files = sorted(
+            (f for f in v.get("video_files", []) if (f.get("link") or "").endswith(".mp4")),
+            key=lambda f: (f.get("width") or 0) * (f.get("height") or 0),
+        )
+        files = [f for f in files if (f.get("width") or 0) <= 1920] or files
+        if not files:
+            continue
+        link = files[0]["link"]
+        safe_name = re.sub(r"[^A-Za-z0-9_-]", "_", str(v.get("id", "")))[:40]
+        raw_path = os.path.join(workdir, f"raw_pexels_{safe_name}.mp4")
+        try:
+            if not os.path.exists(raw_path):
+                download_file(link, raw_path)
+            dur = get_duration(raw_path)
+            if dur < 3:
+                continue
+            clips.append({
+                "path": raw_path, "title": query, "duration": dur,
+                "identifier": f"pexels:{v.get('id')}", "year": "",
+                "source_url": v.get("url", ""), "license_url": "https://www.pexels.com/license/",
+                "description": "",
+            })
+        except Exception as e:
+            log(f"   ⚠️ Pexels 다운로드 실패({v.get('id')}): {e}")
+            continue
+    if clips:
+        log(f"   + Pexels 스톡 영상에서 {len(clips)}개 클립 확보(퍼블릭도메인 아카이브 소스 차단 시 대체)")
+    return clips
+
 
 def fetch_archive_clips(topic, channel_key, workdir, n_target=16):
     """실제 영상을 반드시 확보하는 게 우선이라(사용자 지시: 짧아도, 흑백이어도
@@ -301,6 +356,9 @@ def fetch_archive_clips(topic, channel_key, workdir, n_target=16):
             break
         log(f"   (검색 결과 없음: \"{q}\" — 범위를 넓혀 재시도)")
     if not docs and channel_key != "history":
+        pexels_clips = fetch_pexels_clips(topic, workdir, n_target=min(n_target, 6))
+        if pexels_clips:
+            return pexels_clips
         log("   ❌ 모든 검색 단계에서 이 주제와 실제로 관련된 퍼블릭도메인 영상을 못 찾음 "
             "— 무관한 영상을 억지로 쓰지 않고 여기서 포기함")
         return []
@@ -348,6 +406,9 @@ def fetch_archive_clips(topic, channel_key, workdir, n_target=16):
         if loc_clips:
             log(f"   + LOC(미의회도서관)에서 {len(loc_clips)}개 클립 추가 확보")
         clips.extend(loc_clips)
+
+    if not clips:
+        clips = fetch_pexels_clips(used_query or topic, workdir, n_target=min(n_target, 6))
 
     return clips
 
