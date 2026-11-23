@@ -80,7 +80,7 @@ Source of truth for handles/IDs: `config/SNS_SIX_BRAND_IDENTITY_LOCK_2026-11-21.
 - `seoul_journal1` → `17841449179626171`
 - `seoul_jisoo1` → `17841404970616486`
 - `japanese_sos1` → **ID mismatch unresolved**: Meta Developers API setup currently displays `17841411813216531`, while an earlier record listed `17841441813216531`. Do not save either ID as verified; generate/verify token and trust the `/me` response only.
-  `/me` preflight resolves, not the legacy variable)
+
 - `english_sos1` → `17841441355349874`
 - `chinese.sos1` → not yet connected; will be assigned when added in step 5
 
@@ -104,10 +104,7 @@ Per the owner's explicit requirement, do not enable randomized auto-publish sche
    account (no mismatches).
 2. Each account has one actual test publish with a confirmed public URL.
 
-Only then wire up the randomized dispatch cadence (3 posts/account/platform/day, 08:10–22:50 KST
-window, 15-minute minimum gap — see `config/meta_five_account_daily_policy.json`'s
-`daily_cadence` block for the pattern to carry over to the 6-account scope) and reconcile
-`meta-randomized-dispatch.yml`'s env var references, which still point at old account names.
+Only after those prerequisites are complete, enable a GitHub Actions randomized dispatch schedule for 3 posts per day per account on each platform (36 destination posts/day), within 08:10-22:50 KST, with at least a 15-minute gap. Adapt the existing `config/meta_five_account_daily_policy.json` cadence pattern to all six accounts, and update `meta-randomized-dispatch.yml` account/secret references first.
 
 ## Operational update - 2026-11-23 18:50 KST
 
