@@ -467,3 +467,13 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - The dedicated `Instagram Tester` role is explicitly described in Meta UI as covering Instagram Basic Display API. No Instagram Tester invitation was sent because that role does not match content-publishing verification. The general `Tester` role permits testing all app permissions/features/products; action-time approval was requested before assigning it to the six accounts.
 - No Instagram roles were changed, no token was issued or copied, no GitHub secret was changed, and no test post or publication URL exists yet.
 - Next: await the user's approval for the general Tester role; then continue with account authorization, minimum-scope publishing tokens, designated GitHub environment secrets, and one verified test post per Instagram/Threads destination. Do not add comments, messages, ads, or unrelated scopes.
+
+
+## 2026-11-23 KST — Meta general Tester invitations blocked for Instagram handles
+
+- Follow-up for `task_id=meta-social-token-20261123-0800-kst`, app `클로드` (`2064957407740645`), SeoulTopik business portfolio (`2303233377081420`).
+- The user explicitly directed: “일반 테스터 6개 계정 승인.” In Meta's app role flow, searching the Instagram handles `seoul_journal1`, `seoul_jisoo1`, `korean_sos1`, `chinese.sos1`, `japanese_sos1`, and `english_sos1` returned no selectable person candidate. The general Tester role is person-level; an Instagram handle cannot be submitted as that role identity.
+- No general Tester invitation was submitted and no role changed. The previously sent six Threads Tester invitations remain pending acceptance.
+- Read-only Instagram API permission table shows `instagram_content_publish` is available as “test ready” (0 API calls) under the existing Instagram API with Facebook Login setup; other unrelated scopes remain excluded.
+- No token was issued, no GitHub secret was changed, and no test post or URL was created.
+- Next: if general Tester access is still desired, provide the Facebook/Meta developer profile identity (name/email/Facebook user ID) for each tester; otherwise accept the pending Threads Tester invitations within each corresponding Threads profile and continue with the owner/admin's authorized account flow.
