@@ -1318,3 +1318,11 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - 기존 Chrome Threads 세션은 `japanese_sos1`로 로그인되어 있고, 웹사이트 권한 > 초대 탭에는 “Claude” 행과 삭제 버튼만 표시되어 다른 계정의 수락 버튼은 없었다. 프로필 링크/더보기 메뉴에서도 계정 전환 항목을 찾지 못했다.
 - 기존 일본 계정 세션을 로그아웃하거나 변경하지 않도록 별도 Edge 탭에 Threads 로그인 화면을 열었다. 로그인 폼은 계정 ID와 비밀번호 입력을 기다리는 상태다. 이 세션에서 자격 증명, 2FA 코드 또는 동의 항목을 입력/제출하지 않았다.
 - 현재 남은 조치: 계정 소유자가 로그인 화면에서 수락할 Threads 계정으로 인증하면, 기존 승인 범위 안에서 해당 계정의 초대 수락 후 토큰 발급과 개별 게시 검증을 이어간다. 다른 계정 비밀번호/2FA는 에이전트가 입력하지 않는다. 자동 발행 게이트는 4/12 공개 테스트 상태로 계속 닫혀 있다.
+
+
+## 2026-11-23 22:xx KST — Threads 테스터 초대 상태 재확인
+
+- task_id: `meta-12-destination-publisher-20261123`
+- SEOUL TOPIK 앱(`1383946033947009`) Roles 화면을 새로고침해 확인: Threads Tester 6개 중 `korean_sos1`, `seoul_jisoo1`, `japanese_sos1`는 수락 상태이며 `chinese.sos1`, `english_sos1`, `seoul_journal1`은 대기 중이다. 즉 이 앱에서 현재 미수락은 3개다. 사용자가 직전 제공한 화면에서는 네 계정이 대기였으나, 최신 화면에서는 일본 계정이 수락으로 갱신되어 상태가 달라졌다.
+- 현재 Threads 로그인 세션은 `japanese_sos1`; 해당 세션의 초대 목록에는 수락 가능한 대기 초대가 없다. 별도 Edge Threads 로그인 화면을 열어두었다. 자격 증명/2FA는 입력하거나 제출하지 않았다.
+- 이번 확인에서 새 초대는 수락하지 못했다. 중국어, 영어, 서울저널 세 계정의 계정별 인증 세션이 필요하다. 자동발행 게이트와 게시 검증 상태는 변경하지 않았다.
