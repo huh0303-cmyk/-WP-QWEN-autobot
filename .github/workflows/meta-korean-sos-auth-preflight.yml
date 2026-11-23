@@ -1,0 +1,49 @@
+name: Korean SOS Instagram auth preflight
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  identity-check:
+    runs-on: ubuntu-latest
+    environment: META-SOCIAL
+    timeout-minutes: 5
+    steps:
+      - name: Verify Korean SOS token identity (read-only; no publishing)
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.META_INSTAGRAM_KOREAN_SOS1_ACCESS_TOKEN }}
+          EXPECTED_USER_ID: ${{ vars.META_INSTAGRAM_KOREAN_SOS1_USER_ID }}
+        run: |
+          python - <<'PY'
+          import json, os, sys, urllib.parse, urllib.request, urllib.error
+          token = os.environ.get("IG_ACCESS_TOKEN", "").strip()
+          expected = os.environ.get("EXPECTED_USER_ID", "").strip()
+          if not token or not expected.isdigit():
+              print("RESULT=BLOCKED_MISSING_SECRET")
+              sys.exit(1)
+          query = urllib.parse.urlencode({"fields": "user_id,username", "access_token": token})
+          request = urllib.request.Request(
+              "https://graph.instagram.com/v25.0/me?" + query,
+              headers={"User-Agent": "LondonProject-Meta-Preflight/1.0"},
+          )
+          try:
+              with urllib.request.urlopen(request, timeout=20) as response:
+                  payload = json.loads(response.read().decode("utf-8"))
+                  http_status = response.status
+          except urllib.error.HTTPError as exc:
+              print(f"RESULT=META_HTTP_ERROR; HTTP_STATUS={exc.code}; no response body logged")
+              sys.exit(1)
+          except Exception as exc:
+              print(f"RESULT=REQUEST_ERROR; ERROR_TYPE={type(exc).__name__}; details suppressed")
+              sys.exit(1)
+          actual_id = str(payload.get("user_id", "")).strip()
+          username = str(payload.get("username", "")).strip().lstrip("@")
+          print(f"HTTP_STATUS={http_status}")
+          print(f"RESOLVED_USERNAME={username or 'MISSING'}")
+          print(f"ACCOUNT_ID_MATCH={'YES' if actual_id == expected else 'NO'}")
+          print("PUBLISHING=NOT_ATTEMPTED")
+          if username.casefold() != "korean_sos1" or actual_id != expected:
+              print("RESULT=IDENTITY_MISMATCH")
+              sys.exit(1)
+          print("RESULT=IDENTITY_VERIFIED; write scope remains unverified")
+          PY

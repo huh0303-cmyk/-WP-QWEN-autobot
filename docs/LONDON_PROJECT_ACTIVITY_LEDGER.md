@@ -1028,3 +1028,50 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - Manual run `45132955917` completed successfully. Sanitized output: HTTP 200, resolved username `english_sos1`, account ID match YES, publishing NOT_ATTEMPTED. This verifies token validity and account identity only; it does not prove content-publishing scope.
 - Batch publishing is not ready. The existing five-account daily preflight still targets superseded handles and is read-only; the active six-brand Instagram/Threads roster has no verified current six-account publisher/test receipts. English SOS is the only newly verified current Instagram token in this session. No post was published.
 - Next: update the account mapping and publisher to the current six Instagram + six Threads identities; obtain and verify each account's platform-specific write authorization; then run account-isolated tests with receipt URLs before enabling batch automation.
+
+
+## 2026-11-23 KST — Korean SOS Instagram token stored; runbook written for remaining 10
+
+- `task_id=meta-social-12-account-publish-20261123-1256-kst`. Guided the owner through the Meta
+  developer console live (app `1383946033947009` "SEOUL TOPIK" / SIS Center Publisher-IG,
+  Instagram app `2011251749706595`) → Instagram API → "Instagram 로그인이 포함된 API 설정" →
+  access-token section. All 5 of the old 5-account-scheme Instagram handles were already absent
+  from the new app's connected-account list; instead all 6 new handles except `chinese.sos1`
+  were already present there with profile IDs: `korean_sos1`=17841410825136018,
+  `seoul_journal1`=17841449179626171, `seoul_jisoo1`=17841404970616486,
+  `japanese_sos1`=17841441813216531, `english_sos1`=17841441355349874. `chinese.sos1` is not yet
+  connected to this app and needs "계정 추가" first.
+- Owner logged into Instagram as `korean_sos1`, generated a token, and saved it:
+  `META_INSTAGRAM_KOREAN_SOS1_ACCESS_TOKEN` (secret) and `META_INSTAGRAM_KOREAN_SOS1_USER_ID`
+  (variable, `17841410825136018`) in environment `META-SOCIAL`. Confirmed present via
+  `gh secret list` / `gh variable list` (names/timestamps only, no values read).
+  Added `.github/workflows/meta-korean-sos-auth-preflight.yml` (same read-only `/me` identity
+  pattern as the existing English one) — not yet run.
+- **Correction/incident**: the korean_sos1 token value was visible in a screenshot the owner sent
+  during this session, so it must be treated as exposed even though it was never typed into any
+  file, log, or command by this session. Recommended the owner regenerate it once Meta-side
+  (invalidates the old one) and re-save, next time convenient; not blocking.
+- **Finding for separate cleanup, not resolved here**: `META-SOCIAL` still holds the old
+  5-account-scheme secrets/variables (`*_SEOUL_TOPIK_*`, `*_SEOUL_CHRIS_*`, `*_SEOUL_JISOO_*`,
+  `*_ENGLISH_PICK1_*`, `*_JAPANESE_PICK_*`) alongside the new `*_SOS1_*` keys.
+  `ENGLISH_PICK1_USER_ID` (17841441355349874) is identical to the new `ENGLISH_SOS1` ID — same
+  account, old key name, safe to retire later. `JAPANESE_PICK_USER_ID` (17841411813216531) does
+  **not** exactly match the `japanese_sos1` ID found in this session (17841441813216531) — do
+  not assume these are the same account; needs its own identity check before any reuse or
+  retirement.
+- Also found two different Meta apps issuing tokens for this one roster: app `2064957407740645`
+  ("클로드", used for english_sos1's token) vs app `1383946033947009` ("SEOUL TOPIK", used for
+  korean_sos1's token just now). Both are functionally valid bearer tokens; recommend
+  standardizing on one (SEOUL TOPIK has confirmed `instagram_content_publish` scope) for future
+  accounts to avoid confusion, not changed in this session.
+- Wrote `docs/META_12_ACCOUNT_TOKEN_SETUP_RUNBOOK_2026-11-23.md`: a complete, click-by-click
+  work order for the remaining 4 Instagram accounts (japanese_sos1, seoul_jisoo1,
+  seoul_journal1, chinese.sos1) and all 6 Threads accounts, written so either the owner or
+  another AI session can execute it without further back-and-forth. Every step past "log in"
+  requires the account owner's own password/2FA/consent click and cannot be performed by any AI
+  session — this is a hard boundary, not a missing capability to work around.
+- No test publish was performed for korean_sos1 or any other account in this step. No randomized
+  auto-publish scheduling was enabled (owner's own requirement: wait until all 12 are verified
+  with test-publish public URLs first). Next action: run `meta-korean-sos-auth-preflight.yml`
+  once to confirm identity, then work through the runbook's remaining 10 connections at whatever
+  pace the owner can sustain.
