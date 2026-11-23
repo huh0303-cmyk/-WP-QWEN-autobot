@@ -54,7 +54,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install runtime
-        run: pip install -r requirements-control-center.txt google-api-python-client google-auth requests pillow
+        run: pip install -r requirements-control-center.txt google-api-python-client google-auth requests pillow beautifulsoup4
       - name: Build selected-site daily plan
         run: python scripts/tistory_daily_planner.py --output artifacts/tistory-daily-plan.json
       - name: Generate and quality-check article
