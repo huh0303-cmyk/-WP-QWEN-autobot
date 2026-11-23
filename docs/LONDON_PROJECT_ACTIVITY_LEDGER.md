@@ -477,3 +477,12 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - Read-only Instagram API permission table shows `instagram_content_publish` is available as “test ready” (0 API calls) under the existing Instagram API with Facebook Login setup; other unrelated scopes remain excluded.
 - No token was issued, no GitHub secret was changed, and no test post or URL was created.
 - Next: if general Tester access is still desired, provide the Facebook/Meta developer profile identity (name/email/Facebook user ID) for each tester; otherwise accept the pending Threads Tester invitations within each corresponding Threads profile and continue with the owner/admin's authorized account flow.
+
+
+## 2026-11-23 KST — Instagram publishing setup route inspected; access grant awaits action-time approval
+
+- Follow-up for `task_id=meta-social-token-20261123-0800-kst`, app `클로드` (`2064957407740645`), SeoulTopik business portfolio (`2303233377081420`).
+- In the app role dialog, Meta states that app roles require a Facebook developer account and do not accept ordinary test users. The Instagram Tester role is specifically described as for Instagram Basic Display API; it is not the general Tester role and does not match the requested publishing role. No Instagram Tester/general Tester invitation was submitted.
+- The Instagram API with Facebook Login setup identifies required publishing scopes: `instagram_basic`, `instagram_content_publishing`, `pages_read_engagement`, `business_management`, and `pages_show_list`. Message scopes are presented separately and are not needed for publishing.
+- This flow can authorize a Meta user to access connected professional Instagram/Page assets and publish, but creates a security-sensitive grant and token. Action-time approval was requested before granting the access or issuing tokens.
+- No token, secret, role, post, or URL was created/changed. Six Threads Tester invitations remain pending.
