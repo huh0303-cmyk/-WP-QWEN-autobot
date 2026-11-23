@@ -1201,3 +1201,12 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - Read-only check of the same app `2064957407740645` Roles page shows the Instagram Tester role for `seoul_journal1` is present (as are all six listed Instagram tester roles); therefore this screenshot is not evidence that its tester invitation is pending. The current OAuth login/selected tester profile does not match the selected `seoul_journal1` target. Retry only with the exact `seoul_journal1` Instagram profile selected and authenticated. Do not reuse or save any value from this failed dialog.
 - The same Roles page shows all six Threads Tester invitations still pending. No roles were modified. Both publisher readiness/schedule gates remain false.
 - Progress remains: two Instagram public test URLs verified (English and Japanese); Korean Instagram identity is verified but needs its public write test. Nine credentials/identity pairs remain to validate or issue (Chinese, Seoul Jisoo, Seoul Journal Instagram and six Threads); ten public test posts remain including Korean. No post was made during this diagnostic.
+
+
+## 2026-11-23 21:20 KST — Seoul Journal Instagram token saved to META-SOCIAL
+
+- task_id: `meta-12-destination-publisher-20261123`
+- The Meta token-success dialog identified `seoul_journal1`, Instagram account ID `17841449179626171`, and showed no profile-mismatch error. Saved the credential as GitHub Environment Secret `META_INSTAGRAM_SEOUL_JOURNAL1_ACCESS_TOKEN` in `META-SOCIAL`; saved `META_INSTAGRAM_SEOUL_JOURNAL1_USER_ID=17841449179626171` as an environment variable. GitHub's environment page confirmed both names/ID. No credential value is recorded here.
+- A redundant OAuth login tab was opened while checking the one-time token copy flow and then closed; it was not submitted, and no further owner login is needed for this saved credential.
+- The one-time token value was briefly present in the browser accessibility output during capture. Treat the issued token as potentially exposed and rotate it after the remaining account setup; replace the GitHub Secret with the replacement token. Do not publish it in chat, screenshots, logs, or repository files.
+- No post was sent in this step. Both publisher gates remain false. The one-account identity/write check and public test post for Seoul Journal remain outstanding; continue the already approved roster only with the appropriate account-specific token and exact identity validation.
