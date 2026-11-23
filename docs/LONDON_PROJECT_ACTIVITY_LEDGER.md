@@ -1310,3 +1310,11 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - Meta tester 초대 등록 완료: 6/6. 초대 수락 완료: 1/6. Threads 토큰·게시 검증은 별도 미완료다.
 - GitHub Actions read-only preflight `45179169663`: `VERIFIED=4/12`, `PUBLISHING=NOT_ATTEMPTED`. 확인된 공개 시험 게시 영수증은 Instagram 4개뿐이다. 8개 목적지에 공개 시험 영수증이 아직 없어 자동 게시 게이트가 닫혀 있다.
 - `META_LIVE_PUBLISH=false`, `META_12_TARGETS_READY=false` 유지. 계정 초대 수락이나 계정센터 프로필 수는 게시 검증을 대체하지 않는다. 기존 승인 범위에서 다른 계정의 기존 로그인 세션/초대를 이어서 사용할 수 있을 때만 진행하고, 계정 로그인/2FA가 요구되면 소유자가 해당 계정 세션에서 수락해야 한다. 비밀값은 기록하지 않는다.
+
+
+## 2026-11-23 22:1x KST — 별도 Edge 세션에 Threads 로그인 화면 준비
+
+- task_id: `meta-12-destination-publisher-20261123`
+- 기존 Chrome Threads 세션은 `japanese_sos1`로 로그인되어 있고, 웹사이트 권한 > 초대 탭에는 “Claude” 행과 삭제 버튼만 표시되어 다른 계정의 수락 버튼은 없었다. 프로필 링크/더보기 메뉴에서도 계정 전환 항목을 찾지 못했다.
+- 기존 일본 계정 세션을 로그아웃하거나 변경하지 않도록 별도 Edge 탭에 Threads 로그인 화면을 열었다. 로그인 폼은 계정 ID와 비밀번호 입력을 기다리는 상태다. 이 세션에서 자격 증명, 2FA 코드 또는 동의 항목을 입력/제출하지 않았다.
+- 현재 남은 조치: 계정 소유자가 로그인 화면에서 수락할 Threads 계정으로 인증하면, 기존 승인 범위 안에서 해당 계정의 초대 수락 후 토큰 발급과 개별 게시 검증을 이어간다. 다른 계정 비밀번호/2FA는 에이전트가 입력하지 않는다. 자동 발행 게이트는 4/12 공개 테스트 상태로 계속 닫혀 있다.
