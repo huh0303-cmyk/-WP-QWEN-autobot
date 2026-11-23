@@ -448,3 +448,12 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - In the recommended Instagram API with Unified Login setup, Meta reports no compatible configuration. A new configuration requires an Instagram account and shows `instagram_content_publish`, `instagram_basic`, `instagram_manage_comments`, and `instagram_manage_messages`; ad-account permissions `ads_read` and `ads_management` are also listed as optional. Meta describes the generated system-user access token as non-expiring. The setup says each Instagram account needs the Instagram Tester role before token generation.
 - The legacy Instagram Login setup says it is no longer updated and also requires an Instagram Tester role. The app role list currently contains only the owner as Admin; Tester, Instagram Tester, and Threads Tester counts are zero. Threads API permissions `threads_basic` and `threads_content_publish` were previously shown as test-ready.
 - No configuration, role, permission, token, GitHub secret, or publication state was changed. Next step is action-time authorization for the exact Unified Login configuration and tester-role additions; select the narrowest available posting-only permissions and avoid optional ads, comments, or messaging access unless required and separately approved.
+
+
+## 2026-11-23 KST — User authorization: six matched Instagram/Threads channels
+
+- Follow-up for `task_id`: `meta-social-token-20261123-0800-kst`.
+- The user clarified and authorized setup for 6 Instagram accounts and 6 Threads accounts: four language accounts, one politics/current-affairs account, and one shopping account, with each Instagram account paired to the same-address Threads handle.
+- The user directed completion of automated publishing preparation, then one test publication per account and verification of each resulting URL.
+- Proceed with the least permissions needed for publishing and profile identification. Do not add comments, direct-message, or advertising permissions unless proven necessary and separately approved. Never expose tokens in the repository; use the designated GitHub Actions environment secrets.
+- This approval authorizes the requested flow, but does not itself prove that Meta setup, credentials, test posts, or URLs have completed. Record each step and verify the final receipts.
