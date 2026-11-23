@@ -1170,3 +1170,13 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - 현재 실제 진행: Claude Meta 앱의 일본 SOS Instagram 토큰 OAuth 흐름을 열었으나 Instagram이 계정 재인증을 요구함. Chrome 로그인 탭 하나를 열어 둠. 비밀번호/2FA는 소유자가 직접 입력해야 하므로 이 세션은 대기 상태이며 비밀번호나 코드는 채팅/로그에 요청하거나 저장하지 않음.
 - 이 시점에서 새 토큰은 발급·저장되지 않았고 공개 게시도 하지 않음. 기존 2개 확인 상태와 두 자동 발행 보호 스위치(false)는 변경하지 않음.
 - 다음: 소유자가 열린 Instagram 탭에서 일본 SOS 인증을 마치면 OAuth 권한 동의와 토큰 발급을 이어서 처리한다. Threads 초대 수락 및 나머지 계정 토큰은 같은 인증 세션을 재사용할 수 있는 범위에서 이어가되, 계정별 새 비밀번호/2FA 화면이 다시 나오면 해당 계정만 소유자 입력 대기 상태로 기록한다. Secret 값은 파일이나 로그에 절대 기록하지 않는다.
+
+
+## 2026-11-23 20:52 KST — Japanese SOS Instagram token saved and test publish verified
+
+- task_id: `meta-12-destination-publisher-20261123`
+- Owner generated the Japanese SOS Instagram token in Meta and requested direct storage in GitHub. Saved it as environment Secret `META_INSTAGRAM_JAPANESE_SOS1_ACCESS_TOKEN` in `META-SOCIAL`; added Environment variable `META_INSTAGRAM_JAPANESE_SOS1_USER_ID=17841411813216531`. Secret value was not intentionally included in GitHub files or the final report.
+- Single-test workflow `meta-12-single-test-publish.yml`, run `45168997096`, checked exact `/me` ID and handle, then published one authorized Japanese SOS Instagram test. Result: `TEST_PUBLISHED_AND_VERIFIED`; public URL https://www.instagram.com/p/DgFUQEhFRxK/.
+- The two schedule gates `META_LIVE_PUBLISH` and `META_12_TARGETS_READY` remain false. No recurring schedule activated.
+- Security note: Meta displayed the one-time token in an accessibility state while the GitHub form was being verified. Treat this token as potentially exposed; recommend rotating it after the account workflow is complete, and never include its value in records or logs.
+- Current confirmed Instagram test destinations: English SOS and Japanese SOS; Korean SOS has identity verified but still needs a write test. Remaining nine of twelve require exact credential/identity checks and a one-time test each. Continue from existing session and only hand off where Meta explicitly requests owner password/2FA.
