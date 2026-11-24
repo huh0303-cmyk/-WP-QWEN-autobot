@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
   "effective_at_kst": "2026-09-30T23:39:36+09:00",
-  "owner_decision": "publish_immediately_after_successful_upload_and_identity_verification",
-  "upload_privacy_status": "public",
-  "public_allowed": true,
+  "owner_decision": "private_first_batch_2026-11-24_user_request_branch_only",
+  "upload_privacy_status": "private",
+  "public_allowed": false,
   "require_authenticated_channel_id_match": true,
   "require_post_upload_privacy_verification": true,
   "scheduled_release_allowed": false,

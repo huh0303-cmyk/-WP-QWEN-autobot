@@ -100,8 +100,11 @@ def _music_prompt(index: int) -> str:
 # licenseurl is explicitly public domain are used, matching the same
 # license-verification pattern archive_footage_longform_legacy.py already
 # uses for video.
-MBB_COMPOSERS = ["Bach", "Mozart", "Beethoven"]
-MBB_FORMS = ["concerto", "sonata"]
+MBB_COMPOSERS = ["Bach", "Mozart", "Beethoven", "Brahms"]
+MBB_FORMS = ["piano concerto", "violin concerto", "cello concerto", "flute concerto",
+             "oboe concerto", "trumpet concerto", "cello suite", "violin sonata", "piano sonata"]
+MBB_EXCLUDE_TERMS = ("symphony", "quartet", "quintet", "opera", "overture", "mass", "requiem",
+                     "cantata", "choir", "chorus", "lecture", "interview", "podcast")
 
 
 def _search_pd_classical(query, count):
@@ -139,6 +142,8 @@ def fetch_mbb_tracks(workdir, n_target, minimum_seconds):
         for doc in docs:
             if len(tracks) >= n_target and total >= minimum_seconds:
                 break
+            if any(term in (doc.get("title") or "").lower() for term in MBB_EXCLUDE_TERMS):
+                continue
             identifier = doc["identifier"]
             if identifier in seen:
                 continue
@@ -287,6 +292,12 @@ def fresh_image(topic, workdir, service=None):
                     "antique piano sheet music candlelight",
                     "violin cello piano classical music performance",
                 ]
+            elif base.CHANNEL_KEY == "kpop":
+                queries = ["seoul city night street lights", "cozy listening room headphones window rain",
+                           "seoul cafe window evening", "han river seoul sunset"]
+            elif base.CHANNEL_KEY == "starbucks":
+                queries = ["coffee cup window ocean view cafe", "latte window seaside cafe morning",
+                           "iced coffee cafe window sea view", "cafe table coffee large window sunlight"]
             else:
                 queries = [
                     f"romantic couple cafe terrace {topic}",
@@ -311,6 +322,16 @@ def fresh_image(topic, workdir, service=None):
                         photo for photo in photos
                         if photo.get("id") not in used_ids
                         and any(term in (photo.get("alt") or "").lower() for term in relevant_terms)
+                    ]
+                elif base.CHANNEL_KEY in {"kpop", "starbucks"}:
+                    terms = (("seoul", "city", "night", "street", "window", "rain", "headphone", "room", "river", "cafe", "korea")
+                             if base.CHANNEL_KEY == "kpop" else
+                             ("coffee", "latte", "cup", "cafe", "window", "sea", "ocean", "drink"))
+                    candidates = [
+                        photo for photo in photos
+                        if photo.get("id") not in used_ids
+                        and any(term in (photo.get("alt") or "").lower() for term in terms)
+                        and not any(bad in (photo.get("alt") or "").lower() for bad in ("woman", "man ", "girl", "boy", "people", "portrait"))
                     ]
                 else:
                     candidates = [
@@ -476,6 +497,26 @@ def build_fresh_healing(_service, _theme, output_path):
 
 def select_music(service, folder_id, exts, mime_prefix):
     source = os.environ.get("PLAYLIST_MUSIC_SOURCE", "approved_bank")
+    if source == "mbb_public_domain" and base.CHANNEL_KEY == "mbb":
+        # Concertos and solo piano/violin/cello/flute/oboe/trumpet; Internet Archive items that
+        # are explicitly public domain only. Free; no generated music.
+        return fetch_mbb_tracks(base.WORKDIR, 18, int(random.uniform(52, 68) * 60))
+    if source == "owner_library":
+        from playlist_owner_drive_library import select_library_tracks, record_used
+        service = service or base.get_drive_service()
+        rows, state = select_library_tracks(service, base.CHANNEL_KEY, base.WORKDIR,
+                                            _bank_download, base.get_duration)
+        record_used(service, state, rows)
+        result = []
+        for row in rows:
+            file_id = f"owner-library:{row['md5']}"
+            _generated_paths[file_id] = row["path"]
+            result.append({"id": file_id, "name": row["name"], "duration": row["duration"]})
+        Path(base.WORKDIR, "owner_audio_selection.json").write_text(
+            json.dumps([{"name": r["name"], "md5": r["md5"], "duration": r["duration"]} for r in rows],
+                       ensure_ascii=False, indent=2), encoding="utf-8")
+        print(f"OWNER_LIBRARY_READY selected={len(rows)} minutes={sum(r['duration'] for r in rows)/60:.1f}", flush=True)
+        return result
     if source == "owner_drive" and base.CHANNEL_KEY == "globalmusic":
         from playlist_owner_library import select_owner_tracks
         service = service or base.get_drive_service()
