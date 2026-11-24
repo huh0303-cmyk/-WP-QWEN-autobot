@@ -53,25 +53,38 @@ def _select_narrator(channel_key: str) -> None:
     base.log(f"   narrator: {narrator['name']} ({narrator['accent']}, {narrator['gender']}) for {channel_key}")
 
 
-def _history_date_overlay(path: str) -> str:
-    from PIL import Image, ImageDraw, ImageFont
+def _history_date_overlay(path: str, workdir: str) -> str:
+    import json
+    from PIL import Image, ImageDraw, ImageFont, ImageOps
 
-    image = Image.open(path).convert("RGB")
-    draw = ImageDraw.Draw(image)
-    font_path = base.ensure_thumbnail_font("en", base.DATA_DIR)
+    records = json.loads((Path(workdir) / "scene_manifest.json").read_text(encoding="utf-8"))
+    label = records[0]["clip"].get("event_label", "")
+    year = label.rsplit("·", 1)[-1].strip()
+    if not year.isdigit():
+        raise RuntimeError("Missing verified historical event year")
     episode_date = date.fromisoformat(os.environ["EPISODE_DATE"]) if os.environ.get("EPISODE_DATE") else datetime.now(timezone(timedelta(hours=9))).date()
-    date_text = episode_date.strftime("%B %d").upper()
-    date_font = ImageFont.truetype(font_path, max(118, image.width // 10))
-    label_font = ImageFont.truetype(font_path, max(34, image.width // 32))
-    for text, font, y in (
-        (date_text, date_font, image.height // 24),
-        ("THIS DAY IN HISTORY", label_font, image.height // 4),
-    ):
-        box = draw.textbbox((0, 0), text, font=font, stroke_width=6)
-        x = (image.width - (box[2] - box[0])) // 2
-        draw.text((x, y), text, font=font, fill=(255, 220, 40), stroke_width=6, stroke_fill=(0, 0, 0))
-    image.save(path, quality=94)
-    return path
+    image = Image.new("RGB", (1280, 720), "#f2ead8")
+    draw = ImageDraw.Draw(image)
+    def centered(text, y, size, bold=False):
+        names = ["DejaVuSerif-Bold.ttf", "LiberationSerif-Bold.ttf"] if bold else ["DejaVuSerif.ttf", "LiberationSerif-Regular.ttf"]
+        for name in names + [base.ensure_thumbnail_font("en", base.DATA_DIR)]:
+            try:
+                font = ImageFont.truetype(name, size)
+                break
+            except OSError:
+                continue
+        draw.text((640, y), text, font=font, fill="#211e19", anchor="mt")
+    centered("TODAY IN HISTORY", 20, 58, True)
+    draw.line((45, 95, 1235, 95), fill="#211e19", width=3)
+    with Image.open(path) as source:
+        photo = ImageOps.fit(source.convert("RGB"), (1190, 410))
+        image.paste(photo, (45, 108))
+    draw.line((45, 530, 1235, 530), fill="#211e19", width=2)
+    centered(episode_date.strftime("%B %d").upper(), 540, 78, True)
+    centered(year, 635, 55)
+    target = str(Path(workdir) / "history_newspaper_thumbnail.jpg")
+    image.save(target, quality=94)
+    return target
 
 
 def _gemini_thumbnail(topic: str, channel_key: str, hero_frame_path: str, workdir: str):
@@ -83,8 +96,10 @@ def _gemini_thumbnail(topic: str, channel_key: str, hero_frame_path: str, workdi
         "american_archive": "American archive history documentary",
     }.get(channel_key, "archival history documentary")
     del channel_theme
-    # Use a frame from the actual archival footage first. The old daily PNG\n    # requirement unnecessarily blocked production even when valid footage exists.\n    # The caller must ensure that the source footage is cleared for reuse.\n    source_path = hero_frame_path if hero_frame_path and Path(hero_frame_path).is_file() else _reviewed_image(channel_key, workdir)\n    result = base._legacy_build_thumbnail(topic, channel_key, source_path, workdir)
-    return _history_date_overlay(result) if channel_key == "history" else result
+    source_path = hero_frame_path if hero_frame_path and Path(hero_frame_path).is_file() else _reviewed_image(channel_key, workdir)
+    if channel_key == "history":
+        return _history_date_overlay(source_path, workdir)
+    return base._legacy_build_thumbnail(topic, channel_key, source_path, workdir)
 
 
 base._legacy_build_thumbnail = base.build_thumbnail
