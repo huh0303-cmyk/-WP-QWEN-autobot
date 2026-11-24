@@ -11,7 +11,7 @@ import daily_publication_floor as floor
 
 NOW=datetime(2026,9,12,10,tzinfo=floor.KST)
 WP={'site_id':'wp_example','platform':'wordpress','url':'https://example.org','secret_name':'EXAMPLE_PASS'}
-BLOG={'site_id':'blogger_example','platform':'blogger','url':'https://example.blogspot.com'}
+BLOG={'site_id':'blogger_example','site_key':'example','platform':'blogger','url':'https://example.blogspot.com'}
 
 class API:
     def __init__(self,state=None,runs=None,handoff=None):
@@ -24,10 +24,11 @@ class API:
         assert self.saved[-1]['status']=='CLAIMED'
         self.sent.append((workflow,inputs));return 123
 
-def test_all_25_wp_and_33_blogger_are_in_daily_scope():
-    assert len(floor.sites_for('wordpress'))==25
+def test_all_active_wp_and_33_blogger_are_in_daily_scope():
+    assert len(floor.sites_for('wordpress'))==22
     assert len(floor.sites_for('blogger'))==33
-    assert len(floor.sites_for('newsroom'))==2
+    assert len(floor.sites_for('newsroom'))==1
+    assert all(site.get('site_key') for site in floor.sites_for('blogger'))
 
 def test_already_public_site_never_dispatches():
     api=API()
@@ -43,7 +44,7 @@ def test_due_wp_claims_before_public_dispatch(monkeypatch):
     assert api.saved[-1]['run_id']==123
 
 def test_unknown_dispatch_is_never_replayed():
-    api=API({'status':'CLAIMED','day':'2026-09-11','attempts':1})
+    api=API({'status':'CLAIMED','day':'2026-09-12','attempts':1,'claimed_at':NOW.isoformat()})
     row,used=floor.reconcile(WP,{'status':'DUE'},api,NOW,True)
     assert row['status']=='DISPATCH_UNCERTAIN' and not used and not api.sent
 
@@ -70,18 +71,19 @@ def test_successful_draft_is_not_counted_or_duplicated():
     row,used=floor.reconcile(WP,{'status':'DUE'},api,NOW,True)
     assert row['status']=='AWAITING_PUBLIC' and not used and not api.sent
 
-def test_blogger_handoff_waits_for_child_not_parent_success():
-    api=API({'status':'DISPATCHED','day':'2026-09-12','attempts':1,'run_id':1},
-            {1:{'status':'completed','conclusion':'success'},2:{'status':'in_progress'}},
-            {'workflow_run_id':2,'job_id':'exact-job'})
+def test_blogger_dispatches_exact_single_site_worker():
+    api=API()
     row,used=floor.reconcile(BLOG,{'status':'DUE'},api,NOW,True)
-    assert row['status']=='RUNNING' and row['run_id']==2 and not used
+    workflow, inputs = api.sent[0]
+    assert used and workflow == 'blogger-single-publish.yml'
+    assert inputs['site_key'] == 'example' and inputs['publication_approved'] == 'true'
 
-def test_failed_blogger_child_retries_same_job_without_rewriting():
-    api=API({'status':'DISPATCHED','day':'2026-09-12','attempts':1,'child_run_id':2,'child_job_id':'exact-job'},
+def test_failed_blogger_worker_retries_the_same_site():
+    api=API({'status':'DISPATCHED','day':'2026-09-12','attempts':1,'run_id':2},
             {2:{'status':'completed','conclusion':'failure'}})
     row,used=floor.reconcile(BLOG,{'status':'DUE'},api,NOW,True)
-    assert used and api.sent[0]==('platform-publish-v2.yml',{'platform':'blogger','job_id':'exact-job','max_jobs':'1'})
+    assert used and api.sent[0][0]=='blogger-single-publish.yml'
+    assert api.sent[0][1]['site_key']=='example'
 
 def test_no_more_than_two_generation_attempts_per_site_day():
     api=API({'status':'FAILED','day':'2026-09-12','attempts':2})
@@ -100,6 +102,12 @@ def test_wp_slots_are_unique_spread_and_not_on_regular_minutes():
     assert times[0].hour>=5 and times[-1].hour<=23
     assert floor.daily_slots(ids,date(2026,10,5))==slots        # deterministic within a day
     assert floor.daily_slots(ids,date(2026,10,6))!=slots        # different next day
+
+
+def test_platform_namespaces_receive_independent_daily_slots():
+    from datetime import date
+    ids=['same_1','same_2','same_3']
+    assert floor.daily_slots(ids,date(2026,11,25),'wordpress') != floor.daily_slots(ids,date(2026,11,25),'blogger')
 
 
 def test_slot_gate_waits_then_catches_up_late_evening():

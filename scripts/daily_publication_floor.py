@@ -43,8 +43,19 @@ def sites_for(platform):
     sites = json.loads((ROOT/'config/automation_hub_sites.json').read_text(encoding='utf-8'))['sites']
     if platform == 'newsroom':
         return [dict(s, platform='newsroom') for s in sites if s['platform']=='wordpress' and s.get('enabled', True) and s.get('content_type') in {'news_ko','news_en'}]
-    return [s for s in sites if s['platform'] == platform and s.get('enabled', True)
-            and (platform != 'wordpress' or s.get('content_type') == 'blog')]
+    selected = [s for s in sites if s['platform'] == platform and s.get('enabled', True)
+                and (platform != 'wordpress' or s.get('content_type') == 'blog')]
+    if platform == 'blogger':
+        profiles = json.loads((ROOT/'config/content_engine_profiles.json').read_text(encoding='utf-8'))['profiles']
+        by_url = {
+            p['blogspot']['url'].rstrip('/').lower(): p['site_key']
+            for p in profiles if p.get('blogspot', {}).get('ready_for_automation')
+        }
+        selected = [dict(site, site_key=by_url.get(site['url'].rstrip('/').lower(), '')) for site in selected]
+        missing = [site['site_id'] for site in selected if not site['site_key']]
+        if missing:
+            raise RuntimeError('Blogger site_key mapping missing: ' + ', '.join(missing))
+    return selected
 
 
 def public_status(site, now):
@@ -110,24 +121,29 @@ def public_status(site, now):
         return {'status': 'PUBLISHED', 'url': verified.final_url, 'published_at': raw}
     return {'status': 'DUE'}
 
-# --- Randomized per-site daily publication slots (WordPress) -----------------
+# --- Randomized per-site daily publication slots ------------------------------
 # One post per site per KST day. Slots are deterministic for (day, site) so every
 # hourly/sub-hourly run agrees, evenly spread (>= ~30 min apart across the fleet),
 # never on an exact hour or a 5-minute multiple, and different on every day.
 # After SLOT_END the slot gate is lifted so a missed site is still filled the same day.
-SLOT_START_MIN = 5 * 60 + 30     # 05:30 KST
-SLOT_END_MIN = 23 * 60           # 23:00 KST (catch-up: no gate after this)
+SLOT_START_MIN = 6 * 60          # 06:00 KST
+SLOT_END_MIN = 22 * 60 + 30      # 22:30 KST (catch-up: no gate after this)
 SLOT_JITTER_MIN = 5.0
 
 
-def daily_slots(site_ids, day):
+def daily_slots(site_ids, day, namespace='wordpress'):
     """Return {site_id: aware datetime} for one KST day."""
     ids = sorted(site_ids)
     if not ids:
         return {}
-    rng = random.Random('wp-daily-slots:' + day.isoformat())
+    rng = random.Random(f'{namespace}-daily-slots:' + day.isoformat())
     order = ids[:]
     rng.shuffle(order)
+    if len(order) == 1:
+        minute = rng.randint(SLOT_START_MIN, SLOT_END_MIN - 1)
+        if minute % 60 == 0 or minute % 5 == 0:
+            minute += 1 if (minute + 1) % 5 else 2
+        return {order[0]: datetime(day.year, day.month, day.day, tzinfo=KST) + timedelta(minutes=minute)}
     step = (SLOT_END_MIN - SLOT_START_MIN) / len(order)
     slots = {}
     for index, sid in enumerate(order):
@@ -210,12 +226,10 @@ def worker(site, attempt, claim_id, state):
     if site['platform'] == 'wordpress':
         return 'daily-network-publish.yml', {'target_site_url': site['url'], 'room_id': claim_id,
                                             'publication_approved': 'true', 'force_keyword': ''}
-    if state.get('child_job_id'):
-        return 'platform-publish-v2.yml', {'platform': 'blogger', 'job_id': state['child_job_id'], 'max_jobs': '1'}
-    return 'blogger-rewrite.yml', {'blogger_site_id': site['site_id'], 'language': site.get('language', 'en'),
-        'persona': site.get('persona', 'helpful specialist editor'), 'tone': site.get('tone', 'practical and clear'),
-        'target_chars': str(site.get('target_chars', 1800)), 'publish_now': 'true',
-        'recover_from_wp': 'true', 'fetch_jitter_max_seconds': '30'}
+    return 'blogger-single-publish.yml', {
+        'site_key': site['site_key'], 'schedule_at': '', 'publication_approved': 'true',
+        'image_policy': 'auto_free', 'random_seed': claim_id,
+    }
 
 
 def reconcile(site, public, api, now, allow_dispatch, max_attempts=2):
@@ -265,16 +279,6 @@ def reconcile(site, public, api, now, allow_dispatch, max_attempts=2):
         run = api.run(run_id)
         if run['status'] != 'completed':
             return {**row, 'status': 'RUNNING', 'run_id': run_id}, False
-        if run.get('conclusion') == 'success' and site['platform'] == 'blogger' and not state.get('child_run_id') and not state.get('child_job_id'):
-            receipt = api.handoff(run_id, sid)
-            if not receipt:
-                return {**row, 'status': 'HANDOFF_UNCONFIRMED', 'run_id': run_id}, False
-            state.update(child_run_id=receipt['workflow_run_id'], child_job_id=receipt['job_id'])
-            sha = api.save(sid, state, sha)
-            run_id = state['child_run_id']
-            run = api.run(run_id)
-            if run['status'] != 'completed':
-                return {**row, 'status': 'RUNNING', 'run_id': run_id}, False
         if run.get('conclusion') == 'success':
             # Success may mean a draft or delayed verification. Do not create another article.
             completed = datetime.fromisoformat(run['updated_at'].replace('Z', '+00:00')).astimezone(KST)
@@ -322,15 +326,10 @@ def main():
     with ThreadPoolExecutor(max_workers=8) as pool:
         public = list(pool.map(lambda site: public_status(site, now), sites))
     pairs = list(zip(sites, public))
-    slots = {}
-    if args.platform == 'wordpress':
-        # Randomized one-post-per-day slots; earliest due slot is served first.
-        slots = daily_slots([site['site_id'] for site in sites], now.date())
-        pairs.sort(key=lambda pair: slots[pair[0]['site_id']])
-    else:
-        # Rotate the starting point by hour, so retries cannot starve later sites.
-        offset = (now.hour*4) % len(sites) if sites else 0
-        pairs = pairs[offset:] + pairs[:offset]
+    # Every platform gets independent per-site random slots. Public inventory is
+    # checked first, so an earlier publisher is satisfied instead of duplicated.
+    slots = daily_slots([site['site_id'] for site in sites], now.date(), args.platform)
+    pairs.sort(key=lambda pair: slots[pair[0]['site_id']])
     rows, dispatched = [], 0
     for site, result in pairs:
         try:

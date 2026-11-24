@@ -2,15 +2,10 @@ name: Daily public publication floor
 # Blogger daily floor rerun after cached-source branch repair and reset 2026-09-25
 
 on:
-  # Restored 2026-10-04: the hourly schedule removed in 0201910 (09-29) left WordPress with
-  # no automatic daily publisher. WordPress-only on schedule (Blogger has its own VPS timer,
-  # so scheduled runs must not touch it). Odd minutes; per-site random slots in the script.
-  # 2026-10-09 Chairman: stop the every-10-minutes floor and match Blogspot's proven AM/PM
-  # window pattern instead (blogger-33-daily-github.yml) — once in the morning window, once
-  # in the afternoon window, independent of any manual extension-triggered runs.
+  # One safety owner for WordPress and Blogger. Each destination receives an
+  # independent random KST slot and is publicly checked before dispatch.
   schedule:
-    - cron: '7,37 22,23,0,1,2 * * *'      # 07:07-11:37 KST
-    - cron: '7,37 5,6,7,8,9,10,11 * * *'  # 14:07-20:37 KST
+    - cron: '7,37 21,22,23,0,1,2,3,4,5,6,7,8,9,10,11,12,13 * * *'  # 06:07-22:37 KST
   workflow_dispatch:
     inputs:
       platform:
@@ -68,16 +63,21 @@ jobs:
           JOBINKOREA365COM: ${{ secrets.JOBINKOREA365COM }}
           JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
           KOREA365ORG: ${{ secrets.KOREA365ORG }}
-        run: python scripts/daily_publication_floor.py --platform wordpress --max-dispatch 2
+          KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
+        run: |
+          python scripts/daily_publication_floor.py --platform wordpress --max-dispatch 2
+          python scripts/daily_publication_floor.py --platform newsroom --max-dispatch 1
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: daily-floor-wordpress-${{ github.run_id }}
-          path: artifacts/daily-publication-floor-wordpress.json
+          path: |
+            artifacts/daily-publication-floor-wordpress.json
+            artifacts/daily-publication-floor-newsroom.json
           retention-days: 7
 
   blogger:
-    if: ${{ github.event_name != 'schedule' && (inputs.platform == '' || inputs.platform == 'blogger') }}
+    if: ${{ github.event_name == 'schedule' || inputs.platform == '' || inputs.platform == 'blogger' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -89,7 +89,7 @@ jobs:
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
           GH_DISPATCH_TOKEN: ${{ github.token }}
-        run: python scripts/daily_publication_floor.py --platform blogger --max-dispatch 4
+        run: python scripts/daily_publication_floor.py --platform blogger --max-dispatch 2
       - uses: actions/upload-artifact@v4
         if: always()
         with:

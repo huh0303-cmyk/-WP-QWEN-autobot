@@ -18,6 +18,19 @@ def test_result_artifact_uses_workflow_artifacts_directory():
     assert RESULT.as_posix().endswith("/artifacts/blogger-33-public-results.json")
 
 
+def test_blogger_seo_readiness_gate_scores_complete_article():
+    from scripts.publish_blogger_33_now import blogger_seo_score
+    body = "".join(f"<h2>Korea rental topic {i}</h2><p>{'Practical rental guidance for Korea tenants. ' * 18}</p>" for i in range(4))
+    site = {"theme": "Korea rental deposits", "language": "en"}
+    score, failures = blogger_seo_score(
+        site, "Korea Rental Deposits for First-Time Tenants", body,
+        ["Rental Deposits", "Korea Tenants"],
+        "Korea rental deposit guidance helps first-time tenants compare contract terms, payment timing, and practical checks.",
+    )
+    assert score >= 70
+    assert not any("length" in failure for failure in failures)
+
+
 def test_daily_blogger_generator_rejects_generic_gerund_title(monkeypatch):
     import json
     from scripts import publish_blogger_33_now as publisher

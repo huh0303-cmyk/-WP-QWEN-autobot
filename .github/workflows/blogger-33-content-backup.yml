@@ -1,0 +1,33 @@
+name: "Blogger 33 — read-only content backup"
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    environment: blogger
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: Back up API-visible content and rehearse restore parsing
+        env:
+          BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
+          BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
+          BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
+        run: python scripts/backup_blogger_33.py
+      - name: Save checksummed recovery snapshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: blogger-33-content-backup-${{ github.run_id }}
+          path: artifacts/blogger-33-backup/
+          if-no-files-found: error
+          retention-days: 90

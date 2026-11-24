@@ -27,6 +27,7 @@ from blogger_adsense_structure import rules_for, structure_issues
 from automation_hub.editorial_readability import format_article, validate_article_length
 
 RESULT = ROOT / "artifacts" / "blogger-33-public-results.json"
+BLOGGER_SEO_MIN_SCORE = 70
 
 
 def load_sites() -> list[dict]:
@@ -65,7 +66,52 @@ def strip_hangul_parentheticals(text: str) -> str:
     return text
 
 
-def generate(site: dict, hint: str = "", recent_titles: list[str] | None = None) -> tuple[str, str, list[str], str, str]:
+def blogger_seo_score(site: dict, title: str, body: str, labels: list[str], description: str) -> tuple[int, list[str]]:
+    """Deterministic pre-publication SEO readiness score (not a Google metric)."""
+    score, failures = 0, []
+    theme_terms = set(re.findall(r"[A-Za-z0-9가-힣]{3,}", str(site.get("theme", "")).casefold()))
+    title_terms = set(re.findall(r"[A-Za-z0-9가-힣]{3,}", title.casefold()))
+    if theme_terms & title_terms:
+        score += 15
+    else:
+        failures.append("title does not reflect the site topic")
+    if 20 <= len(title) <= 90:
+        score += 10
+    else:
+        failures.append("title length must be 20-90 characters")
+    visible = html.unescape(re.sub(r"<[^>]*>", " ", body))
+    visible_chars = len(re.sub(r"\s+", "", visible))
+    if 2500 <= visible_chars <= 4500:
+        score += 20
+    else:
+        failures.append(f"body length {visible_chars} is outside 2500-4500")
+    if 80 <= len(description) <= 160:
+        score += 15
+    else:
+        failures.append("search description length must be 80-160 characters")
+    if 1 <= len(labels) <= 3:
+        score += 10
+    else:
+        failures.append("labels must contain 1-3 relevant terms")
+    headings = len(re.findall(r"(?is)<h[23](?:\s[^>]*)?>", body))
+    if headings >= 4:
+        score += 10
+    elif headings >= 3:
+        score += 7
+    else:
+        failures.append("at least three useful H2/H3 headings are required")
+    if not structure_issues(body, site["theme"], site["language"]):
+        score += 10
+    else:
+        failures.append("article structure check failed")
+    if not title_cliches(title) and not body_cliches(body):
+        score += 10
+    else:
+        failures.append("title/body formula check failed")
+    return min(score, 100), failures
+
+
+def generate(site: dict, hint: str = "", recent_titles: list[str] | None = None) -> tuple[str, str, list[str], str, str, int, list[str]]:
     if str(site["language"]).lower().startswith("ko"):
         lang_rule = ("반드시 한국어로만 작성하세요. 제목·본문·소제목·라벨 전부 한글이어야 하며 영어 문장은 절대 쓰지 않습니다 "
                      "(고유명사·약어만 예외). 본문 분량은 HTML 태그와 공백을 제외한 한글 3000~3500자를 목표로 하고, 2500자 미만이나 4500자 초과는 폐기됩니다. 영어로 쓰면 폐기됩니다. "
@@ -150,7 +196,10 @@ Provide 1-3 short, highly relevant labels only.{hint}"""
     description = build_search_description(title=title, topic=site["theme"], language=site["language"])
     validate_search_description(description)
     image_subject = str(data.get("image_subject") or "").strip()[:100]
-    return title, body, labels, description, image_subject
+    seo_score, seo_failures = blogger_seo_score(site, title, body, labels, description)
+    if seo_score < BLOGGER_SEO_MIN_SCORE:
+        raise RuntimeError(f"SEO readiness gate: {seo_score}/{BLOGGER_SEO_MIN_SCORE}; " + "; ".join(seo_failures))
+    return title, body, labels, description, image_subject, seo_score, seo_failures
 
 
 def normalize_title(value: str) -> str:
@@ -217,14 +266,14 @@ def main() -> int:
             hint = ""
             for attempt in range(4):
                 try:
-                    title, body, labels, description, image_subject = generate(site, hint, recent_titles)
+                    title, body, labels, description, image_subject, seo_score, seo_failures = generate(site, hint, recent_titles)
                     validate_article_length(body)
                     if normalize_title(title) in recent_title_keys:
                         raise RuntimeError("duplicate title gate: exact or normalized duplicate title")
                     break
                 except (RuntimeError, ValueError) as gate_exc:  # ValueError covers JSONDecodeError (empty/non-JSON model output)
                     retriable = isinstance(gate_exc, ValueError) or any(
-                        k in str(gate_exc) for k in ("adsense structure gate", "language mismatch", "quality gate", "duplicate title gate", "ARTICLE_LENGTH_BLOCKED"))
+                        k in str(gate_exc) for k in ("adsense structure gate", "language mismatch", "quality gate", "duplicate title gate", "ARTICLE_LENGTH_BLOCKED", "SEO readiness gate"))
                     if not retriable or attempt == 3:
                         raise
                     print(f"generation retry {attempt + 1} for {site['key']}: {str(gate_exc)[:120]}")
@@ -285,7 +334,8 @@ def main() -> int:
                 ok = bool(post.get("id")) and str(post.get("status", "")).upper() == "SCHEDULED"
                 results.append({"site": site["key"], "status": "scheduled" if ok else "verification_failed",
                                 "url": post.get("url", url), "post_id": post.get("id", ""),
-                                "scheduled_at": scheduled_kst.strftime("%Y-%m-%dT%H:%M")})
+                                "scheduled_at": scheduled_kst.strftime("%Y-%m-%dT%H:%M"),
+                                "seo_readiness_score": seo_score, "seo_check_failures": seo_failures})
             elif draft_mode:
                 review_url = f"https://www.blogger.com/blog/post/edit/{site['id']}/{post.get('id', '')}"
                 queued = append_review_rows([{
@@ -300,7 +350,8 @@ def main() -> int:
                                 "review_url": review_url, "post_id": post.get("id", ""),
                                 "search_description": description,
                                 "search_description_length": len(description),
-                                "search_description_status": "required_in_blogger_editor"})
+                                "search_description_status": "required_in_blogger_editor",
+                                "seo_readiness_score": seo_score, "seo_check_failures": seo_failures})
             else:
                 import time as _t
                 check = requests.get(url, timeout=30)
@@ -321,7 +372,7 @@ def main() -> int:
                         pass
                     ok = api_status == "LIVE" and bool(post.get("id"))
                     print(f"verify {site['key']}: public HTTP {check.status_code}, api status {api_status}")
-                results.append({"site": site["key"], "status": "published" if ok else "verification_failed", "image_engine": (found or {}).get("provider", "none") if "found" in locals() else "none", "url": url, "post_id": post.get("id", ""), "http": check.status_code})
+                results.append({"site": site["key"], "status": "published" if ok else "verification_failed", "image_engine": (found or {}).get("provider", "none") if "found" in locals() else "none", "url": url, "post_id": post.get("id", ""), "http": check.status_code, "seo_readiness_score": seo_score, "seo_check_failures": seo_failures})
             failed = failed or not ok
         except Exception as exc:
             failed = True

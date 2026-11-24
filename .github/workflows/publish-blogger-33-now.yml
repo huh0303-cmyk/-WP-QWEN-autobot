@@ -87,6 +87,7 @@ jobs:
           BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
           BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
           BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
+          BLOGGER_33_BACKUP_AND_TEST_VERIFIED: ${{ vars.BLOGGER_33_BACKUP_AND_TEST_VERIFIED || 'false' }}
           # 2026-10-09: 수동 dispatch 워크플로우에 이 네 개가 빠져 있어서 pick_image()의
           # 무료 스톡 검색(Pexels/Pixabay)도, image_guarantee.ensure_image()의 최종 카드
           # 호스팅(GH_ASSET_TOKEN/GITHUB_REPOSITORY)도 둘 다 조용히 실패해 이미지 없이

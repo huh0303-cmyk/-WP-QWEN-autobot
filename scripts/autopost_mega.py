@@ -3498,7 +3498,7 @@ def process_one(site, keyword):
     begin_article()
     report_publication_progress("working", site["url"], detail="주제·출처 확인 및 글 작성·검수 중")
     url=site["url"]; lang=site["lang"]; theme=site["theme"]; mode=site["mode"]
-    quality_target = None  # SEO score is informational only; never a publication gate.
+    quality_target = SEO_TARGET
     p=SITE_PERSONA.get(url,{}); min_chars=resolve_min_chars(url); max_chars=p.get("max_chars")
 
     reporter=pick_reporter(site)
@@ -3837,8 +3837,10 @@ def process_one(site, keyword):
             except Exception as exc:
                 print(f"  ⚠️ 관련 글 미리보기 실패(채점은 원문 기준으로 계속): {exc}")
 
-    # SEO score intentionally removed from the publication pipeline.
-    score=None
+    # Deterministic pre-publication readiness score. This is not an official
+    # Google score; it is the auditable local gate stored with the Rank Math meta.
+    score=estimate_seo_score(title, scoring_body, meta, tags, faq, images, keyword)
+    print(f"  SEO readiness: {score}/{SEO_TARGET}")
 
     plain_len=newsroom_char_count(body) if mode in ("news", "news_en") else len(re.sub(r'<[^>]+>','',body).replace(' ','').replace('\n',''))
     # Koreanews365 is a breaking-news desk: do not impose a fixed character-count gate.
@@ -3880,7 +3882,12 @@ def process_one(site, keyword):
             print(f"  ⛔ 뉴스룸 품질 게이트 실패: {reason}")
             log(url,theme,keyword,title,"",score,len(images),"⛔ skip_newsroom_gate",reason)
             return False
-    # No SEO-score publication gate.\n\n    # 2026-09-03: news_source_category comes from a keyword-*search* RSS feed
+    if mode not in ("news", "news_en") and score < quality_target:
+        print(f"  ⛔ SEO readiness gate: {score}/{quality_target}; publication blocked")
+        log(url,theme,keyword,title,"",score,len(images),"⛔ skip_seo_gate",f"{score}/{quality_target}")
+        return False
+
+    # 2026-09-03: news_source_category comes from a keyword-*search* RSS feed
     # (e.g. gov.uk ?keywords=sport) that does not guarantee the matched item
     # is actually about that topic — forcing it into the match string made
     # every article from that feed get mis-categorized (e.g. tagged 스포츠

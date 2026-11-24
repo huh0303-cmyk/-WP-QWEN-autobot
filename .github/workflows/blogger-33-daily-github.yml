@@ -4,8 +4,8 @@ name: "Blogger 33 — daily (random morning time, GitHub)"
 # Cron ticks during the morning window; a date-seeded random target selects one run.
 # The per-day marker makes repeat ticks idempotent.
 on:
-  schedule:
-    - cron: '7,37 22,23,0,1,2 * * *'      # 07:07-11:37 KST
+  # Manual compatibility only. The per-site randomized daily schedule is owned
+  # by daily-publication-floor.yml to avoid a second publisher.
   workflow_dispatch:
     inputs:
       site_key:

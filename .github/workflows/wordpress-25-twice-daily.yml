@@ -1,8 +1,8 @@
 name: "WordPress — once daily automatic"
 
 on:
-  schedule:
-    - cron: "17 22 * * *"
+  # Legacy manual compatibility only. Scheduled publication is owned by
+  # daily-publication-floor.yml.
   workflow_dispatch:
     inputs:
       slot:

@@ -66,6 +66,7 @@ jobs:
           BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
           BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
           BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
+          BLOGGER_33_BACKUP_AND_TEST_VERIFIED: ${{ vars.BLOGGER_33_BACKUP_AND_TEST_VERIFIED || 'false' }}
           FREE_IMAGE_POLICY: ${{ inputs.image_policy }}
         run: python scripts/publish_blogger_33_now.py
       - name: Save publication proof
