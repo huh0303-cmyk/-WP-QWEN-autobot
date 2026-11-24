@@ -18,12 +18,13 @@ def _service(channel_id: str, privacy: str):
     return service
 
 
-def test_release_policy_is_immediate_public_and_identity_locked():
+def test_release_policy_is_private_first_and_identity_locked():
+    # Owner decision 2026-11-24/25: every upload is private first; owner reviews before public.
     policy = load_release_policy()
-    assert policy["upload_privacy_status"] == "public"
-    assert policy["public_allowed"] is True
+    assert policy["upload_privacy_status"] == "private"
+    assert policy["public_allowed"] is False
     assert policy["require_authenticated_channel_id_match"] is True
-    assert result_url("abcdefghijk") == "https://youtu.be/abcdefghijk"
+    assert result_url("abcdefghijk") == "https://studio.youtube.com/video/abcdefghijk/edit"
 
 
 def test_post_upload_verification_accepts_exact_channel_and_public_status():
