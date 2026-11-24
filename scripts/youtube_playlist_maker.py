@@ -476,6 +476,22 @@ def build_fresh_healing(_service, _theme, output_path):
 
 def select_music(service, folder_id, exts, mime_prefix):
     source = os.environ.get("PLAYLIST_MUSIC_SOURCE", "approved_bank")
+    if source == "owner_library":
+        from playlist_owner_drive_library import select_library_tracks, record_used
+        service = service or base.get_drive_service()
+        rows, state = select_library_tracks(service, base.CHANNEL_KEY, base.WORKDIR,
+                                            _bank_download, base.get_duration)
+        record_used(service, state, rows)
+        result = []
+        for row in rows:
+            file_id = f"owner-library:{row['md5']}"
+            _generated_paths[file_id] = row["path"]
+            result.append({"id": file_id, "name": row["name"], "duration": row["duration"]})
+        Path(base.WORKDIR, "owner_audio_selection.json").write_text(
+            json.dumps([{"name": r["name"], "md5": r["md5"], "duration": r["duration"]} for r in rows],
+                       ensure_ascii=False, indent=2), encoding="utf-8")
+        print(f"OWNER_LIBRARY_READY selected={len(rows)} minutes={sum(r['duration'] for r in rows)/60:.1f}", flush=True)
+        return result
     if source == "owner_drive" and base.CHANNEL_KEY == "globalmusic":
         from playlist_owner_library import select_owner_tracks
         service = service or base.get_drive_service()
