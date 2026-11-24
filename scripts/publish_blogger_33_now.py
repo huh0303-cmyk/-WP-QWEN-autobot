@@ -23,7 +23,7 @@ from automation_hub.kinvest_title_guard import kinvest_title_issues
 from review_sheet import append_review_rows
 from repair_blogger_images import stabilize_html_images
 from blogger_free_image import pick_image, insert_image
-from blogger_adsense_structure import rules_for, structure_issues
+from blogger_adsense_structure import repair_official_source_links, rules_for, structure_issues
 from automation_hub.editorial_readability import format_article, validate_article_length
 
 RESULT = ROOT / "artifacts" / "blogger-33-public-results.json"
@@ -175,6 +175,7 @@ Provide 1-3 short, highly relevant labels only.{hint}"""
         raise RuntimeError(f"body length quality gate: {visible_chars} visible characters; required 2500-4500")
     if not title or not (1 <= len(labels) <= 3):
         raise RuntimeError("Gemini Flash output failed quality gate")
+    body = repair_official_source_links(body, site["theme"], site["language"])
     issues = structure_issues(body, site["theme"], site["language"])
     if issues:
         raise RuntimeError("adsense structure gate: " + "; ".join(issues))

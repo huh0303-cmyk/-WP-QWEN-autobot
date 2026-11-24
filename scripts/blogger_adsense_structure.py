@@ -69,6 +69,38 @@ def source_link_issues(body: str, theme: str) -> list[str]:
     return issues
 
 
+def repair_official_source_links(body: str, theme: str, language: str) -> str:
+    """Keep only verified homepage links and guarantee two topical references."""
+    allowed = official_domains(theme)
+    aliases = {"kto.or.kr": "kto.visitkorea.or.kr", "www.kto.or.kr": "kto.visitkorea.or.kr"}
+    good: set[str] = set()
+
+    def repair(match: re.Match) -> str:
+        url, label = match.group(1), match.group(2)
+        host = _host(url)
+        host = aliases.get(host, host)
+        path = re.sub(r"^https?://[^/]+", "", url).split("?")[0].split("#")[0]
+        if any(host == domain or host.endswith("." + domain) for domain in allowed) and path in ("", "/"):
+            good.add(host)
+            return f'<a href="https://{host}/" rel="noopener" target="_blank">{label}</a>'
+        return label
+
+    body = re.sub(
+        r'<a\b[^>]*href=["\'](https?://[^"\']+)["\'][^>]*>([\s\S]*?)</a>',
+        repair, body, flags=re.I,
+    )
+    general = set(_OFFICIAL["general"])
+    preferred = [domain for domain in allowed if domain not in general] + [domain for domain in allowed if domain in general]
+    missing = [domain for domain in preferred if domain not in good][:max(0, 2 - len(good))]
+    if missing:
+        lead = "Official references" if not str(language).lower().startswith("ko") else "공식 확인처"
+        links = " · ".join(
+            f'<a href="https://{domain}/" rel="noopener" target="_blank">{domain}</a>' for domain in missing
+        )
+        body += f"<p><strong>{lead}:</strong> {links}</p>"
+    return body
+
+
 YMYL = re.compile(r"health|medical|insurance|financ|tax|law|invest|crypto|real estate|visa|immigration|건강|의료|보험|세무|법|투자|부동산|지원금", re.I)
 
 _RULES_TEMPLATE = """AdSense-ready structure (follow exactly, HTML only, no <h1>, no <html>/<body> tags):

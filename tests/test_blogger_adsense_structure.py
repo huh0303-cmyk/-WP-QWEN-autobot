@@ -1,7 +1,7 @@
 import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from blogger_adsense_structure import structure_issues, source_link_issues
+from blogger_adsense_structure import repair_official_source_links, structure_issues, source_link_issues
 
 GOOD = "<p>intro</p>" + "<h2>Key takeaways</h2><ul><li>a</li></ul>" + "".join(f"<h2>S{i}</h2><p>{'word ' * 220}</p>" for i in range(5)) \
     + "<h2>Frequently asked questions</h2><p>q</p><h2>Before you decide</h2><ul><li><a href='https://www.gov.kr/'>FSS</a></li><li><a href='https://www.korea.kr/'>NHIS</a></li></ul><p><em>Informational only, not professional advice; consult a qualified professional.</em></p>"
@@ -34,3 +34,11 @@ def test_source_gate_requires_two_official_homepages():
 def test_source_gate_rejects_deep_links_and_other_sites():
     iss = source_link_issues('<a href="https://www.kdca.go.kr/a/b">a</a><a href="https://blog.example.com/">b</a><a href="https://www.mohw.go.kr/">c</a>', "건강")
     assert any("disallowed" in i for i in iss)
+
+
+def test_source_repair_maps_kto_alias_and_adds_missing_official_homepage():
+    body = '<p><a href="https://www.kto.or.kr/">KTO</a><a href="https://blog.example.com/story">blog</a></p>'
+    repaired = repair_official_source_links(body, "Korea travel", "en")
+    assert "https://kto.visitkorea.or.kr/" in repaired
+    assert "blog.example.com" not in repaired
+    assert source_link_issues(repaired, "Korea travel") == []
