@@ -69,12 +69,14 @@ def render_scenes(topic, channel, clips, workdir, generate, parse, verify,
     """Generate and synthesize each scene independently, then concatenate AV pairs."""
     segments, records = [], []
     elapsed = 0.0
+    # History only: leave a margin below 15 minutes for mux rounding.
+    limit = 890.0 if channel == 'history' else 900.0
     for index, clip in enumerate(clips):
-        if elapsed >= 900:
+        if elapsed >= limit:
             break
         folder = Path(workdir) / f'scene_{index:03d}'
         folder.mkdir(parents=True, exist_ok=True)
-        available = min(float(clip['duration']), 45.0, 900 - elapsed)
+        available = min(float(clip['duration']), (180.0 if channel == 'history' else 45.0), limit - elapsed)
         if available < 5:
             continue
         text, review = generate_grounded_scene_narration(
@@ -123,5 +125,7 @@ def render_scenes(topic, channel, clips, workdir, generate, parse, verify,
     concat.write_text(''.join("file '" + str(p).replace('\\', '/') .replace("'", "'\\''") + "'\n" for p in segments), encoding='utf-8')
     final = str(Path(workdir) / 'final.mp4')
     ffmpeg(['ffmpeg', '-y', '-f', 'concat', '-safe', '0', '-i', str(concat), '-c', 'copy', final])
+    if channel == 'history' and not 120 <= duration(final) < 900:
+        raise RuntimeError('HISTORY_DURATION: insufficient usable footage or invalid render; retry with additional cleared footage')
     Path(workdir, 'scene_manifest.json').write_text(json.dumps(records, ensure_ascii=False, indent=2), encoding='utf-8')
     return final, '\n\n'.join(r['narration'] for r in records)
