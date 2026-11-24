@@ -557,3 +557,10 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - User requested a retry and an explanation of the SSH identity block. Strict read-only SSH to oot@187.127.121.57 again failed with REMOTE HOST IDENTIFICATION HAS CHANGED; presented ED25519 fingerprint SHA256:xGz5BAS5YPG5zrRx8d/ugCTdNg10MhDFavjKmUrXGQg, and the client reported an offending ECDSA key in known_hosts:3.
 - Project records identify Hostinger as the VPS provider. The Hostinger hPanel opened to its login page, so the provider console could not yet independently confirm the replacement host key. Manual user authentication was requested in the browser. Strict host-key checking and known_hosts remain unchanged.
 - November 24 audit results remain unverified; November 25 is not yet the scheduled 23:50 audit. No workflow dispatch, retry publication, or server mutation occurred. Next: after Hostinger login, confirm the server fingerprint from the provider's trusted console, then restore trusted SSH and audit the latest completed daily run; check publication markers before any recovery.
+
+
+## 2026-11-25 KST — Threads token flow opened for japanese_sos1; account login pending
+
+- In the user's Chrome, Meta for Developers was already signed in to SEOUL TOPIK app 1383946033947009. The Threads user token generator listed japanese_sos1, korean_sos1, and seoul_jisoo1.
+- Selecting japanese_sos1 opened a Threads login page requiring that account's Instagram credentials. Browser control was handed to the user for authentication. No token was generated, copied, or stored, and no post was published.
+- The authorization URL requests threads_basic and threads_content_publish plus manage_insights, manage_replies, and read_replies; inspect the consent screen and least-privilege scope before granting. Next: after user login, check the exact account and consent result, then continue token setup without recording token values in GitHub.
