@@ -31,7 +31,8 @@ def creds_for(key):
     prefix = f"META_THREADS_{key.upper()}"
     token = os.environ.get(prefix + '_ACCESS_TOKEN', '').strip()
     uid = os.environ.get(prefix + '_USER_ID', '').strip()
-    return (token, uid) if token and uid.isdigit() else (None, None)
+    # USER_ID variable is optional: identity is enforced by the /me handle match.
+    return (token, uid) if token else (None, None)
 
 
 def select_slots(now, force):
@@ -73,14 +74,16 @@ def main():
             print(f"SKIPPED_SLOT={sid} REASON=credentials missing"); continue
         try:
             me = m.api(BASE + '/me?fields=id,username', token)
-            if str(me.get('id', '')) != uid or str(me.get('username', '')).lower().lstrip('@') != slot['expected_handle'].lower():
+            actual = str(me.get('id', ''))
+            if not actual.isdigit() or (uid and uid != actual) or str(me.get('username', '')).lower().lstrip('@') != slot['expected_handle'].lower():
                 raise RuntimeError('identity mismatch')
+            uid = actual
             account = next(a for a in m.POLICY['accounts'] if a['key'] == key)
             post = m.generate(account, 'threads', slot, m.source_for(slot))
             state[sid] = {'status': 'ATTEMPT_RESERVED', 'platform': 'threads', 'account_key': key,
                           'expected_handle': slot['expected_handle'], 'at_kst': now.isoformat(),
                           'caption': post['caption'], 'content_sha256': hashlib.sha256(post['caption'].encode()).hexdigest()}
-            prepared.append((slot, token, uid))
+            prepared.append((slot, token, actual))
         except Exception as e:
             print(f"SKIPPED_SLOT={sid} REASON={str(e)[:100]}", flush=True)
     if prepared:
