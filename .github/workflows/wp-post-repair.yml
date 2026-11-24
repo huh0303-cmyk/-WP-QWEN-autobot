@@ -1,0 +1,53 @@
+name: WordPress — Repair posts from a reviewed manifest
+
+# Rewrites existing posts (title, slug, meta, body, tags) from data/repairs/<dir>/manifest.json
+# and swaps in a fresh stock photo that passes the duplicate-photo guard.
+# apply_changes=false (default) is a dry run that changes nothing.
+
+on:
+  workflow_dispatch:
+    inputs:
+      manifest_dir:
+        description: Folder under data/repairs/ that holds manifest.json
+        required: true
+      site_key:
+        description: GitHub secret name holding this site's app password (e.g. JOBKOREAGLOBALCOM)
+        required: true
+      apply_changes:
+        description: Apply (false = dry run)
+        type: boolean
+        default: false
+
+permissions:
+  contents: write   # stock photos are hosted by committing them under assets/
+
+concurrency:
+  group: wp-post-repair
+  cancel-in-progress: false
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests beautifulsoup4 lxml Pillow -q
+      - name: Validate manifest
+        env:
+          MANIFEST_DIR: ${{ inputs.manifest_dir }}
+        run: python scripts/wp_repair_posts.py --check "$MANIFEST_DIR"
+      - name: Repair posts
+        env:
+          MANIFEST_DIR: ${{ inputs.manifest_dir }}
+          DRY_RUN: ${{ inputs.apply_changes && 'false' || 'true' }}
+          WP_USER: ${{ secrets.WP_USER }}
+          WP_APP_PASSWORD: ${{ secrets[inputs.site_key] }}
+          STOCK_IMAGES_ENABLED: "true"
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
+          GH_ASSET_TOKEN: ${{ secrets.GH_ASSET_TOKEN || github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: python scripts/wp_repair_posts.py "$MANIFEST_DIR"
