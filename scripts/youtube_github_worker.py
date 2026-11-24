@@ -138,7 +138,7 @@ def _playlist(env: dict[str, str], log_handle) -> str:
                PLAYLIST_VIDEO_GENERATION_ENABLED="true", ROOM_RESULT_SOURCE="artifacts/youtube_playlist_result.json")
     if env["CHANNEL_KEY"] in {"kpop", "starbucks", "mbb"}:
         # Owner library on Drive: content-hash dedup + 7-day no-repeat ledger; no paid API.
-        env.update(PLAYLIST_MUSIC_SOURCE="owner_library", PLAYLIST_PAID_API_ENABLED="false")
+        env.update(PLAYLIST_MUSIC_SOURCE="owner_library", PLAYLIST_IMAGE_SOURCE="pexels_api", PLAYLIST_PAID_API_ENABLED="false", GEMINI_API_KEY="")
     if env["CHANNEL_KEY"] == "globalmusic":
         # CAFE_ROMANTIC uses only owner-approved music and free Pexels photos.
         # Never invoke paid Gemini image generation in this channel's playlist path.

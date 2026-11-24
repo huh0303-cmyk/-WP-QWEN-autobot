@@ -287,6 +287,12 @@ def fresh_image(topic, workdir, service=None):
                     "antique piano sheet music candlelight",
                     "violin cello piano classical music performance",
                 ]
+            elif base.CHANNEL_KEY == "kpop":
+                queries = ["seoul city night street lights", "cozy listening room headphones window rain",
+                           "seoul cafe window evening", "han river seoul sunset"]
+            elif base.CHANNEL_KEY == "starbucks":
+                queries = ["coffee cup window ocean view cafe", "latte window seaside cafe morning",
+                           "iced coffee cafe window sea view", "cafe table coffee large window sunlight"]
             else:
                 queries = [
                     f"romantic couple cafe terrace {topic}",
@@ -311,6 +317,16 @@ def fresh_image(topic, workdir, service=None):
                         photo for photo in photos
                         if photo.get("id") not in used_ids
                         and any(term in (photo.get("alt") or "").lower() for term in relevant_terms)
+                    ]
+                elif base.CHANNEL_KEY in {"kpop", "starbucks"}:
+                    terms = (("seoul", "city", "night", "street", "window", "rain", "headphone", "room", "river", "cafe", "korea")
+                             if base.CHANNEL_KEY == "kpop" else
+                             ("coffee", "latte", "cup", "cafe", "window", "sea", "ocean", "drink"))
+                    candidates = [
+                        photo for photo in photos
+                        if photo.get("id") not in used_ids
+                        and any(term in (photo.get("alt") or "").lower() for term in terms)
+                        and not any(bad in (photo.get("alt") or "").lower() for bad in ("woman", "man ", "girl", "boy", "people", "portrait"))
                     ]
                 else:
                     candidates = [
