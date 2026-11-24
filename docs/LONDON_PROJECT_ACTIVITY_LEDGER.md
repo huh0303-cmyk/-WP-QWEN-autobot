@@ -570,3 +570,9 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 
 - The user showed a Meta account switcher listing the six Instagram and Threads profiles and asked the assistant to sign in. In the existing japanese_sos1 Threads OAuth login tab, Chrome autofilled credentials when the username field was focused; submitting the saved login returned 비밀번호 오류 (incorrect password). No further attempts were made.
 - The login page was handed to the user for correct credentials or account recovery. No token was issued, copied, or stored, and no post was published. Do not treat the account-switcher listing as proof that the OAuth forced reauthentication succeeded. After user authentication, verify exact account and consent scopes before proceeding.
+
+
+## 2026-11-25 KST — japanese_sos1 OAuth reauthentication still pending
+
+- User reported that japanese.sos1 had logged in. Read-only inspection found the prior Threads tab on password recovery and the Meta token generator still showing 액세스 토큰 생성하기 for japanese_sos1. Reopening the generator created a fresh Threads OAuth login tab with orce_reauth=true; no consent screen or token result appeared.
+- Browser control was handed to the user at the exact OAuth login tab. A separate account login or recovery flow does not establish completion of this forced token authorization. No token value was read or saved and no post was published. Next: after account-specific OAuth login, verify the exact username and consent scopes, then continue token handling.
