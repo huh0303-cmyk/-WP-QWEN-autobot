@@ -26,7 +26,7 @@ jobs:
       - run: echo "No upload attempted. Dispatch again with confirm_publication=true only after cost hold and channel credentials are reviewed."
 
   publish:
-    if: ${{ github.event_name == 'schedule' || inputs.confirm_private_upload == true }}
+    if: ${{ (github.event_name == 'schedule' && vars.HISTORY_PREVIEW_APPROVED == 'true') || (github.event_name == 'workflow_dispatch' && inputs.confirm_private_upload == true) }}
     runs-on: ubuntu-latest
     environment: youtube-channels
     timeout-minutes: 420
