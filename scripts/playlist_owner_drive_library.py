@@ -31,6 +31,25 @@ CHANNEL_FOLDERS = {
     "mbb": ["모짜르트_바흐_베트벤클래식"],
 }
 
+# Extra owner Suno folders (path of folder names, resolved by name from the first element).
+# Classified by scripts/sort_suno_tracks.py into sorted/{instrumental,korean,other,...}.
+SUNO_ROOT = "Suno_음악_원곡다운로드"
+CHANNEL_EXTRA_PATHS = {
+    "kpop": [[SUNO_ROOT, "sorted", "korean"]],
+    "globalmusic": [[SUNO_ROOT, "sorted", "other"], [SUNO_ROOT, "sorted", "german"]],
+    "starbucks": [[SUNO_ROOT, "sorted", "instrumental"]],
+}
+
+
+def _resolve_path(service, names):
+    parent = None
+    for name in names:
+        found = _find_folder(service, name, parent)
+        if not found:
+            return None
+        parent = found[0]["id"]
+    return parent
+
 
 def _q(value: str) -> str:
     return value.replace("\\", "\\\\").replace("'", "\\'")
@@ -114,6 +133,12 @@ def select_library_tracks(service, channel, workdir, download, duration_fn, rng=
         if not found:
             raise RuntimeError(f"WAITING_OWNER_LIBRARY: sub-folder '{folder_name}' not found under '{ROOT_NAME}'")
         genre_ids.append(found[0]["id"])
+    for path in CHANNEL_EXTRA_PATHS.get(channel, []):
+        extra_id = _resolve_path(service, path)
+        if extra_id:
+            genre_ids.append(extra_id)
+        else:
+            print(f"OWNER_LIBRARY extra folder not visible: {'/'.join(path)}", flush=True)
     ledger_id, ledger = _load_ledger(service, root_id)
     now = dt.datetime.now(dt.timezone.utc)
     cutoff = now - dt.timedelta(days=COOLDOWN_DAYS)
