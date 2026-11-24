@@ -1,5 +1,15 @@
 # 런던프로젝트 작업 원장 정책
 
+## 2026-11-24 — 활성 WordPress 23개 즉시 발행·공개 검증
+- task_id: `wordpress-23-publish-now-20261124-2200`
+- 요청/승인: 소유자가 2026-11-24 KST에 활성 WordPress 23개 각각 1건의 즉시 공개 발행을 명시적으로 요청했다. 기존 자동화 코드와 설정은 변경하지 않았다.
+- 사전 점검: 현재 `config/automation_hub_sites.json` 기준 활성 WordPress는 정확히 23개다. `ksa-korea.org`와 `sis-korea.com`은 retired이므로 대상이 아니다. 2026-11-24 예약 run `45337959267`은 `startup_failure`로 job이 시작되지 않았다.
+- 최초 실행: `daily-network-publish.yml`의 `manual-20261124-2200` 실행군을 대조했다. 구형 workflow 허용 목록이 retired `ksa-korea.org`까지 24번째 대상으로 받아들였으나 런타임 레지스트리는 WordPress 23개만 로드해 KSA 글은 생성·발행하지 않았고 artifact만 남았다(run `45398682241`). retired 대상 호출 허용은 후속 코드 정합성 문제로 남긴다.
+- 최초 결과: 활성 사이트 중 18개가 해당 실행군에서 공개 성공했다. `studyinkorea365.com`은 선행 run `45398140661`에서 성공했다. `jobinkorea365.com`은 같은 KST 날짜의 선행 공개 글 post ID `1654`가 있어 실패 run `45398693880`을 중복 재시도하지 않았다.
+- 복구: 무료 Gemini 체인 소진으로 실패한 `korea365.org`과 `kieca-korea.org`만 재실행했다. `korea365.org` run `45405532978` 성공, post ID `4346`, 공개 URL `https://korea365.org/jensen-huang-and-the-global-semiconductor-infrastructure-driving-korean-technology-partnerships/`. `kieca-korea.org` run `45405539030` 성공, post ID `1984`, 공개 URL `https://kieca-korea.org/%ea%b8%80%eb%a1%9c%eb%b2%8c-%ec%9c%a0%ed%95%99%ec%83%9d-%ec%9c%a0%ec%b9%98-%ec%8b%9c%ec%9e%a5%ec%9d%98-%ec%a3%bc%ec%9a%94-%ea%b8%b0%ea%b4%80-%ea%b0%84-%ed%98%91%eb%a0%a5-%ea%b5%ac%ec%a1%b0%ec%99%80/`.
+- 외부 차단: `jobkorea365.com`과 `kstudy365.com`은 로컬/Actions와 Google Public DNS 모두 `NXDOMAIN`(DNS status 3)으로 WordPress REST 및 공개 URL에 도달할 수 없었다. 각각 run `45398688111`, `45398668409`에서 `skip_unreachable`; 동일 오류를 반복 호출하지 않았다.
+- 최종 감사: 활성 23개 중 21개 사이트에 2026-11-24 KST 공개 글이 확인됐다. WordPress REST에서 post ID·URL·제목을 대조하고 Python Playwright Chromium으로 21개 공개 URL 전부 HTTP 200, 동일 호스트, 제목/H1 표시를 확인했다. `jobkorea365.com`, `kstudy365.com`은 DNS 복구 전까지 `BLOCKED`; 전체 작업은 `PARTIAL_VERIFIED / 21_OF_23`이며 23/23 완료로 표시하지 않는다.
+
 ## 2026-11-17 — 서울저널 비공개 정치 쇼츠 복구
 - task_id: `seoul-journal-private-poll-thumbnail-repair-20261117`
 - 실제 대상: YouTube 서울저널 `UChRUdHZlXSjftAqBtdDNEWA`; TOPIK 채널로 대체 금지.
