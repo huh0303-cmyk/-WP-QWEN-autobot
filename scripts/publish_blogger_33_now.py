@@ -148,12 +148,17 @@ Provide 1-3 short, highly relevant labels only.{hint}"""
         # Models occasionally return a literal backslash in otherwise valid JSON.
         # Preserve the character instead of losing the whole site's draft.
         data = json.loads(re.sub(r'\\(?!["\\/bfnrtu])', r'\\\\', raw))
-    title, body = str(data["title"]).strip(), str(data["content_html"]).strip()
+    title, body = str(data.get("title") or "").strip(), str(data.get("content_html") or "").strip()
+    if not title or not body:
+        raise RuntimeError("quality gate: model JSON must include non-empty title and content_html")
     if site["key"] == "kinvest365":
         prefix_issues = kinvest_title_issues(title)
         if prefix_issues:
             raise RuntimeError("title quality gate: " + "; ".join(prefix_issues) + "; regenerate with the concrete subject first")
-    labels = [str(x).strip()[:80] for x in data["labels"] if str(x).strip()][:3]
+    raw_labels = data.get("labels")
+    if not isinstance(raw_labels, list) or not raw_labels:
+        raw_labels = [site["theme"]]
+    labels = [str(x).strip()[:80] for x in raw_labels if str(x).strip()][:3]
     if str(site["language"]).lower().startswith("en"):
         title, body = strip_hangul_parentheticals(title), strip_hangul_parentheticals(body)
         labels = [strip_hangul_parentheticals(x) for x in labels]

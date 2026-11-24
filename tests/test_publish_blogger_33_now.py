@@ -82,3 +82,25 @@ def test_daily_blogger_generator_rejects_ai_body_filler(monkeypatch):
     import pytest
     with pytest.raises(RuntimeError, match="body quality gate"):
         publisher.generate(site)
+
+
+def test_daily_blogger_generator_recovers_missing_labels_from_site_theme(monkeypatch):
+    import json
+    from scripts import publish_blogger_33_now as publisher
+
+    sections = "".join(f"<h2>Section {i}</h2><p>{'Practical Korea rental guidance. ' * 18}</p>" for i in range(6))
+    payload = {
+        "title": "Korea Rental Deposits for First-Time Tenants",
+        "content_html": "<h2>Key takeaways</h2><ul><li>Check terms</li></ul>" + sections
+            + "<h2>Frequently asked questions</h2><p>Review the contract.</p>"
+            + "<h2>Before you decide</h2><p>Use official references.</p>",
+        "image_subject": "rental contract",
+    }
+    monkeypatch.setattr(publisher, "blogger_generate_with_fallback", lambda *a, **k: json.dumps(payload))
+    monkeypatch.setattr(publisher, "structure_issues", lambda *a, **k: [])
+    monkeypatch.setattr(publisher, "validate_search_description", lambda *a, **k: None)
+    monkeypatch.setattr(publisher, "build_search_description", lambda **k: "Korea rental deposit guidance helps tenants review contracts and payment terms before signing a home lease safely.")
+    site = {"key": "test", "url": "https://example.blogspot.com", "language": "en",
+            "theme": "Korea rental deposits", "persona": "editor", "tone": "clear"}
+    result = publisher.generate(site)
+    assert result[2] == ["Korea rental deposits"]
