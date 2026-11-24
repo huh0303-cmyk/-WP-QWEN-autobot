@@ -18,6 +18,13 @@ def test_result_artifact_uses_workflow_artifacts_directory():
     assert RESULT.as_posix().endswith("/artifacts/blogger-33-public-results.json")
 
 
+def test_expired_affiliate_catalog_is_an_optional_footer_not_a_publication_gate():
+    source = Path(__file__).resolve().parents[1].joinpath("scripts", "publish_blogger_33_now.py").read_text(encoding="utf-8")
+    assert "BLOGGER_AFFILIATE_FOOTER_OMITTED" in source
+    assert "BLOGGER_PREFLIGHT_AFFILIATE_BLOCKED" not in source
+    assert "if affiliate_footer_enabled:" in source
+
+
 def test_blogger_seo_readiness_gate_scores_complete_article():
     from scripts.publish_blogger_33_now import blogger_seo_score
     body = "".join(f"<h2>Korea rental topic {i}</h2><p>{'Practical rental guidance for Korea tenants. ' * 18}</p>" for i in range(4))

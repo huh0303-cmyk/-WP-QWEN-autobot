@@ -216,13 +216,15 @@ def main() -> int:
     token = access_token()
     headers = {"Authorization": f"Bearer {token}"}
     sites = load_sites()
-    # Fail fast before 33 costly AI generations if the mandatory approved
-    # affiliate catalog is expired. Never extend its validity artificially.
+    # Affiliate commerce must never be the single point of failure for editorial
+    # publication. Expired/unverified offers are omitted, never silently reused.
     from automation_hub.coupang_partners import select_products
+    affiliate_footer_enabled = True
     try:
         select_products("Korean beauty and health", "Korean beauty health products", sites[0]["key"], limit=10)
     except Exception as exc:
-        raise SystemExit(f"BLOGGER_PREFLIGHT_AFFILIATE_BLOCKED: {exc}") from exc
+        affiliate_footer_enabled = False
+        print(f"BLOGGER_AFFILIATE_FOOTER_OMITTED: {type(exc).__name__}: {exc}")
     requested_site = os.environ.get("BLOGGER_SITE_KEY", "").strip()
     if requested_site:
         sites = [site for site in sites if site["key"] == requested_site]
@@ -317,10 +319,10 @@ def main() -> int:
                     scheduled_kst = None
             schedule_mode = bool(scheduled_kst) and not draft_mode
             insert_is_draft = draft_mode or schedule_mode
-            # Mandatory shared Coupang footer: block this site's publication until ten verified cards exist.
-            from automation_hub.coupang_partners import apply_footer
-            affiliate_lang = "ko" if re.search(r"[가-힣]", body) else "en"
-            body = apply_footer(body, title, site.get("key", ""), affiliate_lang)
+            if affiliate_footer_enabled:
+                from automation_hub.coupang_partners import apply_footer
+                affiliate_lang = "ko" if re.search(r"[가-힣]", body) else "en"
+                body = apply_footer(body, title, site.get("key", ""), affiliate_lang)
             response = requests.post(endpoint, params={"isDraft": "true" if insert_is_draft else "false"}, headers=headers,
                                      json={"kind": "blogger#post", "title": title, "content": body, "labels": labels}, timeout=30)
             response.raise_for_status()
