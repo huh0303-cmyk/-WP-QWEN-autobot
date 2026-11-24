@@ -7,28 +7,16 @@ from __future__ import annotations
 
 TEXT_MODELS = {
     "en": (
-        "gemini-3.6-flash",
-        "gemini-3.5-flash",
-        "gemini-3.5-flash-lite",
-        "gemini-3.1-flash-lite",
-        "gemini-2.0-flash",
-        "gemini-3.8-flash",
-    ),
-    # 2026-11-23: owner asked for lite/fast variants tried first (3.5-lite,
-    # 3.1-lite, 2.5-flash), ahead of the full-size models, since the lite
-    # tier has a separate free-tier quota and today's live runs were
-    # getting HTTPError across nearly every model in quick succession
-    # (shared-quota rate limiting). Existing fallbacks are kept, just
-    # pushed later in the chain rather than dropped.
-    "ko": (
-        "gemini-3.5-flash-lite",
-        "gemini-3.1-flash-lite",
+        "gemini-2.5-flash-lite",
         "gemini-2.5-flash",
-        "gemini-3.0-flash-lite",
-        "gemini-3.0-flash",
-        "gemini-2.0-flash",
-        "gemini-3.6-flash",
-        "gemini-3.8-flash",
+        "gemini-3.5-flash-lite",
+    ),
+    # Live probe 45418448833 on 2026-11-24 returned HTTP 200 for these
+    # three models. Do not add speculative model names to a production chain.
+    "ko": (
+        "gemini-2.5-flash-lite",
+        "gemini-2.5-flash",
+        "gemini-3.5-flash-lite",
     ),
 }
 KOREAN_WORDPRESS_DOMAINS = frozenset(("koreanews365.com", "k-health365.com"))

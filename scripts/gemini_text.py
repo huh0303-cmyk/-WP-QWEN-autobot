@@ -33,7 +33,7 @@ def gemini_generate_text(prompt: str, *, temperature: float = 0.7, language: str
                     f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
                     headers={"x-goog-api-key": key},
                     json={"contents": [{"parts": [{"text": prompt}]}],
-                          "generationConfig": {"temperature": temperature, "maxOutputTokens": 16384}},
+                          "generationConfig": {"temperature": temperature, "maxOutputTokens": 8192}},
                     timeout=120,
                 )
                 response.raise_for_status()
