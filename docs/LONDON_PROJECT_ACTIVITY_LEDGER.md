@@ -564,3 +564,9 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - In the user's Chrome, Meta for Developers was already signed in to SEOUL TOPIK app 1383946033947009. The Threads user token generator listed japanese_sos1, korean_sos1, and seoul_jisoo1.
 - Selecting japanese_sos1 opened a Threads login page requiring that account's Instagram credentials. Browser control was handed to the user for authentication. No token was generated, copied, or stored, and no post was published.
 - The authorization URL requests threads_basic and threads_content_publish plus manage_insights, manage_replies, and read_replies; inspect the consent screen and least-privilege scope before granting. Next: after user login, check the exact account and consent result, then continue token setup without recording token values in GitHub.
+
+
+## 2026-11-25 KST — japanese_sos1 Threads saved login rejected
+
+- The user showed a Meta account switcher listing the six Instagram and Threads profiles and asked the assistant to sign in. In the existing japanese_sos1 Threads OAuth login tab, Chrome autofilled credentials when the username field was focused; submitting the saved login returned 비밀번호 오류 (incorrect password). No further attempts were made.
+- The login page was handed to the user for correct credentials or account recovery. No token was issued, copied, or stored, and no post was published. Do not treat the account-switcher listing as proof that the OAuth forced reauthentication succeeded. After user authentication, verify exact account and consent scopes before proceeding.
