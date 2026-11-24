@@ -1,4 +1,5 @@
 """Do not turn unrelated global trends into Korean recruitment advice."""
+import random
 import re
 from urllib.parse import urlparse
 
@@ -24,6 +25,8 @@ def stock_query(subject, theme):
     if re.search(r'teacher|teaching|교사|교원',text):return 'classroom teacher'
     if re.search(r'professor|faculty|교수',text):return 'university lecture'
     if re.search(r'onboarding|인수인계',text):return 'office meeting'
+    # Industrial worker-visa topics (E-9 quotas, factories, logistics) are not about interviews.
+    if re.search(r'\be-9\b|manufactur|factory|industrial|logistic|warehouse|제조|공장|물류',text):return 'factory workers'
     if re.search(r'recruit|hiring|job interview|채용|취업|면접',text):return 'job interview'
     if re.search(r'visa|비자',text):return 'passport'
     return str(subject)
@@ -41,11 +44,16 @@ def choose_scoped_keyword(site_url, proposed, candidates):
     """Reject off-topic trends before authoring and try the site's own pool."""
     if topic_fits(site_url, proposed):
         return proposed
+    # keywords_*.txt lines are "keyword<TAB>category": use only the keyword column, and choose
+    # among ALL fitting lines (taking the first one repeated the same topic on every run).
+    fitting = []
     for candidate in candidates:
-        candidate = candidate.strip()
+        candidate = candidate.split('\t', 1)[0].strip()
         if candidate and not candidate.startswith('#') and topic_fits(site_url, candidate):
-            print('Off-topic trend replaced with a keyword from this site pool')
-            return candidate
+            fitting.append(candidate)
+    if fitting:
+        print('Off-topic trend replaced with a keyword from this site pool')
+        return random.choice(fitting)
     evergreen = {'jobinkorea365.com': 'Korea job interview preparation and employment contract checklist', 'jobkorea365.com': 'Korea employment application and job interview checklist', 'jobkoreaglobal.com': 'Korea international recruitment and worker onboarding checklist'}
     host = urlparse(site_url).hostname
     if host in evergreen:

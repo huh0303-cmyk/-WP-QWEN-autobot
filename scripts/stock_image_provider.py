@@ -4,6 +4,7 @@ import hashlib
 import html
 import json
 import os
+import random
 from pathlib import Path
 import re
 import time
@@ -13,10 +14,10 @@ import requests
 
 CACHE = Path(os.getenv("STOCK_IMAGE_CACHE_DIR", "data/stock_image_cache"))
 METADATA = {}
-# Persist this file across CI runs (artifact/cache or repository commit) for cross-run protection.
+# Persisted across CI runs by actions/cache (see daily-network-publish.yml), one ledger per site; 30-day window.
 USAGE_LEDGER = Path(os.getenv("STOCK_IMAGE_USAGE_LEDGER", "data/stock_image_usage.json"))
 
-def _recent_image_ids(days=7):
+def _recent_image_ids(days=30):
     try:
         data = json.loads(USAGE_LEDGER.read_text(encoding="utf-8"))
         cutoff = time.time() - days * 86400
@@ -31,7 +32,7 @@ def _record_image_id(key):
             data = []
     except (OSError, ValueError):
         data = []
-    cutoff = time.time() - 7 * 86400
+    cutoff = time.time() - 30 * 86400
     data = [x for x in data if isinstance(x, dict) and float(x.get("at", 0)) >= cutoff]
     data.append({"key": key, "at": time.time()})
     USAGE_LEDGER.parent.mkdir(parents=True, exist_ok=True)
@@ -143,6 +144,20 @@ def _search(provider, query, key):
     return items
 
 
+def _duplicate_on_site(stable_url):
+    """True when the target site already shows this photo (perceptual match, last 15 days).
+
+    Uses the shared editorial_image_guard. No target site known -> nothing to compare
+    against, so the photo is allowed; with a site, an unreachable check blocks the photo
+    (same "no unchecked image" rule as the guard itself).
+    """
+    site = os.getenv("WP_SITE_URL") or os.getenv("WORDPRESS_SITE_URL") or os.getenv("TARGET_SITE_URL") or ""
+    if not site or not stable_url:
+        return False
+    from editorial_image_guard import filter_wp_images
+    return not filter_wp_images(site, [stable_url])
+
+
 def find_stock_image(subject, theme="", *, force=False, selected_provider="auto"):
     if not force and os.getenv("STOCK_IMAGES_ENABLED", "false").lower() != "true":
         return None
@@ -173,6 +188,7 @@ def find_stock_image(subject, theme="", *, force=False, selected_provider="auto"
         try:
             if True:  # full query first, then shorter variants; each variant must still match strictly (no off-subject photos)
                 for q in query_variants(query):
+                    eligible = []
                     for item in _search(provider, q, key):
                         host = urlparse(item["url"]).hostname or ""
                         source_host = urlparse(item["source"]).hostname or ""
@@ -195,8 +211,18 @@ def find_stock_image(subject, theme="", *, force=False, selected_provider="auto"
                         image_key = f"{provider.lower()}:{item['id']}"
                         if image_key in _recent_image_ids():
                             continue
+                        eligible.append((image_key, item))
+                    # 2026-11-25: never take "the first match" -- identical queries produced the
+                    # identical photo on every run. Pick among all eligible photos at random and
+                    # fall through to the next one when this site already shows the photo.
+                    random.shuffle(eligible)
+                    for image_key, item in eligible:
                         from stable_image_hosting import host_permanently  # also centre-crops to 1:1
                         stable = host_permanently(item["url"], asset_key=f"stock-{provider.lower()}-{item['id']}")
+                        if _duplicate_on_site(stable):
+                            _record_image_id(image_key)
+                            print(f"stock photo skipped: {image_key} already used on this site")
+                            continue
                         metadata = {**item, "provider": provider, "license": item.get("license") or license_url,
                                     "query": q, "estimated_image_cost_usd": 0, "hosted_url": stable}
                         _record_image_id(image_key)

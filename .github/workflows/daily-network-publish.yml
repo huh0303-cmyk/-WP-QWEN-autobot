@@ -145,6 +145,16 @@ jobs:
         run: python -m py_compile scripts/autopost_current.py scripts/autopost_mega.py
       - if: ${{ inputs.target_site_url == '' || inputs.target_site_url == format('https://{0}', matrix.site) }}
         run: pip install requests beautifulsoup4 lxml Pillow google-api-python-client google-auth google-genai -q
+      # 2026-11-25: every run starts on a fresh runner, so the stock-photo usage ledger
+      # (data/stock_image_usage.json) was always empty and the same photo was re-picked.
+      # One ledger per site; the run_id key re-saves it after every run.
+      - name: Restore stock-photo usage ledger
+        if: ${{ inputs.target_site_url == '' || inputs.target_site_url == format('https://{0}', matrix.site) }}
+        uses: actions/cache@v4
+        with:
+          path: data/stock_image_usage.json
+          key: stock-usage-${{ matrix.site }}-${{ github.run_id }}
+          restore-keys: stock-usage-${{ matrix.site }}-
       - name: Select live keyword
         if: ${{ inputs.target_site_url == '' || inputs.target_site_url == format('https://{0}', matrix.site) }}
         id: viral

@@ -1,0 +1,28 @@
+{
+  "site_url": "https://jobkoreaglobal.com",
+  "reason": "2026-11-25: posts 2750/2752 shared one Pexels photo, one near-duplicate keyword, 110-character titles and no official sources",
+  "posts": [
+    {
+      "id": 2750,
+      "title": "E-9 Quota 2026: 80,000 Cap and the Five Hiring Rounds",
+      "slug": "e-9-quota-2026-80000-cap-hiring-rounds",
+      "meta_description": "South Korea capped 2026 E-9 hiring at 80,000, down from 130,000. See the sector split, the five hiring rounds and what employers can prepare now.",
+      "focus_keyword": "E-9 quota",
+      "tags": ["E-9 visa", "Employment Permit System", "foreign worker quota", "Korea hiring rounds", "MOEL"],
+      "content_file": "quota-2026.html",
+      "image_subject": "factory workers manufacturing line",
+      "image_alt": "Factory workers on a manufacturing line"
+    },
+    {
+      "id": 2752,
+      "title": "How to Hire E-9 Workers: Employer Steps and Required Checks",
+      "slug": "how-to-hire-e-9-workers-employer-steps",
+      "meta_description": "How Korean employers hire E-9 workers: Korean-worker recruitment first, Work24 application, points-based allocation, permit issuance and housing checks.",
+      "focus_keyword": "hire E-9 workers",
+      "tags": ["E-9 visa", "Employment Permit System", "Work24", "Korea employer guide", "foreign worker hiring"],
+      "content_file": "hiring-process.html",
+      "image_subject": "factory workers manufacturing",
+      "image_alt": "Employees working at a factory"
+    }
+  ]
+}
