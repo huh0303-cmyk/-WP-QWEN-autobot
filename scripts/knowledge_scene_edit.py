@@ -67,6 +67,8 @@ def generate_grounded_scene_narration(topic, channel, clip, available, generate,
 def render_scenes(topic, channel, clips, workdir, generate, parse, verify,
                   tts, write_srt, mux, normalize, ffmpeg, duration):
     """Generate and synthesize each scene independently, then concatenate AV pairs."""
+    import random
+    caption_font = random.choice(['DejaVu Sans', 'Liberation Sans', 'Roboto', 'Open Sans', 'Lato', 'Noto Sans'])
     segments, records = [], []
     elapsed = 0.0
     # History only: leave a margin below 15 minutes for mux rounding.
@@ -115,6 +117,12 @@ def render_scenes(topic, channel, clips, workdir, generate, parse, verify,
         write_srt(captions, subtitle)
         final = str(folder / 'final.mp4')
         mux(visual, audio, subtitle, final, str(folder))
+        if channel == 'history':
+            burned = str(folder / 'captioned.mp4')
+            escaped = str(Path(subtitle).resolve()).replace('\\', '/').replace(':', '\\:')
+            style = f"FontName={caption_font},FontSize=18,PrimaryColour=&H00FFFFFF,OutlineColour=&H00000000,BorderStyle=1,Outline=1.5,Shadow=0,Alignment=2,MarginV=22"
+            ffmpeg(['ffmpeg', '-y', '-i', final, '-vf', f"subtitles='{escaped}':force_style='{style}'", '-c:v', 'libx264', '-c:a', 'copy', burned])
+            final = burned
         segments.append(Path(final).resolve())
         records.append({'clip': clip, 'narration': text, 'start': elapsed,
                         'duration': seconds, 'alignment': review})
