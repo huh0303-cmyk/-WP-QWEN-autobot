@@ -2020,7 +2020,7 @@ FAQ_START~FAQ_END에서 작성하라는 뜻]
 {struct_str}
 
 [출력 형식]
-TITLE: (기사 제목 한 줄. 소제목이 아닌 실제로 완성된 기사 제목이어야 함) → 본문HTML → META_DESC: (정확히 130~140자, '{keyword}' 포함) → FAQ_START~FAQ_END (Q:/A: 형식) → {tags_line}"""
+TITLE: (기사 제목 한 줄. 소제목이 아닌 실제로 완성된 기사 제목이어야 함. 공백 포함 25~35자, 45자 초과 금지) → 본문HTML → META_DESC: (정확히 130~140자, '{keyword}' 포함) → FAQ_START~FAQ_END (Q:/A: 형식) → {tags_line}"""
 
     else:
         return f"""[ROLE]
@@ -2089,7 +2089,7 @@ belongs in FAQ_START~FAQ_END, not the body]
 {struct_str}
 
 [OUTPUT FORMAT — write ONLY these parts, back to back, with nothing else]
-1. The line: TITLE: <the complete, specific article headline — not a section heading>
+1. The line: TITLE: <the complete, specific article headline — not a section heading; 50-65 characters including spaces, never more than 70, with the main subject in the first half>
 2. The article body itself, written directly in HTML tags (do not write the words "body" or "HTML" anywhere as a label/header — just start straight in with the first <h2> or <p>)
 3. Then the line: META_DESC: (exactly 130~155 English chars, include '{keyword}')
 4. Then FAQ_START ~ FAQ_END (Q:/A: format)
@@ -4028,7 +4028,7 @@ def main():
                 from editorial_topic_scope import choose_scoped_keyword
                 source_pool = Path(site["keywords_file"])
                 candidates = source_pool.read_text(encoding="utf-8-sig").splitlines() if source_pool.exists() else []
-                candidates = [c for c in candidates if not _keyword_recently_covered(c, url)]
+                candidates = [c for c in candidates if not _keyword_recently_covered(c.split("\t", 1)[0], url)]
                 kw = choose_scoped_keyword(url, kw, candidates)
             try:
                 if process_one(site,kw): ok+=1

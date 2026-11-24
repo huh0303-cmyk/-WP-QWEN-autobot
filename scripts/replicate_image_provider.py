@@ -206,7 +206,9 @@ def _cost_receipt(model, subject, status):
 
 def _site_safe_image(url):
     """Shared WordPress pre-publish guard; never attach unchecked photos."""
-    site = os.getenv("WP_SITE_URL") or os.getenv("WORDPRESS_SITE_URL") or ""
+    # 2026-11-25: the publish workflows only export TARGET_SITE_URL, so this guard
+    # was silently disabled and the same Pexels photo reached several posts.
+    site = os.getenv("WP_SITE_URL") or os.getenv("WORDPRESS_SITE_URL") or os.getenv("TARGET_SITE_URL") or ""
     if not site or not url:
         return url
     from editorial_image_guard import filter_wp_images

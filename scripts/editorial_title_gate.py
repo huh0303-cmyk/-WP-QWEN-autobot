@@ -14,7 +14,20 @@ Newsrooms require factual news headlines, not blog-guide hooks.
 The word Unlock and every Unlock/Unlocking title formula are forbidden.
 """
 
+# Search results cut headlines at roughly 60 Latin / 32 Hangul characters. The writer prompts ask
+# for <=65 / <=35; these hard limits only catch outliers (2026-11: 110-120 character headlines).
+MAX_TITLE_LATIN = 80
+MAX_TITLE_HANGUL = 45
+
+
+def title_too_long(title):
+    limit = MAX_TITLE_HANGUL if re.search(r"[가-힣]", title) else MAX_TITLE_LATIN
+    return len(title.strip()) > limit
+
+
 def require_editorial_approval(*, title, content, meta, keyword, gemini_generate, is_newsroom_brief=False, source_evidence=None):
+    if not is_newsroom_brief and title_too_long(title):
+        raise ValueError(f"TITLE_QUALITY_FAIL: headline is {len(title.strip())} characters; keep it search-result sized")
     if (not title.strip()
             or title_cliches(title)
             or re.search(r"answers from the field|from someone who.s been there|practical guide\s+q\s*&\s*a", title, re.I)):
