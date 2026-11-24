@@ -100,8 +100,11 @@ def _music_prompt(index: int) -> str:
 # licenseurl is explicitly public domain are used, matching the same
 # license-verification pattern archive_footage_longform_legacy.py already
 # uses for video.
-MBB_COMPOSERS = ["Bach", "Mozart", "Beethoven"]
-MBB_FORMS = ["concerto", "sonata"]
+MBB_COMPOSERS = ["Bach", "Mozart", "Beethoven", "Brahms"]
+MBB_FORMS = ["piano concerto", "violin concerto", "cello concerto", "flute concerto",
+             "oboe concerto", "trumpet concerto", "cello suite", "violin sonata", "piano sonata"]
+MBB_EXCLUDE_TERMS = ("symphony", "quartet", "quintet", "opera", "overture", "mass", "requiem",
+                     "cantata", "choir", "chorus", "lecture", "interview", "podcast")
 
 
 def _search_pd_classical(query, count):
@@ -139,6 +142,8 @@ def fetch_mbb_tracks(workdir, n_target, minimum_seconds):
         for doc in docs:
             if len(tracks) >= n_target and total >= minimum_seconds:
                 break
+            if any(term in (doc.get("title") or "").lower() for term in MBB_EXCLUDE_TERMS):
+                continue
             identifier = doc["identifier"]
             if identifier in seen:
                 continue
@@ -492,6 +497,10 @@ def build_fresh_healing(_service, _theme, output_path):
 
 def select_music(service, folder_id, exts, mime_prefix):
     source = os.environ.get("PLAYLIST_MUSIC_SOURCE", "approved_bank")
+    if source == "mbb_public_domain" and base.CHANNEL_KEY == "mbb":
+        # Concertos and solo piano/violin/cello/flute/oboe/trumpet; Internet Archive items that
+        # are explicitly public domain only. Free; no generated music.
+        return fetch_mbb_tracks(base.WORKDIR, 18, int(random.uniform(52, 68) * 60))
     if source == "owner_library":
         from playlist_owner_drive_library import select_library_tracks, record_used
         service = service or base.get_drive_service()
