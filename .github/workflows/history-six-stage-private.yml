@@ -1,6 +1,8 @@
 name: TODAY IN HISTORY Six-Stage Private Production
 
 on:
+  schedule:
+    - cron: '0 16 * * *' # 01:00 KST next day
   workflow_dispatch:
     inputs:
       confirm_private_upload:
@@ -18,16 +20,16 @@ concurrency:
 
 jobs:
   no-upload:
-    if: ${{ inputs.confirm_private_upload != true }}
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.confirm_private_upload != true }}
     runs-on: ubuntu-latest
     steps:
       - run: echo "No upload attempted. Dispatch again with confirm_publication=true only after cost hold and channel credentials are reviewed."
 
   publish:
-    if: ${{ inputs.confirm_private_upload == true }}
+    if: ${{ github.event_name == 'schedule' || inputs.confirm_private_upload == true }}
     runs-on: ubuntu-latest
     environment: youtube-channels
-    timeout-minutes: 180
+    timeout-minutes: 420
     env:
       PYTHONUNBUFFERED: "1"
       HISTORY_PRIVATE_ONLY: "1"
@@ -91,6 +93,20 @@ jobs:
       YOUTUBE_OAUTH_CLIENT_SECRET_RETRO_REELS_TIMES: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_RETRO_REELS_TIMES }}
       YOUTUBE_OAUTH_REFRESH_TOKEN_RETRO_REELS_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_RETRO_REELS_TIMES }}
     steps:
+      - name: Random daily start within 01:00–05:00 KST
+        if: ${{ github.event_name == 'schedule' }}
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import datetime, secrets, time
+          kst = datetime.timezone(datetime.timedelta(hours=9))
+          now = datetime.datetime.now(kst)
+          end = now.replace(hour=5, minute=0, second=0, microsecond=0)
+          remaining = max(0, int((end-now).total_seconds()))
+          delay = secrets.randbelow(remaining) if remaining else 0
+          print(f'Random delay: {delay} seconds', flush=True)
+          time.sleep(delay)
+          PY
       - name: "1/6 - Checkout and freeze history channel"
         uses: actions/checkout@v4
       - name: "2/6 - Prepare English documentary writer and tools"
