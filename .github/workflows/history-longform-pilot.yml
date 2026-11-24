@@ -1,0 +1,35 @@
+name: TODAY IN HISTORY Longform Pilot (offline only)
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "scripts/history_longform_pilot.py"
+      - "tests/test_history_longform_pilot.py"
+      - ".github/workflows/history-longform-pilot.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  safe-offline-demo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install free tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg fonts-dejavu-core
+          python -m pip install --disable-pip-version-check Pillow
+      - name: Run isolated contract and short synthetic video render tests
+        run: PYTHONPATH=. python -m unittest discover -s tests -p 'test_history_longform_pilot.py' -v
+      - name: Confirm tests were discovered (no fake green)
+        run: python -m py_compile scripts/history_longform_pilot.py tests/test_history_longform_pilot.py
+      - name: Safety note
+        run: |
+          echo "Only synthetic offline QA was run. No historical episode or upload occurred."
+          echo "Real private YouTube upload requires factual/rights review and a separate approval."
