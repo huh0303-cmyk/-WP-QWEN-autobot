@@ -1,0 +1,48 @@
+name: Threads 6 randomized publisher
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+    inputs:
+      force_now:
+        description: "true = publish one post per account immediately (test run)"
+        required: false
+        default: "false"
+permissions:
+  contents: write
+concurrency:
+  group: threads-6-publisher
+  cancel-in-progress: false
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/main' && vars.THREADS_6_LIVE != 'false'
+    runs-on: ubuntu-latest
+    environment: META-SOCIAL
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install Pillow -q
+      - name: Publish due Threads posts (identity-verified, receipts committed to GitHub)
+        env:
+          FORCE_NOW: ${{ inputs.force_now || 'false' }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          META_GEMINI_FREE_MODEL: ${{ vars.META_GEMINI_FREE_MODEL }}
+          META_THREADS_ENGLISH_SOS1_ACCESS_TOKEN: ${{ secrets.META_THREADS_ENGLISH_SOS1_ACCESS_TOKEN }}
+          META_THREADS_ENGLISH_SOS1_USER_ID: ${{ vars.META_THREADS_ENGLISH_SOS1_USER_ID }}
+          META_THREADS_JAPANESE_SOS1_ACCESS_TOKEN: ${{ secrets.META_THREADS_JAPANESE_SOS1_ACCESS_TOKEN }}
+          META_THREADS_JAPANESE_SOS1_USER_ID: ${{ vars.META_THREADS_JAPANESE_SOS1_USER_ID }}
+          META_THREADS_CHINESE_SOS1_ACCESS_TOKEN: ${{ secrets.META_THREADS_CHINESE_SOS1_ACCESS_TOKEN }}
+          META_THREADS_CHINESE_SOS1_USER_ID: ${{ vars.META_THREADS_CHINESE_SOS1_USER_ID }}
+          META_THREADS_KOREAN_SOS1_ACCESS_TOKEN: ${{ secrets.META_THREADS_KOREAN_SOS1_ACCESS_TOKEN }}
+          META_THREADS_KOREAN_SOS1_USER_ID: ${{ vars.META_THREADS_KOREAN_SOS1_USER_ID }}
+          META_THREADS_SEOUL_JISOO1_ACCESS_TOKEN: ${{ secrets.META_THREADS_SEOUL_JISOO1_ACCESS_TOKEN }}
+          META_THREADS_SEOUL_JISOO1_USER_ID: ${{ vars.META_THREADS_SEOUL_JISOO1_USER_ID }}
+          META_THREADS_SEOUL_JOURNAL1_ACCESS_TOKEN: ${{ secrets.META_THREADS_SEOUL_JOURNAL1_ACCESS_TOKEN }}
+          META_THREADS_SEOUL_JOURNAL1_USER_ID: ${{ vars.META_THREADS_SEOUL_JOURNAL1_USER_ID }}
+        run: python scripts/threads_6_publisher.py
