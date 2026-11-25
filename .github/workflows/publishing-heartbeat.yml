@@ -1,0 +1,53 @@
+name: Publishing heartbeat (cron-drop recovery)
+# GitHub drops most cron ticks in this repository (see
+# docs/PUBLISHING_HEARTBEAT_2026-11-25.md). workflow_dispatch is reliable, so this
+# job dispatches the existing publishers on a jittered ~10-14 minute loop for
+# ~5.5 hours and then dispatches itself. It publishes nothing by itself; every
+# target keeps its own gates, receipts and kill switches.
+# Kill switch: repository variable PUBLISHING_HEARTBEAT=false.
+
+on:
+  # Backup restarters only. If the self-chain breaks, any surviving tick restarts it.
+  schedule:
+    - cron: '23 */2 * * *'
+    - cron: '47 1-23/2 * * *'
+  workflow_dispatch:
+    inputs:
+      budget_seconds:
+        description: "Loop length in seconds (default 19800 = 5.5h)"
+        required: false
+        default: "19800"
+      chain:
+        description: "Dispatch the next heartbeat when this one ends"
+        required: false
+        type: boolean
+        default: true
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  # One running heartbeat, at most one pending; extra restarters collapse.
+  group: publishing-heartbeat
+  cancel-in-progress: false
+
+jobs:
+  heartbeat:
+    if: github.ref == 'refs/heads/main' && vars.PUBLISHING_HEARTBEAT != 'false'
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install requests -q
+      - name: Dispatch due publishers, then chain the next heartbeat
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GH_DISPATCH_TOKEN: ${{ github.token }}
+          PUBLISHING_HEARTBEAT: ${{ vars.PUBLISHING_HEARTBEAT }}
+          HEARTBEAT_BUDGET_SECONDS: ${{ inputs.budget_seconds || '19800' }}
+          HEARTBEAT_CHAIN: ${{ github.event_name == 'schedule' && 'true' || inputs.chain }}
+        run: python scripts/publishing_heartbeat.py
