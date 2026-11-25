@@ -13,17 +13,17 @@ from pathlib import Path
 # Documentary / news-narrator tuned (slightly slower, slightly lower). Change freely.
 # Override at run time with SEOUL_JOURNAL_VOICE=<voice name | male | female>.
 VOICE_ROSTER = [
-    {"voice": "ko-KR-InJoonNeural",             "gender": "male",   "tone": "documentary_deep", "rate": "-6%", "pitch": "-4Hz"},
-    {"voice": "ko-KR-HyunsuMultilingualNeural", "gender": "male",   "tone": "news_clear",       "rate": "-4%", "pitch": "-2Hz"},
-    {"voice": "en-US-BrianMultilingualNeural",  "gender": "male",   "tone": "narrator_calm",    "rate": "-4%", "pitch": "-2Hz"},
-    {"voice": "ko-KR-SunHiNeural",              "gender": "female", "tone": "anchor",           "rate": "-4%", "pitch": "-2Hz"},
-    {"voice": "en-US-AvaMultilingualNeural",    "gender": "female", "tone": "narrator_warm",    "rate": "-4%", "pitch": "-1Hz"},
-    {"voice": "en-US-EmmaMultilingualNeural",   "gender": "female", "tone": "documentary_clear", "rate": "-5%", "pitch": "-2Hz"},
+    {"voice": "ko-KR-InJoonNeural",             "gender": "male",   "tone": "documentary_deep", "rate": "+8%", "pitch": "-4Hz"},
+    {"voice": "ko-KR-HyunsuMultilingualNeural", "gender": "male",   "tone": "news_clear",       "rate": "+8%", "pitch": "-2Hz"},
+    {"voice": "en-US-BrianMultilingualNeural",  "gender": "male",   "tone": "narrator_calm",    "rate": "+8%", "pitch": "-2Hz"},
+    {"voice": "ko-KR-SunHiNeural",              "gender": "female", "tone": "anchor",           "rate": "+8%", "pitch": "-2Hz"},
+    {"voice": "en-US-AvaMultilingualNeural",    "gender": "female", "tone": "narrator_warm",    "rate": "+8%", "pitch": "-1Hz"},
+    {"voice": "en-US-EmmaMultilingualNeural",   "gender": "female", "tone": "documentary_clear", "rate": "+8%", "pitch": "-2Hz"},
 ]
 
-PAUSE_SENTENCE = 0.30   # silence after the last word of a sentence
-PAUSE_PARAGRAPH = 0.62  # silence after the last sentence of a paragraph
-PAUSE_END = 0.35
+PAUSE_SENTENCE = 0.18   # silence after the last word of a sentence
+PAUSE_PARAGRAPH = 0.38  # silence after the last sentence of a paragraph
+PAUSE_END = 0.30
 
 
 def _run(cmd):
@@ -36,6 +36,38 @@ def _run(cmd):
 def _duration(path):
     r = _run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=nw=1:nk=1", str(path)])
     return float(r.stdout.strip())
+
+
+
+def _speech_bounds(wav_path):
+    """Measure where real sound starts/ends in a clip (silencedetect), so word times
+    are anchored to actual audio instead of the TTS engine's reported offsets."""
+    r = subprocess.run(["ffmpeg","-v","info","-i",str(wav_path),"-af","silencedetect=noise=-38dB:d=0.04","-f","null","-"],
+                       capture_output=True, text=True)
+    total = _duration(wav_path)
+    starts = [float(x) for x in re.findall(r"silence_start: ([0-9.]+)", r.stderr)]
+    ends = [float(x) for x in re.findall(r"silence_end: ([0-9.]+)", r.stderr)]
+    lead = ends[0] if (starts and starts[0] <= 0.02 and ends) else 0.0
+    tail_start = total
+    if starts and (len(starts) > len(ends) or (ends and starts[-1] > ends[-1])):
+        tail_start = starts[-1]
+    elif starts and ends and abs(ends[-1] - total) < 0.05:
+        tail_start = starts[-1]
+    return max(0.0, lead), min(total, max(tail_start, lead + 0.2))
+
+
+def _fit_words(words, lead, speech_end):
+    """Linearly map engine word times onto the measured speech window."""
+    raw_start = min(w["start"] for w in words)
+    raw_end = max(w["end"] for w in words)
+    span = max(0.05, raw_end - raw_start)
+    win = max(0.05, speech_end - lead)
+    out = []
+    for w in words:
+        a = lead + (w["start"] - raw_start) * win / span
+        b = lead + (w["end"] - raw_start) * win / span
+        out.append({"text": w["text"], "start": a, "end": max(b, a + 0.03)})
+    return out
 
 
 def split_units(text):
@@ -85,7 +117,9 @@ def _synthesize_with(voice, units, out_dir, work, log):
         mp3.write_bytes(audio)
         _run(["ffmpeg", "-y", "-v", "error", "-i", str(mp3), "-ar", "44100", "-ac", "1", "-c:a", "pcm_s16le", str(wav)])
         raw_len = _duration(wav)
-        last_end = min(max(w["end"] for w in words), raw_len)
+        lead, speech_end = _speech_bounds(wav)
+        words = _fit_words(words, lead, speech_end)
+        last_end = min(speech_end, raw_len)
         pause = PAUSE_END if i == len(units) - 1 else (PAUSE_PARAGRAPH if kind == "para" else PAUSE_SENTENCE)
         target = last_end + pause
         fit = work / f"u{i:02d}_fit.wav"

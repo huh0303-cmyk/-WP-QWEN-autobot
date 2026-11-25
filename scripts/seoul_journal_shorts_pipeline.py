@@ -109,21 +109,28 @@ def draft(title, body):
     genai.configure(api_key=key)
     models = [os.getenv("SEOUL_JOURNAL_GEMINI_MODEL", "").strip(), "gemini-3.1-flash-lite", "gemini-2.5-flash-lite", "gemini-2.5-flash"]
     models = list(dict.fromkeys(x for x in models if x))
-    prompt = f"""당신은 서울저널의 한국어 정치 뉴스 기자 겸 팩트체커입니다.
+    prompt = f"""당신은 조회수 수백만을 만드는 한국 정치 유튜브 쇼츠 대본 작가입니다.
 기사 제목: {title}
 기사 본문:
 {body[:12000]}
-세로 정치 쇼츠 패키지를 작성하세요. 60초 상한을 두지 말고 핵심 발언, 상대 반박, 확인된 사실과 맥락, 마지막 중립적 투표 질문이 완결될 만큼 작성하세요. 보통 공백 포함 650~1100자, 최소 5개 문단을 목표로 하되 근거가 부족하면 억지로 늘리지 마세요.
-기사에 있는 배경·당사자 발언·확인된 사실을 구체적으로 설명하고 마지막은 '서울저널이 알려드립니다.'로 마무리하세요. 투표 질문은 내레이션이 모두 끝난 뒤 별도 화면에 표시합니다.
-실제 쌍방 충돌이나 반박이 기사에서 확인될 때만 헤드라인에 '공방!', '대격돌!', '정면 대립!' 같은 강한 표현을 자연스럽게 사용할 수 있습니다. 실제 대립이 없으면 이런 표현을 만들지 마세요.
-poll_question은 이 기사에서 시청자가 판단할 핵심 질문으로 쓰고, poll_options는 기사 속 서로 다른 입장 2개와 중립·추가확인 선택지 1개를 A/B/C 순서로 만드세요. 서로 겹치지 않게 하고 사람·주장을 정확히 표시하세요.
-기사에 없는 사실·추측·숫자·인용은 만들지 마세요. JSON 객체 하나만 반환:
-{{"headline":"썸네일용 10~18자 헤드라인","youtube_title":"사실에 근거한 제목 100자 이내","narration":"650~1100자 기자 내레이션(근거가 부족하면 더 짧게)","description":"중립적 요약과 [원문 기사] 자리","source_note":"확인된 사실과 한계","poll_question":"15~28자 중립 질문","poll_options":["18자 이내 선택지","18자 이내 선택지","18자 이내 중립 선택지"]}}"""
+
+[작성 규칙]
+1. 첫 문장은 반드시 3초 안에 시선을 붙잡는 훅입니다. 충격적인 사실, 날 선 질문, 반전 중 하나로 시작하세요. 인사나 배경 설명으로 시작하면 실패입니다.
+2. 문장은 짧게 끊고, 리듬을 만드세요. 한 문장 25자 안팎, 길어도 40자를 넘기지 마세요.
+3. 중간마다 궁금증을 다시 거세요. 예: 그런데 진짜는 따로 있습니다 / 여기서 끝이 아닙니다.
+4. 마지막은 시청자가 댓글로 편을 들게 만드는 한 줄 질문으로 끝내세요.
+5. 표현은 세게, 팩트는 정확하게. 기사에 없는 사실, 추측, 비방, 인신공격은 절대 만들지 마세요. 기사에 나온 발언과 행동은 구체적인 숫자와 이름으로 짚으세요.
+6. 기사에 있는 발언과 갈등은 강한 어조로 살려도 되지만, 확인되지 않은 것은 확인되지 않았다고 말하세요.
+7. 한쪽 편을 들지 말고, 양쪽 주장을 같은 강도로 다루세요.
+
+poll_question은 이 기사에서 시청자가 판단할 핵심 쟁점 질문, poll_options는 서로 다른 입장 2개와 중립 또는 판단보류 1개를 A/B/C 순서로 만드세요.
+기사에 없는 실명 범죄 혐의를 만들지 마세요. JSON 객체 하나만 반환:
+{{"headline":"화면용 10~18자 강한 제목","youtube_title":"클릭을 부르는 제목 100자 이내","narration":"650~1100자 나레이션(첫 문장은 훅)","description":"설명 마지막에 [출처 기사] 포함","source_note":"확인된 사실과 한계","poll_question":"15~28자 질문","poll_options":["18자 이내 입장1","18자 이내 입장2","18자 이내 중립"]}}"""
     errors = []
     for model_name in models:
         try:
             model = genai.GenerativeModel(model_name)
-            result = model.generate_content(prompt, generation_config={"temperature": 0.35, "response_mime_type": "application/json"})
+            result = model.generate_content(prompt, generation_config={"temperature": 0.8, "response_mime_type": "application/json"})
             raw = (result.text or "").strip().strip("`")
             data = json.loads(raw)
             narration = str(data.get("narration", "")).strip()
