@@ -55,4 +55,11 @@ task_id: `claude-20261125-publishing-heartbeat`
 - 이 문서 시점에 하트비트는 main 미병합 → 아직 동작 안 함. 병합 후 첫 실행 로그의 `DISPATCH ... ok=True` 및
   floor 리포트 `public_verified` 증가로 확인해야 한다.
 - 2026-11-25 00:54Z에 기존 `daily-publication-floor.yml`을 main에서 수동 1회 dispatch함(run 45521665016, 밀린 슬롯 처리용).
+- 수동 floor 결과 (01:48Z 확인):
+  - `wp_kworld365` run 45521719907 success, 로그: `✅ 공개 발행: https://kworld365.com/kpop-demon-hunters-agency-production-global-fan-strategy/` (본문 3673자, SEO 72/70).
+    이 세션 네트워크에서 해당 호스트 접근이 막혀 공개 URL 직접 확인은 못 함 → 다음 floor 실행의 `verify_publication` 결과로 확인 필요.
+    이미지 0장: Pixabay·Pexels 검색 결과 없음 + `REPLICATE_API_TOKEN` 401 거부 → 이미지 없이 발행. 제휴 주간 카탈로그 만료로 상품 카드 생략.
+  - `wp_kskin365` run 45521714112 **cancelled** (발행 단계 약 20분 후 중단, 고아 python 프로세스 종료 기록) → 발행 안 됨. 다음 floor가 attempt 2로 재시도.
+  - Blogger 2건: 워커 비활성으로 run 생성 안 됨 (위 표 참조).
+- 추가 차단: `REPLICATE_API_TOKEN` 401 → AI 이미지 대체 경로 전부 실패. 무료 이미지가 없을 때 이미지 없이 발행됨. Chairman: 토큰 갱신 또는 무료 전용 유지 결정.
 - VERIFIED_COMPLETE 아님. 공개 URL 확인은 floor 리포트·감사 엔진 기준.
