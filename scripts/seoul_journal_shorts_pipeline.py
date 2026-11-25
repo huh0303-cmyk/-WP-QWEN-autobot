@@ -155,6 +155,18 @@ def tts(text):
     """Create narration plus word/phrase timestamps for exact subtitle timing."""
     p = OUT / "voice.mp3"
     errors = []
+    # Primary path: rotating 3-male/3-female narrators, synthesized sentence by sentence so
+    # every word time is measured (exact subtitle sync). Fish/Edge below are fallbacks only,
+    # unless SEOUL_JOURNAL_TTS_ENGINE=fish is set explicitly.
+    if os.getenv("SEOUL_JOURNAL_TTS_ENGINE", "roster").strip().casefold() != "fish":
+        try:
+            import sj_av
+            res = sj_av.synthesize_roster_voice(text, OUT, log=log)
+            log(f"TTS_ENGINE=edge_sentence_timed voice={res['voice']} gender={res['gender']} tone={res['tone']} sentences={res['sentences']} audio={res['audio_seconds']}s")
+            return p
+        except Exception as exc:
+            errors.append(f"Roster TTS failed ({type(exc).__name__}: {str(exc)[:200]})")
+            log("TTS_ROSTER_FAILED " + errors[-1])
     voice_name, voice_role = random.choice(EDGE_VOICES)
     fish_ids = [x.strip() for x in os.getenv("FISH_AUDIO_VOICE_IDS","").split(",") if x.strip()]
     fish_voice = random.choice(fish_ids) if fish_ids else ""
@@ -317,9 +329,13 @@ def _cover_frame(headline,photo,style,index,caption="",poll=False,thumbnail=Fals
     draw=ImageDraw.Draw(base)
     # top identity and breaking badge
     draw.rectangle((0,0,W,130),fill=(*style["bg"],238))
-    draw.rectangle((42,34,250,105),fill=style["accent"])
-    draw.text((58,43),style["badge"],font=_font(42),fill=(255,255,255),stroke_width=1,stroke_fill=(0,0,0))
-    draw.text((285,36),"서울저널",font=_font(54),fill=(255,255,255))
+    # Badge width follows its text so it never collides with the brand name.
+    badge_font=_font(42)
+    badge_w=draw.textbbox((0,0),style["badge"],font=badge_font)[2]
+    badge_right=42+badge_w+32
+    draw.rectangle((42,34,badge_right,105),fill=style["accent"])
+    draw.text((58,43),style["badge"],font=badge_font,fill=(255,255,255),stroke_width=1,stroke_fill=(0,0,0))
+    draw.text((badge_right+26,36),"서울저널",font=_font(54),fill=(255,255,255))
     draw.text((W-290,52),"자율 구독",font=_font(36),fill=(255,255,255))
     if thumbnail:
         # 500k+ reference commonality adapted to the owner's explicit preference:
@@ -360,7 +376,7 @@ def _cover_frame(headline,photo,style,index,caption="",poll=False,thumbnail=Fals
                   anchor="mt",font=_font(36),fill=(255,224,75),stroke_width=5,stroke_fill=(0,0,0))
     return base.convert("RGB")
 
-def build_caption_cues(timeline_path, max_chars=28, max_seconds=2.8):
+def build_caption_cues(timeline_path, max_chars=26, max_seconds=3.0):
     """Group timestamped TTS segments into fast, speech-synchronous caption cues."""
     data=json.loads(Path(timeline_path).read_text(encoding="utf-8"))
     segments=data.get("segments",[])
@@ -405,22 +421,31 @@ def build_caption_cues(timeline_path, max_chars=28, max_seconds=2.8):
             segment["text"]=narration[source_start:source_end]
             source_start=source_end
             previous_end=char_end
-    cues=[]; current=[]; cue_start=None; cue_end=None
+    cues=[]; current=[]; cue_words=[]; cue_start=None; cue_end=None
     def clean_join(parts):
         value="".join(parts)
         return re.sub(r"\s+([,.!?。！？])",r"\1",value).strip()
+    def flush():
+        nonlocal current,cue_words,cue_start
+        if current:
+            cues.append({"text":clean_join(current),"start":cue_start,"end":cue_end,"words":cue_words})
+        current=[]; cue_words=[]; cue_start=None
     for segment in segments:
         text=segment.get("text","")
         start=float(segment.get("start",0)); end=float(segment.get("end",0))
         if not text or end<=start: continue
         trial=clean_join(current+[text])
         if current and (len(trial)>max_chars or end-cue_start>max_seconds):
-            cues.append({"text":clean_join(current),"start":cue_start,"end":cue_end})
-            current=[]; cue_start=None
+            flush()
         if cue_start is None: cue_start=start
         current.append(text); cue_end=end
-    if current:
-        cues.append({"text":clean_join(current),"start":cue_start,"end":cue_end})
+        cue_words.append({"text":text,"start":round(start,3),"end":round(end,3)})
+        # Break captions at natural phrase ends so each card reads as one thought.
+        so_far=len(clean_join(current))
+        stripped=text.rstrip()
+        if (stripped.endswith((".","!","?","。","！","？")) and so_far>=8) or (stripped.endswith((",","，")) and so_far>=14):
+            flush()
+    flush()
     if not cues:
         raise RuntimeError("Timestamped narration could not form subtitle cues")
     for index,cue in enumerate(cues):
@@ -525,15 +550,32 @@ def render(headline, photo, audio, photos=None, poll_question="", poll_options=N
     if len(photo_sources)<len(unique):
         raise RuntimeError("Photo metadata is incomplete; semantic scene matching blocked")
     photo_mapping=plan_visual_sequence(active_cues,unique,photo_sources)
-    for idx,cue in enumerate(active_cues):
-        source=unique[photo_mapping[idx]]
-        next_start=active_cues[idx+1]["start"] if idx+1<len(active_cues) else duration
-        hold_seconds=next_start-(0.0 if idx==0 else cue["start"])
-        if hold_seconds<=0 or hold_seconds>4.5:
-            raise RuntimeError(f"Subtitle display duration out of sync: cue={idx} hold={hold_seconds:.3f}")
-        frame = OUT/f"scene-{idx:02d}.jpg"
-        _cover_frame(headline,source,style,idx+1,caption=cue["text"]).save(frame,quality=92)
+    # Captions are drawn by libass from subtitles.ass (outlined text, active word
+    # highlighted). Background scenes follow the photo plan, so a photo keeps one
+    # continuous Ken Burns move instead of restarting at every caption.
+    import sj_av
+    FPS=30
+    groups=[]
+    for idx in range(len(active_cues)):
+        photo_index=photo_mapping[idx]
+        if groups and groups[-1]["photo"]==photo_index:
+            groups[-1]["end_cue"]=idx
+        else:
+            groups.append({"photo":photo_index,"start_cue":idx,"end_cue":idx})
+    previous_frame=0
+    for gi,group in enumerate(groups):
+        end_t=duration if gi+1==len(groups) else active_cues[groups[gi+1]["start_cue"]]["start"]
+        # Quantize every scene boundary to a whole frame from the running total so
+        # rounding can never accumulate into audio/subtitle drift.
+        end_frame=max(previous_frame+1,round(end_t*FPS))
+        hold_seconds=(end_frame-previous_frame)/FPS
+        previous_frame=end_frame
+        if hold_seconds>12.0:
+            raise RuntimeError(f"Photo scene too long to stay lively: scene={gi} hold={hold_seconds:.2f}")
+        frame = OUT/f"scene-{gi:02d}.jpg"
+        _cover_frame(headline,unique[group["photo"]],style,gi+1).save(frame,quality=92)
         frames.append((frame,hold_seconds))
+    subtitle_events=sj_av.write_ass(active_cues,OUT/"subtitles.ass")
     # Narration and every synchronized subtitle end first. Only then does the
     # separate silent poll hold begin.
     poll_frame = OUT/"scene-poll.jpg"
@@ -542,30 +584,41 @@ def render(headline, photo, audio, photos=None, poll_question="", poll_options=N
     frames.append((poll_frame,poll_seconds))
     cmd = [ffmpeg, "-y"]
     for frame,hold_seconds in frames:
-        cmd += ["-loop", "1", "-t", str(hold_seconds), "-i", str(frame)]
+        # -framerate 30 is essential: without it the looped still is read at 25 fps while
+        # zoompan emits one frame per input frame, which made the video 17% shorter than
+        # the narration (subtitles drifted early and the end of the audio was cut off).
+        cmd += ["-framerate", "30", "-loop", "1", "-t", f"{hold_seconds:.6f}", "-i", str(frame)]
     cmd += ["-i", str(audio)]
     filters=[]
     for i in range(len(frames)):
         prefix=f"[{i}:v]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1"
         if i < len(frames)-1:
-            # Slow Ken Burns motion keeps archival politician photos alive without
-            # distorting the face or interfering with the narration subtitles.
-            motion="zoompan=z='min(zoom+0.00012,1.04)':x='iw/2-(iw/zoom/2)+6*sin(on/18)':y='ih/2-(ih/zoom/2)+6*cos(on/21)':d=1:s=1080x1920:fps=30"
+            # Smooth, centred Ken Burns (alternating push-in / pull-out). The still is
+            # upscaled first so zoompan's integer cropping does not shimmer.
+            zoom="min(1.045,1+0.00013*on)" if i%2==0 else "max(1.0,1.045-0.00013*on)"
+            motion=f"scale=1620:2880,zoompan=z='{zoom}':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=1080x1920:fps=30"
             filters.append(prefix+","+motion+f",format=yuv420p[v{i}];")
         else:
             # Keep the final poll steady for legibility.
             filters.append(prefix+f",fps=30,format=yuv420p[v{i}];")
     inputs="".join(filters)
-    inputs += "".join(f"[v{i}]" for i in range(len(frames))) + f"concat=n={len(frames)}:v=1:a=0[outv];"
+    inputs += "".join(f"[v{i}]" for i in range(len(frames))) + f"concat=n={len(frames)}:v=1:a=0[cv];"
+    inputs += "[cv]ass=filename=subtitles.ass[outv];"
     inputs += f"[{len(frames)}:a]apad=pad_dur={poll_seconds:.3f}[outa]"
     video = OUT/"seoul-journal-short.mp4"
-    cmd += ["-filter_complex", inputs, "-map", "[outv]", "-map", "[outa]", "-c:v", "libx264", "-preset", "medium", "-c:a", "aac", "-shortest", "-movflags", "+faststart", str(video)]
-    result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+    cmd += ["-filter_complex", inputs, "-map", "[outv]", "-map", "[outa]", "-c:v", "libx264", "-preset", "medium", "-crf", "20", "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "160k", "-shortest", "-movflags", "+faststart", str(video)]
+    # cwd=OUT lets the ass filter use a plain relative path (no drive-letter escaping).
+    result = subprocess.run(cmd, capture_output=True, text=True, timeout=900, cwd=str(OUT))
     if result.returncode:
         raise RuntimeError("FFmpeg multi-scene render failed: " + result.stderr[-1200:])
     # Prove the poll survived the final mux instead of trusting an intermediate frame.
     final_probe=subprocess.run(["ffprobe","-v","error","-show_entries","format=duration","-of","default=noprint_wrappers=1:nokey=1",str(video)],capture_output=True,text=True,check=True)
     final_duration=float(final_probe.stdout.strip())
+    # Sync gate: video must be exactly narration + poll long. A shortfall means the
+    # subtitles and photos have drifted away from the voice, so block the upload.
+    expected_total=previous_frame/FPS+poll_seconds
+    if abs(final_duration-expected_total)>0.35 or abs(final_duration-(duration+poll_seconds))>0.5:
+        raise RuntimeError(f"A/V length mismatch: video={final_duration:.2f}s expected={expected_total:.2f}s narration+poll={duration+poll_seconds:.2f}s")
     proof_at=max(0.0,final_duration-1.5)
     proof=OUT/"poll-proof.jpg"
     proof_cmd=[ffmpeg,"-y","-ss",f"{proof_at:.3f}","-i",str(video),"-frames:v","1","-q:v","2",str(proof)]
@@ -584,8 +637,12 @@ def render(headline, photo, audio, photos=None, poll_question="", poll_options=N
         "duration_seconds":round(final_duration,3),
         "motion_effect":"ffmpeg zoompan Ken Burns on narration scenes",
         "narration_subtitle_cards":len(active_cues),
-        "subtitle_timing_source":"TTS word/phrase timestamps",
-        "subtitle_max_hold_seconds":round(max(seconds for _,seconds in frames[:-1]),3),
+        "subtitle_engine":"libass (subtitles.ass, active-word highlight)",
+        "subtitle_events":subtitle_events,
+        "photo_scenes":len(frames)-1,
+        "expected_total_seconds":round(expected_total,3),
+        "subtitle_timing_source":"TTS word timestamps, sentence-by-sentence synthesis",
+        "subtitle_max_hold_seconds":round(max(c["end"]-c["start"] for c in active_cues),3),
         "visual_plan_file":"visual-plan.json",
         "poll_seconds":round(poll_seconds,3),
         "poll_starts_after_narration_seconds":round(duration,3),
