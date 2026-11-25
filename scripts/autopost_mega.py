@@ -2453,6 +2453,17 @@ def get_images_pexels(query, need):
         return [(p.get("src",{}).get("large") or p.get("src",{}).get("medium","")) for p in random.sample(photos,min(need,len(photos))) if p.get("src")]
     except: return []
 
+def _stock_search_random_order(query, need):
+    # Pixabay and Pexels: pick the first source at random each call to reduce repeated photos
+    import random
+    sources=[get_images_pixabay, get_images_pexels]
+    random.shuffle(sources)
+    found=[]
+    for fn in sources:
+        if len(found)>=need: break
+        found.extend(fn(query, need-len(found)))
+    return found
+
 def get_multiple_images(keyword, count=3, theme=""):
     has_ko = any('\uAC00'<=c<='\uD7A3' for c in keyword)
     # ★ 검색어에 테마 맥락을 붙여 관련성 낮은 스톡사진이 걸릴 확률을 줄임
@@ -2478,12 +2489,10 @@ def get_multiple_images(keyword, count=3, theme=""):
     urls=[]
     if not has_ko:
         q = with_ctx(keyword)
-        urls.extend(get_images_pixabay(q,count))
-        if len(urls)<count: urls.extend(get_images_pexels(q,count-len(urls)))
+        urls.extend(_stock_search_random_order(q,count))
     if len(urls)<count:
         en=with_ctx(translate_ko_to_en_for_image(keyword,theme))
-        urls.extend(get_images_pixabay(en,count-len(urls)))
-        if len(urls)<count: urls.extend(get_images_pexels(en,count-len(urls)))
+        urls.extend(_stock_search_random_order(en,count-len(urls)))
     # ★ 주의: 예전엔 여기서 못 채운 나머지 슬롯을 THEME_IMAGE_FALLBACK(주제 뭉뚱그림 검색어,
     #   예: "medical health Korea doctor")로 억지로 채웠음. 그 결과 한 글에 키워드에 맞는
     #   사진 1~2장 + 본문과 무관한 범용 사진 1장이 섞여 들어가는 문제가 있었음
