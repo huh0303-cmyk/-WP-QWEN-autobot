@@ -42,7 +42,7 @@ task_id: `claude-20261125-publishing-heartbeat`
 | 플랫폼 | 상태 | 근거 | 필요한 조치 |
 |---|---|---|---|
 | WordPress 23 | 코드·인증 경로 정상, **스케줄 누락으로 정체** | floor 영수증, run 목록 | 하트비트 병합 |
-| Blogspot 33 | 동일 (11-24에 floor가 Blogger 담당으로 변경됐으나 그 뒤 floor 실행 0회) | 위 동일 | 하트비트 병합 |
+| Blogspot 33 | 스케줄 누락 + **발행 워커 `blogger-single-publish.yml`이 2026-11-07부터 disabled_manually(실행 이력 0건)** → floor의 Blogger dispatch가 전부 거부됨. 00:54Z 수동 floor에서 blogger_kfinance365·blogger_koreawedding이 run_id 없이 `CLAIMED`로 멈춤. 또한 `publish_blogger_33_now.py`의 `'labels'` 오류 수정(79accaf)은 실제 실행으로 아직 검증 안 됨 | run 45521665016, 45419345672 | Chairman: Actions → "Blogspot 33 — quick single publish / schedule" → **Enable workflow**. 이번 PR: 비활성 워커면 시도 횟수를 소모하지 않고 `WORKER_DISABLED`로 보고 |
 | YouTube 캘린더(플레이리스트/지식) | scheduler 정상 실행(가드 통과), 실행 빈도만 부족 | run 45489306219 | 하트비트 병합 |
 | YouTube 9개 언어 SOS 쇼츠 | **매일 실패(11-13~)** | run 45490452567: `RefreshError unauthorized_client` | Chairman: `YOUTUBE_OAUTH_CLIENT_ID`와 같은 OAuth 클라이언트로 언어 채널 refresh token 재발급 |
 | YouTube Seoul_Jisoo1 쇼츠 | **매일 실패** | run 45507302896: 동일 `unauthorized_client` | `YOUTUBE_OAUTH_REFRESH_TOKEN_SHOPPING_SEOUL_JISOO1` 재발급 |
