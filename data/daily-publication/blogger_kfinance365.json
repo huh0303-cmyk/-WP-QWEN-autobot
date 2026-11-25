@@ -1,1 +1,1 @@
-{"day": "2026-11-25", "status": "CLAIMED", "attempts": 1, "claim": "daily-2026-11-25-blogger_kfinance365-1b0ad64a", "claimed_at": "2026-11-25T09:54:38.752469+09:00", "run_id": null, "child_run_id": null, "child_job_id": null, "workflow": "blogger-single-publish.yml"}
+{"day": "2026-11-25", "status": "CLAIMED", "attempts": 2, "claim": "daily-2026-11-25-blogger_kfinance365-1c06b5d3", "claimed_at": "2026-11-25T23:15:07.435523+09:00", "run_id": null, "child_run_id": null, "child_job_id": null, "workflow": "blogger-single-publish.yml"}
