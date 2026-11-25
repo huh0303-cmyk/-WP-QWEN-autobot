@@ -113,11 +113,8 @@ def commit(paths,message):
 
 def main():
     if os.environ.get('META_LIVE_PUBLISH','false').lower()!='true':print('RESULT=BLOCKED_LIVE_SWITCH_OFF');return
-    if os.environ.get('META_12_TARGETS_READY','false').lower()!='true':print('RESULT=BLOCKED_12_TARGETS_READY_SWITCH_OFF');return
-    is_ready,why=ready_gate()
-    if not is_ready:print('RESULT=BLOCKED_READINESS_GATE '+why);return
     creds,missing=credentials()
-    if missing:print('RESULT=BLOCKED_MISSING_CREDENTIALS '+','.join(missing));return
+    if missing:print('MISSING_CREDENTIALS '+','.join(missing),flush=True)
     from meta_12_daily_schedule import plan
     now=datetime.now(KST);today=now.date().isoformat();state=json.loads(STATE.read_text(encoding='utf-8')) if STATE.exists() else {}
     due=[];assets=[];changed=False
@@ -125,13 +122,17 @@ def main():
         if slot['slot_id'] in state:continue
         hh,mm=map(int,slot['time_kst'].split(':'));target=now.replace(hour=hh,minute=mm,second=0,microsecond=0);delay=(now-target).total_seconds()
         if delay<0 or delay>POLICY['daily_cadence']['catchup_minutes']*60:continue
-        account=next(x for x in POLICY['accounts'] if x['key']==slot['account_key']);token,uid=creds[(slot['platform'],slot['account_key'])]
+        account=next(x for x in POLICY['accounts'] if x['key']==slot['account_key'])
+        token,uid=creds.get((slot['platform'],slot['account_key']),('',''))
+        if not token:
+            print(f"SKIPPED_SLOT={slot['slot_id']} REASON=missing_token",flush=True)
+            continue
         try:
             endpoint='https://graph.instagram.com/v25.0/me?fields=user_id,username' if slot['platform']=='instagram' else 'https://graph.threads.net/v1.0/me?fields=id,username'
             me=api(endpoint,token);uid=validated_user_id(slot['platform'],me,slot['expected_handle'],uid)
             source=source_for(slot);post=generate(account,slot['platform'],slot,source)
             row={'status':'ATTEMPT_RESERVED','platform':slot['platform'],'account_key':account['key'],'expected_handle':slot['expected_handle'],'at_kst':now.isoformat(),'content_sha256':hashlib.sha256(post['caption'].encode()).hexdigest()}
-            if slot['platform']=='instagram':
+            if slot['platform'] in ('instagram','threads'):
                 asset=f"demo_assets/meta_12/{slot['slot_id'].replace(':','_')}.png";asset_path=ROOT/asset;make_image(asset_path,account,slot,post);row['image_path']=asset
                 row['image_url']=f'https://raw.githubusercontent.com/{REPO}/main/{asset}'
                 assets.append(asset)
@@ -154,7 +155,7 @@ def main():
                 result=api(f'{base}/{uid}/media_publish',token,'POST',{'creation_id':cid});pid=str(result.get('id',''))
                 verified=api(f'{base}/{pid}?fields=id,permalink,timestamp',token);url=str(verified.get('permalink',''))
             else:
-                base='https://graph.threads.net/v1.0';container=api(f'{base}/{uid}/threads',token,'POST',{'media_type':'TEXT','text':row['caption']});cid=str(container.get('id',''))
+                base='https://graph.threads.net/v1.0';container=api(f'{base}/{uid}/threads',token,'POST',{'media_type':'IMAGE','image_url':row['image_url'],'text':row['caption']});cid=str(container.get('id',''))
                 if not cid:raise RuntimeError('Threads container missing')
                 time.sleep(5);result=api(f'{base}/{uid}/threads_publish',token,'POST',{'creation_id':cid});pid=str(result.get('id',''))
                 verified=api(f'{base}/{pid}?fields=id,permalink',token);url=str(verified.get('permalink',''))

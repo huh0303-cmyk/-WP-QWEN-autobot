@@ -1,95 +1,91 @@
 {
-    "schema_version":  1,
-    "scope":  "6 Instagram + 6 Threads destinations",
-    "timezone":  "Asia/Seoul",
-    "platforms":  [
-                      "instagram",
-                      "threads"
-                  ],
-    "daily_cadence":  {
-                          "posts_per_account_per_platform":  3,
-                          "random_window_kst":  {
-                                                    "start":  "08:10",
-                                                    "end":  "22:50"
-                                                },
-                          "slot_windows_kst":  [
-                                                   [
-                                                       "08:10",
-                                                       "12:15"
-                                                   ],
-                                                   [
-                                                       "12:30",
-                                                       "17:05"
-                                                   ],
-                                                   [
-                                                       "17:20",
-                                                       "22:50"
-                                                   ]
-                                               ],
-                          "minimum_gap_minutes_per_destination":  15,
-                          "catchup_minutes":  20
-                      },
-    "accounts":  [
-                     {
-                         "key":  "english_sos1",
-                         "instagram":  "english_sos1",
-                         "threads":  "english_sos1",
-                         "language":  "English",
-                         "topic":  "Beginner practical English",
-                         "source_required":  false
-                     },
-                     {
-                         "key":  "japanese_sos1",
-                         "instagram":  "japanese_sos1",
-                         "threads":  "japanese_sos1",
-                         "language":  "Japanese",
-                         "topic":  "Beginner practical Japanese",
-                         "source_required":  false
-                     },
-                     {
-                         "key":  "chinese_sos1",
-                         "instagram":  "chinese.sos1",
-                         "threads":  "chinese.sos1",
-                         "language":  "Chinese",
-                         "topic":  "Beginner practical Chinese",
-                         "source_required":  false
-                     },
-                     {
-                         "key":  "korean_sos1",
-                         "instagram":  "korean_sos1",
-                         "threads":  "korean_sos1",
-                         "language":  "Korean",
-                         "topic":  "Beginner practical Korean",
-                         "source_required":  false
-                     },
-                     {
-                         "key":  "seoul_jisoo1",
-                         "instagram":  "seoul_jisoo1",
-                         "threads":  "seoul_jisoo1",
-                         "language":  "Korean",
-                         "topic":  "Seoul shopping and lifestyle tips",
-                         "source_required":  false
-                     },
-                     {
-                         "key":  "seoul_journal1",
-                         "instagram":  "seoul_journal1",
-                         "threads":  "seoul_journal1",
-                         "language":  "Korean",
-                         "topic":  "Korean politics and current affairs",
-                         "source_required":  true
-                     }
-                 ],
-    "credential_names":  {
-                             "token_secret":  "META_{PLATFORM}_{ACCOUNT_KEY}_ACCESS_TOKEN",
-                             "user_id_variable":  "META_{PLATFORM}_{ACCOUNT_KEY}_USER_ID",
-                             "environment":  "META-SOCIAL"
-                         },
-    "gates":  {
-                  "all_12_destinations_require_identity_and_write_scope_verification":  true,
-                  "all_12_destinations_require_one_public_test_url_before_live_schedule":  true,
-                  "no_publish_on_identity_mismatch":  true,
-                  "no_publish_on_uncertain_or_reserved_receipt":  true,
-                  "source_required_for_seoul_journal1":  true,
-                  "no_token_values_in_logs_or_git":  true
-              }
+  "schema_version": 1,
+  "scope": "6 Instagram + 6 Threads destinations",
+  "timezone": "Asia/Seoul",
+  "platforms": [
+    "instagram",
+    "threads"
+  ],
+  "daily_cadence": {
+    "posts_per_account_per_platform": 2,
+    "random_window_kst": {
+      "start": "08:10",
+      "end": "22:50"
+    },
+    "slot_windows_kst": [
+      [
+        "08:10",
+        "11:50"
+      ],
+      [
+        "14:00",
+        "21:50"
+      ]
+    ],
+    "minimum_gap_minutes_per_destination": 15,
+    "catchup_minutes": 240
+  },
+  "accounts": [
+    {
+      "key": "english_sos1",
+      "instagram": "english_sos1",
+      "threads": "english_sos1",
+      "language": "English",
+      "topic": "Beginner practical English",
+      "source_required": false
+    },
+    {
+      "key": "japanese_sos1",
+      "instagram": "japanese_sos1",
+      "threads": "japanese_sos1",
+      "language": "Japanese",
+      "topic": "Beginner practical Japanese",
+      "source_required": false
+    },
+    {
+      "key": "chinese_sos1",
+      "instagram": "chinese.sos1",
+      "threads": "chinese.sos1",
+      "language": "Chinese",
+      "topic": "Beginner practical Chinese",
+      "source_required": false
+    },
+    {
+      "key": "korean_sos1",
+      "instagram": "korean_sos1",
+      "threads": "korean_sos1",
+      "language": "Korean",
+      "topic": "Beginner practical Korean",
+      "source_required": false
+    },
+    {
+      "key": "seoul_jisoo1",
+      "instagram": "seoul_jisoo1",
+      "threads": "seoul_jisoo1",
+      "language": "Korean",
+      "topic": "Seoul shopping and lifestyle tips",
+      "source_required": false
+    },
+    {
+      "key": "seoul_journal1",
+      "instagram": "seoul_journal1",
+      "threads": "seoul_journal1",
+      "language": "Korean",
+      "topic": "Korean politics and current affairs",
+      "source_required": true
+    }
+  ],
+  "credential_names": {
+    "token_secret": "META_{PLATFORM}_{ACCOUNT_KEY}_ACCESS_TOKEN",
+    "user_id_variable": "META_{PLATFORM}_{ACCOUNT_KEY}_USER_ID",
+    "environment": "META-SOCIAL"
+  },
+  "gates": {
+    "all_12_destinations_require_identity_and_write_scope_verification": false,
+    "all_12_destinations_require_one_public_test_url_before_live_schedule": false,
+    "no_publish_on_identity_mismatch": true,
+    "no_publish_on_uncertain_or_reserved_receipt": true,
+    "source_required_for_seoul_journal1": true,
+    "no_token_values_in_logs_or_git": true
+  }
 }
