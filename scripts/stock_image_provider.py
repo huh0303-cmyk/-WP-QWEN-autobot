@@ -16,7 +16,22 @@ METADATA = {}
 # Persist this file across CI runs (artifact/cache or repository commit) for cross-run protection.
 USAGE_LEDGER = Path(os.getenv("STOCK_IMAGE_USAGE_LEDGER", "data/stock_image_usage.json"))
 
-def _recent_image_ids(days=7):
+LEDGER_DAYS = 14  # policy: 14-day global duplicate protection
+HOSTED_DIR = Path(os.getenv("STOCK_HOSTED_DIR", "assets/tistory_images"))
+
+
+def _already_hosted(image_key):
+    """Cross-run dedup that survives fresh CI checkouts: every stock photo ever used was
+    committed as assets/tistory_images/stock-<provider>-<id>-<digest>.jpg, so its presence in
+    the checkout means the photo was already published on some site."""
+    provider, _, pid = image_key.partition(":")
+    try:
+        return any(HOSTED_DIR.glob(f"stock-{provider}-{pid}-*"))
+    except OSError:
+        return False
+
+
+def _recent_image_ids(days=LEDGER_DAYS):
     try:
         data = json.loads(USAGE_LEDGER.read_text(encoding="utf-8"))
         cutoff = time.time() - days * 86400
@@ -31,7 +46,7 @@ def _record_image_id(key):
             data = []
     except (OSError, ValueError):
         data = []
-    cutoff = time.time() - 7 * 86400
+    cutoff = time.time() - LEDGER_DAYS * 86400
     data = [x for x in data if isinstance(x, dict) and float(x.get("at", 0)) >= cutoff]
     data.append({"key": key, "at": time.time()})
     USAGE_LEDGER.parent.mkdir(parents=True, exist_ok=True)
@@ -193,7 +208,7 @@ def find_stock_image(subject, theme="", *, force=False, selected_provider="auto"
                         if not matches(_judge, item["description"]):
                             continue
                         image_key = f"{provider.lower()}:{item['id']}"
-                        if image_key in _recent_image_ids():
+                        if image_key in _recent_image_ids() or _already_hosted(image_key):
                             continue
                         from stable_image_hosting import host_permanently  # also centre-crops to 1:1
                         stable = host_permanently(item["url"], asset_key=f"stock-{provider.lower()}-{item['id']}")
