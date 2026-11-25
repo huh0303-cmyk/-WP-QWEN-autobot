@@ -3011,10 +3011,11 @@ def get_slot_posts(site, slot):
 # ============================================================
 # ★ WP 포스팅
 # ============================================================
-def build_faq_html(faq):
+def build_faq_html(faq, lang="ko"):
     if not faq: return ""
+    heading = "자주 묻는 질문 (FAQ)" if str(lang).lower().startswith("ko") else "Frequently Asked Questions"
     items="".join(f'<div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question"><h3 itemprop="name">{q}</h3><div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"><p itemprop="text">{a}</p></div></div>' for q,a in faq)
-    return f'<div itemscope itemtype="https://schema.org/FAQPage"><h2>자주 묻는 질문 (FAQ)</h2>{items}</div>'
+    return f'<div itemscope itemtype="https://schema.org/FAQPage"><h2>{heading}</h2>{items}</div>'
 
 def build_img_html(urls, keyword, alt_text=None):
     # 2026-08-22: 이전엔 한 글에 이미지 여러 장이 들어가도 전부 동일한 alt(키워드
@@ -3143,7 +3144,7 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
         # Newsroom lead photo is the featured image only; never repeat it inline.
         mid = ""
         end = ""
-    faq_html="" if is_newsroom else build_faq_html(faq)
+    faq_html="" if is_newsroom else build_faq_html(faq, site.get("lang","ko"))
 
     h2ends=[m.end() for m in re.finditer(r'</h2>',body_html,re.IGNORECASE)]
     ins=-1
