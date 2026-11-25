@@ -1,0 +1,13 @@
+{
+  "2026-11-25:threads:seoul_jisoo1:2": {
+    "status": "ATTEMPT_RESERVED",
+    "platform": "threads",
+    "account_key": "seoul_jisoo1",
+    "expected_handle": "seoul_jisoo1",
+    "at_kst": "2026-11-25T19:25:14.349479+09:00",
+    "content_sha256": "c4223e0ca39a528821080bd9f084cc68a303487daf85b9c61a1b04d52abae3a5",
+    "image_path": "demo_assets/meta_12/2026-11-25_threads_seoul_jisoo1_2.png",
+    "image_url": "https://raw.githubusercontent.com/huh0303-cmyk/-WP-QWEN-autobot/main/demo_assets/meta_12/2026-11-25_threads_seoul_jisoo1_2.png",
+    "caption": "서울 쇼핑 중이라면, 현지인처럼 숨겨진 보석 같은 가게를 찾아보세요. 대형 쇼핑몰 대신 독립 서점, 빈티지 샵, 혹은 동네 골목에 자리한 작은 공방을 탐험하는 재미가 쏠쏠합니다. 예상치 못한 특별한 아이템을 발견할지도 몰라요! #서울쇼핑 #숨은보석찾기 #서울라이프 #쇼핑팁"
+  }
+}
