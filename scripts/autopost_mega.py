@@ -3307,8 +3307,9 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
                     print("image_engine_used=OpenAI editorial illustration")
         if not featured_media_id:
             return {"ok": False, "error": "KOREANEWS365_IMAGE_REQUIRED: no WordPress featured media ID"}
-    if featured_media_id:
-        data["featured_media"] = featured_media_id
+    if not featured_media_id:
+        return {"ok": False, "error": "FEATURED_IMAGE_REQUIRED: no WordPress featured media ID; publish blocked"}
+    data["featured_media"] = featured_media_id
     if author_id and author_id>0: data["author"]=author_id
 
     try:
