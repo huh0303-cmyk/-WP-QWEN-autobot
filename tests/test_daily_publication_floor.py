@@ -117,3 +117,33 @@ def test_slot_gate_waits_then_catches_up_late_evening():
     assert floor.slot_open(slot,datetime(2026,10,5,14,18,tzinfo=floor.KST))
     late=datetime(2026,10,5,23,5,tzinfo=floor.KST)
     assert floor.slot_open(datetime(2026,10,5,23,0,tzinfo=floor.KST)+timedelta(minutes=30),late)
+
+def test_workflow_active_reads_state(monkeypatch):
+    gh = floor.GitHub('o/r', 'x')
+    resp = Mock(status_code=200); resp.json.return_value = {'state': 'disabled_manually'}
+    monkeypatch.setattr(gh, 'request', lambda *a, **k: resp)
+    assert gh.workflow_active('blogger-single-publish.yml') is False
+    resp.json.return_value = {'state': 'active'}
+    assert gh.workflow_active('blogger-single-publish.yml') is True
+    def boom(*a, **k): raise requests.ConnectionError()
+    monkeypatch.setattr(gh, 'request', boom)
+    assert gh.workflow_active('x.yml') is True  # unknown != disabled
+
+def test_disabled_worker_does_not_claim_or_burn_attempts(monkeypatch, tmp_path):
+    sent = []
+    class FakeGH:
+        def __init__(self, *a): pass
+        def workflow_active(self, wf): return False
+        def load(self, sid): raise AssertionError('must not load/claim for disabled worker')
+        def dispatch(self, *a): sent.append(a); return 1
+    monkeypatch.setattr(floor, 'GitHub', FakeGH)
+    monkeypatch.setattr(floor, 'force_ipv4_dns', lambda: None)
+    monkeypatch.setattr(floor, 'sites_for', lambda p: [BLOG])
+    monkeypatch.setattr(floor, 'public_status', lambda site, now: {'status': 'DUE'})
+    monkeypatch.setenv('GITHUB_REPOSITORY', 'o/r'); monkeypatch.setenv('GH_DISPATCH_TOKEN', 'x')
+    monkeypatch.setattr(sys, 'argv', ['x', '--platform', 'blogger'])
+    monkeypatch.chdir(tmp_path)
+    floor.main()
+    import json
+    report = json.loads((tmp_path/'artifacts/daily-publication-floor-blogger.json').read_text())
+    assert report['sites'][0]['status'] == 'WORKER_DISABLED' and not sent

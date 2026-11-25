@@ -210,6 +210,16 @@ class GitHub:
             raise ValueError('Mismatched publication handoff')
         return data
 
+    def workflow_active(self, workflow):
+        """False only when GitHub positively reports the worker as not active."""
+        try:
+            r = self.request('GET', 'actions/workflows/'+workflow)
+            if r.status_code == 200:
+                return r.json().get('state') == 'active'
+        except (requests.RequestException, ValueError):
+            pass
+        return True
+
     def dispatch(self, workflow, inputs):
         r = self.request('POST', 'actions/workflows/'+workflow+'/dispatches',
                          json={'ref': 'main', 'return_run_details': True, 'inputs': inputs})
@@ -331,7 +341,19 @@ def main():
     slots = daily_slots([site['site_id'] for site in sites], now.date(), args.platform)
     pairs.sort(key=lambda pair: slots[pair[0]['site_id']])
     rows, dispatched = [], 0
+    # A manually disabled worker rejects every dispatch. Do not burn the site's
+    # bounded attempts on it; report it so the owner can re-enable or reroute.
+    worker_ok = {}
     for site, result in pairs:
+        workflow = worker(site, 1, '', {})[0]
+        if workflow not in worker_ok:
+            worker_ok[workflow] = api.workflow_active(workflow)
+        if not worker_ok[workflow] and result.get('status') != 'PUBLISHED':
+            row = {'site_id': site['site_id'], 'url': site['url'], 'status': 'WORKER_DISABLED', 'workflow': workflow}
+            if slots:
+                row['slot_kst'] = slots[site['site_id']].strftime('%H:%M')
+            rows.append(row)
+            continue
         try:
             gate = slot_open(slots[site['site_id']], now) if slots else True
             row, used = reconcile(site, result, api, now, gate and dispatched < args.max_dispatch)

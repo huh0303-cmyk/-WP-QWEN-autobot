@@ -1,5 +1,12 @@
 # 런던프로젝트클로드 — 상태 원장 (State Ledger)
 
+## 2026-11-25 — 자동 발행 정체 원인: GitHub cron 누락 → 발행 하트비트 추가 (PR 병합 대기)
+
+- 원인: `daily-publication-floor.yml`(WP·Blogger·뉴스룸 유일 스케줄러) 34회/일 예약 중 실제 ~2회/일, 11-24 14:35Z 이후 0회. Threads */10, YouTube 시간당 cron도 대부분 누락. YAML·상태는 정상.
+- 수정: `.github/workflows/publishing-heartbeat.yml` + `scripts/publishing_heartbeat.py` — workflow_dispatch로 floor/Threads/YouTube scheduler를 10~14분 무작위 간격으로 깨우고 5.5시간마다 자기 체인. 킬스위치 `PUBLISHING_HEARTBEAT=false`. 테스트 23 passed.
+- 코드로 못 고치는 차단: YouTube 언어 쇼츠·Seoul_Jisoo1 `unauthorized_client`(토큰 재발급), Threads 6 토큰/USER_ID 전부 비어 있음, Instagram 변수 게이트, TikTok 워크플로 없음.
+- 상세: `docs/PUBLISHING_HEARTBEAT_2026-11-25.md`. 다음: PR 병합 → heartbeat 1회 수동 실행 → floor 리포트 public_verified 증가 확인.
+
 ## 2026-11-06 — HISTORY_TV_TODAY 발행 중단 조사 및 일부 복구
 
 - 대상: `HISTORY_TV_TODAY` / `@HISTORY_TV_TODAY` / `UCVBvZwodUF4s57KeNicxQ3w`, scheduler key `history`.
