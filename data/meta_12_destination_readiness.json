@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at_kst": "2026-11-25T12:27:10.668841+09:00",
+  "updated_at_kst": "2026-11-25T12:27:22.677092+09:00",
   "targets": [
     {
       "test_public_url": "https://www.instagram.com/p/DgFGOG7lSYt/",
@@ -88,13 +88,14 @@
       "test_published_at_kst": "2026-11-25T12:26:00.183772+09:00"
     },
     {
-      "test_public_url": "",
+      "test_public_url": "https://www.threads.com/@seoul_jisoo1/post/DgJkBGeACE2",
       "account_key": "seoul_jisoo1",
       "platform": "threads",
-      "write_scope_verified": false,
+      "write_scope_verified": true,
       "identity_verified": true,
-      "test_status": "ATTEMPT_RESERVED",
-      "test_attempted_at_kst": "2026-11-25T12:27:10.668841+09:00"
+      "test_status": "PUBLISHED",
+      "test_attempted_at_kst": "2026-11-25T12:27:10.668841+09:00",
+      "test_published_at_kst": "2026-11-25T12:27:22.677072+09:00"
     },
     {
       "test_public_url": "",
