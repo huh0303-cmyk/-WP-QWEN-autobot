@@ -1493,3 +1493,10 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - English login encountered reCAPTCHA, then returned to a login processing/reload loop after the owner reported completing the challenge. The supplied screenshot showed english_sos1 and a masked password, no useful error sentence. Do not repeatedly resubmit this flow or ask the owner to read an absent error message.
 - Selected the visible official Instagram Continue login option once. The same tab now displays Instagram's official login page for the Threads SSO flow; filled only username english_sos1 and handed control to the owner for password/authentication. No password was read, copied, or entered by the assistant, and no English token was generated.
 - Meta Roles currently confirms Threads English, Chinese and Seoul Journal invitations are pending; Chinese Instagram invitation is also pending. After English authentication, accept only its existing app invitation, generate/store its matching token without screenshots, then continue Chinese and Seoul Journal. All twelve accounts and requested card-media publishing remain incomplete; current global publishing gates were not enabled.
+
+
+## 2026-11-25 KST — English registration blocked by forgotten password
+
+- Owner reported that the English login credentials failed and that the password is not known. Stop repeated sign-in submissions; do not guess credentials, read saved passwords, or initiate a password change on the owner's behalf.
+- Official Instagram sign-in for the Threads SSO flow remains at the owner's authentication handoff with username english_sos1. No English token was issued or saved. Owner-controlled password recovery is required before this account can be completed; other accounts can continue independently when their authenticated sessions are available.
+- Remaining requested scope is unchanged: complete Threads English/Chinese/Seoul Journal registrations, then all six Instagram checks, relevant card-format real publications, and remaining Japanese/Korean test-post cleanup. Jisoo test deletion is owner-reported, not independently verified.
