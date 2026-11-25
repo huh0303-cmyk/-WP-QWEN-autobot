@@ -458,6 +458,33 @@ def build_caption_cues(timeline_path, max_chars=26, max_seconds=3.0):
     (OUT/"subtitle-cues.json").write_text(json.dumps(receipt,ensure_ascii=False,indent=2),encoding="utf-8")
     return cues
 
+def _repair_scene_groups(raw, n, photo_count):
+    """Make the model's scene plan structurally valid (gaps, overlaps, adjacent duplicates)
+    without changing the photo it picked for any cue it did cover. A low-confidence or
+    out-of-range photo choice is still rejected."""
+    mapping=[None]*n
+    for g in sorted(raw,key=lambda x:int(x.get("start",0)) if isinstance(x,dict) else 0):
+        try:
+            s=int(g["start"]); e=int(g["end"]); p=int(g["photo_index"]); c=float(g.get("confidence",0))
+        except Exception:
+            continue
+        if not 0<=p<photo_count or c<0.65:
+            raise RuntimeError("Scene plan low-confidence/invalid photo")
+        for i in range(max(0,s),min(n-1,e)+1):
+            if mapping[i] is None: mapping[i]=p
+    first=next((m for m in mapping if m is not None),None)
+    if first is None:
+        raise RuntimeError("Scene plan empty")
+    last=first
+    for i in range(n):
+        if mapping[i] is None: mapping[i]=last
+        else: last=mapping[i]
+    groups=[]
+    for i,p in enumerate(mapping):
+        if groups and groups[-1]["photo_index"]==p: groups[-1]["end"]=i
+        else: groups.append({"start":i,"end":i,"photo_index":p,"confidence":0.8})
+    return groups
+
 def plan_visual_sequence(cues, photos, photo_sources):
     """Use actual image pixels and narration meaning to choose semantic change points."""
     key=os.getenv("GEMINI_API_KEY","").strip()
@@ -489,7 +516,7 @@ start/end는 포함 범위이며 CUE_0부터 CUE_{len(cues)-1}까지 중복·누
                 response=genai.GenerativeModel(model_name).generate_content(content,generation_config={"temperature":0.15,"response_mime_type":"application/json"})
                 plan=json.loads((response.text or "").strip().strip("`"))
                 if plan.get("blocked"): raise RuntimeError("Scene director found insufficient visual relevance")
-                groups=plan.get("groups",[]); expected=0; mapping=[None]*len(cues); used=[]
+                groups=_repair_scene_groups(plan.get("groups",[]),len(cues),len(photos)); expected=0; mapping=[None]*len(cues); used=[]
                 for group in groups:
                     start=int(group["start"]); end=int(group["end"]); photo_index=int(group["photo_index"]); confidence=float(group.get("confidence",0))
                     if start!=expected or end<start or end>=len(cues): raise RuntimeError("Scene plan range gap/overlap")
