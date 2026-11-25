@@ -57,7 +57,7 @@ def load_thumbnail_benchmark_contract():
     (OUT/"thumbnail-benchmark-receipt.json").write_text(json.dumps(receipt,ensure_ascii=False,indent=2),encoding="utf-8")
     return receipt
 
-def get_with_retries(url, *, params=None, timeout=25, attempts=3):
+def get_with_retries(url, *, params=None, timeout=40, attempts=5):
     last=None
     for attempt in range(attempts):
         try:
@@ -67,8 +67,45 @@ def get_with_retries(url, *, params=None, timeout=25, attempts=3):
         except requests.RequestException as exc:
             last=exc
             if attempt+1<attempts:
-                time.sleep(1.5*(attempt+1))
+                time.sleep(2.0*(attempt+1))
     raise last
+
+
+import xml.etree.ElementTree as _ET
+GOOGLE_NEWS_POLITICS="https://news.google.com/rss/headlines/section/topic/NATION?hl=ko&gl=KR&ceid=KR:ko"
+TRUSTED_SOURCES=("조선일보","한겨레","연합뉴스","경향신문","중앙일보","동아일보","한국일보","KBS","MBC","SBS","JTBC","YTN","뉴시스","뉴스1","머니투데이","서울신문","세계일보","한국경제","매일경제","파이낸셜뉴스")
+
+def choose_google_article():
+    """Fallback when Naver is unreachable: Google News Korea top politics/nation feed,
+    resolved to the publisher's own article page (Chosun, Hankyoreh, Yonhap, ...)."""
+    r=get_with_retries(GOOGLE_NEWS_POLITICS)
+    root=_ET.fromstring(r.content)
+    rows=[]
+    for item in root.iter("item"):
+        title=(item.findtext("title") or "").strip()
+        link=(item.findtext("link") or "").strip()
+        src=(item.findtext("source") or "").strip()
+        if not title or not link: continue
+        rows.append({"title":title,"link":link,"source":src})
+    if not rows: raise RuntimeError("Google News fallback returned no items")
+    pri=[x for x in rows if any(n in x["title"] for n in PRIORITY_FIGURES)]
+    trusted=[x for x in (pri or rows) if any(t in (x["source"]+x["title"]) for t in TRUSTED_SOURCES)]
+    pick=(trusted or pri or rows)[0]
+    resp=requests.get(pick["link"],headers=UA,timeout=40,allow_redirects=True)
+    return resp.url, pick["title"], "Google News Korea fallback ("+(pick["source"] or "publisher")+"; Naver unreachable; not verified by view count)"
+
+def extract_generic(url):
+    r=get_with_retries(url)
+    soup=BeautifulSoup(r.text,"html.parser")
+    t=(soup.find("meta",property="og:title") or {}).get("content") if soup.find("meta",property="og:title") else ""
+    if not t:
+        h=soup.select_one("h1") or soup.title
+        t=" ".join(h.get_text(" ",strip=True).split()) if h else ""
+    text=trafilatura.extract(r.text,include_comments=False,include_tables=False)
+    og=soup.find("meta",property="og:image")
+    image_url=og.get("content","") if og else ""
+    if not text or len(text)<300: raise RuntimeError("fallback article body too short")
+    return t,text,image_url,r.text
 
 def choose_naver_article():
     r=get_with_retries(NAVER_POLITICS)
@@ -935,11 +972,24 @@ def main():
         raise RuntimeError("서울저널 워크플로는 정치(politics) 콘텐츠만 허용합니다.")
     url=os.getenv("INPUT_ARTICLE_URL","").strip()
     if not url:
-        url,title_hint,selection=choose_naver_article()
-        log(f"Auto-selected from Naver Politics: {url} ({selection})")
+        try:
+            url,title_hint,selection=choose_naver_article()
+            log(f"Auto-selected from Naver Politics: {url} ({selection})")
+        except Exception as exc:
+            log(f"NAVER_LIST_FAILED {type(exc).__name__}: {str(exc)[:120]} -> Google News fallback")
+            url,title_hint,selection=choose_google_article()
+            log(f"Auto-selected from Google News: {url} ({selection})")
     else:
-        title_hint=""; selection="User-supplied Naver Politics article URL (politics-only workflow)"
-    title,body,img,article_html=extract(url)
+        title_hint=""; selection="User-supplied politics article URL (politics-only workflow)"
+    try:
+        if "naver.com" in urlparse(url).netloc.lower():
+            title,body,img,article_html=extract(url)
+        else:
+            title,body,img,article_html=extract_generic(url)
+    except Exception as exc:
+        log(f"ARTICLE_FETCH_FAILED {type(exc).__name__}: {str(exc)[:120]} -> Google News fallback")
+        url,title_hint,selection=choose_google_article()
+        title,body,img,article_html=extract_generic(url)
     if title_hint and len(title)<8: title=title_hint
     meta=draft(title,body)
     meta["source_title"]=title; meta["source_url"]=url; meta["article_selection_method"]=selection; meta["content_scope"]="politics"
