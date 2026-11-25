@@ -1411,3 +1411,12 @@ Owner confirmed all ten connections three posts/day. Verified three existing tok
 - Next: confirm the in-flight run's actual local-publish result (public URL or specific
   remaining blocker); if WordPress/Blogspot's own daily workflows haven't run since this fix,
   their next scheduled/manual run is the real-world confirmation for #8.
+
+
+## 2026-11-25 KST — japanese_sos1 Threads token setup awaiting authentication
+
+- task_id: `threads-japanese-sos1-secret-20261125`; owner limited this request to `japanese_sos1`, with no separate USER_ID variable, and requested PR #295 squash merge.
+- Fetched current GitHub main and verified PR #295 is already merged (2026-11-25 10:07:53 KST), merge commit `bc8551f2bc99706e0c167cb28fcd8035c59b4f78`. The publisher resolves /me ID from the token and still enforces the expected handle. No merge was repeated.
+- Existing Chrome SEOUL TOPIK app `1383946033947009` / Threads app `1919604765661947` has japanese_sos1 in the user token generator. Its generate action opened the Threads authentication flow. Login did not complete: the page displayed a password error, then explicitly requested a password after the login submission. No password was retrieved or entered by the assistant. The flow requires owner authentication before consent/token generation can continue.
+- Confirmed existing GitHub META-SOCIAL environment `26484618415` Add secret dialog has name `META_THREADS_JAPANESE_SOS1_ACCESS_TOKEN` and empty Value. No token was generated, copied, saved, logged, or screenshotted; no GitHub secret or USER_ID variable was changed. No workflow dispatch or test publication occurred.
+- Retained one Threads login flow and the existing GitHub Add secret dialog; closed only the duplicate login popup opened during this attempt. Next: owner completes japanese_sos1 authentication in Chrome, then resume this exact token flow, copy token directly to the prepared secret Value, save and verify the secret name/update receipt without exposing its value. No other accounts are in scope.
