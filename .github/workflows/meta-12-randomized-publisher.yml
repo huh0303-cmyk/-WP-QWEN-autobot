@@ -10,7 +10,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   dispatch:
-    if: github.ref == 'refs/heads/main' && vars.META_LIVE_PUBLISH == 'true'
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: META-SOCIAL
     timeout-minutes: 20
