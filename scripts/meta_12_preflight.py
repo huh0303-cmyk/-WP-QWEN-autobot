@@ -1,6 +1,7 @@
 """Read-only identity check for the current six Instagram + six Threads targets."""
 import json, os, sys, urllib.error, urllib.parse, urllib.request
 from pathlib import Path
+from meta_12_identity import validated_user_id
 ROOT=Path(__file__).resolve().parents[1]
 POLICY=json.loads((ROOT/'config/meta_12_account_daily_policy.json').read_text(encoding='utf-8'))
 
@@ -22,7 +23,7 @@ def main():
             expected_id=os.environ.get(prefix+'_USER_ID','').strip()
             expected_handle=account[platform].lower().lstrip('@')
             row={'platform':platform,'account_key':account['key'],'expected_handle':expected_handle,'identity':'NOT_CHECKED','write_scope':'NOT_CHECKED'}
-            if not token or not expected_id.isdigit():
+            if not token:
                 row['identity']='MISSING_CREDENTIALS'
                 missing.append(prefix)
             else:
@@ -31,10 +32,15 @@ def main():
                 status,payload=get_json(graph+'?'+urllib.parse.urlencode({'fields':fields}),token)
                 actual_id=str(payload.get('user_id' if platform=='instagram' else 'id',''))
                 actual_handle=str(payload.get('username','')).lower().lstrip('@')
-                row['identity']='VERIFIED' if status==200 and actual_id==expected_id and actual_handle==expected_handle else 'MISMATCH_OR_API_ERROR'
+                try:
+                    resolved_id=validated_user_id(platform,payload,expected_handle,expected_id) if status==200 else ''
+                except ValueError:
+                    resolved_id=''
+                row['identity']='VERIFIED' if resolved_id else 'MISMATCH_OR_API_ERROR'
                 row['http_status']=status
-                row['account_id_match']=actual_id==expected_id
+                row['account_id_match']=actual_id==expected_id if expected_id else None
                 row['handle_match']=actual_handle==expected_handle
+                if resolved_id:row['resolved_user_id']=resolved_id
                 if row['identity']!='VERIFIED':missing.append(prefix)
             report['targets'].append(row)
     report['identity_verified_count']=sum(x['identity']=='VERIFIED' for x in report['targets'])
