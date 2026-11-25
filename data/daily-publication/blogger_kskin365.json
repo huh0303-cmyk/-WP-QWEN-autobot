@@ -1,1 +1,1 @@
-{"day": "2026-11-09", "status": "CLAIMED", "attempts": 1, "claim": "daily-2026-11-09-blogger_kskin365-7d84b608", "claimed_at": "2026-11-09T14:37:54.442367+09:00", "run_id": null, "child_run_id": null, "child_job_id": null, "workflow": "blogger-rewrite.yml"}
+{"day": "2026-11-25", "status": "CLAIMED", "attempts": 1, "claim": "daily-2026-11-25-blogger_kskin365-e9c1f8e2", "claimed_at": "2026-11-25T13:06:38.774901+09:00", "run_id": null, "child_run_id": null, "child_job_id": null, "workflow": "blogger-single-publish.yml"}
