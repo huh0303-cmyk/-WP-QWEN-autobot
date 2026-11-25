@@ -576,3 +576,10 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 
 - User reported that japanese.sos1 had logged in. Read-only inspection found the prior Threads tab on password recovery and the Meta token generator still showing 액세스 토큰 생성하기 for japanese_sos1. Reopening the generator created a fresh Threads OAuth login tab with orce_reauth=true; no consent screen or token result appeared.
 - Browser control was handed to the user at the exact OAuth login tab. A separate account login or recovery flow does not establish completion of this forced token authorization. No token value was read or saved and no post was published. Next: after account-specific OAuth login, verify the exact username and consent scopes, then continue token handling.
+
+
+## 2026-11-25 KST — PR #295 merged; japanese_sos1 Threads token still pending
+
+- Read-only Chrome inspection confirmed GitHub signed in and the META-SOCIAL environment Add secret form open with name META_THREADS_JAPANESE_SOS1_ACCESS_TOKEN and an empty Value field. Meta SEOUL TOPIK Threads generator still showed 액세스 토큰 생성하기 for japanese_sos1; the recent OAuth tab was on password recovery. No token was available to copy or save.
+- Reviewed PR #295's single-file change: it makes USER_ID optional, reads /me?id,username, requires numeric ID and expected-handle match, and retains an optional configured ID check. PR #295 was mergeable with no reported checks; user requested squash merge. Squash merge completed at c8551f2bc99706e0c167cb28fcd8035c59b4f78 and GitHub readback showed MERGED.
+- No secret was created, no token value was read or recorded, and no force_now test publication ran. Next: complete exact japanese_sos1 OAuth login and review requested scopes, generate token, store it only in META-SOCIAL secret, verify secret name, then perform controlled test with URL receipt after readiness checks.
