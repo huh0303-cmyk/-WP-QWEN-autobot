@@ -597,8 +597,8 @@ def render(headline, photo, audio, photos=None, poll_question="", poll_options=N
         end_frame=max(previous_frame+1,round(end_t*FPS))
         hold_seconds=(end_frame-previous_frame)/FPS
         previous_frame=end_frame
-        if hold_seconds>12.0:
-            raise RuntimeError(f"Photo scene too long to stay lively: scene={gi} hold={hold_seconds:.2f}")
+        if hold_seconds<=0:
+            raise RuntimeError(f"Photo scene has no duration: scene={gi}")
         frame = OUT/f"scene-{gi:02d}.jpg"
         _cover_frame(headline,unique[group["photo"]],style,gi+1).save(frame,quality=92)
         frames.append((frame,hold_seconds))
@@ -622,7 +622,9 @@ def render(headline, photo, audio, photos=None, poll_question="", poll_options=N
         if i < len(frames)-1:
             # Smooth, centred Ken Burns (alternating push-in / pull-out). The still is
             # upscaled first so zoompan's integer cropping does not shimmer.
-            zoom="min(1.045,1+0.00013*on)" if i%2==0 else "max(1.0,1.045-0.00013*on)"
+            # Zoom speed follows the scene length, so a long scene keeps moving smoothly.
+            nframes=max(1,round(frames[i][1]*30))
+            zoom=f"1+0.045*min(1,on/{nframes})" if i%2==0 else f"1.045-0.045*min(1,on/{nframes})"
             motion=f"scale=1620:2880,zoompan=z='{zoom}':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=1080x1920:fps=30"
             filters.append(prefix+","+motion+f",format=yuv420p[v{i}];")
         else:
