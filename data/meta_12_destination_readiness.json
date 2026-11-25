@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at_kst": "2026-11-25T12:24:01.096192+09:00",
+  "updated_at_kst": "2026-11-25T12:24:14.530963+09:00",
   "targets": [
     {
       "test_public_url": "https://www.instagram.com/p/DgFGOG7lSYt/",
@@ -61,13 +61,14 @@
       "identity_verified": false
     },
     {
-      "test_public_url": "",
+      "test_public_url": "https://www.threads.com/@japanese_sos1/post/DgJjqGlmwz8",
       "account_key": "japanese_sos1",
       "platform": "threads",
-      "write_scope_verified": false,
+      "write_scope_verified": true,
       "identity_verified": true,
-      "test_status": "ATTEMPT_RESERVED",
-      "test_attempted_at_kst": "2026-11-25T12:24:01.096192+09:00"
+      "test_status": "PUBLISHED",
+      "test_attempted_at_kst": "2026-11-25T12:24:01.096192+09:00",
+      "test_published_at_kst": "2026-11-25T12:24:14.530940+09:00"
     },
     {
       "test_public_url": "",
