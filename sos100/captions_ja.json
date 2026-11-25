@@ -1,0 +1,702 @@
+[
+ {
+  "n": 1,
+  "ex": "こんにちは",
+  "rd": "konnichiwa",
+  "ko": "안녕하세요",
+  "caption": "일본어 필수 표현 1/100 🇯🇵 \"こんにちは\" = konnichiwa = 안녕하세요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 2,
+  "ex": "さようなら",
+  "rd": "sayōnara",
+  "ko": "안녕히 가세요",
+  "caption": "일본어 필수 표현 2/100 🇯🇵 \"さようなら\" = sayōnara = 안녕히 가세요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 3,
+  "ex": "またね",
+  "rd": "mata ne",
+  "ko": "또 봐요",
+  "caption": "일본어 필수 표현 3/100 🇯🇵 \"またね\" = mata ne = 또 봐요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 4,
+  "ex": "ありがとうございます",
+  "rd": "arigatō gozaimasu",
+  "ko": "감사합니다",
+  "caption": "일본어 필수 표현 4/100 🇯🇵 \"ありがとうございます\" = arigatō gozaimasu = 감사합니다. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 5,
+  "ex": "どうもありがとう",
+  "rd": "dōmo arigatō",
+  "ko": "정말 고마워요",
+  "caption": "일본어 필수 표현 5/100 🇯🇵 \"どうもありがとう\" = dōmo arigatō = 정말 고마워요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 6,
+  "ex": "申し訳ありません",
+  "rd": "mōshiwake arimasen",
+  "ko": "죄송합니다",
+  "caption": "일본어 필수 표현 6/100 🇯🇵 \"申し訳ありません\" = mōshiwake arimasen = 죄송합니다. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 7,
+  "ex": "ごめんね",
+  "rd": "gomen ne",
+  "ko": "미안해요",
+  "caption": "일본어 필수 표현 7/100 🇯🇵 \"ごめんね\" = gomen ne = 미안해요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 8,
+  "ex": "すみません",
+  "rd": "sumimasen",
+  "ko": "실례합니다",
+  "caption": "일본어 필수 표현 8/100 🇯🇵 \"すみません\" = sumimasen = 실례합니다. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 9,
+  "ex": "ちょっと待ってください",
+  "rd": "chotto matte kudasai",
+  "ko": "잠시만요",
+  "caption": "일본어 필수 표현 9/100 🇯🇵 \"ちょっと待ってください\" = chotto matte kudasai = 잠시만요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 10,
+  "ex": "大丈夫です",
+  "rd": "daijōbu desu",
+  "ko": "괜찮아요",
+  "caption": "일본어 필수 표현 10/100 🇯🇵 \"大丈夫です\" = daijōbu desu = 괜찮아요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 11,
+  "ex": "はい",
+  "rd": "hai",
+  "ko": "네",
+  "caption": "일본어 필수 표현 11/100 🇯🇵 \"はい\" = hai = 네. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 12,
+  "ex": "いいえ",
+  "rd": "iie",
+  "ko": "아니요",
+  "caption": "일본어 필수 표현 12/100 🇯🇵 \"いいえ\" = iie = 아니요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 13,
+  "ex": "いただきます",
+  "rd": "itadakimasu",
+  "ko": "잘 먹겠습니다",
+  "caption": "일본어 필수 표현 13/100 🇯🇵 \"いただきます\" = itadakimasu = 잘 먹겠습니다. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 14,
+  "ex": "ごちそうさまでした",
+  "rd": "gochisōsama deshita",
+  "ko": "잘 먹었습니다",
+  "caption": "일본어 필수 표현 14/100 🇯🇵 \"ごちそうさまでした\" = gochisōsama deshita = 잘 먹었습니다. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 15,
+  "ex": "おいしいです",
+  "rd": "oishii desu",
+  "ko": "맛있어요",
+  "caption": "일본어 필수 표현 15/100 🇯🇵 \"おいしいです\" = oishii desu = 맛있어요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 16,
+  "ex": "これをください",
+  "rd": "kore o kudasai",
+  "ko": "이거 주세요",
+  "caption": "일본어 필수 표현 16/100 🇯🇵 \"これをください\" = kore o kudasai = 이거 주세요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 17,
+  "ex": "お水をください",
+  "rd": "omizu o kudasai",
+  "ko": "물 좀 주세요",
+  "caption": "일본어 필수 표현 17/100 🇯🇵 \"お水をください\" = omizu o kudasai = 물 좀 주세요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 18,
+  "ex": "いくらですか",
+  "rd": "ikura desu ka",
+  "ko": "얼마예요?",
+  "caption": "일본어 필수 표현 18/100 🇯🇵 \"いくらですか\" = ikura desu ka = 얼마예요?. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 19,
+  "ex": "高いです",
+  "rd": "takai desu",
+  "ko": "비싸요",
+  "caption": "일본어 필수 표현 19/100 🇯🇵 \"高いです\" = takai desu = 비싸요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 20,
+  "ex": "安くしてください",
+  "rd": "yasuku shite kudasai",
+  "ko": "깎아 주세요",
+  "caption": "일본어 필수 표현 20/100 🇯🇵 \"安くしてください\" = yasuku shite kudasai = 깎아 주세요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 21,
+  "ex": "カードは使えますか",
+  "rd": "kādo wa tsukaemasu ka",
+  "ko": "카드 돼요?",
+  "caption": "일본어 필수 표현 21/100 🇯🇵 \"カードは使えますか\" = kādo wa tsukaemasu ka = 카드 돼요?. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 22,
+  "ex": "お会計をお願いします",
+  "rd": "okaikei o onegai shimasu",
+  "ko": "계산해 주세요",
+  "caption": "일본어 필수 표현 22/100 🇯🇵 \"お会計をお願いします\" = okaikei o onegai shimasu = 계산해 주세요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 23,
+  "ex": "持ち帰りでお願いします",
+  "rd": "mochikaeri de onegai shimasu",
+  "ko": "포장해 주세요",
+  "caption": "일본어 필수 표현 23/100 🇯🇵 \"持ち帰りでお願いします\" = mochikaeri de onegai shimasu = 포장해 주세요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 24,
+  "ex": "すみません、注文お願いします",
+  "rd": "sumimasen, chūmon onegai shimasu",
+  "ko": "저기요, 주문할게요",
+  "caption": "일본어 필수 표현 24/100 🇯🇵 \"すみません、注文お願いします\" = sumimasen, chūmon onegai shimasu = 저기요, 주문할게요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 25,
+  "ex": "トイレはどこですか",
+  "rd": "toire wa doko desu ka",
+  "ko": "화장실 어디예요?",
+  "caption": "일본어 필수 표현 25/100 🇯🇵 \"トイレはどこですか\" = toire wa doko desu ka = 화장실 어디예요?. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 26,
+  "ex": "助けてください",
+  "rd": "tasukete kudasai",
+  "ko": "도와주세요",
+  "caption": "일본어 필수 표현 26/100 🇯🇵 \"助けてください\" = tasukete kudasai = 도와주세요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 27,
+  "ex": "わかりません",
+  "rd": "wakarimasen",
+  "ko": "몰라요",
+  "caption": "일본어 필수 표현 27/100 🇯🇵 \"わかりません\" = wakarimasen = 몰라요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 28,
+  "ex": "わかりました",
+  "rd": "wakarimashita",
+  "ko": "알겠어요",
+  "caption": "일본어 필수 표현 28/100 🇯🇵 \"わかりました\" = wakarimashita = 알겠어요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 29,
+  "ex": "聞き取れませんでした",
+  "rd": "kikitoremasen deshita",
+  "ko": "잘 못 알아들었어요",
+  "caption": "일본어 필수 표현 29/100 🇯🇵 \"聞き取れませんでした\" = kikitoremasen deshita = 잘 못 알아들었어요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 30,
+  "ex": "もう一度言ってください",
+  "rd": "mō ichido itte kudasai",
+  "ko": "다시 말해 주세요",
+  "caption": "일본어 필수 표현 30/100 🇯🇵 \"もう一度言ってください\" = mō ichido itte kudasai = 다시 말해 주세요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 31,
+  "ex": "ゆっくり話してください",
+  "rd": "yukkuri hanashite kudasai",
+  "ko": "천천히 말해 주세요",
+  "caption": "일본어 필수 표현 31/100 🇯🇵 \"ゆっくり話してください\" = yukkuri hanashite kudasai = 천천히 말해 주세요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 32,
+  "ex": "日本語を少し話せます",
+  "rd": "nihongo o sukoshi hanasemasu",
+  "ko": "일본어를 조금 해요",
+  "caption": "일본어 필수 표현 32/100 🇯🇵 \"日本語を少し話せます\" = nihongo o sukoshi hanasemasu = 일본어를 조금 해요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 33,
+  "ex": "韓国語は話せますか",
+  "rd": "kankokugo wa hanasemasu ka",
+  "ko": "한국어 할 수 있어요?",
+  "caption": "일본어 필수 표현 33/100 🇯🇵 \"韓国語は話せますか\" = kankokugo wa hanasemasu ka = 한국어 할 수 있어요?. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 34,
+  "ex": "私の名前はOOです",
+  "rd": "watashi no namae wa OO desu",
+  "ko": "제 이름은 OO예요",
+  "caption": "일본어 필수 표현 34/100 🇯🇵 \"私の名前はOOです\" = watashi no namae wa OO desu = 제 이름은 OO예요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 35,
+  "ex": "はじめまして",
+  "rd": "hajimemashite",
+  "ko": "처음 뵙겠습니다",
+  "caption": "일본어 필수 표현 35/100 🇯🇵 \"はじめまして\" = hajimemashite = 처음 뵙겠습니다. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 36,
+  "ex": "お会いできてうれしいです",
+  "rd": "oaidekite ureshii desu",
+  "ko": "만나서 반가워요",
+  "caption": "일본어 필수 표현 36/100 🇯🇵 \"お会いできてうれしいです\" = oaidekite ureshii desu = 만나서 반가워요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 37,
+  "ex": "お久しぶりです",
+  "rd": "ohisashiburi desu",
+  "ko": "오랜만이에요",
+  "caption": "일본어 필수 표현 37/100 🇯🇵 \"お久しぶりです\" = ohisashiburi desu = 오랜만이에요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 38,
+  "ex": "お元気でしたか",
+  "rd": "ogenki deshita ka",
+  "ko": "잘 지냈어요?",
+  "caption": "일본어 필수 표현 38/100 🇯🇵 \"お元気でしたか\" = ogenki deshita ka = 잘 지냈어요?. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 39,
+  "ex": "元気です",
+  "rd": "genki desu",
+  "ko": "잘 지내요",
+  "caption": "일본어 필수 표현 39/100 🇯🇵 \"元気です\" = genki desu = 잘 지내요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 40,
+  "ex": "どこへ行きますか",
+  "rd": "doko e ikimasu ka",
+  "ko": "어디 가요?",
+  "caption": "일본어 필수 표현 40/100 🇯🇵 \"どこへ行きますか\" = doko e ikimasu ka = 어디 가요?. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 41,
+  "ex": "何をしていますか",
+  "rd": "nani o shite imasu ka",
+  "ko": "뭐 해요?",
+  "caption": "일본어 필수 표현 41/100 🇯🇵 \"何をしていますか\" = nani o shite imasu ka = 뭐 해요?. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 42,
+  "ex": "これは何ですか",
+  "rd": "kore wa nan desu ka",
+  "ko": "이게 뭐예요?",
+  "caption": "일본어 필수 표현 42/100 🇯🇵 \"これは何ですか\" = kore wa nan desu ka = 이게 뭐예요?. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 43,
+  "ex": "どなたですか",
+  "rd": "donata desu ka",
+  "ko": "누구세요?",
+  "caption": "일본어 필수 표현 43/100 🇯🇵 \"どなたですか\" = donata desu ka = 누구세요?. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 44,
+  "ex": "いつですか",
+  "rd": "itsu desu ka",
+  "ko": "언제예요?",
+  "caption": "일본어 필수 표현 44/100 🇯🇵 \"いつですか\" = itsu desu ka = 언제예요?. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 45,
+  "ex": "なぜですか",
+  "rd": "naze desu ka",
+  "ko": "왜요?",
+  "caption": "일본어 필수 표현 45/100 🇯🇵 \"なぜですか\" = naze desu ka = 왜요?. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 46,
+  "ex": "どうすればいいですか",
+  "rd": "dō sureba ii desu ka",
+  "ko": "어떻게 해요?",
+  "caption": "일본어 필수 표현 46/100 🇯🇵 \"どうすればいいですか\" = dō sureba ii desu ka = 어떻게 해요?. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 47,
+  "ex": "どこですか",
+  "rd": "doko desu ka",
+  "ko": "어디예요?",
+  "caption": "일본어 필수 표현 47/100 🇯🇵 \"どこですか\" = doko desu ka = 어디예요?. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 48,
+  "ex": "そうです",
+  "rd": "sō desu",
+  "ko": "맞아요",
+  "caption": "일본어 필수 표현 48/100 🇯🇵 \"そうです\" = sō desu = 맞아요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 49,
+  "ex": "いいえ、違います",
+  "rd": "iie, chigaimasu",
+  "ko": "아니에요",
+  "caption": "일본어 필수 표현 49/100 🇯🇵 \"いいえ、違います\" = iie, chigaimasu = 아니에요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 50,
+  "ex": "いいですね",
+  "rd": "ii desu ne",
+  "ko": "좋아요",
+  "caption": "일본어 필수 표현 50/100 🇯🇵 \"いいですね\" = ii desu ne = 좋아요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 51,
+  "ex": "好きじゃないです",
+  "rd": "suki janai desu",
+  "ko": "싫어요",
+  "caption": "일본어 필수 표현 51/100 🇯🇵 \"好きじゃないです\" = suki janai desu = 싫어요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 52,
+  "ex": "本当ですか",
+  "rd": "hontō desu ka",
+  "ko": "정말요?",
+  "caption": "일본어 필수 표현 52/100 🇯🇵 \"本当ですか\" = hontō desu ka = 정말요?. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 53,
+  "ex": "すごい",
+  "rd": "sugoi",
+  "ko": "대박",
+  "caption": "일본어 필수 표현 53/100 🇯🇵 \"すごい\" = sugoi = 대박. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 54,
+  "ex": "頑張って",
+  "rd": "ganbatte",
+  "ko": "화이팅",
+  "caption": "일본어 필수 표현 54/100 🇯🇵 \"頑張って\" = ganbatte = 화이팅. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 55,
+  "ex": "お疲れ様です",
+  "rd": "otsukaresama desu",
+  "ko": "수고하세요",
+  "caption": "일본어 필수 표현 55/100 🇯🇵 \"お疲れ様です\" = otsukaresama desu = 수고하세요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 56,
+  "ex": "お疲れ様でした",
+  "rd": "otsukaresama deshita",
+  "ko": "수고하셨습니다",
+  "caption": "일본어 필수 표현 56/100 🇯🇵 \"お疲れ様でした\" = otsukaresama deshita = 수고하셨습니다. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 57,
+  "ex": "おめでとうございます",
+  "rd": "omedetō gozaimasu",
+  "ko": "축하해요",
+  "caption": "일본어 필수 표현 57/100 🇯🇵 \"おめでとうございます\" = omedetō gozaimasu = 축하해요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 58,
+  "ex": "お誕生日おめでとう",
+  "rd": "otanjōbi omedetō",
+  "ko": "생일 축하해요",
+  "caption": "일본어 필수 표현 58/100 🇯🇵 \"お誕生日おめでとう\" = otanjōbi omedetō = 생일 축하해요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 59,
+  "ex": "あけましておめでとうございます",
+  "rd": "akemashite omedetō gozaimasu",
+  "ko": "새해 복 많이 받으세요",
+  "caption": "일본어 필수 표현 59/100 🇯🇵 \"あけましておめでとうございます\" = akemashite omedetō gozaimasu = 새해 복 많이 받으세요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 60,
+  "ex": "お大事に",
+  "rd": "odaiji ni",
+  "ko": "건강하세요",
+  "caption": "일본어 필수 표현 60/100 🇯🇵 \"お大事に\" = odaiji ni = 건강하세요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 61,
+  "ex": "気をつけて",
+  "rd": "ki o tsukete",
+  "ko": "조심하세요",
+  "caption": "일본어 필수 표현 61/100 🇯🇵 \"気をつけて\" = ki o tsukete = 조심하세요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 62,
+  "ex": "大丈夫ですか",
+  "rd": "daijōbu desu ka",
+  "ko": "괜찮으세요?",
+  "caption": "일본어 필수 표현 62/100 🇯🇵 \"大丈夫ですか\" = daijōbu desu ka = 괜찮으세요?. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 63,
+  "ex": "元気を出して",
+  "rd": "genki o dashite",
+  "ko": "힘내세요",
+  "caption": "일본어 필수 표현 63/100 🇯🇵 \"元気を出して\" = genki o dashite = 힘내세요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 64,
+  "ex": "心配しないでください",
+  "rd": "shinpai shinaide kudasai",
+  "ko": "걱정하지 마세요",
+  "caption": "일본어 필수 표현 64/100 🇯🇵 \"心配しないでください\" = shinpai shinaide kudasai = 걱정하지 마세요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 65,
+  "ex": "急いでください",
+  "rd": "isoide kudasai",
+  "ko": "서둘러 주세요",
+  "caption": "일본어 필수 표현 65/100 🇯🇵 \"急いでください\" = isoide kudasai = 서둘러 주세요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 66,
+  "ex": "ゆっくりどうぞ",
+  "rd": "yukkuri dōzo",
+  "ko": "천천히 하세요",
+  "caption": "일본어 필수 표현 66/100 🇯🇵 \"ゆっくりどうぞ\" = yukkuri dōzo = 천천히 하세요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 67,
+  "ex": "ちょっと待って",
+  "rd": "chotto matte",
+  "ko": "잠깐만요",
+  "caption": "일본어 필수 표현 67/100 🇯🇵 \"ちょっと待って\" = chotto matte = 잠깐만요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 68,
+  "ex": "一緒に行きましょう",
+  "rd": "issho ni ikimashō",
+  "ko": "같이 가요",
+  "caption": "일본어 필수 표현 68/100 🇯🇵 \"一緒に行きましょう\" = issho ni ikimashō = 같이 가요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 69,
+  "ex": "一緒に食べましょう",
+  "rd": "issho ni tabemashō",
+  "ko": "같이 먹어요",
+  "caption": "일본어 필수 표현 69/100 🇯🇵 \"一緒に食べましょう\" = issho ni tabemashō = 같이 먹어요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 70,
+  "ex": "一杯飲みましょう",
+  "rd": "ippai nomimashō",
+  "ko": "한잔해요",
+  "caption": "일본어 필수 표현 70/100 🇯🇵 \"一杯飲みましょう\" = ippai nomimashō = 한잔해요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 71,
+  "ex": "お腹がすきました",
+  "rd": "onaka ga sukimashita",
+  "ko": "배고파요",
+  "caption": "일본어 필수 표현 71/100 🇯🇵 \"お腹がすきました\" = onaka ga sukimashita = 배고파요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 72,
+  "ex": "お腹がいっぱいです",
+  "rd": "onaka ga ippai desu",
+  "ko": "배불러요",
+  "caption": "일본어 필수 표현 72/100 🇯🇵 \"お腹がいっぱいです\" = onaka ga ippai desu = 배불러요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 73,
+  "ex": "のどが渇きました",
+  "rd": "nodo ga kawakimashita",
+  "ko": "목말라요",
+  "caption": "일본어 필수 표현 73/100 🇯🇵 \"のどが渇きました\" = nodo ga kawakimashita = 목말라요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 74,
+  "ex": "疲れました",
+  "rd": "tsukaremashita",
+  "ko": "피곤해요",
+  "caption": "일본어 필수 표현 74/100 🇯🇵 \"疲れました\" = tsukaremashita = 피곤해요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 75,
+  "ex": "眠いです",
+  "rd": "nemui desu",
+  "ko": "졸려요",
+  "caption": "일본어 필수 표현 75/100 🇯🇵 \"眠いです\" = nemui desu = 졸려요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 76,
+  "ex": "痛いです",
+  "rd": "itai desu",
+  "ko": "아파요",
+  "caption": "일본어 필수 표현 76/100 🇯🇵 \"痛いです\" = itai desu = 아파요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 77,
+  "ex": "暑いです",
+  "rd": "atsui desu",
+  "ko": "더워요",
+  "caption": "일본어 필수 표현 77/100 🇯🇵 \"暑いです\" = atsui desu = 더워요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 78,
+  "ex": "寒いです",
+  "rd": "samui desu",
+  "ko": "추워요",
+  "caption": "일본어 필수 표현 78/100 🇯🇵 \"寒いです\" = samui desu = 추워요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 79,
+  "ex": "忙しいです",
+  "rd": "isogashii desu",
+  "ko": "바빠요",
+  "caption": "일본어 필수 표현 79/100 🇯🇵 \"忙しいです\" = isogashii desu = 바빠요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 80,
+  "ex": "退屈です",
+  "rd": "taikutsu desu",
+  "ko": "심심해요",
+  "caption": "일본어 필수 표현 80/100 🇯🇵 \"退屈です\" = taikutsu desu = 심심해요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 81,
+  "ex": "愛しています",
+  "rd": "aishite imasu",
+  "ko": "사랑해요",
+  "caption": "일본어 필수 표현 81/100 🇯🇵 \"愛しています\" = aishite imasu = 사랑해요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 82,
+  "ex": "会いたいです",
+  "rd": "aitai desu",
+  "ko": "보고 싶어요",
+  "caption": "일본어 필수 표현 82/100 🇯🇵 \"会いたいです\" = aitai desu = 보고 싶어요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 83,
+  "ex": "今何時ですか",
+  "rd": "ima nanji desu ka",
+  "ko": "지금 몇 시예요?",
+  "caption": "일본어 필수 표현 83/100 🇯🇵 \"今何時ですか\" = ima nanji desu ka = 지금 몇 시예요?. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 84,
+  "ex": "今日はいい天気ですね",
+  "rd": "kyō wa ii tenki desu ne",
+  "ko": "오늘 날씨 좋네요",
+  "caption": "일본어 필수 표현 84/100 🇯🇵 \"今日はいい天気ですね\" = kyō wa ii tenki desu ne = 오늘 날씨 좋네요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 85,
+  "ex": "道に迷いました",
+  "rd": "michi ni mayoimashita",
+  "ko": "길을 잃었어요",
+  "caption": "일본어 필수 표현 85/100 🇯🇵 \"道に迷いました\" = michi ni mayoimashita = 길을 잃었어요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 86,
+  "ex": "ここはどこですか",
+  "rd": "koko wa doko desu ka",
+  "ko": "여기가 어디예요?",
+  "caption": "일본어 필수 표현 86/100 🇯🇵 \"ここはどこですか\" = koko wa doko desu ka = 여기가 어디예요?. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 87,
+  "ex": "タクシーを呼んでください",
+  "rd": "takushī o yonde kudasai",
+  "ko": "택시 불러 주세요",
+  "caption": "일본어 필수 표현 87/100 🇯🇵 \"タクシーを呼んでください\" = takushī o yonde kudasai = 택시 불러 주세요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 88,
+  "ex": "地下鉄の駅はどこですか",
+  "rd": "chikatetsu no eki wa doko desu ka",
+  "ko": "지하철역이 어디예요?",
+  "caption": "일본어 필수 표현 88/100 🇯🇵 \"地下鉄の駅はどこですか\" = chikatetsu no eki wa doko desu ka = 지하철역이 어디예요?. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 89,
+  "ex": "ここで止めてください",
+  "rd": "koko de tomete kudasai",
+  "ko": "여기서 세워 주세요",
+  "caption": "일본어 필수 표현 89/100 🇯🇵 \"ここで止めてください\" = koko de tomete kudasai = 여기서 세워 주세요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 90,
+  "ex": "どのくらいかかりますか",
+  "rd": "dono kurai kakarimasu ka",
+  "ko": "얼마나 걸려요?",
+  "caption": "일본어 필수 표현 90/100 🇯🇵 \"どのくらいかかりますか\" = dono kurai kakarimasu ka = 얼마나 걸려요?. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 91,
+  "ex": "Wi-Fiのパスワードは何ですか",
+  "rd": "Wi-Fi no pasuwādo wa nan desu ka",
+  "ko": "와이파이 비밀번호가 뭐예요?",
+  "caption": "일본어 필수 표현 91/100 🇯🇵 \"Wi-Fiのパスワードは何ですか\" = Wi-Fi no pasuwādo wa nan desu ka = 와이파이 비밀번호가 뭐예요?. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 92,
+  "ex": "写真を撮ってください",
+  "rd": "shashin o totte kudasai",
+  "ko": "사진 찍어 주세요",
+  "caption": "일본어 필수 표현 92/100 🇯🇵 \"写真を撮ってください\" = shashin o totte kudasai = 사진 찍어 주세요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 93,
+  "ex": "これはありますか",
+  "rd": "kore wa arimasu ka",
+  "ko": "이거 있어요?",
+  "caption": "일본어 필수 표현 93/100 🇯🇵 \"これはありますか\" = kore wa arimasu ka = 이거 있어요?. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 94,
+  "ex": "ありません",
+  "rd": "arimasen",
+  "ko": "없어요",
+  "caption": "일본어 필수 표현 94/100 🇯🇵 \"ありません\" = arimasen = 없어요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 95,
+  "ex": "あります",
+  "rd": "arimasu",
+  "ko": "있어요",
+  "caption": "일본어 필수 표현 95/100 🇯🇵 \"あります\" = arimasu = 있어요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 96,
+  "ex": "もう一つください",
+  "rd": "mō hitotsu kudasai",
+  "ko": "하나 더 주세요",
+  "caption": "일본어 필수 표현 96/100 🇯🇵 \"もう一つください\" = mō hitotsu kudasai = 하나 더 주세요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 97,
+  "ex": "少しだけください",
+  "rd": "sukoshi dake kudasai",
+  "ko": "조금만 주세요",
+  "caption": "일본어 필수 표현 97/100 🇯🇵 \"少しだけください\" = sukoshi dake kudasai = 조금만 주세요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 98,
+  "ex": "辛いですか",
+  "rd": "karai desu ka",
+  "ko": "매워요?",
+  "caption": "일본어 필수 표현 98/100 🇯🇵 \"辛いですか\" = karai desu ka = 매워요?. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 99,
+  "ex": "たくさん召し上がってください",
+  "rd": "takusan meshiagatte kudasai",
+  "ko": "많이 드세요",
+  "caption": "일본어 필수 표현 99/100 🇯🇵 \"たくさん召し上がってください\" = takusan meshiagatte kudasai = 많이 드세요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ },
+ {
+  "n": 100,
+  "ex": "また明日",
+  "rd": "mata ashita",
+  "ko": "내일 봐요",
+  "caption": "일본어 필수 표현 100/100 🇯🇵 \"また明日\" = mata ashita = 내일 봐요. 소리 내어 5번 따라 읽어 보세요! #JapaneseSOS #일본어회화 #필수표현 #일본어공부"
+ }
+]
