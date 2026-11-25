@@ -3,6 +3,7 @@ import hashlib,json,os,subprocess,sys,time,urllib.error,urllib.parse,urllib.requ
 from datetime import datetime,timedelta,timezone
 from pathlib import Path
 from PIL import Image,ImageDraw,ImageFont
+from meta_12_identity import validated_user_id
 ROOT=Path(__file__).resolve().parents[1];POLICY=json.loads((ROOT/'config/meta_12_account_daily_policy.json').read_text(encoding='utf-8'))
 STATE=ROOT/'data/meta_12_publishing_receipts.json';READINESS=ROOT/'data/meta_12_destination_readiness.json';QUEUE=ROOT/'data/meta_12_seoul_journal_queue.json';KST=timezone(timedelta(hours=9));REPO='huh0303-cmyk/-WP-QWEN-autobot'
 
@@ -28,7 +29,7 @@ def credentials():
     for a in POLICY['accounts']:
         for p in POLICY['platforms']:
             prefix=f"META_{p.upper()}_{a['key'].upper()}";token=os.environ.get(prefix+'_ACCESS_TOKEN','').strip();uid=os.environ.get(prefix+'_USER_ID','').strip()
-            if not token or not uid.isdigit():missing.append(prefix)
+            if not token:missing.append(prefix)
             found[(p,a['key'])]=(token,uid)
     return found,missing
 
@@ -127,8 +128,7 @@ def main():
         account=next(x for x in POLICY['accounts'] if x['key']==slot['account_key']);token,uid=creds[(slot['platform'],slot['account_key'])]
         try:
             endpoint='https://graph.instagram.com/v25.0/me?fields=user_id,username' if slot['platform']=='instagram' else 'https://graph.threads.net/v1.0/me?fields=id,username'
-            me=api(endpoint,token);actualid=str(me.get('user_id' if slot['platform']=='instagram' else 'id',''));handle=str(me.get('username','')).lower().lstrip('@')
-            if actualid!=uid or handle!=slot['expected_handle'].lower():raise RuntimeError('identity mismatch')
+            me=api(endpoint,token);uid=validated_user_id(slot['platform'],me,slot['expected_handle'],uid)
             source=source_for(slot);post=generate(account,slot['platform'],slot,source)
             row={'status':'ATTEMPT_RESERVED','platform':slot['platform'],'account_key':account['key'],'expected_handle':slot['expected_handle'],'at_kst':now.isoformat(),'content_sha256':hashlib.sha256(post['caption'].encode()).hexdigest()}
             if slot['platform']=='instagram':

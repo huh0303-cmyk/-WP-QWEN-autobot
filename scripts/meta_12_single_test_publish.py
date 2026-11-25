@@ -2,6 +2,7 @@
 import json,os,time
 from datetime import datetime,timedelta,timezone
 from meta_12_publisher import ROOT,POLICY,READINESS,api,make_image,commit
+from meta_12_identity import validated_user_id,test_already_attempted
 KST=timezone(timedelta(hours=9));REPO='huh0303-cmyk/-WP-QWEN-autobot'
 SAMPLE={
  'english_sos1':'ENGLISH SOS connection test. Could I get a coffee, please? | Korean meaning: 커피 한 잔 주시겠어요? #EnglishSOS',
@@ -17,14 +18,14 @@ def main():
     account=next((a for a in POLICY['accounts'] if a['key']==key),None)
     if not account:raise SystemExit('BLOCKED=INVALID_ACCOUNT')
     data=json.loads(READINESS.read_text(encoding='utf-8'));row=next(x for x in data['targets'] if x['platform']==platform and x['account_key']==key)
-    if row.get('test_public_url') or row.get('test_attempted_at'):
+    if test_already_attempted(row):
         print('RESULT=ALREADY_TESTED_OR_RESERVED; no duplicate post');return
     prefix=f'META_{platform.upper()}_{key.upper()}';token=os.environ.get(prefix+'_ACCESS_TOKEN','').strip();uid=os.environ.get(prefix+'_USER_ID','').strip()
-    if not token or not uid.isdigit():raise SystemExit('BLOCKED=MISSING_TARGET_CREDENTIALS')
+    if not token:raise SystemExit('BLOCKED=MISSING_TARGET_CREDENTIALS')
     expected=account[platform].lower().lstrip('@');base='https://graph.instagram.com/v25.0' if platform=='instagram' else 'https://graph.threads.net/v1.0'
     me=api(('https://graph.instagram.com/v25.0/me?fields=user_id,username' if platform=='instagram' else 'https://graph.threads.net/v1.0/me?fields=id,username'),token)
-    actualid=str(me.get('user_id' if platform=='instagram' else 'id',''));handle=str(me.get('username','')).lower().lstrip('@')
-    if actualid!=uid or handle!=expected:raise SystemExit('BLOCKED=IDENTITY_MISMATCH; no post sent')
+    try:uid=validated_user_id(platform,me,expected,uid)
+    except ValueError:raise SystemExit('BLOCKED=IDENTITY_MISMATCH; no post sent')
     now=datetime.now(KST);row.update({'identity_verified':True,'test_status':'ATTEMPT_RESERVED','test_attempted_at_kst':now.isoformat()});data['updated_at_kst']=now.isoformat();READINESS.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n',encoding='utf-8');commit([str(READINESS.relative_to(ROOT))],'meta: reserve one destination test before publish')
     caption=SAMPLE[key];slot={'date_kst':now.date().isoformat()}
     if platform=='instagram':
