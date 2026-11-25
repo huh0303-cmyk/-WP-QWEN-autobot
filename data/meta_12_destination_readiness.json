@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at_kst": "2026-11-23T21:37:29.852938+09:00",
+  "updated_at_kst": "2026-11-25T12:24:01.096192+09:00",
   "targets": [
     {
       "test_public_url": "https://www.instagram.com/p/DgFGOG7lSYt/",
@@ -65,7 +65,9 @@
       "account_key": "japanese_sos1",
       "platform": "threads",
       "write_scope_verified": false,
-      "identity_verified": false
+      "identity_verified": true,
+      "test_status": "ATTEMPT_RESERVED",
+      "test_attempted_at_kst": "2026-11-25T12:24:01.096192+09:00"
     },
     {
       "test_public_url": "",
