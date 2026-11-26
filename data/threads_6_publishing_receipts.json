@@ -1,0 +1,11 @@
+{
+  "2026-11-26:threads:seoul_jisoo1:2": {
+    "status": "ATTEMPT_RESERVED",
+    "platform": "threads",
+    "account_key": "seoul_jisoo1",
+    "expected_handle": "seoul_jisoo1",
+    "at_kst": "2026-11-26T20:48:52.630869+09:00",
+    "caption": "서울 쇼핑 팁: 동대문 시장은 밤에 더욱 활기찹니다. 특히 밤 10시 이후에는 도매 시장이 문을 열어 합리적인 가격에 다양한 의류와 액세서리를 구매할 수 있어요. 늦은 시간까지 쇼핑하며 특별한 아이템을 찾아보세요! #서울쇼핑 #동대문 #야시장 #쇼핑팁",
+    "content_sha256": "4772dd2fc29de44e56de743f83300335a77513401be230802069336376e3e91e"
+  }
+}
