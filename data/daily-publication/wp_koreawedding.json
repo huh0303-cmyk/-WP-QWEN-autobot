@@ -1,1 +1,1 @@
-{"day": "2026-11-26", "status": "CLAIMED", "attempts": 1, "claim": "daily-2026-11-26-wp_koreawedding-e5582530", "claimed_at": "2026-11-26T22:05:52.611550+09:00", "run_id": null, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-11-26", "status": "DISPATCHED", "attempts": 1, "claim": "daily-2026-11-26-wp_koreawedding-e5582530", "claimed_at": "2026-11-26T22:05:52.611550+09:00", "run_id": 45825858281, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
