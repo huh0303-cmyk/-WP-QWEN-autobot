@@ -14,7 +14,7 @@
     "published_at_kst": "2026-11-25T19:25:14.349479+09:00"
   },
   "2026-11-26:threads:seoul_jisoo1:1": {
-    "status": "ATTEMPT_RESERVED",
+    "status": "PUBLISHED",
     "platform": "threads",
     "account_key": "seoul_jisoo1",
     "expected_handle": "seoul_jisoo1",
@@ -22,6 +22,9 @@
     "content_sha256": "64827be9488c52302c96bd1bdecfaa6c7120ecae0f2e9e012c2438a6f943358a",
     "image_path": "demo_assets/meta_12/2026-11-26_threads_seoul_jisoo1_1.png",
     "image_url": "https://raw.githubusercontent.com/huh0303-cmyk/-WP-QWEN-autobot/main/demo_assets/meta_12/2026-11-26_threads_seoul_jisoo1_1.png",
-    "caption": "서울의 숨겨진 보석 같은 편집샵을 발견하는 재미! 🌷 독특한 디자인의 옷, 액세서리, 리빙 소품까지, 나만의 스타일을 완성할 수 있는 아이템을 찾아보세요. 👗 힙한 동네를 탐험하며 득템하는 즐거움은 덤! #서울쇼핑 #편집샵 #라이프스타일 #서울여행 #쇼핑팁"
+    "caption": "서울의 숨겨진 보석 같은 편집샵을 발견하는 재미! 🌷 독특한 디자인의 옷, 액세서리, 리빙 소품까지, 나만의 스타일을 완성할 수 있는 아이템을 찾아보세요. 👗 힙한 동네를 탐험하며 득템하는 즐거움은 덤! #서울쇼핑 #편집샵 #라이프스타일 #서울여행 #쇼핑팁",
+    "id": "18119217545279644",
+    "public_url": "https://www.threads.com/@seoul_jisoo1/post/DgMEDh0keXQ",
+    "published_at_kst": "2026-11-26T11:45:26.835254+09:00"
   }
 }
