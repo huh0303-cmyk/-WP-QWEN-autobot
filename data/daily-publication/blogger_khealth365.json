@@ -1,1 +1,1 @@
-{"day": "2026-11-09", "status": "CLAIMED", "attempts": 1, "claim": "daily-2026-11-09-blogger_khealth365-bcac541e", "claimed_at": "2026-11-09T14:37:54.442367+09:00", "run_id": null, "child_run_id": null, "child_job_id": null, "workflow": "blogger-rewrite.yml"}
+{"day": "2026-11-26", "status": "CLAIMED", "attempts": 1, "claim": "daily-2026-11-26-blogger_khealth365-e750ade4", "claimed_at": "2026-11-26T22:05:59.730039+09:00", "run_id": null, "child_run_id": null, "child_job_id": null, "workflow": "blogger-single-publish.yml"}
