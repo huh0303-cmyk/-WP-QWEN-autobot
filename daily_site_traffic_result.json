@@ -1,20 +1,20 @@
 {
-  "checked_at": "2026-11-25 13:50:52",
+  "checked_at": "2026-11-26 13:04:04",
   "records": [
     {
       "domain": "k-health365.com",
-      "date": "2026-11-25",
-      "weekday": "\uc218",
-      "daily_visitors": 249,
-      "visitor_delta": -540,
-      "total_visitors": 20416,
-      "today_live": 249,
+      "date": "2026-11-26",
+      "weekday": "\ubaa9",
+      "daily_visitors": 203,
+      "visitor_delta": -203,
+      "total_visitors": 20776,
+      "today_live": 203,
       "gsc_clicks": 0,
       "clicks": 0,
       "impressions": 0,
       "ctr": 0,
       "position": 0,
-      "gsc_date": "2026-11-22",
+      "gsc_date": "2026-11-23",
       "indexed": 0,
       "sitemap_indexed": 0,
       "sitemap_submitted": 1028,
@@ -25,26 +25,26 @@
       "gsc_property": "sc-domain:k-health365.com",
       "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-25 13:50:52",
-      "total_delta": 249,
-      "yesterday_visitors": 789,
-      "day_before_yesterday_visitors": 486,
-      "yesterday_delta": 303
+      "checked_at": "2026-11-26 13:04:04",
+      "total_delta": 203,
+      "yesterday_visitors": 406,
+      "day_before_yesterday_visitors": 789,
+      "yesterday_delta": -383
     },
     {
       "domain": "koreamedicaltour.com",
-      "date": "2026-11-25",
-      "weekday": "\uc218",
-      "daily_visitors": 62,
-      "visitor_delta": -163,
-      "total_visitors": 13441,
-      "today_live": 62,
+      "date": "2026-11-26",
+      "weekday": "\ubaa9",
+      "daily_visitors": 39,
+      "visitor_delta": -56,
+      "total_visitors": 13513,
+      "today_live": 39,
       "gsc_clicks": 0,
       "clicks": 0,
       "impressions": 1,
       "ctr": 0,
       "position": 84,
-      "gsc_date": "2026-11-22",
+      "gsc_date": "2026-11-23",
       "indexed": 0,
       "sitemap_indexed": 0,
       "sitemap_submitted": 233,
@@ -55,26 +55,26 @@
       "gsc_property": "sc-domain:koreamedicaltour.com",
       "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-25 13:50:52",
-      "total_delta": 62,
-      "yesterday_visitors": 225,
+      "checked_at": "2026-11-26 13:04:04",
+      "total_delta": 39,
+      "yesterday_visitors": 95,
       "day_before_yesterday_visitors": 225,
-      "yesterday_delta": 0
+      "yesterday_delta": -130
     },
     {
       "domain": "koreainvest365.com",
-      "date": "2026-11-25",
-      "weekday": "\uc218",
-      "daily_visitors": 283,
-      "visitor_delta": -76,
-      "total_visitors": 23428,
-      "today_live": 283,
+      "date": "2026-11-26",
+      "weekday": "\ubaa9",
+      "daily_visitors": 183,
+      "visitor_delta": -234,
+      "total_visitors": 23745,
+      "today_live": 183,
       "gsc_clicks": 0,
       "clicks": 0,
       "impressions": 0,
       "ctr": 0,
       "position": 0,
-      "gsc_date": "2026-11-22",
+      "gsc_date": "2026-11-23",
       "indexed": 0,
       "sitemap_indexed": 0,
       "sitemap_submitted": 315,
@@ -85,11 +85,11 @@
       "gsc_property": "sc-domain:koreainvest365.com",
       "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-25 13:50:52",
-      "total_delta": 283,
-      "yesterday_visitors": 359,
-      "day_before_yesterday_visitors": 584,
-      "yesterday_delta": -225
+      "checked_at": "2026-11-26 13:04:04",
+      "total_delta": 183,
+      "yesterday_visitors": 417,
+      "day_before_yesterday_visitors": 359,
+      "yesterday_delta": 58
     },
     {
       "domain": "ki-korea.com",
@@ -120,52 +120,52 @@
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://ki-korea.com/",
         "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "koreainsurance365.com",
-      "date": "2026-11-25",
-      "weekday": "\uc218",
-      "daily_visitors": 317,
-      "visitor_delta": -174,
-      "total_visitors": 20887,
-      "today_live": 317,
-      "gsc_clicks": 0,
-      "clicks": 0,
-      "impressions": 13,
-      "ctr": 0,
-      "position": 9.8,
-      "gsc_date": "2026-11-22",
+      "date": "2026-11-26",
+      "weekday": "\ubaa9",
+      "daily_visitors": 229,
+      "visitor_delta": -268,
+      "total_visitors": 21296,
+      "today_live": 229,
+      "gsc_clicks": 1,
+      "clicks": 1,
+      "impressions": 10,
+      "ctr": 10.0,
+      "position": 6,
+      "gsc_date": "2026-11-23",
       "indexed": 0,
       "sitemap_indexed": 0,
       "sitemap_submitted": 68,
       "unindexed": 68,
       "index_rate": 0.0,
       "recent_index_increase": 0,
-      "total_posts": 117,
+      "total_posts": 118,
       "gsc_property": "sc-domain:koreainsurance365.com",
       "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-25 13:50:52",
-      "total_delta": 317,
-      "yesterday_visitors": 491,
-      "day_before_yesterday_visitors": 590,
-      "yesterday_delta": -99
+      "checked_at": "2026-11-26 13:04:04",
+      "total_delta": 229,
+      "yesterday_visitors": 497,
+      "day_before_yesterday_visitors": 491,
+      "yesterday_delta": 6
     },
     {
       "domain": "kfinance365.com",
-      "date": "2026-11-25",
-      "weekday": "\uc218",
-      "daily_visitors": 742,
-      "visitor_delta": 309,
-      "total_visitors": 25706,
-      "today_live": 742,
+      "date": "2026-11-26",
+      "weekday": "\ubaa9",
+      "daily_visitors": 212,
+      "visitor_delta": -685,
+      "total_visitors": 26073,
+      "today_live": 212,
       "gsc_clicks": 0,
       "clicks": 0,
       "impressions": 0,
       "ctr": 0,
       "position": 0,
-      "gsc_date": "2026-11-22",
+      "gsc_date": "2026-11-23",
       "indexed": 0,
       "sitemap_indexed": 0,
       "sitemap_submitted": 259,
@@ -176,26 +176,26 @@
       "gsc_property": "sc-domain:kfinance365.com",
       "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-25 13:50:52",
-      "total_delta": 742,
-      "yesterday_visitors": 433,
-      "day_before_yesterday_visitors": 644,
-      "yesterday_delta": -211
+      "checked_at": "2026-11-26 13:04:04",
+      "total_delta": 212,
+      "yesterday_visitors": 897,
+      "day_before_yesterday_visitors": 433,
+      "yesterday_delta": 464
     },
     {
       "domain": "koreataxnlaw.com",
-      "date": "2026-11-25",
-      "weekday": "\uc218",
-      "daily_visitors": 158,
-      "visitor_delta": -140,
-      "total_visitors": 13206,
-      "today_live": 158,
+      "date": "2026-11-26",
+      "weekday": "\ubaa9",
+      "daily_visitors": 96,
+      "visitor_delta": -194,
+      "total_visitors": 13434,
+      "today_live": 96,
       "gsc_clicks": 0,
       "clicks": 0,
-      "impressions": 1,
+      "impressions": 0,
       "ctr": 0,
-      "position": 77,
-      "gsc_date": "2026-11-22",
+      "position": 0,
+      "gsc_date": "2026-11-23",
       "indexed": 0,
       "sitemap_indexed": 0,
       "sitemap_submitted": 193,
@@ -206,26 +206,26 @@
       "gsc_property": "sc-domain:koreataxnlaw.com",
       "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-25 13:50:52",
-      "total_delta": 158,
-      "yesterday_visitors": 298,
-      "day_before_yesterday_visitors": 1101,
-      "yesterday_delta": -803
+      "checked_at": "2026-11-26 13:04:04",
+      "total_delta": 96,
+      "yesterday_visitors": 290,
+      "day_before_yesterday_visitors": 298,
+      "yesterday_delta": -8
     },
     {
       "domain": "koreacrypto365.com",
-      "date": "2026-11-25",
-      "weekday": "\uc218",
-      "daily_visitors": 190,
-      "visitor_delta": -176,
-      "total_visitors": 16340,
-      "today_live": 190,
+      "date": "2026-11-26",
+      "weekday": "\ubaa9",
+      "daily_visitors": 127,
+      "visitor_delta": -179,
+      "total_visitors": 16583,
+      "today_live": 127,
       "gsc_clicks": 0,
       "clicks": 0,
-      "impressions": 1,
+      "impressions": 0,
       "ctr": 0,
-      "position": 1,
-      "gsc_date": "2026-11-22",
+      "position": 0,
+      "gsc_date": "2026-11-23",
       "indexed": 0,
       "sitemap_indexed": 0,
       "sitemap_submitted": 124,
@@ -236,26 +236,26 @@
       "gsc_property": "sc-domain:koreacrypto365.com",
       "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-25 13:50:52",
-      "total_delta": 190,
-      "yesterday_visitors": 366,
-      "day_before_yesterday_visitors": 304,
-      "yesterday_delta": 62
+      "checked_at": "2026-11-26 13:04:04",
+      "total_delta": 127,
+      "yesterday_visitors": 306,
+      "day_before_yesterday_visitors": 366,
+      "yesterday_delta": -60
     },
     {
       "domain": "krealestate365.com",
-      "date": "2026-11-25",
-      "weekday": "\uc218",
-      "daily_visitors": 112,
-      "visitor_delta": -82,
-      "total_visitors": 12023,
-      "today_live": 112,
+      "date": "2026-11-26",
+      "weekday": "\ubaa9",
+      "daily_visitors": 30,
+      "visitor_delta": -126,
+      "total_visitors": 12097,
+      "today_live": 30,
       "gsc_clicks": 0,
       "clicks": 0,
-      "impressions": 0,
+      "impressions": 4,
       "ctr": 0,
-      "position": 0,
-      "gsc_date": "2026-11-22",
+      "position": 57,
+      "gsc_date": "2026-11-23",
       "indexed": 0,
       "sitemap_indexed": 0,
       "sitemap_submitted": 95,
@@ -266,26 +266,26 @@
       "gsc_property": "sc-domain:krealestate365.com",
       "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-25 13:50:52",
-      "total_delta": 112,
-      "yesterday_visitors": 194,
-      "day_before_yesterday_visitors": 224,
-      "yesterday_delta": -30
+      "checked_at": "2026-11-26 13:04:04",
+      "total_delta": 30,
+      "yesterday_visitors": 156,
+      "day_before_yesterday_visitors": 194,
+      "yesterday_delta": -38
     },
     {
       "domain": "ktech365.com",
-      "date": "2026-11-25",
-      "weekday": "\uc218",
-      "daily_visitors": 148,
-      "visitor_delta": -137,
-      "total_visitors": 21640,
-      "today_live": 148,
+      "date": "2026-11-26",
+      "weekday": "\ubaa9",
+      "daily_visitors": 100,
+      "visitor_delta": -177,
+      "total_visitors": 21869,
+      "today_live": 100,
       "gsc_clicks": 0,
       "clicks": 0,
-      "impressions": 4,
+      "impressions": 3,
       "ctr": 0,
       "position": 4,
-      "gsc_date": "2026-11-22",
+      "gsc_date": "2026-11-23",
       "indexed": 0,
       "sitemap_indexed": 0,
       "sitemap_submitted": 219,
@@ -296,26 +296,26 @@
       "gsc_property": "sc-domain:ktech365.com",
       "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-25 13:50:52",
-      "total_delta": 148,
-      "yesterday_visitors": 285,
-      "day_before_yesterday_visitors": 266,
-      "yesterday_delta": 19
+      "checked_at": "2026-11-26 13:04:04",
+      "total_delta": 100,
+      "yesterday_visitors": 277,
+      "day_before_yesterday_visitors": 285,
+      "yesterday_delta": -8
     },
     {
       "domain": "kskin365.com",
-      "date": "2026-11-25",
-      "weekday": "\uc218",
-      "daily_visitors": 151,
-      "visitor_delta": -293,
-      "total_visitors": 19424,
-      "today_live": 151,
+      "date": "2026-11-26",
+      "weekday": "\ubaa9",
+      "daily_visitors": 75,
+      "visitor_delta": -151,
+      "total_visitors": 19574,
+      "today_live": 75,
       "gsc_clicks": 0,
       "clicks": 0,
       "impressions": 0,
       "ctr": 0,
       "position": 0,
-      "gsc_date": "2026-11-22",
+      "gsc_date": "2026-11-23",
       "indexed": 0,
       "sitemap_indexed": 0,
       "sitemap_submitted": 143,
@@ -326,26 +326,26 @@
       "gsc_property": "sc-domain:kskin365.com",
       "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-25 13:50:52",
-      "total_delta": 151,
-      "yesterday_visitors": 444,
-      "day_before_yesterday_visitors": 396,
-      "yesterday_delta": 48
+      "checked_at": "2026-11-26 13:04:04",
+      "total_delta": 75,
+      "yesterday_visitors": 226,
+      "day_before_yesterday_visitors": 444,
+      "yesterday_delta": -218
     },
     {
       "domain": "oliveyoungkorea.com",
-      "date": "2026-11-25",
-      "weekday": "\uc218",
-      "daily_visitors": 130,
-      "visitor_delta": -181,
-      "total_visitors": 19394,
-      "today_live": 130,
+      "date": "2026-11-26",
+      "weekday": "\ubaa9",
+      "daily_visitors": 134,
+      "visitor_delta": -96,
+      "total_visitors": 19628,
+      "today_live": 134,
       "gsc_clicks": 0,
       "clicks": 0,
-      "impressions": 56,
+      "impressions": 25,
       "ctr": 0,
-      "position": 51.0,
-      "gsc_date": "2026-11-22",
+      "position": 46.2,
+      "gsc_date": "2026-11-23",
       "indexed": 0,
       "sitemap_indexed": 0,
       "sitemap_submitted": 106,
@@ -356,26 +356,26 @@
       "gsc_property": "sc-domain:oliveyoungkorea.com",
       "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-25 13:50:52",
-      "total_delta": 130,
-      "yesterday_visitors": 311,
-      "day_before_yesterday_visitors": 252,
-      "yesterday_delta": 59
+      "checked_at": "2026-11-26 13:04:04",
+      "total_delta": 134,
+      "yesterday_visitors": 230,
+      "day_before_yesterday_visitors": 311,
+      "yesterday_delta": -81
     },
     {
       "domain": "kworld365.com",
-      "date": "2026-11-25",
-      "weekday": "\uc218",
-      "daily_visitors": 278,
-      "visitor_delta": -105,
-      "total_visitors": 22793,
-      "today_live": 278,
+      "date": "2026-11-26",
+      "weekday": "\ubaa9",
+      "daily_visitors": 284,
+      "visitor_delta": -63,
+      "total_visitors": 23147,
+      "today_live": 284,
       "gsc_clicks": 0,
       "clicks": 0,
       "impressions": 0,
       "ctr": 0,
       "position": 0,
-      "gsc_date": "2026-11-22",
+      "gsc_date": "2026-11-23",
       "indexed": 0,
       "sitemap_indexed": 0,
       "sitemap_submitted": 153,
@@ -386,86 +386,86 @@
       "gsc_property": "sc-domain:kworld365.com",
       "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-25 13:50:52",
-      "total_delta": 278,
-      "yesterday_visitors": 383,
-      "day_before_yesterday_visitors": 290,
-      "yesterday_delta": 93
+      "checked_at": "2026-11-26 13:04:04",
+      "total_delta": 284,
+      "yesterday_visitors": 347,
+      "day_before_yesterday_visitors": 383,
+      "yesterday_delta": -36
     },
     {
       "domain": "k-trip365.com",
-      "date": "2026-11-25",
-      "weekday": "\uc218",
+      "date": "2026-11-26",
+      "weekday": "\ubaa9",
       "daily_visitors": 186,
-      "visitor_delta": -207,
-      "total_visitors": 17341,
+      "visitor_delta": -192,
+      "total_visitors": 17719,
       "today_live": 186,
       "gsc_clicks": 0,
       "clicks": 0,
-      "impressions": 4,
+      "impressions": 3,
       "ctr": 0,
-      "position": 60,
-      "gsc_date": "2026-11-22",
+      "position": 61.3,
+      "gsc_date": "2026-11-23",
       "indexed": 0,
       "sitemap_indexed": 0,
       "sitemap_submitted": 199,
       "unindexed": 199,
       "index_rate": 0.0,
       "recent_index_increase": 0,
-      "total_posts": 91,
+      "total_posts": 92,
       "gsc_property": "sc-domain:k-trip365.com",
       "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-25 13:50:52",
+      "checked_at": "2026-11-26 13:04:04",
       "total_delta": 186,
-      "yesterday_visitors": 393,
-      "day_before_yesterday_visitors": 443,
-      "yesterday_delta": -50
+      "yesterday_visitors": 378,
+      "day_before_yesterday_visitors": 393,
+      "yesterday_delta": -15
     },
     {
       "domain": "k-visa365.com",
-      "date": "2026-11-25",
-      "weekday": "\uc218",
-      "daily_visitors": 291,
-      "visitor_delta": -166,
-      "total_visitors": 10527,
-      "today_live": 291,
+      "date": "2026-11-26",
+      "weekday": "\ubaa9",
+      "daily_visitors": 73,
+      "visitor_delta": -395,
+      "total_visitors": 10777,
+      "today_live": 73,
       "gsc_clicks": 0,
       "clicks": 0,
       "impressions": 0,
       "ctr": 0,
       "position": 0,
-      "gsc_date": "2026-11-22",
+      "gsc_date": "2026-11-23",
       "indexed": 0,
       "sitemap_indexed": 0,
       "sitemap_submitted": 112,
       "unindexed": 112,
       "index_rate": 0.0,
       "recent_index_increase": 0,
-      "total_posts": 61,
+      "total_posts": 62,
       "gsc_property": "sc-domain:k-visa365.com",
       "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-25 13:50:52",
-      "total_delta": 291,
-      "yesterday_visitors": 457,
-      "day_before_yesterday_visitors": 239,
-      "yesterday_delta": 218
+      "checked_at": "2026-11-26 13:04:04",
+      "total_delta": 73,
+      "yesterday_visitors": 468,
+      "day_before_yesterday_visitors": 457,
+      "yesterday_delta": 11
     },
     {
       "domain": "koreawedding365.com",
-      "date": "2026-11-25",
-      "weekday": "\uc218",
-      "daily_visitors": 204,
-      "visitor_delta": -209,
-      "total_visitors": 26958,
-      "today_live": 204,
+      "date": "2026-11-26",
+      "weekday": "\ubaa9",
+      "daily_visitors": 661,
+      "visitor_delta": 245,
+      "total_visitors": 27831,
+      "today_live": 661,
       "gsc_clicks": 0,
       "clicks": 0,
-      "impressions": 33,
+      "impressions": 14,
       "ctr": 0,
-      "position": 9.2,
-      "gsc_date": "2026-11-22",
+      "position": 15.9,
+      "gsc_date": "2026-11-23",
       "indexed": 0,
       "sitemap_indexed": 0,
       "sitemap_submitted": 327,
@@ -476,11 +476,11 @@
       "gsc_property": "sc-domain:koreawedding365.com",
       "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-25 13:50:52",
-      "total_delta": 204,
-      "yesterday_visitors": 413,
-      "day_before_yesterday_visitors": 839,
-      "yesterday_delta": -426
+      "checked_at": "2026-11-26 13:04:04",
+      "total_delta": 661,
+      "yesterday_visitors": 416,
+      "day_before_yesterday_visitors": 413,
+      "yesterday_delta": 3
     },
     {
       "domain": "kstudy365.com",
@@ -495,7 +495,7 @@
       "impressions": 0,
       "ctr": 0,
       "position": 0,
-      "gsc_date": "2026-11-22",
+      "gsc_date": "2026-11-23",
       "indexed": 0,
       "sitemap_indexed": 0,
       "sitemap_submitted": 166,
@@ -509,22 +509,22 @@
         "visitor API \uc608\uc678: HTTPSConnectionPool(host='kstudy365.com', port=443): Max retries exceeded with url: /wp-json/site-stats/v1/visitors (Caused by NameResolutionError(\"HTTPSConnect",
         "posts API \uc608\uc678: HTTPSConnectionPool(host='kstudy365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=1&_fields=id (Caused by NameResolutionError(\"H"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "studyinkorea365.com",
-      "date": "2026-11-25",
-      "weekday": "\uc218",
-      "daily_visitors": 137,
-      "visitor_delta": -277,
-      "total_visitors": 16200,
-      "today_live": 137,
+      "date": "2026-11-26",
+      "weekday": "\ubaa9",
+      "daily_visitors": 87,
+      "visitor_delta": -167,
+      "total_visitors": 16404,
+      "today_live": 87,
       "gsc_clicks": 0,
       "clicks": 0,
       "impressions": 0,
       "ctr": 0,
       "position": 0,
-      "gsc_date": "2026-11-22",
+      "gsc_date": "2026-11-23",
       "indexed": 0,
       "sitemap_indexed": 0,
       "sitemap_submitted": 270,
@@ -535,26 +535,26 @@
       "gsc_property": "sc-domain:studyinkorea365.com",
       "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-25 13:50:52",
-      "total_delta": 137,
-      "yesterday_visitors": 414,
-      "day_before_yesterday_visitors": 408,
-      "yesterday_delta": 6
+      "checked_at": "2026-11-26 13:04:04",
+      "total_delta": 87,
+      "yesterday_visitors": 254,
+      "day_before_yesterday_visitors": 414,
+      "yesterday_delta": -160
     },
     {
       "domain": "kieca-korea.org",
-      "date": "2026-11-25",
-      "weekday": "\uc218",
-      "daily_visitors": 73,
-      "visitor_delta": -79,
-      "total_visitors": 12206,
-      "today_live": 73,
+      "date": "2026-11-26",
+      "weekday": "\ubaa9",
+      "daily_visitors": 34,
+      "visitor_delta": -95,
+      "total_visitors": 12296,
+      "today_live": 34,
       "gsc_clicks": 0,
       "clicks": 0,
-      "impressions": 3,
+      "impressions": 5,
       "ctr": 0,
-      "position": 6,
-      "gsc_date": "2026-11-22",
+      "position": 16.8,
+      "gsc_date": "2026-11-23",
       "indexed": 0,
       "sitemap_indexed": 0,
       "sitemap_submitted": 234,
@@ -565,11 +565,11 @@
       "gsc_property": "sc-domain:kieca-korea.org",
       "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-25 13:50:52",
-      "total_delta": 73,
-      "yesterday_visitors": 152,
-      "day_before_yesterday_visitors": 753,
-      "yesterday_delta": -601
+      "checked_at": "2026-11-26 13:04:04",
+      "total_delta": 34,
+      "yesterday_visitors": 129,
+      "day_before_yesterday_visitors": 152,
+      "yesterday_delta": -23
     },
     {
       "domain": "ksa-korea.org",
@@ -600,7 +600,7 @@
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://ksa-korea.org",
         "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "sis-korea.com",
@@ -631,7 +631,7 @@
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://sis-korea.com",
         "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "jobkorea365.com",
@@ -646,7 +646,7 @@
       "impressions": 0,
       "ctr": 0,
       "position": 0,
-      "gsc_date": "2026-11-22",
+      "gsc_date": "2026-11-23",
       "indexed": 0,
       "sitemap_indexed": 0,
       "sitemap_submitted": 113,
@@ -660,22 +660,22 @@
         "visitor API \uc608\uc678: HTTPSConnectionPool(host='jobkorea365.com', port=443): Max retries exceeded with url: /wp-json/site-stats/v1/visitors (Caused by NameResolutionError(\"HTTPSConne",
         "posts API \uc608\uc678: HTTPSConnectionPool(host='jobkorea365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=1&_fields=id (Caused by NameResolutionError("
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "jobinkorea365.com",
-      "date": "2026-11-25",
-      "weekday": "\uc218",
-      "daily_visitors": 232,
-      "visitor_delta": 29,
-      "total_visitors": 12323,
-      "today_live": 232,
+      "date": "2026-11-26",
+      "weekday": "\ubaa9",
+      "daily_visitors": 46,
+      "visitor_delta": -278,
+      "total_visitors": 12461,
+      "today_live": 46,
       "gsc_clicks": 0,
       "clicks": 0,
-      "impressions": 3,
+      "impressions": 2,
       "ctr": 0,
-      "position": 12.7,
-      "gsc_date": "2026-11-22",
+      "position": 10.5,
+      "gsc_date": "2026-11-23",
       "indexed": 0,
       "sitemap_indexed": 0,
       "sitemap_submitted": 92,
@@ -686,56 +686,56 @@
       "gsc_property": "sc-domain:jobinkorea365.com",
       "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-25 13:50:52",
-      "total_delta": 232,
-      "yesterday_visitors": 203,
-      "day_before_yesterday_visitors": 307,
-      "yesterday_delta": -104
+      "checked_at": "2026-11-26 13:04:04",
+      "total_delta": 46,
+      "yesterday_visitors": 324,
+      "day_before_yesterday_visitors": 203,
+      "yesterday_delta": 121
     },
     {
       "domain": "jobkoreaglobal.com",
-      "date": "2026-11-25",
-      "weekday": "\uc218",
-      "daily_visitors": 513,
-      "visitor_delta": 53,
-      "total_visitors": 23331,
-      "today_live": 513,
+      "date": "2026-11-26",
+      "weekday": "\ubaa9",
+      "daily_visitors": 203,
+      "visitor_delta": -528,
+      "total_visitors": 23752,
+      "today_live": 203,
       "gsc_clicks": 0,
       "clicks": 0,
-      "impressions": 3,
+      "impressions": 2,
       "ctr": 0,
-      "position": 64.7,
-      "gsc_date": "2026-11-22",
+      "position": 60,
+      "gsc_date": "2026-11-23",
       "indexed": 0,
       "sitemap_indexed": 0,
       "sitemap_submitted": 257,
       "unindexed": 257,
       "index_rate": 0.0,
       "recent_index_increase": 0,
-      "total_posts": 115,
+      "total_posts": 116,
       "gsc_property": "sc-domain:jobkoreaglobal.com",
       "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-25 13:50:52",
-      "total_delta": 513,
-      "yesterday_visitors": 460,
-      "day_before_yesterday_visitors": 749,
-      "yesterday_delta": -289
+      "checked_at": "2026-11-26 13:04:04",
+      "total_delta": 203,
+      "yesterday_visitors": 731,
+      "day_before_yesterday_visitors": 460,
+      "yesterday_delta": 271
     },
     {
       "domain": "korea365.org",
-      "date": "2026-11-25",
-      "weekday": "\uc218",
-      "daily_visitors": 447,
-      "visitor_delta": -544,
-      "total_visitors": 43042,
-      "today_live": 447,
-      "gsc_clicks": 0,
-      "clicks": 0,
-      "impressions": 40,
-      "ctr": 0,
-      "position": 16.4,
-      "gsc_date": "2026-11-22",
+      "date": "2026-11-26",
+      "weekday": "\ubaa9",
+      "daily_visitors": 944,
+      "visitor_delta": 173,
+      "total_visitors": 44312,
+      "today_live": 944,
+      "gsc_clicks": 2,
+      "clicks": 2,
+      "impressions": 60,
+      "ctr": 3.33,
+      "position": 18.9,
+      "gsc_date": "2026-11-23",
       "indexed": 0,
       "sitemap_indexed": 0,
       "sitemap_submitted": 334,
@@ -746,26 +746,26 @@
       "gsc_property": "sc-domain:korea365.org",
       "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-25 13:50:52",
-      "total_delta": 447,
-      "yesterday_visitors": 991,
-      "day_before_yesterday_visitors": 506,
-      "yesterday_delta": 485
+      "checked_at": "2026-11-26 13:04:04",
+      "total_delta": 944,
+      "yesterday_visitors": 771,
+      "day_before_yesterday_visitors": 991,
+      "yesterday_delta": -220
     },
     {
       "domain": "koreanews365.com",
-      "date": "2026-11-25",
-      "weekday": "\uc218",
-      "daily_visitors": 139,
-      "visitor_delta": -433,
-      "total_visitors": 9763,
-      "today_live": 139,
+      "date": "2026-11-26",
+      "weekday": "\ubaa9",
+      "daily_visitors": 104,
+      "visitor_delta": -275,
+      "total_visitors": 10107,
+      "today_live": 104,
       "gsc_clicks": 0,
       "clicks": 0,
       "impressions": 0,
       "ctr": 0,
       "position": 0,
-      "gsc_date": "2026-11-22",
+      "gsc_date": "2026-11-23",
       "indexed": 0,
       "sitemap_indexed": 0,
       "sitemap_submitted": 397,
@@ -776,11 +776,11 @@
       "gsc_property": "sc-domain:koreanews365.com",
       "status": "\uc815\uc0c1",
       "errors": [],
-      "checked_at": "2026-11-25 13:50:52",
-      "total_delta": 139,
-      "yesterday_visitors": 572,
-      "day_before_yesterday_visitors": 137,
-      "yesterday_delta": 435
+      "checked_at": "2026-11-26 13:04:04",
+      "total_delta": 104,
+      "yesterday_visitors": 379,
+      "day_before_yesterday_visitors": 572,
+      "yesterday_delta": -193
     },
     {
       "domain": "theseouljournal.com",
@@ -811,7 +811,7 @@
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'sc-domain:theseouljou",
         "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "k-insight-vietnam.tistory.com",
@@ -839,7 +839,7 @@
       "errors": [
         "GSC \uc18d\uc131 \uc5f0\uacb0 \ud544\uc694"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "k-vietnam.tistory.com",
@@ -867,7 +867,7 @@
       "errors": [
         "GSC \uc18d\uc131 \uc5f0\uacb0 \ud544\uc694"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "k-healthcare.tistory.com",
@@ -895,7 +895,7 @@
       "errors": [
         "GSC \uc18d\uc131 \uc5f0\uacb0 \ud544\uc694"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "huh0303.tistory.com",
@@ -923,7 +923,7 @@
       "errors": [
         "GSC \uc18d\uc131 \uc5f0\uacb0 \ud544\uc694"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "k-trip365.tistory.com",
@@ -951,7 +951,7 @@
       "errors": [
         "GSC \uc18d\uc131 \uc5f0\uacb0 \ud544\uc694"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "k-trip365.blogspot.com",
@@ -980,7 +980,7 @@
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://k-trip365.blo",
         "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "kworld365seoul.blogspot.com",
@@ -1009,7 +1009,7 @@
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://kworld365seou",
         "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "jobkorea365.blogspot.com",
@@ -1038,7 +1038,7 @@
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://jobkorea365.b",
         "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "kstudy365.blogspot.com",
@@ -1067,7 +1067,7 @@
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://kstudy365.blo",
         "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "koreainsurance365.blogspot.com",
@@ -1096,7 +1096,7 @@
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://koreainsuranc",
         "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "kfinance365.blogspot.com",
@@ -1125,7 +1125,7 @@
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://kfinance365.b",
         "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "koreamedicaltour365.blogspot.com",
@@ -1154,7 +1154,7 @@
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://koreamedicalt",
         "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "k-visa365.blogspot.com",
@@ -1183,7 +1183,7 @@
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://k-visa365.blo",
         "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "koreanews365daily.blogspot.com",
@@ -1212,7 +1212,7 @@
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://koreanews365d",
         "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "koreainvest365.blogspot.com",
@@ -1241,7 +1241,7 @@
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://koreainvest36",
         "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "oliveyoungkorea.blogspot.com",
@@ -1270,7 +1270,7 @@
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://oliveyoungkor",
         "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "koreacrypto365.blogspot.com",
@@ -1299,7 +1299,7 @@
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://koreacrypto36",
         "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "jobinkorea365.blogspot.com",
@@ -1328,7 +1328,7 @@
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://jobinkorea365",
         "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "koreawedding365.blogspot.com",
@@ -1357,7 +1357,7 @@
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://koreawedding3",
         "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "theseouljournal.blogspot.com",
@@ -1386,7 +1386,7 @@
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://theseouljourn",
         "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "ktech365.blogspot.com",
@@ -1415,7 +1415,7 @@
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://ktech365.blog",
         "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "kieca-korea.blogspot.com",
@@ -1444,7 +1444,7 @@
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://kieca-korea.b",
         "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "ki-korea.blogspot.com",
@@ -1473,7 +1473,7 @@
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://ki-korea.blog",
         "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "ksa-korea.blogspot.com",
@@ -1502,7 +1502,7 @@
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://ksa-korea.blo",
         "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "koreataxnlaw.blogspot.com",
@@ -1531,7 +1531,7 @@
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://koreataxnlaw.",
         "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "jobkoreaglobal.blogspot.com",
@@ -1560,7 +1560,7 @@
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://jobkoreagloba",
         "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "studyinkorea365.blogspot.com",
@@ -1589,7 +1589,7 @@
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://studyinkorea3",
         "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "korea365guide.blogspot.com",
@@ -1618,7 +1618,7 @@
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://korea365guide",
         "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "sis-korea.blogspot.com",
@@ -1647,7 +1647,7 @@
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://sis-korea.blo",
         "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "krealestate365.blogspot.com",
@@ -1676,7 +1676,7 @@
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://krealestate36",
         "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "k-health365.blogspot.com",
@@ -1705,7 +1705,7 @@
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://k-health365.b",
         "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "skin.k-health365.com",
@@ -1733,7 +1733,7 @@
       "errors": [
         "GSC \uc18d\uc131 \uc5f0\uacb0 \ud544\uc694"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "glow.k-health365.com",
@@ -1761,7 +1761,7 @@
       "errors": [
         "GSC \uc18d\uc131 \uc5f0\uacb0 \ud544\uc694"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "k-health365-edu.blogspot.com",
@@ -1790,7 +1790,7 @@
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://k-health365-e",
         "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "korea-life-support365.blogspot.com",
@@ -1819,7 +1819,7 @@
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://korea-life-su",
         "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "koreamedicaltour1.blogspot.com",
@@ -1848,7 +1848,7 @@
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://koreamedicalt",
         "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "kworld365.blogspot.com",
@@ -1877,7 +1877,7 @@
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://kworld365.blo",
         "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     },
     {
       "domain": "seoulintlschoolguide.blogspot.com",
@@ -1906,7 +1906,7 @@
         "GSC HTTP 403: {\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"User does not have sufficient permission for site 'https://seoulintlscho",
         "\uc0ac\uc774\ud2b8\ub9f5 \ubaa9\ub85d HTTP 403"
       ],
-      "checked_at": "2026-11-25 13:50:52"
+      "checked_at": "2026-11-26 13:04:04"
     }
   ],
   "partial": false
