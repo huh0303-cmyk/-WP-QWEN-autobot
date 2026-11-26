@@ -28,7 +28,7 @@
     "published_at_kst": "2026-11-26T11:45:26.835254+09:00"
   },
   "2026-11-26:threads:seoul_jisoo1:2": {
-    "status": "ATTEMPT_RESERVED",
+    "status": "PUBLISHED",
     "platform": "threads",
     "account_key": "seoul_jisoo1",
     "expected_handle": "seoul_jisoo1",
@@ -36,6 +36,9 @@
     "content_sha256": "2836db442ad319c169929089036c2ea502948034932acb6b1f094fad0693da48",
     "image_path": "demo_assets/meta_12/2026-11-26_threads_seoul_jisoo1_2.png",
     "image_url": "https://raw.githubusercontent.com/huh0303-cmyk/-WP-QWEN-autobot/main/demo_assets/meta_12/2026-11-26_threads_seoul_jisoo1_2.png",
-    "caption": "서울 쇼핑 팁: 한국의 독특한 기념품을 찾고 있다면, 인사동 거리로 가보세요. 전통 공예품, 붓글씨 작품, 그리고 맛있는 한국 간식까지 다양한 아이템을 만날 수 있습니다. 현지 문화를 직접 느껴볼 수 있는 좋은 기회예요! #서울 #쇼핑 #기념품 #인사동 #한국여행"
+    "caption": "서울 쇼핑 팁: 한국의 독특한 기념품을 찾고 있다면, 인사동 거리로 가보세요. 전통 공예품, 붓글씨 작품, 그리고 맛있는 한국 간식까지 다양한 아이템을 만날 수 있습니다. 현지 문화를 직접 느껴볼 수 있는 좋은 기회예요! #서울 #쇼핑 #기념품 #인사동 #한국여행",
+    "id": "17946575433392853",
+    "public_url": "https://www.threads.com/@seoul_jisoo1/post/DgNAT4KIQmg",
+    "published_at_kst": "2026-11-26T20:31:59.706777+09:00"
   }
 }
