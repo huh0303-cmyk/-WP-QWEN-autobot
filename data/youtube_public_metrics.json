@@ -1,5 +1,5 @@
 {
-  "checked_at_kst": "2026-11-25T14:03:10.102512+09:00",
+  "checked_at_kst": "2026-11-26T13:15:49.359372+09:00",
   "source": "YouTube Data API v3 public statistics",
   "confirmed_channels": 23,
   "connected_channels": 22,
@@ -8,7 +8,7 @@
       "name": "CAFE_ROMANTIC",
       "handle": "cafe_romantic",
       "subscribers": 11,
-      "views": 2070,
+      "views": 2073,
       "videos": 39,
       "connected": true
     },
@@ -71,7 +71,7 @@
     "UCLvy6kSpC8-7o3hnSrfQ47g": {
       "name": "CINEMA_TV3",
       "handle": "OLD_HOLLYWOOD1",
-      "subscribers": 2,
+      "subscribers": 1,
       "views": 38,
       "videos": 6,
       "connected": true
@@ -88,24 +88,24 @@
       "name": "서울국제대학-TOPIK센터",
       "handle": "seoul_topik1",
       "subscribers": 5830,
-      "views": 416099,
-      "videos": 1351,
+      "views": 416244,
+      "videos": 1355,
       "connected": true
     },
     "UCrjkKWMHzAAvpLIFgHnwcWg": {
       "name": "English_SOS1",
       "handle": "english_sos1",
       "subscribers": 35,
-      "views": 21149,
-      "videos": 81,
+      "views": 21147,
+      "videos": 85,
       "connected": true
     },
     "UCOWoNH_d6p45ywQ6W0Z1Jng": {
       "name": "Japanese_SOS",
       "handle": "seoul_japanese1",
       "subscribers": 32,
-      "views": 20994,
-      "videos": 123,
+      "views": 20997,
+      "videos": 127,
       "connected": true
     },
     "UCGTd7RhfaUaGGbVRsNPUN6Q": {
@@ -120,7 +120,7 @@
       "name": "Portuguese_SOS",
       "handle": "Portuguese_survival",
       "subscribers": 6,
-      "views": 1380,
+      "views": 1381,
       "videos": 25,
       "connected": true
     },
