@@ -42,7 +42,7 @@
     "published_at_kst": "2026-11-26T20:31:59.706777+09:00"
   },
   "2026-11-27:threads:seoul_jisoo1:2": {
-    "status": "ATTEMPT_RESERVED",
+    "status": "PUBLISHED",
     "platform": "threads",
     "account_key": "seoul_jisoo1",
     "expected_handle": "seoul_jisoo1",
@@ -50,6 +50,9 @@
     "content_sha256": "fc98bebf9d0b47b74f73c915d62a2f1bdf258d0f4dd5af46c4984bc4a8a939fd",
     "image_path": "demo_assets/meta_12/2026-11-27_threads_seoul_jisoo1_2.png",
     "image_url": "https://raw.githubusercontent.com/huh0303-cmyk/-WP-QWEN-autobot/main/demo_assets/meta_12/2026-11-27_threads_seoul_jisoo1_2.png",
-    "caption": "서울에서 쇼핑할 때 팁 하나 드릴게요! 😊\n\n현지인처럼 쇼핑하고 싶다면, 마트나 백화점보다는 동네 골목길에 숨어있는 작은 가게들을 탐험해보세요. 종종 예상치 못한 보석 같은 아이템이나 독특한 기념품을 발견할 수 있답니다. 득템의 즐거움을 느껴보세요! ✨\n#서울쇼핑 #서울라이프 #쇼핑팁 #골목길탐험 #숨은보석찾기"
+    "caption": "서울에서 쇼핑할 때 팁 하나 드릴게요! 😊\n\n현지인처럼 쇼핑하고 싶다면, 마트나 백화점보다는 동네 골목길에 숨어있는 작은 가게들을 탐험해보세요. 종종 예상치 못한 보석 같은 아이템이나 독특한 기념품을 발견할 수 있답니다. 득템의 즐거움을 느껴보세요! ✨\n#서울쇼핑 #서울라이프 #쇼핑팁 #골목길탐험 #숨은보석찾기",
+    "id": "17910916563386260",
+    "public_url": "https://www.threads.com/@seoul_jisoo1/post/DgPpD2vESvG",
+    "published_at_kst": "2026-11-27T21:06:35.293981+09:00"
   }
 }
