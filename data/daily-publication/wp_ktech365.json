@@ -1,1 +1,1 @@
-{"day": "2026-11-27", "status": "CLAIMED", "attempts": 1, "claim": "daily-2026-11-27-wp_ktech365-06c02578", "claimed_at": "2026-11-27T23:16:17.546516+09:00", "run_id": null, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-11-27", "status": "DISPATCHED", "attempts": 1, "claim": "daily-2026-11-27-wp_ktech365-06c02578", "claimed_at": "2026-11-27T23:16:17.546516+09:00", "run_id": 46014434735, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
