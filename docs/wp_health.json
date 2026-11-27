@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-11-26T03:45:45.705204+00:00",
+  "generated_at": "2026-11-27T03:47:41.260351+00:00",
   "method": "public_wordpress_rest_read_only",
   "sample": "latest_50_public_posts",
   "warning": "Editorial/technical heuristic, NOT Rank Math score or Site Kit analytics; unknown is never green",
   "sites": {
     "korea365.org": {
       "site": "korea365.org",
-      "checked_at": "2026-11-26T03:44:48.228976+00:00",
+      "checked_at": "2026-11-27T03:46:08.783566+00:00",
       "status": "unknown",
       "posts_checked": 50,
       "http_status": 200,
@@ -14,7 +14,7 @@
     },
     "koreawedding365.com": {
       "site": "koreawedding365.com",
-      "checked_at": "2026-11-26T03:44:51.027708+00:00",
+      "checked_at": "2026-11-27T03:46:11.477714+00:00",
       "status": "unknown",
       "posts_checked": 50,
       "http_status": 200,
@@ -22,7 +22,7 @@
     },
     "oliveyoungkorea.com": {
       "site": "oliveyoungkorea.com",
-      "checked_at": "2026-11-26T03:44:53.588304+00:00",
+      "checked_at": "2026-11-27T03:46:14.276014+00:00",
       "status": "unknown",
       "posts_checked": 50,
       "http_status": 200,
@@ -30,7 +30,7 @@
     },
     "jobkoreaglobal.com": {
       "site": "jobkoreaglobal.com",
-      "checked_at": "2026-11-26T03:44:57.232710+00:00",
+      "checked_at": "2026-11-27T03:46:16.883315+00:00",
       "status": "unknown",
       "posts_checked": 50,
       "http_status": 200,
@@ -38,7 +38,7 @@
     },
     "koreainsurance365.com": {
       "site": "koreainsurance365.com",
-      "checked_at": "2026-11-26T03:44:59.640697+00:00",
+      "checked_at": "2026-11-27T03:46:20.590753+00:00",
       "status": "unknown",
       "posts_checked": 50,
       "http_status": 200,
@@ -46,7 +46,7 @@
     },
     "kieca-korea.org": {
       "site": "kieca-korea.org",
-      "checked_at": "2026-11-26T03:45:02.064517+00:00",
+      "checked_at": "2026-11-27T03:46:24.480182+00:00",
       "status": "unknown",
       "posts_checked": 50,
       "http_status": 200,
@@ -54,7 +54,7 @@
     },
     "ktech365.com": {
       "site": "ktech365.com",
-      "checked_at": "2026-11-26T03:45:04.855705+00:00",
+      "checked_at": "2026-11-27T03:46:27.249754+00:00",
       "status": "unknown",
       "posts_checked": 50,
       "http_status": 200,
@@ -62,7 +62,7 @@
     },
     "jobinkorea365.com": {
       "site": "jobinkorea365.com",
-      "checked_at": "2026-11-26T03:45:07.278581+00:00",
+      "checked_at": "2026-11-27T03:46:29.892516+00:00",
       "status": "unknown",
       "posts_checked": 50,
       "http_status": 200,
@@ -70,7 +70,7 @@
     },
     "k-trip365.com": {
       "site": "k-trip365.com",
-      "checked_at": "2026-11-26T03:45:09.907075+00:00",
+      "checked_at": "2026-11-27T03:46:32.817798+00:00",
       "status": "unknown",
       "posts_checked": 50,
       "http_status": 200,
@@ -78,7 +78,7 @@
     },
     "k-visa365.com": {
       "site": "k-visa365.com",
-      "checked_at": "2026-11-26T03:45:12.706110+00:00",
+      "checked_at": "2026-11-27T03:46:36.173700+00:00",
       "status": "unknown",
       "posts_checked": 50,
       "http_status": 200,
@@ -86,7 +86,7 @@
     },
     "koreacrypto365.com": {
       "site": "koreacrypto365.com",
-      "checked_at": "2026-11-26T03:45:15.094579+00:00",
+      "checked_at": "2026-11-27T03:46:37.843220+00:00",
       "status": "unknown",
       "posts_checked": 50,
       "http_status": 200,
@@ -94,7 +94,7 @@
     },
     "krealestate365.com": {
       "site": "krealestate365.com",
-      "checked_at": "2026-11-26T03:45:17.321182+00:00",
+      "checked_at": "2026-11-27T03:46:40.307028+00:00",
       "status": "unknown",
       "posts_checked": 50,
       "http_status": 200,
@@ -102,14 +102,14 @@
     },
     "jobkorea365.com": {
       "site": "jobkorea365.com",
-      "checked_at": "2026-11-26T03:45:19.821558+00:00",
+      "checked_at": "2026-11-27T03:46:42.977976+00:00",
       "status": "unknown",
       "posts_checked": 0,
-      "error": "ConnectionError: HTTPSConnectionPool(host='jobkorea365.com', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(\"HTTPSConnection(host='jobkorea"
+      "error": "ConnectTimeout: HTTPSConnectionPool(host='jobkorea365.com', port=443): Max retries exceeded with url: / (Caused by ConnectTimeoutError(<HTTPSConnection(host='jobkorea"
     },
     "k-health365.com": {
       "site": "k-health365.com",
-      "checked_at": "2026-11-26T03:45:19.873116+00:00",
+      "checked_at": "2026-11-27T03:46:59.199699+00:00",
       "status": "unknown",
       "posts_checked": 50,
       "http_status": 200,
@@ -117,7 +117,7 @@
     },
     "kfinance365.com": {
       "site": "kfinance365.com",
-      "checked_at": "2026-11-26T03:45:22.590994+00:00",
+      "checked_at": "2026-11-27T03:47:01.963986+00:00",
       "status": "unknown",
       "posts_checked": 50,
       "http_status": 200,
@@ -125,7 +125,7 @@
     },
     "koreainvest365.com": {
       "site": "koreainvest365.com",
-      "checked_at": "2026-11-26T03:45:25.031655+00:00",
+      "checked_at": "2026-11-27T03:47:05.454683+00:00",
       "status": "unknown",
       "posts_checked": 50,
       "http_status": 200,
@@ -133,7 +133,7 @@
     },
     "koreamedicaltour.com": {
       "site": "koreamedicaltour.com",
-      "checked_at": "2026-11-26T03:45:27.337569+00:00",
+      "checked_at": "2026-11-27T03:47:08.167450+00:00",
       "status": "unknown",
       "posts_checked": 50,
       "http_status": 200,
@@ -141,7 +141,7 @@
     },
     "koreanews365.com": {
       "site": "koreanews365.com",
-      "checked_at": "2026-11-26T03:45:30.787134+00:00",
+      "checked_at": "2026-11-27T03:47:11.600211+00:00",
       "status": "unknown",
       "posts_checked": 50,
       "http_status": 200,
@@ -149,7 +149,7 @@
     },
     "koreataxnlaw.com": {
       "site": "koreataxnlaw.com",
-      "checked_at": "2026-11-26T03:45:34.896808+00:00",
+      "checked_at": "2026-11-27T03:47:15.885396+00:00",
       "status": "unknown",
       "posts_checked": 50,
       "http_status": 200,
@@ -157,7 +157,7 @@
     },
     "kskin365.com": {
       "site": "kskin365.com",
-      "checked_at": "2026-11-26T03:45:37.427652+00:00",
+      "checked_at": "2026-11-27T03:47:18.345594+00:00",
       "status": "unknown",
       "posts_checked": 50,
       "http_status": 200,
@@ -165,14 +165,14 @@
     },
     "kstudy365.com": {
       "site": "kstudy365.com",
-      "checked_at": "2026-11-26T03:45:40.944078+00:00",
+      "checked_at": "2026-11-27T03:47:21.154572+00:00",
       "status": "unknown",
       "posts_checked": 0,
-      "error": "ConnectionError: HTTPSConnectionPool(host='kstudy365.com', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(\"HTTPSConnection(host='kstudy365."
+      "error": "ConnectTimeout: HTTPSConnectionPool(host='kstudy365.com', port=443): Max retries exceeded with url: / (Caused by ConnectTimeoutError(<HTTPSConnection(host='kstudy365."
     },
     "kworld365.com": {
       "site": "kworld365.com",
-      "checked_at": "2026-11-26T03:45:40.985901+00:00",
+      "checked_at": "2026-11-27T03:47:37.346557+00:00",
       "status": "unknown",
       "posts_checked": 50,
       "http_status": 200,
@@ -180,7 +180,7 @@
     },
     "studyinkorea365.com": {
       "site": "studyinkorea365.com",
-      "checked_at": "2026-11-26T03:45:42.373596+00:00",
+      "checked_at": "2026-11-27T03:47:38.943602+00:00",
       "status": "unknown",
       "posts_checked": 50,
       "http_status": 200,
