@@ -24,12 +24,15 @@
     "published_at_kst": "2026-11-27T12:15:04.412714+09:00"
   },
   "2026-11-27:threads:seoul_jisoo1:2": {
-    "status": "ATTEMPT_RESERVED",
+    "status": "PUBLISHED",
     "platform": "threads",
     "account_key": "seoul_jisoo1",
     "expected_handle": "seoul_jisoo1",
     "at_kst": "2026-11-27T21:35:25.260706+09:00",
     "caption": "서울에서 쇼핑할 때, 현지인처럼 즐기는 꿀팁! 🛍️\n\n1. 동대문 시장: 밤늦게까지 열리는 곳이 많아 퇴근 후에도 쇼핑하기 좋아요. 특히 의류 도매 시장은 독특한 디자인을 합리적인 가격에 구할 수 있는 기회!\n2. 홍대 거리: 개성 넘치는 소품샵과 패션 편집샵이 즐비해요. 트렌디한 아이템을 구경하며 영감을 얻기 좋답니다.\n3. 백화점/아울렛: 브랜드 제품을 할인된 가격에 구매하고 싶다면 방문해보세요. 시즌오프 세일 기간을 노리면 더욱 알뜰하게 쇼핑할 수 있어요.\n\n나만의 스타일을 찾아보세요! ✨",
-    "content_sha256": "a2f89782dcec1d61ad3d67258540ea5e530e59b24b157d32b0e8f959f3648207"
+    "content_sha256": "a2f89782dcec1d61ad3d67258540ea5e530e59b24b157d32b0e8f959f3648207",
+    "id": "17997247053026482",
+    "public_url": "https://www.threads.com/@seoul_jisoo1/post/DgPsXB7lFHL",
+    "published_at_kst": "2026-11-27T21:35:42.422697+09:00"
   }
 }
