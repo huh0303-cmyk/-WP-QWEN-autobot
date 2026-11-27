@@ -10,5 +10,14 @@
     "id": "18136609195784641",
     "public_url": "https://www.threads.com/@seoul_jisoo1/post/DgNCPMTkRP4",
     "published_at_kst": "2026-11-26T20:49:10.188296+09:00"
+  },
+  "2026-11-27:threads:seoul_jisoo1:1": {
+    "status": "ATTEMPT_RESERVED",
+    "platform": "threads",
+    "account_key": "seoul_jisoo1",
+    "expected_handle": "seoul_jisoo1",
+    "at_kst": "2026-11-27T12:14:50.138806+09:00",
+    "caption": "서울 쇼핑과 라이프스타일 팁: 늦은 밤에도 신선한 과일을 사고 싶다면? 동네 편의점이나 24시간 운영하는 마트를 찾아보세요. 늦은 시간에도 간단한 식료품이나 간식을 쉽게 구할 수 있어 편리합니다. #서울 #라이프스타일 #쇼핑팁 #24시마트",
+    "content_sha256": "c97a6cfa812530170443557bb2b93b4e02b9aa294a933282f66c929b5c193e50"
   }
 }
