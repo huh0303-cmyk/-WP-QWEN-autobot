@@ -1,1 +1,1 @@
-{"day": "2026-11-22", "status": "PUBLISHED", "public_url": "https://kieca-korea.org/%EC%A7%80%EC%97%AD-%EA%B5%90%EC%9C%A1-%EA%B1%B0%EB%B2%84%EB%84%8C%EC%8A%A4-%EC%97%B0%EA%B3%84%ED%98%95-%EC%99%B8%EA%B5%AD%EC%9D%B8-%EC%9C%A0%ED%95%99%EC%83%9D-%EC%9C%A0%EC%B9%98-%EC%A0%84%EB%9E%B5/", "published_at": "2026-11-22T03:31:03Z"}
+{"day": "2026-11-28", "status": "CLAIMED", "attempts": 1, "claim": "daily-2026-11-28-wp_kieca-4b030006", "claimed_at": "2026-11-28T12:14:23.089098+09:00", "run_id": null, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
