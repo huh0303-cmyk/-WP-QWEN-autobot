@@ -1,1 +1,1 @@
-{"day": "2026-11-28", "status": "DISPATCHED", "attempts": 1, "claim": "daily-2026-11-28-wp_kinsurance365-2671714d", "claimed_at": "2026-11-28T21:16:45.229896+09:00", "run_id": 46143905667, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-11-28", "status": "PUBLISHED", "public_url": "https://koreainsurance365.com/korea-nhis-co-payments-foreigner-obligations-for-medical-expenses/", "published_at": "2026-11-28T12:20:34Z"}
