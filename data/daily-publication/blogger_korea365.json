@@ -1,1 +1,1 @@
-{"day": "2026-11-28", "status": "CLAIMED", "attempts": 2, "claim": "daily-2026-11-28-blogger_korea365-a8ccd187", "claimed_at": "2026-11-28T21:09:41.881295+09:00", "run_id": null, "child_run_id": null, "child_job_id": null, "workflow": "blogger-single-publish.yml"}
+{"day": "2026-11-28", "status": "DISPATCHED", "attempts": 2, "claim": "daily-2026-11-28-blogger_korea365-a8ccd187", "claimed_at": "2026-11-28T21:09:41.881295+09:00", "run_id": 46143291718, "child_run_id": null, "child_job_id": null, "workflow": "blogger-single-publish.yml"}
