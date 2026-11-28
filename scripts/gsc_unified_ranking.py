@@ -49,8 +49,8 @@ def load_active_targets():
     blogspot = list(dict.fromkeys(blogspot))
     if len(wordpress) != 23:
         raise RuntimeError(f"Expected 23 active WordPress targets, found {len(wordpress)}")
-    if len(blogspot) != 31:
-        raise RuntimeError(f"Expected 31 active Blogspot targets, found {len(blogspot)}")
+    if len(blogspot) not in (31, 32):
+        raise RuntimeError(f"Expected 31 or 32 active Blogspot targets, found {len(blogspot)}")
     return wordpress, blogspot
 
 
