@@ -1,5 +1,5 @@
 {
-  "checked_at_kst": "2026-11-27T13:14:02.472973+09:00",
+  "checked_at_kst": "2026-11-28T13:01:03.435899+09:00",
   "source": "YouTube Data API v3 public statistics",
   "confirmed_channels": 23,
   "connected_channels": 22,
@@ -88,24 +88,24 @@
       "name": "서울국제대학-TOPIK센터",
       "handle": "seoul_topik1",
       "subscribers": 5830,
-      "views": 416467,
-      "videos": 1357,
+      "views": 416516,
+      "videos": 1359,
       "connected": true
     },
     "UCrjkKWMHzAAvpLIFgHnwcWg": {
       "name": "English_SOS1",
       "handle": "english_sos1",
-      "subscribers": 39,
-      "views": 23920,
-      "videos": 87,
+      "subscribers": 42,
+      "views": 24810,
+      "videos": 89,
       "connected": true
     },
     "UCOWoNH_d6p45ywQ6W0Z1Jng": {
       "name": "Japanese_SOS",
       "handle": "seoul_japanese1",
       "subscribers": 32,
-      "views": 21260,
-      "videos": 129,
+      "views": 21306,
+      "videos": 131,
       "connected": true
     },
     "UCGTd7RhfaUaGGbVRsNPUN6Q": {
@@ -152,7 +152,7 @@
       "name": "Health_Clinic_Japan",
       "handle": "Health_Clinic_Japan",
       "subscribers": 3,
-      "views": 122,
+      "views": 124,
       "videos": 23,
       "connected": true
     },
@@ -184,7 +184,7 @@
       "name": "Italian_SOS",
       "handle": "SIS_ItalianSurvival",
       "subscribers": 3,
-      "views": 1175,
+      "views": 1176,
       "videos": 21,
       "connected": true
     }
