@@ -101,10 +101,14 @@ def main() -> int:
 
     used_metadata = {}
     for code in codes:
-        svc = service_for(code)
-        rows = channel_metadata(svc, by_code[code]["channel_id"])
-        used_metadata[code] = [norm(item) for item in rows]
-        print(f"HISTORY_CHECK_OK language={code} uploads_scanned={len(rows)}", flush=True)
+        try:
+            svc = service_for(code)
+            rows = channel_metadata(svc, by_code[code]["channel_id"])
+            used_metadata[code] = [norm(item) for item in rows]
+            print(f"HISTORY_CHECK_OK language={code} uploads_scanned={len(rows)}", flush=True)
+        except Exception as exc:
+            print(f"HISTORY_CHECK_SKIPPED language={code} reason={exc}", flush=True)
+            used_metadata[code] = []
 
     for pair in catalog:
         # Search all ten channels, and keep title/description/tags from each

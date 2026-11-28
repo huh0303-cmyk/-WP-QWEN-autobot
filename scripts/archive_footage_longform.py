@@ -96,7 +96,30 @@ def _gemini_thumbnail(topic: str, channel_key: str, hero_frame_path: str, workdi
         "american_archive": "American archive history documentary",
     }.get(channel_key, "archival history documentary")
     del channel_theme
-    source_path = hero_frame_path if hero_frame_path and Path(hero_frame_path).is_file() else _reviewed_image(channel_key, workdir)
+
+    source_path = None
+    if hero_frame_path and Path(hero_frame_path).is_file():
+        source_path = hero_frame_path
+    else:
+        try:
+            source_path = _reviewed_image(channel_key, workdir)
+        except Exception as exc:
+            base.log(f"   [thumbnail] Pre-reviewed image unavailable ({exc}), generating via Gemini...")
+            gemini_out = os.path.join(workdir, "thumbnail_gemini_source.jpg")
+            prompt = (
+                f"Create a completely original photorealistic 16:9 documentary thumbnail source image about '{topic}'. "
+                f"Editorial direction: {channel_theme}. One unmistakable focal subject, strong depth, historically "
+                "plausible details, clean space for later title typography, no text, no logo, no watermark, no copied image."
+            )
+            try:
+                generate_thumbnail(prompt, gemini_out)
+                source_path = gemini_out
+            except Exception as gerr:
+                base.log(f"   [thumbnail] Gemini generation failed ({gerr}), falling back to emergency background...")
+                source_path = os.path.join(workdir, "thumbnail_fallback.jpg")
+                from PIL import Image
+                Image.new("RGB", (1280, 720), (30, 30, 36)).save(source_path, quality=90)
+
     if channel_key == "history":
         return _history_date_overlay(source_path, workdir)
     return base._legacy_build_thumbnail(topic, channel_key, source_path, workdir)
