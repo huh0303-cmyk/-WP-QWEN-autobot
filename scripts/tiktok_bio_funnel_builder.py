@@ -1,0 +1,180 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+TikTok 31.1K (@seoultopik) Bio Funnel & Live Monetization Operations Generator.
+Generates Beacons/Linktree configuration schemas, Coupang tracked deep links,
+and live stream run-sheets.
+"""
+
+import json
+from dataclasses import dataclass, asdict
+from typing import List, Dict
+
+@dataclass
+class BioLinkItem:
+    id: str
+    priority: int
+    title_kr: str
+    title_en: str
+    target_url: str
+    category: str
+    is_hot: bool
+    badge: str
+
+@dataclass
+class CoupangSurvivalKit:
+    kit_id: str
+    name_kr: str
+    name_en: str
+    deep_link: str
+    products: List[str]
+    target_audience: str
+    avg_price_krw: int
+
+def generate_bio_funnel_config() -> Dict:
+    bio_items = [
+        BioLinkItem(
+            id="lead_vocab300",
+            priority=1,
+            title_kr="📥 [무료 다운로드] 2026 E-7-4 비자 & 토픽 빈출 300단어장",
+            title_en="Free Download: 2026 E-7-4 Visa & TOPIK Essential 300 Vocab PDF",
+            target_url="https://seoultopik.com/lead-magnet?utm_source=tiktok&utm_medium=bio&utm_campaign=vocab300",
+            category="Lead Magnet",
+            is_hot=True,
+            badge="FREE 100%"
+        ),
+        BioLinkItem(
+            id="tripwire_essay54",
+            priority=2,
+            title_kr="📘 [특가 ₩9,900] 토픽 쓰기 54번 템플릿 마스터북",
+            title_en="TOPIK 54 Essay Writing Magic Template Master Guide",
+            target_url="https://seoultopik.com/products/topik54-master?utm_source=tiktok&utm_medium=bio&utm_campaign=tripwire99",
+            category="Digital Product",
+            is_hot=True,
+            badge="BESTSELLER"
+        ),
+        BioLinkItem(
+            id="coupang_essentials",
+            priority=3,
+            title_kr="📦 외국인 한국생활 필수템 쿠팡 모음전 (외국인등록/방한/시험)",
+            title_en="Foreigner Korea Living Essentials Special Shop (Coupang)",
+            target_url="https://influencers.coupang.com/s/seoulshop?utm_source=tiktok_bio&utm_medium=influencer",
+            category="Affiliate",
+            is_hot=False,
+            badge="ROCKET DELIVERY"
+        ),
+        BioLinkItem(
+            id="zalo_vip_club",
+            priority=4,
+            title_kr="🇻🇳 [Zalo VIP] 베트남 수험생 전용 단톡방 (매일 모의고사)",
+            title_en="Vietnam Zalo VIP Study Club (Daily Mock Exams & Consultation)",
+            target_url="https://zalo.me/g/seoultopikvip?utm_source=tiktok&utm_medium=bio",
+            category="VIP Community",
+            is_hot=False,
+            badge="VIETNAM VIP"
+        ),
+        BioLinkItem(
+            id="telegram_vip_club",
+            priority=5,
+            title_kr="🌐 [Telegram VIP] 글로벌 E-7-4 비자 & 토픽 질의응답방",
+            title_en="Global Telegram VIP (Visa Score Audit & Korean Q&A)",
+            target_url="https://t.me/seoultopik_vip?utm_source=tiktok&utm_medium=bio",
+            category="VIP Community",
+            is_hot=False,
+            badge="GLOBAL VIP"
+        ),
+        BioLinkItem(
+            id="youtube_membership",
+            priority=6,
+            title_kr="🔴 유튜브 멤버십 전용 강의 (기출문제 풀이 풀영상)",
+            title_en="Join YouTube Channel Membership for Full Past Exam Breakdown",
+            target_url="https://youtube.com/@seoultopik/join?sub_confirmation=1&utm_source=tiktok_bio",
+            category="YouTube Channel",
+            is_hot=False,
+            badge="EXCLUSIVE VIDEO"
+        ),
+        BioLinkItem(
+            id="consultation_1on1",
+            priority=7,
+            title_kr="💼 [주 5명 한정] E-7-4 비자 점수표 1:1 줌 컨설팅 예약",
+            title_en="Book 1-on-1 30-min Visa Strategy Consultation (Zoom)",
+            target_url="https://calendly.com/seoultopik/visa-consultation?utm_source=tiktok&utm_medium=bio",
+            category="High-Ticket Coaching",
+            is_hot=False,
+            badge="LIMITED 5/WEEK"
+        ),
+    ]
+
+    coupang_kits = [
+        CoupangSurvivalKit(
+            kit_id="immigration_kit",
+            name_kr="외국인등록 & 출입국 서류 완벽 키트",
+            name_en="Alien Registration & Immigration Documentation Kit",
+            deep_link="https://influencers.coupang.com/s/seoulshop?category=immigration",
+            products=["여권용 사진 재단기 (3.5x4.5cm)", "서류 보관용 대용량 아코디언 파일", "공문서용 유성볼펜 10입", "인감도장 전용 스탬프패드"],
+            target_audience="신규 입국 외국인, 비자 연장 대상자",
+            avg_price_krw=28000
+        ),
+        CoupangSurvivalKit(
+            kit_id="telecom_wifi_kit",
+            name_kr="외국인 데이터 무제한 유심 & 포켓 와이파이 키트",
+            name_en="Foreigner Unlimited Data USIM & Pocket Wi-Fi Kit",
+            deep_link="https://influencers.coupang.com/s/seoulshop?category=telecom",
+            products=["선불 무제한 데이터 유심", "고속 충전 20,000mAh 대용량 보조배터리", "한국 220V 플러그 변환 어댑터"],
+            target_audience="외국인등록증 발급 대기자, 여행/단기 체류자",
+            avg_price_krw=45000
+        ),
+        CoupangSurvivalKit(
+            kit_id="winter_survival_kit",
+            name_kr="한국 겨울나기 혹한기 방한 풀세트",
+            name_en="Korean Sub-Zero Winter Survival Gear Kit",
+            deep_link="https://influencers.coupang.com/s/seoulshop?category=winter",
+            products=["남녀공용 헤비 롱패딩 점퍼", "군용 핫팩 대용량 100개 세트", "기모 발열내의 상하의 세트", "방한 방풍 귀마개 및 기모 장갑"],
+            target_audience="동남아/중앙아시아 신규 입국자 (영하 15도 대비)",
+            avg_price_krw=99000
+        ),
+        CoupangSurvivalKit(
+            kit_id="topik_exam_stationery_kit",
+            name_kr="토픽 시험장 완벽 대비 문구 & 스톱워치 키트",
+            name_en="Official TOPIK Exam Stationery & Silent Timer Kit",
+            deep_link="https://influencers.coupang.com/s/seoulshop?category=topik_exam",
+            products=["컴퓨터용 수성사인펜 10자루", "번짐 없는 수정테이프 + 리필 5개", "무소음 진동 시험용 스톱워치", "토픽 OMR 답안지 연습용 패드"],
+            target_audience="토픽 I, II 정기시험 응시자",
+            avg_price_krw=22000
+        )
+    ]
+
+    return {
+        "account": "@seoultopik",
+        "followers": 31100,
+        "bio_link_hierarchy": [asdict(item) for item in bio_items],
+        "coupang_survival_kits": [asdict(kit) for kit in coupang_kits],
+        "live_schedule": {
+            "weekly_frequency": "2x/week",
+            "sessions": [
+                {
+                    "day": "Wednesday",
+                    "time_kst": "21:00-22:30",
+                    "focus": "Mid-week Korean Speaking Clinic & Real-Time Grammar QA",
+                    "target_audience": "E-9 Workers & Part-time Students after shift"
+                },
+                {
+                    "day": "Sunday",
+                    "time_kst": "20:30-22:30",
+                    "focus": "E-7-4 / F-2-R Visa Score Calculation & Creator PK Battle",
+                    "target_audience": "Prime Weekend CCV Peak (Global Foreigners)"
+                }
+            ],
+            "monetization_triggers": {
+                "fast_track_visa_audit": "100~500 TikTok Coins (Paper Crane/Corgi Gift)",
+                "pk_battle_unlock": "100 Roses -> PDF Vocab Drop in Chat",
+                "vip_membership_super_gift": "TikTok Universe/Lion -> Free 1-Month VIP Group Pass"
+            }
+        }
+    }
+
+if __name__ == "__main__":
+    data = generate_bio_funnel_config()
+    with open("scripts/tiktok_bio_funnel_config.json", "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+    print("Successfully generated scripts/tiktok_bio_funnel_config.json")
