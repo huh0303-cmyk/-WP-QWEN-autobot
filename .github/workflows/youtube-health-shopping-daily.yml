@@ -159,3 +159,13 @@ jobs:
             artifacts/long-video/${{ steps.pick.outputs.channel }}/**/video.mp4
           retention-days: 14
           if-no-files-found: warn
+      - name: Send KakaoTalk upload report (Public / Private status)
+        if: always() && steps.produce.outcome == 'success'
+        env:
+          KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}
+          KAKAO_REFRESH_TOKEN: ${{ secrets.KAKAO_REFRESH_TOKEN }}
+        run: |
+          python scripts/youtube_notify_kakao.py \
+            --channel "${{ steps.pick.outputs.channel || inputs.channel }}" \
+            --title "Daily Health/Shopping Video" \
+            --privacy "${{ inputs.privacy || 'private' }}"
