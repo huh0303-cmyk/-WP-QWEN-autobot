@@ -1,1 +1,1 @@
-{"day": "2026-11-28", "status": "CLAIMED", "attempts": 2, "claim": "daily-2026-11-28-blogger_seouljournal-d65fda9a", "claimed_at": "2026-11-28T22:49:00.701591+09:00", "run_id": null, "child_run_id": null, "child_job_id": null, "workflow": "blogger-single-publish.yml"}
+{"day": "2026-11-28", "status": "DISPATCHED", "attempts": 2, "claim": "daily-2026-11-28-blogger_seouljournal-d65fda9a", "claimed_at": "2026-11-28T22:49:00.701591+09:00", "run_id": 46151493966, "child_run_id": null, "child_job_id": null, "workflow": "blogger-single-publish.yml"}
