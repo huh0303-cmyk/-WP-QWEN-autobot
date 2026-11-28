@@ -1,1 +1,1 @@
-{"day": "2026-11-28", "status": "CLAIMED", "attempts": 1, "claim": "daily-2026-11-28-wp_koreanews-90e1c7c2", "claimed_at": "2026-11-28T12:14:40.181755+09:00", "run_id": null, "child_run_id": null, "child_job_id": null, "workflow": "newsrooms-daily-publisher.yml"}
+{"day": "2026-11-28", "status": "CLAIMED", "attempts": 2, "claim": "daily-2026-11-28-wp_koreanews-5b227f7c", "claimed_at": "2026-11-28T20:15:20.116328+09:00", "run_id": null, "child_run_id": null, "child_job_id": null, "workflow": "newsrooms-daily-publisher.yml"}
