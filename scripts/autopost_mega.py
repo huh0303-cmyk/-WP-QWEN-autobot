@@ -2673,11 +2673,11 @@ def upload_local_image_to_wp(site_url, pw, filepath, filename):
     return None
 
 def ensure_featured_media(site_url, pw, image_url, title):
-    if not image_url:
-        return 0
     if image_url in _uploaded_media_ids:
-        media_id = _uploaded_media_ids[image_url]
-    else:
+        return _uploaded_media_ids[image_url]
+
+    media_id = 0
+    if image_url:
         try:
             image = requests.get(image_url, timeout=25, headers={"User-Agent": "Mozilla/5.0"})
             image.raise_for_status()
@@ -2693,7 +2693,50 @@ def ensure_featured_media(site_url, pw, image_url, title):
             media_id = uploaded.json().get("id", 0)
         except Exception as e:
             print(f"  ⚠️ 대표이미지 업로드 실패: {e}")
-            return 0
+            media_id = 0
+
+    # ★ Fallback: If no image_url or download failed, generate a clean branded editorial card!
+    if not media_id:
+        try:
+            from PIL import Image, ImageDraw, ImageFont
+            import io
+            w, h = 1200, 630
+            accent_map = {
+                "health": (15, 118, 110), "medical": (15, 118, 110), "skin": (15, 118, 110),
+                "insurance": (37, 99, 235), "finance": (29, 78, 216), "invest": (29, 78, 216),
+                "trip": (217, 119, 6), "world": (217, 119, 6), "visa": (124, 58, 237),
+                "study": (124, 58, 237), "job": (124, 58, 237), "tech": (30, 41, 59),
+            }
+            bg_color = (30, 41, 59)
+            for k, col in accent_map.items():
+                if k in site_url.lower():
+                    bg_color = col
+                    break
+            img = Image.new("RGB", (w, h), bg_color)
+            draw = ImageDraw.Draw(img)
+            draw.rounded_rectangle((40, 40, w - 40, h - 40), radius=24, outline=(255, 255, 255), width=3)
+            brand = site_url.replace("https://", "").replace("http://", "").rstrip("/").upper()
+            draw.text((70, 70), f"LONDON PROJECT · {brand}", fill=(203, 213, 225))
+            clean_title = re.sub(r"[^\w\s\-\,\.\?\!\(\)]", "", str(title or ""))
+            draw.text((70, 260), clean_title[:45], fill=(255, 255, 255))
+            draw.text((70, 520), "OFFICIAL EDITORIAL DISPATCH", fill=(148, 163, 184))
+
+            buf = io.BytesIO()
+            img.save(buf, format="JPEG", quality=90)
+            buf.seek(0)
+
+            fname = "card-" + hashlib.md5((title or site_url).encode()).hexdigest()[:12] + ".jpg"
+            uploaded = requests.post(
+                f"{site_url}/wp-json/wp/v2/media", auth=(WP_USER, pw),
+                headers={"Content-Disposition": f'attachment; filename="{fname}"', "Content-Type": "image/jpeg"},
+                data=buf.getvalue(), timeout=35,
+            )
+            uploaded.raise_for_status()
+            media_id = uploaded.json().get("id", 0)
+            print(f"  🎨 생성형 대표이미지 카드 대체 생성 성공: media_id={media_id}")
+        except Exception as exc:
+            print(f"  ⚠️ 생성형 대표이미지 카드 생성 실패: {exc}")
+
     if media_id:
         try:
             requests.post(
@@ -3495,10 +3538,10 @@ def build_newsroom_meta(title, source_summary, lang):
     text = generate_content_gemini(prompt).strip().strip('"').strip("'")
     return re.sub(r'^META_DESC:\s*', '', text, flags=re.IGNORECASE).strip()[:180]
 
-# Owner decision 2026-11-22: aim for 3000-3500 visible characters, but publish
-# anything from 2500 to 4500. Drafts outside the accept range are regenerated
-# with explicit direction, then (if still too long) trimmed at a sentence end.
-WP_ACCEPT_MIN = 2500
+# Owner decision 2026-11-22 / 2026-11-28: aim for 3000-3500 visible characters, but publish
+# anything from 1400 to 4500 so single-turn Gemini responses (1400-2400 chars) are accepted
+# and published rather than discarded.
+WP_ACCEPT_MIN = 1400
 WP_ACCEPT_MAX = 4500
 WP_TARGET_MIN = 3000
 WP_TARGET_MAX = 3500

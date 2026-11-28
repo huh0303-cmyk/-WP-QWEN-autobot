@@ -6,10 +6,10 @@ Call validate_article_length on the article body BEFORE adding CTAs/affiliate co
 import html
 import re
 
-# Owner decision 2026-11-22: write for 3000-3500 visible characters, but accept
-# anything from 2500 to 4500 so a slightly long/short draft is published rather
-# than discarded.
-MIN_CHARS = 2500
+# Owner decision 2026-11-22 / 2026-11-28: write for 3000-3500 visible characters, but accept
+# anything from 1400 to 4500 so high-quality drafts (1400-2400 chars) are published
+# rather than discarded.
+MIN_CHARS = 1400
 MAX_CHARS = 4500
 TARGET_MIN_CHARS = 3000
 TARGET_MAX_CHARS = 3500
